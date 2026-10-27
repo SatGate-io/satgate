@@ -206,11 +206,11 @@ export default function AiAgentApiCostControlPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Where teams should start</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            Do not begin by guessing perfect prices. Start with visibility. Put agent API traffic through an economic gateway in Observe mode. Attribute spend by agent, model, route, and tool. Find the workflows with the worst cost-to-value ratio.
+            Do not begin by guessing perfect prices. Start with visibility. Put agent API traffic through an economic gateway in Observe mode. See spend by agent, route and tool. Find the workflows with the worst cost-to-value ratio.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Then move the riskiest paths into Control mode. Add per-agent budgets, per-request ceilings, and revocation. Finally, when you expose APIs to external autonomous agents, add admission on a payment method (<code>policy: charge</code>) so payment can be collected before the request goes through.
+            Then move the riskiest paths into Control mode. Add per-agent budgets, per-request ceilings, and revocation. Finally, when you expose APIs to external autonomous agents, charge them with Admit (<code>policy: charge</code>, Lightning or USDC) so they pay before the request goes through.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

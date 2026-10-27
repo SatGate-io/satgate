@@ -10,7 +10,7 @@ type RoiCtaProps = {
 export default function RoiCta({
   eyebrow = 'Calculate the business case',
   title = 'See what unmanaged agent spend is costing you',
-  body = 'Use the SatGate ROI calculator to model ghost spend from loops, runaway tool calls, and delayed budget enforcement — then turn that estimate into a free Shadow Audit.',
+  body = 'Use the SatGate ROI calculator to model ghost spend from loops, runaway tool calls and late budget enforcement, then try a budget on one workflow with the free 14-day trial.',
 }: RoiCtaProps) {
   return (
     <aside className="not-prose my-12 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-950/40 via-gray-950 to-cyan-950/30 p-6 md:p-8">

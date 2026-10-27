@@ -270,12 +270,11 @@ tools:
             </div>
 
             <p>
-              The parser handles JSON-RPC batches, nested tool calls, and streaming responses. It runs at the 
-              proxy layer with{' '}
+              The parser handles JSON-RPC batches, nested tool calls, and streaming responses. It runs at the
+              proxy layer, and{' '}
               <a href="https://github.com/SatGate-io/satgate" className="text-purple-400 hover:text-purple-300 underline">
-                96% test coverage
-              </a>{' '}
-              — this isn&apos;t a proof of concept.
+                the code is on GitHub
+              </a>.
             </p>
 
             {/* --- Hope-Based Governance --- */}
@@ -294,21 +293,22 @@ tools:
             </p>
 
             <p>
-              SatGate replaces this hope-based governance with <strong className="text-purple-400">L402</strong> and{' '}
-              <strong className="text-purple-400">macaroons</strong>.
+              SatGate replaces this hope-based governance with budgets in <strong className="text-purple-400">macaroon</strong> tokens
+              for your agents. On the HTTP routes you choose, Admit makes external agents pay before they get in, in Lightning
+              (<strong className="text-purple-400">L402</strong>) or USDC on Base (x402).
             </p>
 
             {/* --- L402 --- */}
             <h2 className="text-2xl font-bold text-white mt-12 mb-4">L402: The Economic Handshake</h2>
 
             <p>
-              L402 (formerly LSAT) combines Lightning Network payments with macaroons. When an agent makes a 
-              request through SatGate, we don&apos;t just check if they have a &quot;key.&quot; We initiate an economic handshake:
+              L402 (formerly LSAT) combines Lightning Network payments with macaroons. When an external agent calls a
+              paid HTTP route through SatGate, we don&apos;t just check if they have a &quot;key.&quot; We initiate an economic handshake:
             </p>
 
             <ol className="list-decimal list-inside space-y-3 text-gray-400">
               <li>
-                <strong className="text-white">Challenge</strong>: SatGate intercepts the tool call and returns{' '}
+                <strong className="text-white">Challenge</strong>: on a paid route, SatGate returns{' '}
                 <code className="bg-gray-800 px-1.5 py-0.5 rounded text-yellow-300">402 Payment Required</code>{' '}
                 with a Lightning invoice and a macaroon
               </li>
@@ -318,7 +318,7 @@ tools:
               </li>
               <li>
                 <strong className="text-white">Access</strong>: The agent retries with the preimage. SatGate 
-                verifies it cryptographically and unlocks the tool
+                verifies it cryptographically and unlocks the route
               </li>
             </ol>
 
@@ -328,9 +328,8 @@ tools:
             </p>
 
             <p>
-              For enterprises not ready for Lightning, <strong className="text-white">Fiat402</strong> provides 
-              the same enforcement model using credit-based budgets — same hard caps, same delegation, 
-              familiar accounting.
+              Your own agents spend from credit budgets (<strong className="text-white">Fiat402</strong>); external
+              agents pay with Lightning or USDC.
             </p>
 
             {/* --- Macaroons --- */}
@@ -354,7 +353,7 @@ tools:
 
             <p>
               And here&apos;s the critical property: macaroons are <strong className="text-white">self-verifying</strong>. 
-              Using a root key and HMAC chain, SatGate validates a token in microseconds without hitting a database. 
+              Using a root key and HMAC chain, SatGate checks a token&apos;s signature and limits without asking a central policy server.
               At agent scale — thousands of tool calls per minute — this is the difference between a governance 
               layer you can deploy and one that becomes a bottleneck.
             </p>
@@ -385,7 +384,7 @@ tools:
             <p>
               Each level can only narrow — add restrictions, reduce budgets, narrow scope. A division token 
               can&apos;t grant more than its parent allocated. An agent token can&apos;t exceed its division&apos;s budget. 
-              This is enforced cryptographically, not by policy checks in a database.
+              The token&apos;s limits can only narrow; spend is checked against SatGate&apos;s budget store before each call.
             </p>
 
             <p>When an agent hits its budget ceiling, SatGate returns a <code className="bg-gray-800 px-1.5 py-0.5 rounded text-yellow-300">402 Payment Required</code>:</p>
@@ -393,14 +392,16 @@ tools:
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 my-6 font-mono text-sm overflow-x-auto">
               <pre className="text-gray-300">{`HTTP/1.1 402 Payment Required
 Content-Type: application/json
-X-SatGate-Budget-Remaining: 0
-X-SatGate-Budget-Limit: 2500
+X-SatGate-Budget-Cost-Credits: 25
+X-SatGate-Budget-Remaining-Credits: 0
 
 {
-  "error": "budget_exceeded",
-  "message": "Agent 'acme-design-gen' has exhausted its budget",
-  "spent": 2500,
-  "limit": 2500
+  "error": "budget_exhausted",
+  "message": "Insufficient credits for this request",
+  "payable": false,
+  "cost_credits": 25,
+  "remaining_credits": 0,
+  "receipt": { ... }
 }`}</pre>
             </div>
 
@@ -482,35 +483,35 @@ X-SatGate-Budget-Limit: 2500
 
             <p>
               The revoked intern bot? Someone&apos;s experimental agent tried to escalate its own delegation 
-              permissions. SatGate caught the attempt, blocked it, and revoked the token. That&apos;s the security 
+              permissions. SatGate refused the wider token, and the owner revoked the bot. That&apos;s the security 
               story: not just cost control, but <strong className="text-white">agent governance</strong>.
             </p>
 
             {/* --- Three Modes --- */}
-            <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Three Modes: Observe → Control → Prove</h2>
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">Start in Observe, then turn on Control</h2>
 
-            <p>Not every organization is ready to hard-block their agents on day one. SatGate supports a progressive rollout:</p>
+            <p>Not every organization is ready to hard-block their agents on day one. SatGate supports a progressive rollout (plans are on <a href="/pricing" className="text-purple-400 hover:text-purple-300 underline">pricing</a>):</p>
 
             <div className="space-y-4 my-6">
               <div className="bg-gray-900 border border-purple-500/30 rounded-xl p-4">
-                <p className="font-bold text-purple-300 mb-1">👁 Observe (Free)</p>
+                <p className="font-bold text-purple-300 mb-1">👁 Observe</p>
                 <p className="text-gray-400">
                   Deploy as a transparent proxy. See what your agents are doing and what they&apos;re spending. 
-                  No blocking, no enforcement. This is your &quot;holy shit&quot; moment when you see the actual numbers.
+                  No blocking, no enforcement. This is where you see the real numbers.
                 </p>
               </div>
               <div className="bg-gray-900 border border-cyan-500/30 rounded-xl p-4">
-                <p className="font-bold text-cyan-300 mb-1">🎛 Control ($99/mo)</p>
+                <p className="font-bold text-cyan-300 mb-1">🎛 Control</p>
                 <p className="text-gray-400">
                   Turn on budget enforcement. Hard caps, per-tool cost attribution, cascade delegation. HTTP agents 
                   that exceed their budget get a 402, not a surprise invoice.
                 </p>
               </div>
               <div className="bg-gray-900 border border-yellow-500/30 rounded-xl p-4">
-                <p className="font-bold text-yellow-300 mb-1">💲 Payment Methods (Custom)</p>
+                <p className="font-bold text-yellow-300 mb-1">💲 Admit (charging external agents)</p>
                 <p className="text-gray-400">
-                  Monetize your APIs with L402 micropayments over Lightning. Agents pay per-call with 
-                  cryptographic proof of payment. Your MCP tools become revenue generators, not cost centers.
+                  On the HTTP routes you choose, Admit makes external agents pay before they get in, in Lightning (L402)
+                  or USDC on Base (x402).
                 </p>
               </div>
             </div>

@@ -193,7 +193,8 @@ export default function ApiMonetizationAiBlogPage() {
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`HTTP/1.1 402 Payment Required
+            <code className="text-green-300">{`# Illustration of a priced 402 (header names vary by server)
+HTTP/1.1 402 Payment Required
 WWW-Authenticate: L402 macaroon="AGIAJEem...", invoice="lnbc10n1..."
 X-Cost-Per-Call: 0.001 USD
 X-Budget-Remaining: 4.50 USD
@@ -383,7 +384,7 @@ sub_agent_token = attenuate(agent_a_token, [
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Step 4: Enable L402 for zero-signup access.</strong> Let agents discover and pay for your API without registration. The agent presents a Lightning payment, gets a macaroon, and starts consuming. No forms, no sales calls, no onboarding friction.
+            <strong className="text-white">Step 4: Charge external agents with Admit.</strong> They pay in Lightning (L402) or USDC on Base (x402), with no sign-up. No forms, no sales calls, no onboarding friction.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

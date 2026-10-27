@@ -50,7 +50,7 @@ export default function AgentSwarmsCostGovernancePage() {
         name: 'Why do agent swarms create runaway spend risk?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Agent swarms multiply cost because a coordinator can spawn sub-agents, each with its own tools, retries, fanout, and API calls. One user task can become thousands of paid calls unless budgets roll up across the delegation tree.',
+          text: 'Agent swarms multiply cost because a coordinator can spawn sub-agents, each with its own tools, retries, fanout, and API calls. One user task can become thousands of paid calls unless each helper’s budget is carved out of its parent’s.',
         },
       },
       {
@@ -154,7 +154,7 @@ export default function AgentSwarmsCostGovernancePage() {
                     You could give each agent its own API key with a spending limit at the provider level 
                     (e.g., OpenAI spend caps). But when a coordinator delegates to sub-agents, each sub-agent 
                     needs its own key. Key management becomes combinatorial. And there&apos;s no hierarchical 
-                    budget — sub-agents&apos; limits don&apos;t roll up to a parent ceiling.
+                    budget: sub-agents&apos; limits aren&apos;t carved out of a parent ceiling.
                   </p>
                 </div>
               </div>
@@ -202,7 +202,7 @@ export default function AgentSwarmsCostGovernancePage() {
               <CheckCircle className="text-green-400 mt-1 shrink-0" size={18} />
               <div>
                 <p className="text-white font-semibold">Hierarchical budgets</p>
-                <p className="text-gray-400">The coordinator gets a total budget. When it delegates to sub-agents, it carves out a portion. Sub-agents can never collectively exceed the parent&apos;s allocation. The math is enforced cryptographically.</p>
+                <p className="text-gray-400">The coordinator gets a total budget. When it delegates to sub-agents, it carves out a portion. SatGate carves each helper&apos;s budget out of its parent&apos;s, so the tree can&apos;t spend more than the parent had.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -270,7 +270,7 @@ export default function AgentSwarmsCostGovernancePage() {
             <h2 className="mb-6 text-2xl font-bold text-white">Agent swarm cost governance questions</h2>
             <div className="space-y-5">
               {[
-                ['Why do agent swarms create runaway spend risk?', 'Agent swarms multiply cost because a coordinator can spawn sub-agents, each with its own tools, retries, fanout, and API calls. One user task can become thousands of paid calls unless budgets roll up across the delegation tree.'],
+                ['Why do agent swarms create runaway spend risk?', 'Agent swarms multiply cost because a coordinator can spawn sub-agents, each with its own tools, retries, fanout, and API calls. One user task can become thousands of paid calls unless each helper’s budget is carved out of its parent’s.'],
                 ['How should teams control multi-agent spending?', 'Use hierarchical budgets, scoped delegation tokens, cascade revocation, and enforcement before the request goes through so each sub-agent can spend only within the parent agent’s authority.'],
                 ['Why is gateway-level enforcement better than framework callbacks?', 'Gateway-level enforcement works across frameworks and blocks costly calls before they execute. Framework callbacks often observe spend after the request and only cover agents built with that framework.'],
                 ['How do hierarchical budgets work for agent swarms?', 'A parent agent receives a total budget, then delegates smaller scoped budgets to sub-agents. Child agents can spend only inside their delegated allowance, and the whole swarm cannot exceed the parent ceiling.'],
@@ -285,7 +285,7 @@ export default function AgentSwarmsCostGovernancePage() {
 
           <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 rounded-xl p-8 mt-12 text-center">
             <h3 className="text-xl font-bold text-white mb-3">Control your agent swarm&apos;s spend</h3>
-            <p className="text-gray-400 mb-6">The SatGate gateway is open source. See the delegation demo live.</p>
+            <p className="text-gray-400 mb-6">SatGate&apos;s core gateway is open source. See the delegation demo live.</p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/protect" className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition flex items-center gap-2">
                 See Demo <ArrowRight size={16} />

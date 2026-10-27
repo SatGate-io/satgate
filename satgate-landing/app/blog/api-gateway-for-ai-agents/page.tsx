@@ -112,7 +112,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
-            Kong, Solo.io, and Gravitee were built for humans clicking buttons. Autonomous agents need something fundamentally different.
+            Classic API gateways were built for traffic from people and apps. Some now add cost-based limits for LLM calls; few give each agent a budget it can hand on, smaller, to a helper.
           </p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -186,11 +186,11 @@ export default function ApiGatewayForAiAgentsBlogPage() {
 ─────────────────────────────────────────────────────────────────
 Authentication        API keys, OAuth         Macaroon tokens (attenuated)
 Rate Limiting         RPM/RPS                 Budget (dollar-denominated)
-Cost Tracking         None (just counters)    Per-call cost attribution
+Cost Tracking         Varies by gateway       Per-call cost attribution
 Delegation            N/A                     Cryptographic trust chains
 Spend Enforcement     N/A                     Real-time budget hard caps
-Audit trail           Request logs            Signed receipts (who spent what)
-Monetization          Subscription tiers      Per-call micropayments (L402)`}</code>
+Audit trail           Request logs            Signed receipts for refusals and spending
+Monetization          Subscription tiers      Payment from external agents per use (Lightning or USDC)`}</code>
             </pre>
           </div>
 
@@ -201,7 +201,7 @@ Monetization          Subscription tiers      Per-call micropayments (L402)`}</c
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Missing Layer: Before the Request Goes Through</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            An API gateway for AI agents needs three capabilities that traditional gateways lack entirely:
+            An API gateway for AI agents needs three capabilities:
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Budget Enforcement (Not Rate Limiting)</h3>
@@ -212,7 +212,7 @@ Monetization          Subscription tiers      Per-call micropayments (L402)`}</c
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
             <code className="text-cyan-300">{`# satgate-mcp.yaml: budget and per-tool costs
 budget:
-  limit: 5000    # 5000 credits ($50)
+  limit: 5000    # 5000 credits
 tools:
   costs:
     web_search: 5
@@ -296,7 +296,7 @@ tools:
 │  ├─ Check policy and budget atomically   │
 │  ├─ Resolve tool cost                    │
 │  ├─ Allow, deny, or require approval     │
-│  └─ Emit signed receipt                  │
+│  └─ Sign receipts: refusals and spending │
 └──────────────┬───────────────────────────┘
                │
 ┌──────────────▼───────────────────────────┐
@@ -332,7 +332,7 @@ tools:
           </p>
 
           <ul className="text-gray-300 space-y-2">
-            <li>✅ <strong className="text-white">Dollar-denominated budget limits</strong> (not just request counts)</li>
+            <li>✅ <strong className="text-white">Budgets in credits you can price</strong> (not just request counts)</li>
             <li>✅ <strong className="text-white">Per-tool cost resolution</strong> (different calls cost different amounts)</li>
             <li>✅ <strong className="text-white">Atomic budget enforcement</strong> (no race conditions at scale)</li>
             <li>✅ <strong className="text-white">Capability-based tokens</strong> (narrowed delegation, not all-or-nothing keys)</li>

@@ -135,10 +135,10 @@ export default function AiGovernanceApiTeamsBlogPage() {
           </ol>
 
           <p className="text-gray-300 leading-relaxed">
-            Traditional API management tools answer question one (authentication) and partially answer question three (rate limiting). Questions two and four — the economic questions — are completely unaddressed.
+            Traditional API management tools answer question one (authentication) and partially answer question three (rate limiting). Questions two and four are the economic questions.
           </p>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Zuplo Problem: Great DX, Missing Economics</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Where API gateways stop</h2>
 
           <p className="text-gray-300 leading-relaxed">
             Take a modern API gateway like Zuplo. It's excellent at what it does: edge-deployed API management with TypeScript policies, OpenAPI-native design, and developer-friendly configuration. For human-to-API traffic, it's a strong choice.
@@ -151,12 +151,12 @@ export default function AiGovernanceApiTeamsBlogPage() {
           <ul className="text-gray-300 space-y-2">
             <li><strong className="text-white">Rate limiting?</strong> Yes — requests per window. But an agent making 50 requests per minute might cost $0.50 or $500, depending on the payload. Rate limits don't understand cost.</li>
             <li><strong className="text-white">Authentication?</strong> Yes — API keys, JWT, OAuth. But an API key grants binary access: you're in or you're out. There's no concept of "you can call this endpoint 100 more times before your budget runs out."</li>
-            <li><strong className="text-white">Monetization?</strong> Some gateways support usage-based billing. But billing happens after the fact. The agent already consumed the resources. You're sending an invoice, not enforcing a limit.</li>
+            <li><strong className="text-white">Monetization?</strong> Gateways like Zuplo and Kong now cap LLM spend and sell API plans.</li>
             <li><strong className="text-white">Attribution?</strong> You know which API key made the call. But when one key serves an orchestrator that spawns sub-agents, you can't trace costs back to the originating workflow.</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
-            This isn't a criticism of Zuplo specifically — it's the state of the entire API gateway category. Kong, Gravitee, Apigee, Tyk — they all share the same blind spot. They were built for a world where the API consumer is a developer writing code, not an autonomous agent making real-time economic decisions.
+            Gateways like Zuplo and Kong now cap LLM spend and sell API plans. They don&apos;t give each agent a token with its own budget that it can hand on, smaller, to a helper, or sign a receipt anyone can check.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Five Governance Capabilities API Teams Need Now</h2>
@@ -258,17 +258,16 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
             <code className="text-green-300">{`HTTP/1.1 402 Payment Required
 Content-Type: application/json
+X-SatGate-Budget-Cost-Credits: 15
+X-SatGate-Budget-Remaining-Credits: 3
 
 {
   "error": "budget_exhausted",
+  "message": "Insufficient credits for this request",
+  "payable": false,
+  "cost_credits": 15,
   "remaining_credits": 3,
-  "required_credits": 15,
-  "cheapest_alternative": {
-    "endpoint": "/api/generate",
-    "model": "gpt-4o-mini",
-    "cost": 1
-  },
-  "request_more": "https://api.example.com/budget/topup"
+  "receipt": { ... }
 }`}</code>
           </pre>
 
@@ -312,7 +311,8 @@ Content-Type: application/json
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Platform team: define governance policy
+            <code className="text-green-300">{`# Illustration (not SatGate syntax)
+# Platform team: define governance policy
 policies:
   team-alpha:
     daily_budget: 5000
@@ -333,6 +333,10 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
 → team-beta: 28,100 credits ($1,405)
 → team-gamma: 14,300 credits ($715)`}</code>
           </pre>
+
+          <p className="text-gray-300 leading-relaxed">
+            In SatGate, set each team&apos;s and agent&apos;s budget in Tokens and Delegation &amp; Budgets, and see spend by token in Usage.
+          </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Implementation: Gateway-Layer vs Application-Layer</h2>
 
@@ -362,7 +366,7 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
             <li><strong className="text-white">Macaroon-based tokens</strong> that carry budget context, expire automatically, and support hierarchical delegation</li>
             <li><strong className="text-white">Per-endpoint cost modeling</strong> so every API call has an economic weight</li>
             <li><strong className="text-white">Real-time budget enforcement</strong> — pre-call checks, not post-hoc billing</li>
-            <li><strong className="text-white">HTTP 402 responses</strong> that give agents structured denial with actionable alternatives</li>
+            <li><strong className="text-white">HTTP 402 responses</strong> that tell the agent its budget ran out, so it stops instead of retrying</li>
             <li><strong className="text-white">Signed receipts</strong> for each agent&apos;s budget spends and for its refusals over a budget, a missing payment or a tool permission</li>
             <li><strong className="text-white">MCP-native support</strong> for teams building with the Model Context Protocol</li>
           </ul>
@@ -381,7 +385,7 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
 export API_BASE_URL=https://api.satgate.io/v1
 # and send X-SatGate-Tenant: your-tenant
 
-# That's it. Budget enforcement is live.`}</code>
+# Set the route to Control and budget enforcement is on.`}</code>
           </pre>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Governance Checklist for API Teams</h2>
