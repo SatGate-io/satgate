@@ -455,7 +455,7 @@ export default function ROICalculatorPage() {
             {[
               { href: '/policy-to-proof', title: 'Map ROI to Rules and Receipts', body: 'Connect exposure to enforceable checks, receipts, and a signed receipt (Evidence Pack).' },
               { href: '/govern', title: 'Govern agent execution', body: 'Put authority, budget, and audit policy in place before the request goes through.' },
-              { href: '/build', title: 'Build with SatGate', body: 'Mint an agent token with a budget, expiry and revoke.' },
+              { href: '/build', title: 'Build with SatGate', body: 'SDKs, receipts and how to put SatGate in front of your tools.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{item.title}</h3>

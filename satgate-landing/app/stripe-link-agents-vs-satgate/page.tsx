@@ -33,7 +33,7 @@ const comparison = [
   ['Primary job', 'Provide payment credentials and approval flows', 'Govern agent/API spending on each request that goes through SatGate'],
   ['Best fit', 'Purchases on merchant sites and payment-token flows', 'APIs, models, MCP tools, delegated agents, budgets, and monetization'],
   ['Control point', 'Wallet / credential issuance', 'Gateway policy check before forwarding to an upstream API, model, or tool'],
-  ['Budget enforcement', 'User approval and future granular controls', 'Per-agent, route, tool, tenant, workflow, and time-window budgets'],
+  ['Budget enforcement', 'Per-purchase limits, an approved budget, or approval of each purchase', 'Per-agent, sub-agent, route and tool budgets, and daily or weekly dollar limits on MCP tools'],
   ['API metering', 'Not the core product', 'Core Observe capability'],
   ['Payment method', 'Cards and shared payment tokens', 'SatGate payment rules record payment details for API monetization'],
   ['Governance question', 'Can this agent pay?', 'Should this agent access, spend, delegate, route, or pay now?'],
@@ -170,7 +170,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <h2 className="text-3xl font-bold text-white mb-8">Why payment approval is not enough</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            ['Budgets', 'A paid credential does not prove the agent is within route, tenant, model, or workflow budget.'],
+            ['Budgets', 'A paid credential does not prove the agent is within its route or tool budget.'],
             ['Scope', 'Agents need scoped authority, not broad long-lived access just because a payment method exists.'],
             ['Audit', 'Finance and security need to know which agent, tool, route, policy, and proof were involved.'],
             ['Monetization', 'API providers need request-native pricing and payment rules when agents become customers.'],

@@ -43,7 +43,7 @@ const principles = [
   },
   {
     icon: Ban,
-    title: 'Revocation must be immediate',
+    title: 'Revocation must stop the next request',
     body: 'A misbehaving agent needs a kill switch that works on the next request, not after a deploy or manual key rotation.',
   },
   {
@@ -284,7 +284,7 @@ export default function AgentApiGovernancePage() {
             <div className="p-4">Agent capability</div>
           </div>
           {[
-            ['Authority', 'Usually broad and long-lived', 'Scoped to route, task, tenant, or tool'],
+            ['Authority', 'Usually broad and long-lived', 'Scoped to routes and tools'],
             ['Budget', 'External or manual', 'Embedded or enforced inline'],
             ['Delegation', 'Copied or shared', 'Narrowed: sub-agents get less authority'],
             ['Revocation', 'Rotate key or change config', 'Revoke/expire capability before next request'],
@@ -305,7 +305,7 @@ export default function AgentApiGovernancePage() {
             <h2 className="text-3xl font-bold text-white mb-6">Observe, Control and Admit</h2>
             <div className="space-y-4">
               {[
-                ['Observe', 'Attribute calls by agent, worker, route, tenant, and workflow so real access and spend patterns are visible before policy tightens.'],
+                ['Observe', 'See calls and spend by agent token and route before you tighten limits.'],
                 ['Control', 'Issue scoped capabilities, enforce budgets and route policy, narrow delegation, and revoke authority before the next request.'],
                 ['Admit', 'Give external agents limited access, and charge them where you want to.'],
               ].map(([title, body]) => (
@@ -317,10 +317,6 @@ export default function AgentApiGovernancePage() {
             </div>
           </div>
 
-          <div className="min-w-0 rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Example capability policy</h2>
-            <pre className="bg-black border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>{`delegation_depth = 1`}</code></pre>
-          </div>
         </div>
       </section>
 

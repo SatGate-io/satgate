@@ -172,7 +172,7 @@ export default function IntegrationsPage() {
         <section className="mt-14 rounded-3xl border border-purple-900/50 bg-gradient-to-br from-purple-950/25 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Why integration pages matter</h2>
           <p className="max-w-4xl text-lg leading-relaxed text-gray-300">
-            Agent governance is adopted inside real workflows. SatGate sits between agent clients and upstream APIs, MCP servers, and paid tools so teams can observe, control, and prove before autonomous requests create cost or risk.
+            Agent governance is adopted inside real workflows. SatGate sits between your agents and the APIs, MCP servers and paid tools they call, so you can see and limit what they do before it costs you, with receipts you can check.
           </p>
         </section>
 

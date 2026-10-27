@@ -54,12 +54,12 @@ const paymentFlow = [
   {
     icon: ShieldCheck,
     title: 'Policy still applies',
-    body: 'Observe and Control policies can still enforce budget, identity, route, risk tier, and revocation rules.',
+    body: 'Control can still enforce budgets, routes and revokes on a paid route; Observe records usage without blocking.',
   },
   {
     icon: ReceiptText,
     title: 'Revenue is auditable',
-    body: 'Each paid request carries agent identity, price, route, policy decision, payment proof, and upstream outcome.',
+    body: 'Each paid request is recorded with the route, price and payment, and SatGate signs a receipt when it refuses one for a missing payment.',
   },
 ];
 
@@ -165,7 +165,7 @@ export default function RobotCustomerPaymentsPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(250,204,21,0.18),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.14),transparent_32%)]" />
         <div className="relative max-w-6xl mx-auto px-6 py-24">
           <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-950/20 px-4 py-2 text-sm text-yellow-200 mb-8">
-            <Bot size={16} /> Agents consume. Humans and platforms buy.
+            <Bot size={16} /> You set the rules. External agents pay to get in.
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
             Governed Paid API Access for Agents

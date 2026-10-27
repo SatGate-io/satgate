@@ -30,7 +30,7 @@ export const metadata = {
 const controls = [
   { icon: DollarSign, title: 'Budget before the call runs', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
   { icon: KeyRound, title: 'Scoped capabilities', body: 'Replace broad static keys with expiring, revocable credentials constrained by route, tool, calls, and spend.' },
-  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool or agent session on its next request, without rotating every shared secret.' },
+  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop an agent’s token on its next request, without rotating every shared secret.' },
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
 ];
 
@@ -140,7 +140,7 @@ export default function SatGateIntegrationPage() {
           <h3 className="mb-4 text-xl font-bold text-white">What this prevents</h3>
           <ul className="space-y-3 text-gray-300">
               <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Keep local assistant workflows from reaching paid APIs without a budget decision.</li>
-              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Limit MCP tools by task, route, user, tenant, and time window.</li>
+              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Limit which MCP tools each agent token can call, and until when.</li>
               <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Turn every tool call into auditable economic activity instead of invisible automation.</li>
           </ul>
         </div>

@@ -70,7 +70,7 @@ export default function DesignPartnersPage() {
     { q: 'How long is the program?', a: '90 days. At the end we look at what SatGate allowed and refused, what your agents spent, how you used the receipts and how much help you needed, then decide together whether to expand, scale back or stop.' },
     { q: 'Is it really free?', a: 'Yes, and there’s no credit card. You get visibility into agent traffic and help shape the authority, budget, revocation, and signed receipt workflows that matter in your environment.' },
     { q: 'Do I need to change my code?', a: 'Usually no. Most pilots start with a DNS, proxy, or MCP configuration change around one staging endpoint or tool. We verify the path together before expanding.' },
-    { q: 'Where does my data go?', a: 'The data path, environment, and custody boundaries are documented before activation. Enterprise self-host installs the same SatGate binary in your own environment.' },
+    { q: 'Where does my data go?', a: 'Before we start, we write down where your data goes and who holds what. Enterprise self-host installs the same SatGate binary in your own environment.' },
     { q: 'Is this for production traffic?', a: 'Usually not at first. The goal is to verify policy before the request goes through, plus revocation, budgets, and signed receipts, before expanding scope.' },
   ];
 
@@ -213,7 +213,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">Free Observe Mode</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Full visibility into your AI agent traffic. See API calls, tokens, costs, refusals and signed receipts across MCP servers, REST APIs and LLM endpoints.
+                See what your agents call and spend, by agent and route, across MCP servers, REST APIs and LLM endpoints.
               </p>
             </div>
 
@@ -259,7 +259,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">One Endpoint or Tool</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Point one staging API endpoint or MCP tool through SatGate. One DNS change or config update, no code modifications.
+                Send one tool or API through SatGate. Usually no code changes.
               </p>
             </div>
 
@@ -326,7 +326,7 @@ export default function DesignPartnersPage() {
                 step: '4',
                 title: 'Your Reports',
                 time: 'Week 3+',
-                desc: 'Your data, your dashboards. Cost attribution, refusals, revocations and signed receipt reports, all yours.',
+                desc: 'Your data in your dashboard: spend by agent and route, refusals, revokes and the receipts SatGate signed.',
                 color: 'yellow',
                 icon: <BarChart3 size={20} />,
               },

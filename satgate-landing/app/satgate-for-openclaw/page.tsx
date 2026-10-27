@@ -30,7 +30,7 @@ export const metadata = {
 const controls = [
   { icon: DollarSign, title: 'Budget before execution', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
   { icon: KeyRound, title: 'Scoped capabilities', body: 'Replace broad static keys with expiring, revocable credentials constrained by route, tool, calls, and spend.' },
-  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool or agent session on its next request, without rotating every shared secret.' },
+  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop an agent’s token on its next request, without rotating every shared secret.' },
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
 ];
 
@@ -137,8 +137,8 @@ export default function SatGateIntegrationPage() {
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="mb-4 text-xl font-bold text-white">What this prevents</h3>
           <ul className="space-y-3 text-gray-300">
-              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Attribute spend across agents, sub-agents, tools, models, routes, and workflows.</li>
-              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Enforce per-agent and per-task budgets before expensive requests execute.</li>
+              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">See spend by agent, sub-agent, tool and route.</li>
+              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Give each agent and sub-agent its own budget.</li>
               <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Use Admit when external agents should pay for your APIs, in Lightning or USDC.</li>
           </ul>
         </div>

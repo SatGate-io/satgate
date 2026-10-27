@@ -218,12 +218,12 @@ export default function L402ApiPricingCalculatorPage() {
           </p>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              [Bot, 'Identify the agent', 'Know which agent, tenant, route, resource, and workflow is asking to spend.'],
-              [Coins, 'Price the resource', 'Attach a per-request price or pricing tier to the protected API route.'],
+              [Bot, 'Identify the agent', 'Know which agent token and route is asking to spend.'],
+              [Coins, 'Price the resource', 'Set a price per payment on the route, and how many requests one payment buys.'],
               [ReceiptText, 'Verify proof', 'Accept payment details as proof before forwarding the paid API request.'],
               [Gauge, 'Respect budget', 'Check remaining budget and policy so an agent cannot spend beyond its allowed task.'],
               [Zap, 'Unlock instantly', 'Let software customers pay and proceed without account setup or invoice friction.'],
-              [Calculator, 'Audit economics', 'Record route, price, payment proof, budget, and outcome for analysis.'],
+              [Calculator, 'Audit economics', 'Signed receipts record the route, price and payment.'],
             ].map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof Bot;
               return (

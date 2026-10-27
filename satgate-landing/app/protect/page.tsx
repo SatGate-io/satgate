@@ -845,9 +845,9 @@ export default function ProtectDemoPage() {
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
             All non-PUBLIC routes have <strong className="text-white">Default Protection</strong> — cryptographic 
-            verification, caveats, delegation, revocation. Then choose your economic policy: 
-            <strong className="text-purple-400"> observe</strong> (audit), <strong className="text-cyan-400">control</strong> (budget), 
-            or <strong className="text-yellow-400">charge</strong> (payment rules for admitting external agents).
+            verification, caveats, delegation, revocation. Then pick
+            <strong className="text-purple-400"> Observe</strong>, <strong className="text-cyan-400">Control</strong>
+            or <strong className="text-yellow-400">Admit</strong>.
           </p>
           <p className="text-gray-500 text-sm mt-3">
             Protection is the starting state. Economics are configurable.
@@ -937,8 +937,8 @@ export default function ProtectDemoPage() {
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
-                    Default Protection is the foundation of SatGate's security model. <strong className="text-blue-400">Every protected
-                    request is checked</strong>: the token&apos;s signature, its limits and its handoffs. You can&apos;t turn this off.
+                    <strong className="text-blue-400">Every protected route checks the token first</strong>:
+                    its signature, its limits and its handoffs.
                     Then pick <strong className="text-white">Observe, Control or Admit</strong>.
                   </p>
                 </>
@@ -1093,9 +1093,9 @@ export default function ProtectDemoPage() {
                     <h4 className="font-semibold text-white mb-2">What You'll See:</h4>
                     <ul className="text-gray-400 text-sm space-y-1">
                       <li>✓ Credentials checked by their signature, plus a revocation check on each request</li>
-                      <li>✓ Instant cryptographic validation</li>
+                      <li>✓ Token checked on every request</li>
                       <li>✓ Offline narrowing of a token&apos;s caveats</li>
-                      <li>✓ Mathematical scope enforcement</li>
+                      <li>✓ A token can&apos;t reach beyond its scope</li>
                     </ul>
                   </div>
 

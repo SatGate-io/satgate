@@ -31,11 +31,11 @@ export const metadata = {
 };
 
 const controls = [
-  { icon: Bot, title: 'Agent identity', body: 'Attribute requests to the tenant, agent, task, workflow, route, model, MCP tool, and delegated sub-agent.' },
+  { icon: Bot, title: 'Agent identity', body: 'See requests by agent token, route, MCP tool and MCP task.' },
   { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, tool costs and route budgets before forwarding.' },
   { icon: KeyRound, title: 'Scoped credentials', body: 'Use expiring capabilities instead of broad static keys so authority matches the job.' },
-  { icon: Ban, title: 'Revocation', body: 'Block the next request when a credential, workflow, route, budget, or agent should stop.' },
-  { icon: ReceiptText, title: 'Audit trails', body: 'Record allow/deny decisions with policy, budget remaining, route, tool, estimated cost, and outcome.' },
+  { icon: Ban, title: 'Revocation', body: 'Block the next request when a token is revoked or its budget runs out.' },
+  { icon: ReceiptText, title: 'Signed receipts', body: 'Refusals and spending, with the route or tool, the budget left and the cost.' },
   { icon: BarChart3, title: 'Benchmark risk', body: 'Model loops, retry storms, fanout, detection delay, and avoided spend with benchmark-backed scenarios.' },
 ];
 
@@ -127,7 +127,7 @@ export default function Page() {
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="mb-4 text-xl font-bold text-white">What good policy includes</h3>
           <div className="space-y-4">
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Per-agent budgets</h3><p className="leading-relaxed text-gray-400">Track and limit spend by agent identity, tenant, task, workflow, route, model, and MCP tool.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Per-agent budgets</h3><p className="leading-relaxed text-gray-400">Track spend per agent, sub-agent, route, MCP tool and MCP task, and limit it per agent, sub-agent, route and tool.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegated sub-agent limits</h3><p className="leading-relaxed text-gray-400">Give sub-agents smaller budgets, narrower tools, shorter expiry, and separate signed receipts than their parent.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Kill switches and revocation</h3><p className="leading-relaxed text-gray-400">Stop future spend by revoking or narrowing credentials before the next API or MCP request.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">From Observe to Control</h3><p className="leading-relaxed text-gray-400">Start by measuring real agent spend, then enforce hard caps where risk, cost, or autonomy justifies it.</p></div>

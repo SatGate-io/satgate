@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, BellRing, CheckCircle2, CreditCard, FileSearch, Gauge, KeyRound, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Agent Payment Governance | Policy Before Paid Access',
+  title: 'Agent Payment Controls | Limits Before Payment',
   description: 'Agent payment controls combine budgets, policy, scoped authority, revocation, metering, payment details, and signed receipts before requests execute.',
   alternates: { canonical: 'https://satgate.io/agent-payment-controls' },
   keywords: [
@@ -16,7 +16,7 @@ export const metadata = {
     'payment rules for agents',
   ],
   openGraph: {
-    title: 'Agent Payment Governance | Policy Before Paid Access',
+    title: 'Agent Payment Controls | Limits Before Payment',
     description: 'Wallet approval is necessary but not sufficient. SatGate adds budgets on each request that goes through SatGate, scoped authority, metering, revocation, and signed receipts.',
     url: 'https://satgate.io/agent-payment-controls',
     type: 'article',
@@ -24,16 +24,16 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Agent Payment Governance | Policy Before Paid Access',
+    title: 'Agent Payment Controls | Limits Before Payment',
     description: 'Control delegated paid access before it becomes runaway API, MCP, and model spend.',
   },
 };
 
 const controls = [
-  { icon: KeyRound, title: 'Agent identity', body: 'Know which tenant, agent, workflow, delegated sub-agent, route, and token caused the economic action.' },
-  { icon: Gauge, title: 'Budgets', body: 'Enforce hard limits by agent, route, model, MCP tool, workflow, tenant, and time window before requests execute.' },
-  { icon: ShieldCheck, title: 'Policy', body: 'Allow, deny, meter, require approval, preserve paid context, or revoke based on risk, scope, price, and authority.' },
-  { icon: FileSearch, title: 'Signed receipts', body: 'Record request, cost, payment challenge, policy decision, credential, proof, and upstream outcome.' },
+  { icon: KeyRound, title: 'Agent identity', body: 'Know which agent token and route caused each spend.' },
+  { icon: Gauge, title: 'Budgets', body: 'Enforce hard limits per agent, sub-agent, route and MCP tool, and daily or weekly dollar limits on MCP tools, before requests run.' },
+  { icon: ShieldCheck, title: 'Policy', body: 'Allow, refuse, ask you for approval, or revoke, based on the agent’s permissions, budget and the price.' },
+  { icon: FileSearch, title: 'Signed receipts', body: 'Sign a receipt for refusals and spending: the route or tool, the decision, the cost and the payment details.' },
   { icon: CreditCard, title: 'Payment rail awareness', body: 'Understand whether a flow uses card credentials, shared payment tokens, payment details, or another 402 challenge.' },
   { icon: BellRing, title: 'Human approval', body: 'Escalate only the decisions humans should make, instead of turning every agent request into a manual checkpoint.' },
 ];
@@ -42,7 +42,7 @@ export default function AgentPaymentControlsPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'Agent Payment Governance | Policy Before Paid Access',
+    headline: 'Agent Payment Controls | Limits Before Payment',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
@@ -145,7 +145,7 @@ export default function AgentPaymentControlsPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-white mb-8">Payment rails SatGate can govern around</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">Payment methods SatGate works alongside</h2>
         <div className="grid md:grid-cols-2 gap-5">
           {[
             ['Cards and one-time credentials', 'Useful for merchant checkout. SatGate still governs API and tool access before downstream spend patterns become uncontrolled.'],
@@ -171,7 +171,7 @@ export default function AgentPaymentControlsPage() {
             {[
               ['Purchase approval', 'Ask the user to approve a purchase', 'Decide whether policy allows the agent to attempt the spend'],
               ['Credential safety', 'Issue temporary credentials or tokens', 'Scope, revoke, and audit capability after authorization'],
-              ['Budgeting', 'May cap specific approved transactions', 'Enforce budgets across routes, tools, models, tenants, and workflows'],
+              ['Budgeting', 'May cap specific approved transactions', 'Enforce budgets across routes and tools'],
               ['Paid API access', 'Pay a merchant or endpoint', 'Preserve payment context, verify policy, and unlock access only when authority and budget allow it'],
             ].map(([control, wallet, firewall]) => (
               <div key={control} className="grid md:grid-cols-3 border-t border-gray-800 text-gray-300">

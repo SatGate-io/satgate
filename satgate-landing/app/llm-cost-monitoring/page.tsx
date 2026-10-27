@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Bell, Bot, Eye, Gauge, LineChart, LockKeyhole, Route, ShieldAlert } from 'lucide-react';
+import { ArrowRight, Bell, Bot, Eye, Gauge, LineChart, LockKeyhole, ShieldAlert } from 'lucide-react';
 
 export const metadata = {
   title: 'LLM Cost Monitoring: Dashboards, Alerts, and Real-Time Enforcement',
@@ -33,8 +33,7 @@ const stages = [
   { icon: Eye, title: 'Observe', body: 'Capture every model, API, and MCP tool request with agent, user, tenant, route, model, latency, and cost context.' },
   { icon: LineChart, title: 'Monitor', body: 'Trend spend velocity, token growth, retry storms, model drift, error spikes, and unusual agent behavior.' },
   { icon: Bell, title: 'Alert', body: 'Notify teams when spend crosses thresholds, but treat alerting as a signal — not the control itself.' },
-  { icon: Gauge, title: 'Budget', body: 'Assign per-agent, per-session, per-route, per-tool, and per-tenant ceilings in dollars or credits.' },
-  { icon: Route, title: 'Route', body: 'Move low-value calls to cheaper models or tools while reserving premium routes for justified work.' },
+  { icon: Gauge, title: 'Budget', body: 'Assign ceilings per agent, route and tool (credits), and daily or weekly dollar limits on MCP tools.' },
   { icon: LockKeyhole, title: 'Enforce', body: 'Block, revoke or require payment before the upstream call runs.' },
 ];
 
@@ -209,7 +208,7 @@ export default function LlmCostMonitoringPage() {
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
-              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
+              ['/build', 'Build with SatGate', 'SDKs, receipts and how to put SatGate in front of your tools.'],
               ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
               ['/policy-to-proof', 'Rules and Receipts', 'How budget spends, and refusals over a budget, a missing payment or a tool permission, become signed receipts.'],
               ['/economic-firewall-readiness-grader', 'Readiness grader', 'Find gaps across identity, budgets, routing, revocation, signed receipts, and payment details.'],
@@ -257,11 +256,11 @@ export default function LlmCostMonitoringPage() {
             </Link>
             <Link href="/roi-calculator" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
               <h3 className="mb-2 text-lg font-bold text-white">ROI calculator →</h3>
-              <p className="text-gray-400">Estimate loop waste, ghost spend, payback, and avoided cost.</p>
+              <p className="text-gray-400">Estimate ghost spend, annual exposure and payback.</p>
             </Link>
             <Link href="/build" className="rounded-2xl border border-gray-800 bg-black/70 p-6 transition hover:border-purple-600">
-              <h3 className="mb-2 text-lg font-bold text-white">Agent spend policy →</h3>
-              <p className="text-gray-400">Turn monitoring signals into budget, revocation, and signed receipt policy.</p>
+              <h3 className="mb-2 text-lg font-bold text-white">Build with SatGate →</h3>
+              <p className="text-gray-400">SDKs, receipts and how to put SatGate in front of your tools.</p>
             </Link>
           </div>
         </div>

@@ -411,7 +411,7 @@ export default function EconomicFirewallPage() {
             {[
               ['/economic-firewall-readiness-grader', 'Readiness grader', 'Grade your setup on identity, budgets, revokes, audit records, MCP tools and payments.'],
               ['/roi-calculator', 'ROI calculator', 'Estimate runaway agent spend, wasted cost and payback.'],
-              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
+              ['/build', 'Build with SatGate', 'SDKs, receipts and how to put SatGate in front of your tools.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>

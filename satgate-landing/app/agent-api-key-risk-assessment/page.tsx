@@ -168,7 +168,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
               Run assessment <ArrowRight size={18} />
             </a>
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
-              Generate token policy
+              Build with SatGate
             </Link>
             <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
               Agent API governance
@@ -217,7 +217,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
             {[
               [LockKeyhole, 'Scope', 'Limit routes, tools, tenants, actions, data, and delegation for one task or workflow.'],
               [ShieldCheck, 'Control', 'Attach budgets, expiry, per-request ceilings, kill switches, and revocation checks.'],
-              [ReceiptText, 'Audit', 'Record identity, capability, budget, route, tool, policy, decision, and outcome.'],
+              [ReceiptText, 'Audit', 'Keep a signed record of what was allowed or refused, on which route or tool, against which budget.'],
             ].map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof LockKeyhole;
               return (
@@ -255,13 +255,13 @@ export default function AgentApiKeyRiskAssessmentPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-orange-950/20 p-8 md:p-12">
-          <h2 className="mb-4 text-3xl font-bold text-white">Move from API keys to economic capabilities.</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">Move from shared API keys to tokens with limits.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
             SatGate checks each agent request against its permissions, budget and revoke status before forwarding it.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Generate token policy <ArrowRight size={18} />
+              Build with SatGate <ArrowRight size={18} />
             </Link>
             <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Agent capability tokens

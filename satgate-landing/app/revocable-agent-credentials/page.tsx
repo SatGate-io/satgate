@@ -29,10 +29,10 @@ export const metadata = {
 };
 
 const controls = [
-  { icon: Fingerprint, title: 'Agent identity', body: 'Bind each credential to an agent, task, tenant, workflow, route, model, or MCP server.' },
+  { icon: Fingerprint, title: 'Agent identity', body: 'Give each agent its own token, limited to the routes, tools and MCP servers it needs.' },
   { icon: KeyRound, title: 'Scoped authority', body: 'Limit routes, tools, methods, customers, delegation, and request types instead of issuing broad API keys.' },
   { icon: Clock, title: 'Expiry by default', body: 'Make credentials expire with the work: minutes, sessions, jobs, customers, or delegated sub-tasks.' },
-  { icon: Ban, title: 'Revocation checks', body: 'Block the next request when a token, task, agent, route, or budget is no longer allowed.' },
+  { icon: Ban, title: 'Revocation checks', body: 'Block the next request when a token is revoked or expired, or its budget runs out.' },
   { icon: ReceiptText, title: 'Budget caveats', body: 'Attach spend caps, call ceilings, per-tool limits, and remaining-budget checks before the request goes through.' },
   { icon: GitBranch, title: 'Narrowed delegation', body: 'Let agents delegate narrower credentials to sub-agents without expanding parent authority.' },
 ];
@@ -83,7 +83,7 @@ export default function Page() {
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">Revocable agent credentials are the missing kill switch for AI autonomy</h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">AI agents should not hold broad, long-lived API keys. They need task-scoped credentials that can be narrowed, expired, or revoked before the next API, model, or MCP tool call executes.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Mint an agent token <ArrowRight size={18} /></Link>
+            <a href="https://cloud.satgate.io/docs/guides/mint-identity" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Mint an agent token <ArrowRight size={18} /></a>
             <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Agent API governance</Link>
             <Link href="/ai-agent-cost-control" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">AI agent cost control</Link>
           </div>
@@ -126,15 +126,6 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-          <h2 className="text-3xl font-bold text-white">Credential policy example</h2>
-          <Link href="/build" className="inline-flex items-center gap-2 font-semibold text-cyan-300 transition hover:text-cyan-200">
-            Mint a revocable agent token <ArrowRight size={16} />
-          </Link>
-        </div>
-        <pre className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950 p-6 text-sm text-green-300"><code>{`delegation_depth = 1`}</code></pre>
-      </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-2xl border border-gray-800 bg-gray-950 p-8">

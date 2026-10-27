@@ -87,7 +87,7 @@ export default function CapabilityAuthPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Generate capability policy <ArrowRight size={18} />
+              Build with SatGate <ArrowRight size={18} />
             </Link>
             <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-emerald-500 transition">
               Compare macaroons and API keys
@@ -177,7 +177,7 @@ export default function CapabilityAuthPage() {
           {[
             ['/mcp', 'MCP gateway', 'Apply capabilities to tool calls.'],
             ['/agent-capability-tokens', 'Agent capability tokens', 'See how scoped authority is encoded.'],
-            ['/govern', 'AI agent governance', 'Observe, Control, and Prove agent actions.'],
+            ['/govern', 'AI agent governance', 'Observe and control what agents do, with receipts you can check.'],
             ['/blog/how-to-add-budget-limits-to-openai-api-calls', 'Budget limits', 'Attach spend policy to access.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 hover:border-emerald-700 transition">

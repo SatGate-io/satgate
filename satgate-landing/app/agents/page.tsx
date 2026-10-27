@@ -100,7 +100,7 @@ export default function AgentsLandingPage() {
 
           <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10">
             HTTP APIs and MCP tool calls — authenticated, logged, cost-tracked, and budget-enforced. 
-            Per-agent budgets. Delegation hierarchies. Next-request revocation. Connect in 5 minutes.
+            Per-agent budgets. Delegation hierarchies. Next-request revocation.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -149,10 +149,9 @@ export default function AgentsLandingPage() {
               </p>
               <div className="bg-black rounded-lg p-4 font-mono text-xs text-gray-400 mb-4">
                 <div className="text-gray-600"># Route config</div>
-                <div><span className="text-purple-400">path:</span> /openai/*</div>
-                <div><span className="text-purple-400">upstream:</span> https://api.openai.com</div>
-                <div><span className="text-purple-400">policy:</span> control</div>
-                <div><span className="text-purple-400">cost_credits:</span> 10</div>
+                <div>- <span className="text-purple-400">match:</span> {'{'} pathPrefix: /openai/ {'}'}</div>
+                <div>&nbsp;&nbsp;<span className="text-purple-400">upstream:</span> https://api.openai.com</div>
+                <div>&nbsp;&nbsp;<span className="text-purple-400">policy:</span> {'{'} kind: control, costCredits: 10 {'}'}</div>
               </div>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Reverse proxy for any HTTP API</li>
@@ -218,7 +217,7 @@ export default function AgentsLandingPage() {
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Real-time monitoring</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Cost attribution by agent</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Shadow Report analytics</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Usage by agent and route</li>
               </ul>
             </div>
 
@@ -228,7 +227,7 @@ export default function AgentsLandingPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Control</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Set per-agent budgets. Get alerts at thresholds.
-                Block requests when budgets are exhausted. HTTP agents get a 402. No surprise bills.
+                Block requests when budgets are exhausted. HTTP agents get a 402.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Per-agent credit budgets</li>
@@ -243,12 +242,12 @@ export default function AgentsLandingPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Admit</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Monetize your APIs. Approved external agents are admitted under a charge policy
-                (<code className="text-xs">policy: charge</code>): scoped, paid access per request
+                (<code className="text-xs">policy: {'{'} kind: charge, priceSats: 10 {'}'}</code>): scoped, paid access
                 via Lightning (L402) or USDC on Base (x402), without sharing long-lived API keys or requiring a subscription.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> charging external agents</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Per-request pricing</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Your price per payment, for 1 to unlimited requests</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Agent-native monetization</li>
               </ul>
             </div>
@@ -307,7 +306,7 @@ export default function AgentsLandingPage() {
                 <DollarSign className="text-amber-400" size={16} />
                 <h4 className="text-amber-300 font-semibold text-sm">Economic Firewall</h4>
               </div>
-              <p className="text-gray-500 text-xs">Every token carries a spending cap. When credits hit zero, SatGate refuses the next priced request (HTTP 402 on HTTP routes). No surprise bills. No runaway agents.</p>
+              <p className="text-gray-500 text-xs">Every token can carry a spending cap. When credits hit zero, SatGate refuses the next priced request (HTTP 402 on HTTP routes).</p>
             </div>
             <div className="bg-cyan-950/20 border border-cyan-900/30 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-2">
@@ -327,7 +326,7 @@ export default function AgentsLandingPage() {
             Why agents need an Economic Firewall
           </h2>
           <p className="text-gray-400 text-center max-w-2xl mx-auto mb-12">
-            AI agents don&apos;t have credit cards. They have API access. Without governance,
+            AI agents spend through API keys, and a key has no budget. Without governance,
             every request is an unaudited transaction on your cloud bill.
           </p>
 

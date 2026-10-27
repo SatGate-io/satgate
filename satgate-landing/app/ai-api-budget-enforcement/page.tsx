@@ -31,11 +31,11 @@ export const metadata = {
 };
 
 const controls = [
-  { icon: Bot, title: 'Agent identity', body: 'Attribute requests to the tenant, agent, task, workflow, route, model, MCP tool, and delegated sub-agent.' },
+  { icon: Bot, title: 'Agent identity', body: 'See requests by agent token, route, MCP tool and MCP task.' },
   { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, tool costs and route budgets before forwarding.' },
   { icon: KeyRound, title: 'Scoped credentials', body: 'Use expiring capabilities instead of broad static keys so authority matches the job.' },
-  { icon: Ban, title: 'Revocation', body: 'Block the next request when a credential, workflow, route, budget, or agent should stop.' },
-  { icon: ReceiptText, title: 'Audit trails', body: 'Record allow/deny decisions with policy, budget remaining, route, tool, estimated cost, and outcome.' },
+  { icon: Ban, title: 'Revocation', body: 'Block the next request when a token is revoked or its budget runs out.' },
+  { icon: ReceiptText, title: 'Signed receipts', body: 'Refusals and spending, with the route or tool, the budget left and the cost.' },
   { icon: BarChart3, title: 'Benchmark risk', body: 'Model loops, retry storms, fanout, detection delay, and avoided spend with benchmark-backed scenarios.' },
 ];
 
@@ -126,10 +126,10 @@ export default function Page() {
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="mb-4 text-xl font-bold text-white">What good policy includes</h3>
           <div className="space-y-4">
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budget before forwarding</h3><p className="leading-relaxed text-gray-400">Check remaining daily, session, per-agent, per-tool, and per-request budget before traffic reaches the upstream provider.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Policy by agent and workflow</h3><p className="leading-relaxed text-gray-400">Separate budgets by tenant, workflow, route, model, MCP server, delegated sub-agent, and task instead of one account-level cap.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Stop loops automatically</h3><p className="leading-relaxed text-gray-400">Deny the next request when a loop, retry storm, fanout chain, or high-cost tool call crosses policy.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit allow and deny decisions</h3><p className="leading-relaxed text-gray-400">Record allow/deny decisions with identity, route, estimated cost, budget remaining, policy, and revocation state.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budget before forwarding</h3><p className="leading-relaxed text-gray-400">Check the agent’s remaining budget, and daily or weekly dollar limits on MCP tools, before traffic reaches the provider.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Policy by agent</h3><p className="leading-relaxed text-gray-400">Separate budgets per agent, sub-agent, route and MCP server instead of one account-level cap.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Stop loops at the budget</h3><p className="leading-relaxed text-gray-400">When a loop or retry storm uses up the budget, the next request is refused.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Signed receipts</h3><p className="leading-relaxed text-gray-400">Signed receipts for refusals and spending, with the route, cost and budget left.</p></div>
           </div>
         </div>
       </section>
