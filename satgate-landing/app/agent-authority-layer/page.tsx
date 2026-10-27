@@ -157,7 +157,7 @@ export default function AgentAuthorityLayerPage() {
               Agent Permissions and Receipts
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a budget and allowed scope; in Control, SatGate enforces them on each request and signs receipts for refusals and for spending.
+              Useful agent work needs <span className="text-white">limited permission to act.</span> Set a budget and allowed scope; in Control, SatGate enforces them on each request and signs receipts for refusals and for spending.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
               Use internal budget controls for your agents and scoped admission for external agents. Payment adapters have different availability. Confirm the chosen integration before relying on it.

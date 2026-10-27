@@ -230,7 +230,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            It&apos;s happening right now. Companies deploying AI agents are discovering that traditional security gives them a binary answer — access or no access — when what they need is a continuous answer: access <em>within these economic constraints</em>.
+            It&apos;s happening right now. Companies deploying AI agents are discovering that traditional security gives them a binary answer (access or no access) when what they need is a continuous answer: access <em>within these economic constraints</em>.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -347,7 +347,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Admit mode (payment methods, <code className="text-sm">policy: charge</code>)</strong> — requires payment before access. Payment is one policy input; SatGate still evaluates scoped authority and configured access policy. Approved external agents can pay per request and receive scoped access without a subscription. SatGate signs a receipt when it refuses an agent for a missing payment.
+            <strong className="text-white">Admit mode (payment methods, <code className="text-sm">policy: charge</code>)</strong>: requires payment before access. Payment is one policy input; SatGate still evaluates scoped authority and configured access policy. Approved external agents can pay per request and receive scoped access without a subscription. SatGate signs a receipt when it refuses an agent for a missing payment.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
