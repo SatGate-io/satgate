@@ -97,6 +97,7 @@ server:
   name: satgate-mcp-proxy   # Reported in MCP initialize response
   version: 0.1.0            # Reported in MCP initialize response
   # port: 9100              # For future SSE/HTTP transport
+  # allowQueryToken: false   # Accept the token from a ?token= URL parameter (SSE / Streamable HTTP). Off by default: any ?token= gets 401.
 
 # --- Authentication ---
 auth:
@@ -111,8 +112,10 @@ upstreams:
   my-server:
     transport: stdio         # Only "stdio" is currently implemented for upstream validation
     command: ["node", "server.js"]
-    env:                     # Additional env vars for the subprocess
+    env:                     # Env vars set for the subprocess (see "Upstream Environment")
       API_KEY: "${MY_API_KEY}"
+    # envPassthrough: [HTTPS_PROXY]  # Names of proxy env vars the subprocess also receives
+    # forwardCallerToken: false      # Pass the credential the proxy verified for the request in params._meta.token. Off by default.
     timeout: 30s             # Per-request timeout (default: 30s)
     displayName: "My Server" # Name shown to agents when two upstreams share a tool name (default: the key)
 
@@ -297,6 +300,30 @@ auth:
   rootToken: "eyJpZCI6Ii..."   # Reuse this token instead of minting new ones
 ```
 
+### Tokens and Upstreams
+
+Agents authenticate to the proxy with the `Authorization` header, `Bearer` scheme (SSE and Streamable HTTP), or `params._meta.token` (stdio). The token is for the proxy:
+
+- **Not forwarded by default.** The proxy removes `_meta.token` from every request before it reaches an upstream, including a `_meta.token` the agent put there itself. Other `_meta` members (such as `progressToken`) are passed on.
+- **Opt-in per upstream.** An upstream that must check the caller's SatGate token itself can be given it with `forwardCallerToken: true`. That upstream then holds the caller's token and can act as the caller with it until it expires or is revoked; enable it only for an upstream you run and trust.
+- **Only the verified credential.** What an opted-in upstream receives in `_meta.token` is the credential the proxy verified for that request, never a value from the request's params that it did not verify: for `tools/call` (and every method, with sign-every-action on) the token authentication accepted; for a method the proxy passes on without authenticating it (`resources/list`, `prompts/get` and the like), the connection's credential (the `Authorization` header, or the URL token with `allowQueryToken`), which the proxy verifies and checks for revocation first. A request with no credential that verifies (none sent, one that fails verification or is revoked, or, with sign-every-action off, a stdio request other than `tools/call`) forwards none.
+
+```yaml
+upstreams:
+  my-verifying-server:
+    transport: stdio
+    command: ["./verifier-mcp"]
+    forwardCallerToken: true
+```
+
+**Token in the URL.** By default `GET /sse`, `POST /message` and the Streamable HTTP endpoint (every HTTP method) refuse with 401 any request whose URL has a `token` query parameter, whatever its value: also empty, repeated, or next to an `Authorization` header. A URL ends up in access logs, browser history and `Referer` headers. The value is not repeated in the response or the log. Send the token in the `Authorization` header. For a client that cannot set a header, `server.allowQueryToken: true` restores the URL fallback (the header first, else the first `token` value):
+
+```yaml
+server:
+  transport: sse
+  allowQueryToken: true   # only for clients that cannot send Authorization
+```
+
 ### Token Delegation
 
 With macaroon auth (`mode: header`), agents can create scoped sub-tokens via the `satgate/delegate` MCP method:
@@ -379,7 +406,30 @@ For `stdio` upstreams, the proxy manages the subprocess lifecycle:
 - **Auto-spawn:** Starts the process on proxy startup
 - **Auto-respawn:** If the upstream process dies, retries up to 5 times with exponential backoff (2s, 4s, 6s, 8s, 10s)
 - **Tool re-discovery:** After respawn, calls `initialize` and `tools/list` to rebuild the tool map
-- **Env passthrough:** The subprocess inherits `os.Environ()` plus any `env` overrides in the upstream config
+- **Environment:** The subprocess does not inherit the proxy's environment. See [Upstream Environment](#upstream-environment).
+
+### Upstream Environment
+
+A `stdio` upstream starts with a small fixed set of variables taken from the proxy's environment (each only if the proxy has it):
+
+`PATH`, `HOME`, `USER`, `LOGNAME`, `SHELL`, `LANG`, `LANGUAGE`, `LC_ALL`, `LC_CTYPE`, `LC_MESSAGES`, `TMPDIR`, `TMP`, `TEMP`, `TZ`, `TERM`, `SSL_CERT_FILE`, `SSL_CERT_DIR`, and on Windows `SystemRoot`, `SystemDrive`, `ComSpec`, `PATHEXT`, `windir`, `USERPROFILE`, `APPDATA`, `LOCALAPPDATA`, `ProgramData`.
+
+Two per-upstream keys add to it:
+
+- `env` — variables set for the subprocess, with the value given (after `${VAR}` expansion of the config file). A value here wins over the base set and over `envPassthrough`. These entries come after the inherited ones, so they also win where variable names are compared without regard to case (Windows).
+- `envPassthrough` — names of variables of the proxy's environment the subprocess also receives, with the proxy's value. A name the proxy does not have is skipped.
+
+Nothing else reaches the subprocess: not the proxy's root key, database or cloud credentials, or any other variable. If an upstream read a variable from the inherited environment before, name it in `envPassthrough` or set it in `env`:
+
+```yaml
+upstreams:
+  github:
+    transport: stdio
+    command: ["npx", "@modelcontextprotocol/server-github"]
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
+    envPassthrough: [HTTPS_PROXY, NO_PROXY, NODE_EXTRA_CA_CERTS]
+```
 
 ## Example Configs
 

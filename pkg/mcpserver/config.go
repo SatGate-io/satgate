@@ -55,6 +55,15 @@ type ServerConfig struct {
 
 	// Version reported in initialize response.
 	Version string `yaml:"version"`
+
+	// AllowQueryToken accepts the caller's token from a "token" URL query
+	// parameter (?token=...) on the SSE and Streamable HTTP endpoints, for
+	// clients that cannot send an Authorization header. Off by default: a
+	// request that carries ?token= is refused with 401, and the token must be
+	// sent as "Authorization: Bearer <token>". A token in a URL is kept in
+	// access logs, browser history and Referer headers; turn this on only
+	// for a client that has no other way to authenticate.
+	AllowQueryToken bool `yaml:"allowQueryToken,omitempty"`
 }
 
 // AuthConfig configures token verification for incoming requests.
@@ -96,8 +105,26 @@ type UpstreamConfig struct {
 	// Timeout for upstream requests.
 	Timeout time.Duration `yaml:"timeout,omitempty"`
 
-	// Env additional environment variables for subprocess.
+	// Env sets environment variables of a stdio upstream's process. A stdio
+	// upstream does not inherit the proxy's environment: it starts with the
+	// short fixed list in stdioBaseEnv (PATH, HOME, locale, temp dir, time
+	// zone and the like, each only if the proxy has it), then the variables
+	// named in EnvPassthrough, then Env. A value in Env wins over both.
 	Env map[string]string `yaml:"env,omitempty"`
+
+	// EnvPassthrough names variables of the proxy's own environment that a
+	// stdio upstream also receives, with the proxy's value (e.g. an API key
+	// the upstream reads, or HTTPS_PROXY). A name the proxy does not have is
+	// skipped. Nothing else from the proxy's environment reaches the upstream.
+	EnvPassthrough []string `yaml:"envPassthrough,omitempty"`
+
+	// ForwardCallerToken passes the caller's SatGate token on to this
+	// upstream in params._meta.token. Off by default: the proxy removes
+	// _meta.token from every request it forwards, including one the caller
+	// put there. Turn it on only for an upstream that must verify the
+	// caller's SatGate token itself; that upstream then holds the caller's
+	// token and can use it as the caller until it expires or is revoked.
+	ForwardCallerToken bool `yaml:"forwardCallerToken,omitempty"`
 
 	// Headers are additional HTTP headers sent with every request (e.g., Authorization).
 	// Only used for HTTP/SSE/Streamable transports.
@@ -310,6 +337,10 @@ func copyUpstreamConfig(cfg UpstreamConfig) UpstreamConfig {
 	out.ExtraSecrets = append([]string(nil), cfg.ExtraSecrets...)
 	if cfg.ExtraSecrets == nil {
 		out.ExtraSecrets = nil
+	}
+	out.EnvPassthrough = append([]string(nil), cfg.EnvPassthrough...)
+	if cfg.EnvPassthrough == nil {
+		out.EnvPassthrough = nil
 	}
 	out.Env = copyStringMap(cfg.Env)
 	out.Headers = copyStringMap(cfg.Headers)

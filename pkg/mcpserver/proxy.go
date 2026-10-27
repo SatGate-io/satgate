@@ -482,7 +482,7 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 		return p.dispatchAuthenticated(ctx, req)
 
 	case MethodCancelled:
-		log.Debug().RawJSON("params", req.Params).Msg("cancellation received")
+		log.Debug().RawJSON("params", withoutMetaToken(req.Params)).Msg("cancellation received")
 		return nil, nil
 
 	default:
@@ -501,7 +501,9 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 
 // authenticate extracts token from the request's _meta field or falls back to config.
 // If a token is provided but fails verification, authentication fails (fail-closed).
-func (p *Proxy) authenticate(ctx context.Context, req *Request) (*TokenInfo, error) {
+// verified is the credential that Verify accepted, or "" when the request runs
+// under the default identity with no credential.
+func (p *Proxy) authenticate(ctx context.Context, req *Request) (info *TokenInfo, verified string, err error) {
 	// Try to extract token from params._meta.token (MCP convention for metadata)
 	token := extractMetaToken(req.Params)
 	if token == "" && p.signEveryAction {
@@ -517,15 +519,15 @@ func (p *Proxy) authenticate(ctx context.Context, req *Request) (*TokenInfo, err
 		if err != nil {
 			// Fail-closed: if a token was provided but is invalid, deny the request.
 			// Never silently fall back to default identity on auth failure.
-			return nil, fmt.Errorf("authentication failed: %w", err)
+			return nil, "", fmt.Errorf("authentication failed: %w", err)
 		}
-		return info, nil
+		return info, token, nil
 	}
 
 	// No token provided.
 	// In header mode, a missing token is an auth bypass — deny it.
 	if p.config.Auth.Mode == "header" {
-		return nil, fmt.Errorf("authentication required: no token provided")
+		return nil, "", fmt.Errorf("authentication required: no token provided")
 	}
 
 	// For auth modes "none" and "config", fall back to default identity.
@@ -533,7 +535,7 @@ func (p *Proxy) authenticate(ctx context.Context, req *Request) (*TokenInfo, err
 		TokenID:  p.tokenID,
 		BudgetID: p.tokenID,
 		Scope:    "*",
-	}, nil
+	}, "", nil
 }
 
 // extractMetaToken pulls the token from params._meta.token if present.
@@ -1116,7 +1118,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		timeout = ucfg.Timeout
 	}
 
-	resp, err = p.router.ForwardToolCallForTenant(ctx, tenantID, tc.Name, req.Params, timeout)
+	// The caller's token stays with the proxy: it is removed from params. An
+	// upstream that opts in (UpstreamConfig.ForwardCallerToken) gets only the
+	// credential authenticate verified, which dispatchAuthenticated put on ctx
+	// (see upstream_hygiene.go).
+	resp, err = p.router.ForwardToolCallForTenant(ctx, tenantID, tc.Name, withoutMetaToken(req.Params), timeout)
 	// What the router returned, as the gate must read it: the reply below is
 	// rewritten into a JSON-RPC error on a transport failure, which would
 	// otherwise look like an answer from the upstream.
@@ -1502,7 +1508,13 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 	}
 	timeout := 30 * time.Second
 
-	resp, err := p.upstream.ForwardRequest(ctx, req.Method, req.Params, timeout)
+	// As for tools/call: the caller's token is not passed on (see
+	// upstream_hygiene.go). An upstream that opted in gets the credential
+	// verified for this request: the one authenticate verified (forwardGoverned),
+	// else the connection's own credential once it verifies here. Never a
+	// value read from params.
+	fwdCtx := p.verifyConnectionCredential(ctx)
+	resp, err := p.upstream.ForwardRequest(fwdCtx, req.Method, withoutMetaToken(req.Params), timeout)
 	if err != nil {
 		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream: %v", err)), nil
 	}

@@ -293,11 +293,13 @@ func TestDuplicateKeysRefusedBothOrdersAtProxy(t *testing.T) {
 		{"escaped duplicate", "CallWixSiteAPI", `{"method":"GET","m\u0065thod":"DELETE","url":"` + site + `"}`, false, ""},
 		{"nested duplicate", "CallWixSiteAPI", `{"method":"GET","url":"` + site + `","body":{"a":1,"a":2}}`, false, ""},
 	})
-	// Unchanged bytes are what the upstream receives on a pass.
+	// Unchanged bytes are what the upstream receives on a pass, less the
+	// caller's _meta.token, which stays with the proxy.
 	proxy, rr, _ := newArgProxy(t)
 	_, tok := argToken(t, scope, wixReadOnlyDoc)
-	req := argCall(1, tok, "CallWixSiteAPI", `{"method":"GET","url":"`+site+`"}`)
-	want := string(req.Params)
+	args := `{"method":"GET","url":"` + site + `"}`
+	req := argCall(1, tok, "CallWixSiteAPI", args)
+	want := `{"name":"CallWixSiteAPI","arguments":` + args + `}`
 	if o := runCall(t, proxy, req); o.denied {
 		t.Fatalf("allowed call refused: %+v", o.resp.Error)
 	}

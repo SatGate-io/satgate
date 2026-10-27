@@ -127,6 +127,39 @@ Budget isolation: when the child exhausts their budget, siblings and parent are 
 | `config` | Single static token in config file |
 | `header` | Per-request macaroon verification (production) |
 
+Over SSE and Streamable HTTP the token goes in the `Authorization` header
+(`Bearer` scheme). By default any request to `GET /sse`, `POST /message` or the
+Streamable HTTP endpoint whose URL has a `token` query parameter is refused
+(401), whatever its value (empty, repeated, or next to a header), and the value
+is not repeated in the response or the log. `server.allowQueryToken: true`
+restores the URL fallback for a client that cannot send a header.
+
+## What Upstreams Receive
+
+- **Environment (stdio):** a fixed base set (`PATH`, `HOME`, locale, temp dir,
+  `TZ` and the like; see `stdioBaseEnv` in `upstream_hygiene.go`), plus the
+  variables named in the upstream's `envPassthrough` list, plus its `env` map,
+  which wins (also where names compare without regard to case, as on Windows).
+  Nothing else from the proxy's environment.
+- **Caller token:** never, by default. `_meta.token` is removed from every
+  forwarded request. `forwardCallerToken: true` on an upstream passes that
+  upstream the credential the proxy verified for the request (the token
+  authentication accepted, or for a method passed on without authentication
+  the connection's own credential once it verifies and is not revoked), never a value from params that it did not verify; with none
+  verified, none is passed.
+  That upstream can then act as the caller.
+
+```yaml
+upstreams:
+  tools:
+    transport: stdio
+    command: ["node", "server.js"]
+    env:
+      API_KEY: "${TOOLS_API_KEY}"
+    envPassthrough: [HTTPS_PROXY]
+    # forwardCallerToken: true   # only if this upstream verifies SatGate tokens itself
+```
+
 ## Per-Tool Routing
 
 Route different tools to different upstream servers:

@@ -638,7 +638,7 @@ func (p *Proxy) recordAuthRefusal(ctx context.Context, req *Request, authErr err
 // other method a key may ask for. The order is authentication, revocation, the
 // request limiter, then the method.
 func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Response, error) {
-	tokenInfo, authErr := p.authenticate(ctx, req)
+	tokenInfo, verified, authErr := p.authenticate(ctx, req)
 	if authErr != nil {
 		log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
 		p.events.Publish(Event{
@@ -668,6 +668,9 @@ func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Respo
 		ctx = context.WithValue(ctx, CtxTenantID, tokenInfo.TenantID)
 	}
 	ctx = context.WithValue(ctx, CtxTokenInfo, tokenInfo)
+	// The credential just verified is the only one an upstream configured
+	// with ForwardCallerToken may receive (see upstream_hygiene.go).
+	ctx = withVerifiedCredential(ctx, verified)
 	// Check revocation (after tenant is in context)
 	if p.revocation != nil && tokenInfo.BudgetID != "" {
 		if p.revocation.IsRevoked(ctx, tokenInfo.BudgetID) {
@@ -828,10 +831,12 @@ func retryUndo(ctx context.Context, bound time.Duration, undo func(context.Conte
 type transportTokenKey struct{}
 
 // withTransportToken keeps the bearer credential of a connection on the
-// request's context, apart from the request's params. The transports set it
-// with the switch on; authenticate reads it when params carry no token. It is
-// the credential the connection presented, verified like any other: nothing a
-// caller wrote into params can name a different identity through it.
+// request's context, apart from the request's params. The transports always
+// set it; with the switch on, authenticate reads it when params carry no
+// token, and verifyConnectionCredential reads it for an upstream configured
+// with ForwardCallerToken. It is the credential the connection presented,
+// verified like any other before it is used: nothing a caller wrote into
+// params can name a different identity through it.
 func withTransportToken(ctx context.Context, token string) context.Context {
 	if token == "" {
 		return ctx
