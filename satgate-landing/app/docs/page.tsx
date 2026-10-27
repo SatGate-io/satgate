@@ -8,10 +8,10 @@ export const metadata: Metadata = {
 };
 
 const docs = [
-  ['Verify a signed receipt', '/verify-evidence-pack', 'Independently verify signed receipts, JWKS, pack mirrors, and tamper evidence.'],
-  ['Rules and Receipts', '/policy-to-proof', 'How SatGate turns authority decisions into portable evidence.'],
-  ['Signed receipt demo', '/evidence-pack-demo', 'Explore a buyer-readable sample artifact and schema.'],
-  ['MCP Gateway', '/mcp', 'Govern MCP tool calls with scoped authority and budget evidence.'],
+  ['Verify a signed receipt', '/verify-evidence-pack', 'Check a signed receipt yourself with SatGate’s published keys.'],
+  ['Rules and Receipts', '/policy-to-proof', 'How SatGate’s rules and receipts work.'],
+  ['Signed receipt demo', '/evidence-pack-demo', 'See what a receipt looks like.'],
+  ['MCP Gateway', '/mcp', 'Budgets and allowed tools for MCP tool calls.'],
   ['Build with SatGate', '/build', 'SDK and developer starting point.'],
 ];
 
@@ -21,7 +21,7 @@ export default function DocsPage() {
       <div className="mx-auto max-w-4xl">
         <Link href="/" className="text-sm text-gray-400 hover:text-white">← Back to Home</Link>
         <h1 className="mt-10 text-5xl font-black tracking-tight">SatGate Docs</h1>
-        <p className="mt-5 text-xl leading-8 text-gray-300">Public entry points for SatGate’s Economic Firewall, rules and receipts, signed receipt (Evidence Pack) verification, MCP gateway, and SDK surfaces.</p>
+        <p className="mt-5 text-xl leading-8 text-gray-300">Start here: how SatGate works, how to check a receipt, MCP setup and the SDKs.</p>
         <div className="mt-10 grid gap-4">
           {docs.map(([title, href, body]) => (
             <Link key={href} href={href} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-cyan-300/40">
