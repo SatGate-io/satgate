@@ -274,7 +274,7 @@ readiness_required_phrases = [
     "Assess whether your agent/API stack is ready for autonomous authority",
     "See SatGate governance",
     "See how rules and receipts work",
-    "spend context",
+    "a refusal code and the budget left",
 ]
 
 readiness_forbidden_phrases = [
@@ -451,7 +451,7 @@ spend_longtail_required_phrases = {
     ],
     "ai-agent-runaway-spend-benchmark": [
         "a permission check before the agent acts",
-        "Evidence Pack",
+        "with a signed receipt for the refusal",
         "Prove",
         "Govern agent spend",
         "See how rules and receipts work",

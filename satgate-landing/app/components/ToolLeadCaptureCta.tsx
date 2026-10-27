@@ -8,7 +8,7 @@ type ToolLeadCaptureCtaProps = {
 
 export default function ToolLeadCaptureCta({
   title = 'Turn this into an enforceable SatGate policy',
-  body = 'Export the calculator result or generated policy, then have SatGate review the budget model, MCP tool costs, credential scope, and enforcement path with your team.',
+  body = 'Export the calculator result, then have SatGate review the budget model, MCP tool costs, credential scope, and enforcement path with your team.',
 }: ToolLeadCaptureCtaProps) {
   return (
     <section className="rounded-3xl border border-cyan-900/70 bg-gradient-to-br from-cyan-950/30 via-gray-950 to-purple-950/20 p-8 md:p-10">
@@ -21,7 +21,7 @@ export default function ToolLeadCaptureCta({
         <div className="rounded-2xl border border-gray-800 bg-black/50 p-5">
           <Download className="mb-3 text-cyan-300" size={24} />
           <h3 className="mb-2 font-bold text-white">Export</h3>
-          <p className="text-sm leading-relaxed text-gray-400">Save the YAML, JSON, CSV, benchmark data, or calculator output your team already generated.</p>
+          <p className="text-sm leading-relaxed text-gray-400">Save the calculator output or benchmark data your team already has.</p>
         </div>
         <div className="rounded-2xl border border-gray-800 bg-black/50 p-5">
           <Mail className="mb-3 text-purple-300" size={24} />

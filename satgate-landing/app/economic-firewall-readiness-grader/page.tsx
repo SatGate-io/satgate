@@ -48,7 +48,7 @@ const questions: Question[] = [
     id: 'audit',
     category: 'Audit evidence',
     prompt: 'Can finance/security/platform teams reconstruct who had authority, what happened, why it was allowed or denied, and which policy decided?',
-    fix: 'Record the authority chain, policy decision, denial reason, estimated cost, remaining budget, route, tool, credential, and upstream outcome for receipt export.',
+    fix: 'Keep signed receipts with the route or tool, the decision, a refusal code and the budget left.',
   },
   {
     id: 'routing',
@@ -245,7 +245,7 @@ export default function EconomicFirewallReadinessGraderPage() {
             {[
               [KeyRound, 'Authority', 'Agent identity, scoped credentials, expiry, narrowing, and revocation.'],
               [Gauge, 'Budget and authority limits', 'Budgets checked before the request goes through, scoped permissions, per-tool caps, model routing, and loop prevention.'],
-              [ReceiptText, 'Evidence', 'Signed receipt trails that explain authority, spend context, policy decision, denial reason, route, and outcome.'],
+              [ReceiptText, 'Evidence', 'Keep signed receipts with the route or tool, the decision, a refusal code and the budget left.'],
               [BadgeCheck, 'Payment details', 'Observe, Control, and Prove paths for internal agents and paid calls.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof KeyRound;

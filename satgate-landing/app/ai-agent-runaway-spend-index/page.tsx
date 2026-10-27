@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, BarChart3, Download, Gauge, ShieldCheck, Zap } from 'lucide-react';
 
 export const metadata = {
-  title: 'AI Agent Runaway Spend Index: April 2026 cost risk benchmark',
+  title: 'AI agent runaway spend model (April 2026)',
   description: 'SatGate index (April 2026) of modeled runaway AI agent spend, MCP tool cost failures, retry loops, fanout risk, and avoided cost from controls before the request goes through.',
   alternates: { canonical: 'https://satgate.io/ai-agent-runaway-spend-index' },
   keywords: [
@@ -86,7 +86,7 @@ const faqJsonLd = {
       name: 'What is the AI Agent Runaway Spend Index?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'The AI Agent Runaway Spend Index is a benchmark of modeled autonomous agent cost failures (one edition so far, April 2026), including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from controls before the request goes through.',
+        text: 'The AI Agent Runaway Spend Index is a benchmark of modeled autonomous agent cost failures (April 2026), including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from controls before the request goes through.',
       },
     },
     {
@@ -199,7 +199,7 @@ export default function AiAgentRunawaySpendIndexPage() {
         <h2 className="mb-8 text-3xl font-bold text-white">Runaway spend index FAQ</h2>
         <div className="space-y-5">
           {[
-            ['What is the AI Agent Runaway Spend Index?', 'The AI Agent Runaway Spend Index is a benchmark of modeled autonomous agent cost failures (one edition so far, April 2026), including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from controls before the request goes through.'],
+            ['What is the AI Agent Runaway Spend Index?', 'The AI Agent Runaway Spend Index is a benchmark of modeled autonomous agent cost failures (April 2026), including retry loops, MCP tool storms, delegated fanout, paid API polling, and avoided spend from controls before the request goes through.'],
             ['Why do runaway AI agents create cost risk?', 'Agents can loop, retry, delegate, and call paid tools or APIs much faster than humans. Without budgets checked before the request goes through and kill switches, small mistakes can become expensive incidents before dashboards report the damage.'],
             ['How does SatGate reduce runaway agent spend?', 'SatGate reduces runaway agent spend by enforcing per-request budgets, MCP tool cost policy, revocable capabilities, delegation caps, audit requirements, and kill switches at the gateway before forwarding to upstream services.'],
             ['Which failure modes does the index track?', 'The index tracks OpenAI retry loops, MCP browser automation loops, sub-agent research fanout, paid data API polling loops, and multi-tenant agent swarms.'],

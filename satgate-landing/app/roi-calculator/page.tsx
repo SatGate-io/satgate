@@ -50,8 +50,8 @@ export default function ROICalculatorPage() {
   const [agents, setAgents] = useState(50);
   const [costPerCall, setCostPerCall] = useState(0.05);
   const [callsPerDay, setCallsPerDay] = useState(200);
-  const [loopFreq, setLoopFreq] = useState(2);
-  const [loopDuration, setLoopDuration] = useState(150);
+  const [loopFreq, setLoopFreq] = useState(0.1);
+  const [loopDuration, setLoopDuration] = useState(50);
 
   const calc = useMemo(() => {
     const monthlyToolSpend = agents * callsPerDay * costPerCall * 30;
@@ -372,7 +372,7 @@ export default function ROICalculatorPage() {
           <div className="space-y-6">
             {/* Metrics */}
             <div className="p-6 md:p-8 rounded-2xl bg-gray-900 border border-gray-800">
-              <h2 className="text-lg font-bold text-white mb-2">Unmanaged cost exposure (estimate)</h2>
+              <h2 className="text-lg font-bold text-white mb-2">Example estimate: unmanaged cost exposure</h2>
               <p className="text-xs text-gray-500 mb-6">Formula: extra calls = agents × calls/day × 30 × loop frequency × N × cost per call. Savings assume a hard cap stops those extra calls. Pro is modeled at $99/month. Not a measurement.</p>
               <div className="space-y-4">
                 <div className="flex justify-between items-baseline">
@@ -622,7 +622,7 @@ export default function ROICalculatorPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Turn this ROI model into proof</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-            SatGate checks permission before the agent acts, records every policy decision as a receipt, and packages the evidence for review.
+            SatGate checks permission before the agent acts and signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

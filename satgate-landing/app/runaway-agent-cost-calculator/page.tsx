@@ -107,7 +107,7 @@ export default function RunawayAgentCostCalculatorPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate reduce runaway agent costs?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate enforces budgets on each request that goes through SatGate, plus scoped authority, per-tool spend caps, revocation, and route policy at the gateway before forwarding to upstream APIs or MCP tools, then records the decision in the signed receipt (Evidence Pack).' },
+        acceptedAnswer: { '@type': 'Answer', text: 'In Control, SatGate checks each request’s budget, permissions and revoke status before forwarding it, and signs a receipt when it refuses one or spends from a budget.' },
       },
       {
         '@type': 'Question',
@@ -263,7 +263,7 @@ export default function RunawayAgentCostCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate reduce runaway agent costs?</h3>
               <p className="text-gray-400 leading-relaxed">
-                SatGate enforces budgets on each request that goes through SatGate, plus scoped authority, per-tool spend caps, revocation, and route policy at the gateway before forwarding to upstream APIs or MCP tools, then records the decision in the signed receipt (Evidence Pack).
+                In Control, SatGate checks each request&apos;s budget, permissions and revoke status before forwarding it, and signs a receipt when it refuses one or spends from a budget.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

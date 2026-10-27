@@ -130,7 +130,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'Is L402 the same as Fiat402?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate payment methods. SatGate can preserve payment details without conflating them.',
+          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402 (USDC on Base) is the other live way to pay on SatGate. AgentCore Payments and Pay.sh are planned.',
         },
       },
       {
@@ -258,7 +258,7 @@ export default function L402ApiPricingCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is L402 the same as Fiat402?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate payment methods. SatGate can preserve payment details without conflating them.
+                No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402 (USDC on Base) is the other live way to pay on SatGate. AgentCore Payments and Pay.sh are planned.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
