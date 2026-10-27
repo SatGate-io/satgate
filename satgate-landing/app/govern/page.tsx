@@ -70,7 +70,7 @@ const faqSchema = {
       name: "What are rules and receipts for AI agents?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Rules and receipts for AI agents apply before the request goes through. They apply scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, so they can be verified later.",
+        text: "Rules and receipts for AI agents apply before the request goes through. They apply scopes, budgets, delegation rules, and revocation before an agent reaches an upstream API, model, or MCP tool, then keep signed receipts anyone can check later.",
       },
     },
     {

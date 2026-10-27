@@ -141,24 +141,24 @@ required_phrases = [
 ]
 
 govern_required_phrases = [
-    "Govern what agents can do",
+    "Set what agents can do, and prove it.",
     "Check the receipts afterward",
     "SatGate checks each request against them before it reaches the service.",
-    "Payment proves value moved; SatGate proves authority was evaluated.",
+    "Your auditor can check them with the open-source verifier and SatGate&apos;s published keys",
     "Govern first. Enforce before execution. Check the receipts afterward.",
     "Receipt exports",
-    "first denied call after revoke",
+    "Refusals and revokes",
     "Stop giving AI agents standing authority",
     "Export proof after",
     "Rules and Receipts",
     "Policy enforced before execution",
-    "Across Both Agent Lanes",
+    "for both kinds of agent",
     "invoice-reconciler worker",
     "Worker Attempts Unauthorized Tool",
     "SatGate Denies Before Execution",
-    "Receipt exported",
-    "Authority Dashboard",
-    "Revocation & Denial",
+    "Receipt signed",
+    "Agents and tokens",
+    "Spend by agent",
     "Root Policy",
     "Invoice Reconciler",
     "Agent governance readiness grader",
@@ -184,6 +184,10 @@ govern_forbidden_phrases = [
     "Economic firewall readiness grader",
     "By Monday",
     "How does SatGate relate to x402, AgentCore Payments, and Pay.sh?",
+    "Real-World Scenario",
+    "IaC modules ready",
+    "receipt authority timeline",
+    "jq -r '.token'",
 ]
 
 acp_required_phrases = [
