@@ -187,7 +187,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             Budget enforcement isn&apos;t one-size-fits-all. SatGate supports granular policy across multiple dimensions:
           </p>
           <ul className="text-gray-300 space-y-2">
-            <li><strong>Per agent:</strong> The research agent&apos;s token gets $100 of budget; on MCP tools you can also cap it per day. Each is independently capped.</li>
+            <li><strong>Per agent:</strong> The research agent&apos;s token gets $100 of budget. Each is independently capped.</li>
             <li><strong>Per tool:</strong> Premium APIs get tighter limits than commodity ones. Your $0.50/call image generation endpoint has different economics than your $0.001/call text lookup.</li>
             <li><strong>Per team:</strong> Give each team lead a token and let them hand out smaller ones. Neither team can dip into the other&apos;s allocation.</li>
           </ul>
