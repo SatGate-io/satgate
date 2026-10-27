@@ -438,11 +438,9 @@ func (m *UpstreamManager) connectStdio(name string, cfg UpstreamConfig) (*Upstre
 
 	cmd := exec.Command(cfg.Command[0], cfg.Command[1:]...)
 
-	// Set environment
-	cmd.Env = os.Environ()
-	for k, v := range cfg.Env {
-		cmd.Env = append(cmd.Env, k+"="+v)
-	}
+	// Least privilege: the base list, the names the configuration passes
+	// through and its own env map. Nothing else of the proxy's environment.
+	cmd.Env = stdioEnv(cfg, os.LookupEnv)
 
 	// Stderr goes to our stderr for debugging
 	cmd.Stderr = os.Stderr
@@ -643,6 +641,9 @@ func (m *UpstreamManager) reconnect(ctx context.Context, client *UpstreamClient,
 func (m *UpstreamManager) sendRequest(ctx context.Context, client *UpstreamClient, method string, params json.RawMessage, timeout time.Duration) (*Response, error) {
 	id := m.idCounter.Add(1)
 	idJSON, _ := json.Marshal(id)
+
+	// The caller's token stays with the proxy unless this upstream opted in.
+	params = m.outboundParams(ctx, client.name, params)
 
 	req := Request{
 		JSONRPC: "2.0",

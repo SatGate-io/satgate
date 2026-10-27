@@ -101,7 +101,7 @@ func (s *SSEServer) resumeStreamSession(w http.ResponseWriter, r *http.Request, 
 		http.Error(w, "session not found", http.StatusNotFound)
 		return nil, false
 	}
-	token := extractAuthToken(r)
+	token := s.authToken(r)
 	// The same token checks an initialize gets, in the same order.
 	if s.rejectHardAuthFailure(w, r, token) {
 		return nil, false

@@ -163,7 +163,7 @@ func (s *SSEServer) writeAuthChallenge(w http.ResponseWriter, msg string) {
 // new session (MCP spec, session management), since a refreshed access token
 // is a different token than the one the session was opened with.
 func (s *SSEServer) rejectStreamSessionToken(w http.ResponseWriter, r *http.Request, sess *streamSession) bool {
-	tok := extractAuthToken(r)
+	tok := s.authToken(r)
 	if s.oauthChallengeEnabled() && s.requiresVerifiedStreamToken() {
 		if tok == "" {
 			s.writeAuthChallenge(w, "authentication required")
@@ -235,9 +235,14 @@ func (s *SSEServer) handleStreamable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// A token in the URL is refused unless server.allowQueryToken is on.
+	if s.refuseQueryToken(w, r) {
+		return
+	}
+
 	// A token issued for another MCP resource is refused before any method
 	// runs (see resource_binding.go).
-	if s.refuseWrongResource(w, extractAuthToken(r)) {
+	if s.refuseWrongResource(w, s.authToken(r)) {
 		return
 	}
 
@@ -337,7 +342,7 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 			http.Error(w, "unsupported protocol version", http.StatusBadRequest)
 			return
 		}
-		authToken := extractAuthToken(r)
+		authToken := s.authToken(r)
 		if denied := s.rejectHardAuthFailure(w, r, authToken); denied {
 			return
 		}
@@ -394,7 +399,7 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	authToken := extractAuthToken(r)
+	authToken := s.authToken(r)
 	// With sign-every-action on, the connection's credential also travels on
 	// the context, apart from params, and params that are not an object are
 	// left as they came (see authenticate).

@@ -482,7 +482,7 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 		return p.dispatchAuthenticated(ctx, req)
 
 	case MethodCancelled:
-		log.Debug().RawJSON("params", req.Params).Msg("cancellation received")
+		log.Debug().RawJSON("params", withoutMetaToken(req.Params)).Msg("cancellation received")
 		return nil, nil
 
 	default:
@@ -1116,7 +1116,11 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		timeout = ucfg.Timeout
 	}
 
-	resp, err = p.router.ForwardToolCallForTenant(ctx, tenantID, tc.Name, req.Params, timeout)
+	// The caller's token stays with the proxy: it is removed from params, and
+	// travels on the context only for an upstream that opts in to receive it
+	// (UpstreamConfig.ForwardCallerToken, see upstream_hygiene.go).
+	fwdCtx := withCallerToken(ctx, callerToken(ctx, req))
+	resp, err = p.router.ForwardToolCallForTenant(fwdCtx, tenantID, tc.Name, withoutMetaToken(req.Params), timeout)
 	// What the router returned, as the gate must read it: the reply below is
 	// rewritten into a JSON-RPC error on a transport failure, which would
 	// otherwise look like an answer from the upstream.
@@ -1502,7 +1506,10 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 	}
 	timeout := 30 * time.Second
 
-	resp, err := p.upstream.ForwardRequest(ctx, req.Method, req.Params, timeout)
+	// As for tools/call: the caller's token is not passed on (see
+	// upstream_hygiene.go) unless the upstream opted in.
+	fwdCtx := withCallerToken(ctx, callerToken(ctx, req))
+	resp, err := p.upstream.ForwardRequest(fwdCtx, req.Method, withoutMetaToken(req.Params), timeout)
 	if err != nil {
 		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream: %v", err)), nil
 	}

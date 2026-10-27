@@ -220,6 +220,9 @@ func (s *SSEServer) ListenAndServe(ctx context.Context) error {
 // Response: text/event-stream with JSON-RPC messages as "message" events.
 // The endpoint URL for posting messages is sent as the first event.
 func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
+	if s.refuseQueryToken(w, r) {
+		return
+	}
 	// Only the finite connect-time phase can record. Release before opening
 	// a healthy stream, but cover every denial, return and panic before that.
 	var endConnect func()
@@ -253,7 +256,7 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Capture auth token from header before writing response.
-	authToken := extractAuthToken(r)
+	authToken := s.authToken(r)
 
 	// A token issued for another MCP resource gets no stream.
 	if s.refuseWrongResource(w, authToken) {
@@ -406,6 +409,9 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "POST required", http.StatusMethodNotAllowed)
 		return
 	}
+	if s.refuseQueryToken(w, r) {
+		return
+	}
 
 	var end func()
 	var lease *operationLease
@@ -447,7 +453,7 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Also check Authorization header for token (SSE auth)
-	authToken := extractAuthToken(r)
+	authToken := s.authToken(r)
 
 	// A token issued for another MCP resource gets no method answered.
 	if s.refuseWrongResource(w, authToken) {
@@ -637,18 +643,48 @@ func (s *SSEServer) handleHealth(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(body)
 }
 
-// extractAuthToken pulls Bearer token from Authorization header.
+// extractAuthToken pulls the Bearer token from the Authorization header. It
+// never reads the URL: see SSEServer.authToken for the ?token= fallback.
 func extractAuthToken(r *http.Request) string {
-	// Check Authorization header first
 	auth := r.Header.Get("Authorization")
 	if auth != "" {
 		return strings.TrimPrefix(auth, "Bearer ")
 	}
-	// Fall back to ?token= query parameter (used by SSE clients like Cursor)
-	if token := r.URL.Query().Get("token"); token != "" {
-		return token
+	return ""
+}
+
+// queryTokenParam is the URL query parameter some clients put the token in.
+const queryTokenParam = "token"
+
+// allowQueryToken reports whether server.allowQueryToken is on.
+func (s *SSEServer) allowQueryToken() bool {
+	return s != nil && s.proxy != nil && s.proxy.config != nil && s.proxy.config.Server.AllowQueryToken
+}
+
+// authToken is the caller's token on r: the Authorization header, else, only
+// with server.allowQueryToken on, the ?token= query parameter.
+func (s *SSEServer) authToken(r *http.Request) string {
+	if tok := extractAuthToken(r); tok != "" {
+		return tok
+	}
+	if s.allowQueryToken() {
+		return r.URL.Query().Get(queryTokenParam)
 	}
 	return ""
+}
+
+// refuseQueryToken answers 401 to a request that carries ?token= while
+// server.allowQueryToken is off, so a client is told to send the header
+// instead of being served under no identity. It reports true when it refused.
+func (s *SSEServer) refuseQueryToken(w http.ResponseWriter, r *http.Request) bool {
+	if s.allowQueryToken() || r.URL.Query().Get(queryTokenParam) == "" {
+		return false
+	}
+	if s.oauthChallengeEnabled() {
+		w.Header().Set("WWW-Authenticate", s.bearerChallenge())
+	}
+	http.Error(w, "token in URL not accepted: send it in the Authorization header (Bearer)", http.StatusUnauthorized)
+	return true
 }
 
 // injectMetaToken adds _meta.token to params JSON if not already present.
