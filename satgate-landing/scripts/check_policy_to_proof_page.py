@@ -314,7 +314,7 @@ tool_required_phrases = {
     "design-partners": [
         "Policy-to-Proof layer",
         "signed receipts",
-        "bounded lane",
+        "test setup you choose",
         "refusals and signed receipts",
         "Rules and receipts for AI agents",
         "/policy-to-proof",

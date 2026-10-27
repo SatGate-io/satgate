@@ -3,7 +3,7 @@ import { ArrowRight, Bot, CircleDollarSign, KeyRound, Network, ReceiptText, Shie
 
 export const metadata = {
   title: 'Governed Paid API Access for Agents',
-  description: 'A practical guide to letting platforms delegate paid API access to agents with L402, scoped permissions, policy before the request goes through, and signed receipts.',
+  description: 'How to let external agents pay for API access with Lightning (L402) or USDC on Base (x402), within the permissions and budget you set.',
   alternates: { canonical: 'https://satgate.io/paid-agent-payments' },
   keywords: [
     'paid agent payments',
@@ -140,7 +140,7 @@ export default function RobotCustomerPaymentsPage() {
         name: 'Do SatGate payment rules use L402?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. SatGate can use L402-style payment details for external agent/API monetization. Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.',
+          text: 'Yes, on routes that take Lightning. SatGate also takes USDC on Base (x402). Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.',
         },
       },
     ],
@@ -171,7 +171,7 @@ export default function RobotCustomerPaymentsPage() {
             Governed Paid API Access for Agents
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            AI agents should not become unmanaged customers. They need bounded economic authority from a human or platform, plus APIs that can verify price, policy, scope, and signed receipt (Evidence Pack) proof before the request goes through.
+            AI agents should not become unmanaged customers. They need limits set by a person or platform, and APIs that check the price, the permissions and the payment before the request goes through.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/l402-agent-payments" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
@@ -235,7 +235,7 @@ export default function RobotCustomerPaymentsPage() {
                 Wallets and payment credentials can help platforms delegate value movement to autonomous software. API companies still need the control plane around those payments: identity, budgets, scoped access, revocation, metering, and audit.
               </p>
               <p>
-                SatGate payment rules are policy-native API monetization. Stripe-style shared payment tokens and card credentials are separate payment methods; SatGate&apos;s durable role is governing delegated agent spending before access.
+                With SatGate you charge external agents on the routes you choose. Card and Stripe payment tokens are a different thing; SatGate&apos;s job is to check what an agent may do and spend before it gets in.
               </p>
             </div>
           </div>
@@ -319,7 +319,7 @@ export default function RobotCustomerPaymentsPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Do SatGate payment rules use L402?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Yes. SatGate payment rules are based on payment details for external agent/API monetization. Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.
+                Yes, on routes that take Lightning. SatGate also takes USDC on Base (x402). Payment proof unlocks only the scoped capability, route, quota, or expiry allowed by policy.
               </p>
             </div>
           </div>

@@ -129,10 +129,10 @@ const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: 'How does Control differ from Prove?',
+      name: 'How do receipts fit with Control?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed receipts (Evidence Packs) for supported receipt-producing decisions across internal and external agent lanes, so an auditor can verify what happened without trusting SatGate.',
+        text: 'Control enforces scopes, budgets and revokes before a request runs. SatGate signs receipts for its refusals and for spending in Control, and an auditor can check them against SatGate’s published keys with no need to trust the AI company.',
       },
     },
   ],
@@ -858,12 +858,12 @@ export default function ProtectDemoPage() {
       <section id="proof-path" className="border-b border-gray-800/50 bg-cyan-950/10">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
           <div className="rounded-2xl border border-cyan-500/30 bg-black/40 p-6">
-            <p className="mb-2 text-xs font-mono uppercase tracking-[0.22em] text-cyan-300">Deterministic public proof path</p>
+            <p className="mb-2 text-xs font-mono uppercase tracking-[0.22em] text-cyan-300">Walkthrough</p>
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <h3 className="text-2xl font-bold text-white">Need the buyer-safe allow/deny/revoke proof?</h3>
+                <h3 className="text-2xl font-bold text-white">See the 90-second walkthrough</h3>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-300">
-                  The one-click Control scenes are useful for protocol exploration. The deterministic buyer proof lives on the public demo path and shows 401 no authority, 200 allowed, 402/403 denial, revoke/replay denial, and Evidence Pack export without auth or hidden shortcuts.
+                  Watch an agent get allowed, refused for its budget and permissions, and revoked, with the receipt at the end.
                 </p>
               </div>
               <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
@@ -933,13 +933,13 @@ export default function ProtectDemoPage() {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-white">Default Protection</h2>
-                      <p className="text-gray-400 text-sm">Layer 0 — Always-On Cryptographic Verification</p>
+                      <p className="text-gray-400 text-sm">Every protected request is checked</p>
                     </div>
                   </div>
                   <p className="text-gray-300 leading-relaxed">
                     Default Protection is the foundation of SatGate's security model. <strong className="text-blue-400">Every protected
-                    (non-PUBLIC) request is cryptographically verified</strong> — signatures, caveats, delegation chains. You can't turn this off.
-                    Then you choose your <strong className="text-white">economic policy</strong>: observe, control, or charge.
+                    request is checked</strong>: the token&apos;s signature, its limits and its handoffs. You can&apos;t turn this off.
+                    Then pick <strong className="text-white">Observe, Control or Admit</strong>.
                   </p>
                 </>
               )}
@@ -1065,10 +1065,10 @@ export default function ProtectDemoPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="p-4 bg-black rounded-xl border border-gray-800">
                       <div className="flex items-center gap-2 text-purple-400 font-semibold mb-2">
-                        <User size={18} /> CISO Role
+                        <User size={18} /> Security owner
                       </div>
                       <p className="text-gray-400 text-sm">
-                        Issues root credentials. Retains authority. Can revoke governed access.
+                        Issues the first tokens and can revoke any of them.
                       </p>
                     </div>
                     <div className="p-4 bg-black rounded-xl border border-gray-800">
@@ -1808,7 +1808,7 @@ export default function ProtectDemoPage() {
             {[
               ['What does SatGate Control protect?', 'SatGate Control protects agent API and MCP tool calls by enforcing scoped capability tokens, budgets, delegation limits, revocation, and audit policy before requests reach upstream services.'],
               ['Why use revocable capability tokens for agents?', 'Revocable capability tokens give agents narrow, expiring authority that can be delegated safely and denied at policy check without rotating global API keys or service-account credentials.'],
-              ['How does Control differ from Prove?', 'Control enforces scopes, budgets, and revocation before execution. Prove exports signed receipts (Evidence Packs) for supported receipt-producing decisions across internal and external agent lanes, so an auditor can verify what happened without trusting SatGate.'],
+              ['How do receipts fit with Control?', 'Control enforces scopes, budgets and revokes before a request runs. SatGate signs receipts for its refusals and for spending in Control, and an auditor can check them against SatGate’s published keys with no need to trust the AI company.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>
