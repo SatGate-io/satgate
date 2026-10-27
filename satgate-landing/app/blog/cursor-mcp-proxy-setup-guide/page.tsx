@@ -206,7 +206,7 @@ satgate-mcp --config ./satgate-mcp.yaml`}</code>
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
             <code>{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
 Send Cursor's calls through the gateway with that token.
-There is no satgate token create command; mint the token in the dashboard, where you can also set daily and weekly dollar limits for MCP tools.`}</code>
+There is no satgate token create command; mint the token in the dashboard and set its budget there.`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -297,7 +297,7 @@ There is no satgate token create command; mint the token in the dashboard, where
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Runaway tool loops</h3>
           <p className="text-gray-300 leading-relaxed">
-            Cursor keeps retrying a flaky tool. Without a proxy, it burns time and money until someone notices. With SatGate, the token&apos;s budget or daily limit stops the loop.
+            Cursor keeps retrying a flaky tool. Without a proxy, it burns time and money until someone notices. With SatGate, the token&apos;s budget stops the loop.
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Overpowered editor access</h3>

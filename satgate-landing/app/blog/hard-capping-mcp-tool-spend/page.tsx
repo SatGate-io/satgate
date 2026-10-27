@@ -283,7 +283,7 @@ export default function HardCappingMcpToolSpendPage() {
             <code className="text-cyan-300">{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
 Send the agent's calls through the gateway with that token.
 There is no satgate token create or satgate token attenuate command.
-You can also set daily and weekly dollar limits for MCP tools in the dashboard.
+For trading tools, you can also set daily and weekly dollar limits on orders in the dashboard.
 A spent budget refuses the next call with code budget_exhausted.`}</code>
           </pre>
 

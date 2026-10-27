@@ -51,7 +51,7 @@ const satgateWins: Array<{ icon: typeof ShieldCheck; title: string; body: string
   {
     icon: Gauge,
     title: 'Budgets for each agent and tool',
-    body: 'Control spend per agent, sub-agent, route and MCP tool, with daily and weekly dollar limits on MCP tools.',
+    body: 'Control spend per agent, sub-agent, route and MCP tool, with daily and weekly dollar limits on trade orders.',
   },
   {
     icon: KeyRound,

@@ -33,7 +33,7 @@ const stages = [
   { icon: Eye, title: 'Observe', body: 'Capture every model, API, and MCP tool request with agent, user, tenant, route, model, latency, and cost context.' },
   { icon: LineChart, title: 'Monitor', body: 'Trend spend velocity, token growth, retry storms, model drift, error spikes, and unusual agent behavior.' },
   { icon: Bell, title: 'Alert', body: 'Notify teams when spend crosses thresholds, but treat alerting as a signal — not the control itself.' },
-  { icon: Gauge, title: 'Budget', body: 'Assign ceilings per agent, route and tool (credits), and daily or weekly dollar limits on MCP tools.' },
+  { icon: Gauge, title: 'Budget', body: 'Assign ceilings per agent, route and tool (credits), and daily or weekly dollar limits on trade orders.' },
   { icon: LockKeyhole, title: 'Enforce', body: 'Block, revoke or require payment before the upstream call runs.' },
 ];
 

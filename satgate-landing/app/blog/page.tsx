@@ -214,7 +214,7 @@ const posts = [
   {
     slug: 'ai-agent-spending-limits',
     title: 'AI Agent Spending Limits: Hard Budgets by Agent, Tool, and Workflow',
-    description: 'Set AI agent spending limits with hard budgets per agent, tool and route, and daily or weekly dollar limits on MCP tools.',
+    description: 'Set AI agent spending limits with hard budgets per agent, tool and route, and daily or weekly dollar limits on trade orders.',
     date: '2026-03-10',
     readTime: '9 min read',
     author: 'Matt Dean',

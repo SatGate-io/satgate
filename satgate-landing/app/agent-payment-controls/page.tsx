@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, BellRing, CheckCircle2, CreditCard, FileSearch, Gauge, KeyRound, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Agent Payment Controls | Limits Before Payment',
+  title: 'Agent payment controls | Limits before payment',
   description: 'Agent payment controls combine budgets, policy, scoped authority, revocation, metering, payment details, and signed receipts before requests execute.',
   alternates: { canonical: 'https://satgate.io/agent-payment-controls' },
   keywords: [
@@ -16,7 +16,7 @@ export const metadata = {
     'payment rules for agents',
   ],
   openGraph: {
-    title: 'Agent Payment Controls | Limits Before Payment',
+    title: 'Agent payment controls | Limits before payment',
     description: 'Wallet approval is necessary but not sufficient. SatGate adds budgets on each request that goes through SatGate, scoped authority, metering, revocation, and signed receipts.',
     url: 'https://satgate.io/agent-payment-controls',
     type: 'article',
@@ -24,14 +24,14 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Agent Payment Controls | Limits Before Payment',
+    title: 'Agent payment controls | Limits before payment',
     description: 'Control delegated paid access before it becomes runaway API, MCP, and model spend.',
   },
 };
 
 const controls = [
   { icon: KeyRound, title: 'Agent identity', body: 'Know which agent token and route caused each spend.' },
-  { icon: Gauge, title: 'Budgets', body: 'Enforce hard limits per agent, sub-agent, route and MCP tool, and daily or weekly dollar limits on MCP tools, before requests run.' },
+  { icon: Gauge, title: 'Budgets', body: 'Enforce hard limits per agent, sub-agent, route and MCP tool, and daily or weekly dollar limits on trade orders, before requests run.' },
   { icon: ShieldCheck, title: 'Policy', body: 'Allow, refuse, ask you for approval, or revoke, based on the agent’s permissions, budget and the price.' },
   { icon: FileSearch, title: 'Signed receipts', body: 'Sign a receipt for refusals and spending: the route or tool, the decision, the cost and the payment details.' },
   { icon: CreditCard, title: 'Payment rail awareness', body: 'Understand whether a flow uses card credentials, shared payment tokens, payment details, or another 402 challenge.' },
@@ -42,7 +42,7 @@ export default function AgentPaymentControlsPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'Agent Payment Controls | Limits Before Payment',
+    headline: 'Agent payment controls | Limits before payment',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },

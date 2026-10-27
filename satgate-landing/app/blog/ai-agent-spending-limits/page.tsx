@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: 'AI Agent Spending Limits: Hard Budgets by Agent, Tool, and Workflow',
-  description: 'Set AI agent spending limits with hard budgets per agent, tool and route, and daily or weekly dollar limits on MCP tools.',
+  description: 'Set AI agent spending limits with hard budgets per agent, tool and route, and daily or weekly dollar limits on trade orders.',
   alternates: { canonical: 'https://satgate.io/blog/ai-agent-spending-limits' },
   keywords: ['AI agent spending limits', 'API budget control', 'agent cost management', 'economic firewall', 'API key vs budget', 'autonomous agent costs'],
   openGraph: {
     title: 'AI Agent Spending Limits: Hard Budgets by Agent and Tool',
-    description: 'Set AI agent spending limits with hard budgets per agent, tool and route, and daily or weekly dollar limits on MCP tools.',
+    description: 'Set AI agent spending limits with hard budgets per agent, tool and route, and daily or weekly dollar limits on trade orders.',
     url: 'https://satgate.io/blog/ai-agent-spending-limits',
     type: 'article',
     publishedTime: '2026-03-10T00:00:00Z',
@@ -74,7 +74,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
         name: 'Can AI agent spending limits be set per workflow or time window?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate budgets are set per agent and sub-agent token, route and MCP tool, with daily and weekly dollar limits on Cloud MCP tools and an end date on each token.',
+          text: 'SatGate budgets are set per agent and sub-agent token, route and MCP tool, with daily and weekly dollar limits on trade orders through Cloud MCP and an end date on each token.',
         },
       },
     ],
@@ -209,7 +209,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
                 ['What are AI agent spending limits?', 'AI agent spending limits are policies, checked before the request goes through, that cap how much an autonomous agent can spend by agent, tool, model, route, workflow, or time window at the gateway before forwarding to upstream APIs or MCP tools.'],
                 ['Why are rate limits not enough for AI agent cost control?', 'Rate limits control request volume, not money. AI agents can still choose expensive tools, retry costly calls, or fan out across subtasks while staying under a request-per-minute limit.'],
                 ['Where should teams enforce AI agent spend limits?', 'Enforce spending limits before the request goes through, at an economic firewall or MCP proxy so budget, revocation and audit policy are checked before a costly call executes.'],
-                ['Can AI agent spending limits be set per workflow or time window?', 'SatGate budgets are set per agent and sub-agent token, route and MCP tool, with daily and weekly dollar limits on Cloud MCP tools and an end date on each token.'],
+                ['Can AI agent spending limits be set per workflow or time window?', 'SatGate budgets are set per agent and sub-agent token, route and MCP tool, with daily and weekly dollar limits on trade orders through Cloud MCP and an end date on each token.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

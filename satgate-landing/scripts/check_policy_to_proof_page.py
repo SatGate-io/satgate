@@ -557,7 +557,7 @@ tool_metadata_required_phrases = {
         "openGraph",
         "twitter",
         "https://satgate.io/mcp-proxy-config-generator",
-        "Cloud MCP Connect Snippet",
+        "Cloud MCP connect snippet",
     ],
     "l402-api-pricing-calculator": [
         "keywords",

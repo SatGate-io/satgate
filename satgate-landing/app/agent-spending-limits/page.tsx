@@ -3,7 +3,7 @@ import { ArrowRight, Ban, BarChart3, Bot, DollarSign, Gauge, KeyRound, ReceiptTe
 
 export const metadata = {
   title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-  description: 'Set AI agent spending limits per agent, sub-agent, route and tool, with daily and weekly dollar limits for MCP tools. In Control, SatGate enforces them before spend occurs.',
+  description: 'Set AI agent spending limits per agent, sub-agent, route and tool, with daily and weekly dollar limits on trade orders. In Control, SatGate enforces them before spend occurs.',
   alternates: { canonical: 'https://satgate.io/agent-spending-limits' },
   keywords: [
     'agent spending limits',
@@ -18,7 +18,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set AI agent spending limits per agent, sub-agent, route and tool, with daily and weekly dollar limits for MCP tools. In Control, SatGate enforces them before spend occurs.',
+    description: 'Set AI agent spending limits per agent, sub-agent, route and tool, with daily and weekly dollar limits on trade orders. In Control, SatGate enforces them before spend occurs.',
     url: 'https://satgate.io/agent-spending-limits',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -26,7 +26,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Agent Spending Limits | Spend Caps for Autonomous AI Agents',
-    description: 'Set AI agent spending limits per agent, sub-agent, route and tool, with daily and weekly dollar limits for MCP tools. In Control, SatGate enforces them before spend occurs.',
+    description: 'Set AI agent spending limits per agent, sub-agent, route and tool, with daily and weekly dollar limits on trade orders. In Control, SatGate enforces them before spend occurs.',
   },
 };
 
@@ -35,7 +35,7 @@ const controls = [
   { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, tool costs and route budgets before forwarding.' },
   { icon: KeyRound, title: 'Scoped credentials', body: 'Use expiring capabilities instead of broad static keys so authority matches the job.' },
   { icon: Ban, title: 'Revocation', body: 'Block the next request when a token is revoked or its budget runs out.' },
-  { icon: ReceiptText, title: 'Signed receipts', body: 'Refusals and spending, with the route or tool, the budget left and the cost.' },
+  { icon: ReceiptText, title: 'Signed receipts', body: 'Refusals and spending, with the route or tool, the cost and, when SatGate checked the budget, the budget left.' },
   { icon: BarChart3, title: 'Benchmark risk', body: 'Model loops, retry storms, fanout, detection delay, and avoided spend with benchmark-backed scenarios.' },
 ];
 

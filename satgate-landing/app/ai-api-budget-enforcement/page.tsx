@@ -35,7 +35,7 @@ const controls = [
   { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, tool costs and route budgets before forwarding.' },
   { icon: KeyRound, title: 'Scoped credentials', body: 'Use expiring capabilities instead of broad static keys so authority matches the job.' },
   { icon: Ban, title: 'Revocation', body: 'Block the next request when a token is revoked or its budget runs out.' },
-  { icon: ReceiptText, title: 'Signed receipts', body: 'Refusals and spending, with the route or tool, the budget left and the cost.' },
+  { icon: ReceiptText, title: 'Signed receipts', body: 'Refusals and spending, with the route or tool, the cost and, when SatGate checked the budget, the budget left.' },
   { icon: BarChart3, title: 'Benchmark risk', body: 'Model loops, retry storms, fanout, detection delay, and avoided spend with benchmark-backed scenarios.' },
 ];
 
@@ -126,10 +126,10 @@ export default function Page() {
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="mb-4 text-xl font-bold text-white">What good policy includes</h3>
           <div className="space-y-4">
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budget before forwarding</h3><p className="leading-relaxed text-gray-400">Check the agent’s remaining budget, and daily or weekly dollar limits on MCP tools, before traffic reaches the provider.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budget before forwarding</h3><p className="leading-relaxed text-gray-400">Check the agent’s remaining budget, and daily or weekly dollar limits on trade orders, before traffic reaches the provider.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Policy by agent</h3><p className="leading-relaxed text-gray-400">Separate budgets per agent, sub-agent, route and MCP server instead of one account-level cap.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Stop loops at the budget</h3><p className="leading-relaxed text-gray-400">When a loop or retry storm uses up the budget, the next request is refused.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Signed receipts</h3><p className="leading-relaxed text-gray-400">Signed receipts for refusals and spending, with the route, cost and budget left.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Signed receipts</h3><p className="leading-relaxed text-gray-400">Signed receipts for refusals and spending, with the route and cost, and the budget left when SatGate checked the budget.</p></div>
           </div>
         </div>
       </section>

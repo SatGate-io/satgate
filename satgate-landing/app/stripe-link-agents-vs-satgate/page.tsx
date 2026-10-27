@@ -33,7 +33,7 @@ const comparison = [
   ['Primary job', 'Provide payment credentials and approval flows', 'Govern agent/API spending on each request that goes through SatGate'],
   ['Best fit', 'Purchases on merchant sites and payment-token flows', 'APIs, models, MCP tools, delegated agents, budgets, and monetization'],
   ['Control point', 'Wallet / credential issuance', 'Gateway policy check before forwarding to an upstream API, model, or tool'],
-  ['Budget enforcement', 'Per-purchase limits, an approved budget, or approval of each purchase', 'Per-agent, sub-agent, route and tool budgets, and daily or weekly dollar limits on MCP tools'],
+  ['Budget enforcement', 'Per-purchase limits, an approved budget, or approval of each purchase', 'Per-agent, sub-agent, route and tool budgets, and daily or weekly dollar limits on trade orders'],
   ['API metering', 'Not the core product', 'Core Observe capability'],
   ['Payment method', 'Cards and shared payment tokens', 'SatGate payment rules record payment details for API monetization'],
   ['Governance question', 'Can this agent pay?', 'Should this agent access, spend, delegate, route, or pay now?'],

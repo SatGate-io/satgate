@@ -124,8 +124,7 @@ export default function WhyRoutingIsntGovernancePage() {
             
             <p className="text-lg">
               AI gateways like Bifrost, LiteLLM and Portkey route LLM calls and now cap spend per key or team. What they
-              don&apos;t do is give each agent a token with its own budget and tools that it can hand on, smaller, to a helper,
-              or cover the paid APIs and MCP tools agents call beyond the LLM.
+              don&apos;t do is give each agent a token with its own budget and tools that it can hand on, smaller, to a helper.
             </p>
 
             <p>
