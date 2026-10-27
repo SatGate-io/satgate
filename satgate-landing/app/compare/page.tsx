@@ -36,7 +36,7 @@ const comparisons = [
   {
     href: '/compare/litellm',
     title: 'SatGate vs LiteLLM',
-    description: 'LLM gateway vs economic firewall. LiteLLM routes model access; SatGate governs agent/API spend, MCP tools, and payments.',
+    description: 'LiteLLM gives developers one gateway to many models, with budgets per key, team and agent. SatGate puts budgets on MCP and API calls and charges external agents.',
     icon: Route,
     color: 'green',
   },
@@ -50,7 +50,7 @@ const comparisons = [
   {
     href: '/compare/helicone',
     title: 'SatGate vs Helicone',
-    description: 'LLM observability vs economic firewall. Helicone helps debug and analyze AI apps; SatGate enforces budgets before agents spend.',
+    description: 'Helicone helps debug and analyze AI apps and can cap cost per window; SatGate puts budgets on agents’ tool and API calls before they run.',
     icon: Eye,
     color: 'blue',
   },
@@ -64,7 +64,7 @@ const comparisons = [
   {
     href: '/compare/cloudflare-ai-gateway',
     title: 'SatGate vs Cloudflare AI Gateway',
-    description: 'AI traffic gateway vs spending controls before the agent acts. Cloudflare routes and observes AI traffic; SatGate controls delegated spend and authority.',
+    description: 'Cloudflare routes and watches AI traffic and can block at a spend limit. SatGate puts budgets on your agents’ tool and API calls and signs receipts.',
     icon: Cloud,
     color: 'yellow',
   },
@@ -202,7 +202,7 @@ export default function ComparePage() {
         name: 'How is SatGate different from AI gateways?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on spending controls before the request goes through: hard budgets, scoped agent permissions, MCP tool cost policy, audit evidence, revocation, and payment details at the gateway before forwarding.',
+          text: 'Most AI gateways route and watch model traffic, and many now cap model spend. SatGate puts budgets on your agents’ tool and API calls before they go through, charges external agents, and signs receipts.',
         },
       },
       {
@@ -250,7 +250,7 @@ export default function ComparePage() {
           </div>
           <h1 className="mb-5 text-5xl font-extrabold tracking-tight md:text-7xl">Compare SatGate</h1>
           <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Most AI gateways help route, observe, or expose model/API traffic. SatGate focuses on spending controls: hard budgets, MCP tool cost attribution, scoped agent permissions, signed receipts, and payment details at the gateway before forwarding.
+            Most AI gateways route and watch model traffic, and many now cap model spend. SatGate puts budgets on your agents&apos; tool and API calls, charges external agents, and signs receipts.
           </p>
         </div>
 
@@ -289,7 +289,7 @@ export default function ComparePage() {
             {[
               [
                 'How is SatGate different from AI gateways?',
-                'Most AI gateways focus on routing, provider abstraction, caching, rate limits, observability, or prompt operations. SatGate focuses on spending controls before the request goes through: hard budgets, scoped agent permissions, MCP tool cost policy, audit evidence, revocation, and payment details at the gateway before forwarding.',
+                'Most AI gateways route and watch model traffic, and many now cap model spend. SatGate puts budgets on your agents’ tool and API calls before they go through, charges external agents, and signs receipts.',
               ],
               [
                 'Does SatGate replace LiteLLM, Portkey, Helicone, or Cloudflare AI Gateway?',

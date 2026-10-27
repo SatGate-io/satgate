@@ -34,10 +34,10 @@ const rows: Array<[string, string, string]> = [
   ['Primary job', 'Rules and receipts for AI agents', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped credentials, revocation, signed receipts, and charging external agents', 'API gateway, AI gateway, service connectivity, plugins, traffic policy, API platform operations'],
   ['Hard budgets before the request goes through', 'Yes: at the gateway before forwarding to an upstream API, model, or MCP tool', 'Partial / depends on gateway policy and traffic type'],
-  ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Not the primary category focus'],
+  ['MCP tool budget enforcement', 'Yes: per-tool budgets, cost attribution, and deny decisions', 'Cost-based rate limits for LLM traffic; MCP traffic governance'],
   ['Scoped revocable agent capabilities', 'Yes: route, tool, call, budget, expiry, delegation, and revocation caveats', 'Typically API keys, policies, tokens, or platform auth building blocks'],
   ['Runaway agent spend benchmark/data', 'Yes: benchmark page plus JSON/CSV dataset', 'No direct equivalent'],
-  ['Paid access for external agents (Lightning or USDC)', 'Yes: checks payment before access, and signs a receipt when it refuses an agent for a missing payment', 'No native SatGate-style payment rules focus'],
+  ['Paid access for external agents (Lightning or USDC)', 'Yes: checks payment before access, and signs a receipt when it refuses an agent for a missing payment', 'Markets AI and API monetization'],
   ['Broad API/AI platform management', 'Focused on spending controls', 'Yes / stronger fit'],
 ];
 

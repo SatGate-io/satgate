@@ -50,10 +50,10 @@ const comparisonRows = [
     satgate: 'Yes — one governance layer across all providers',
   },
   {
-    feature: 'Agent-to-Agent Commerce',
+    feature: 'Agent payments',
     icon: <Bot size={16} className="text-gray-400" />,
-    cloud: 'Not supported',
-    satgate: 'Lightning (L402) or USDC (x402) payments built in',
+    cloud: 'AWS AgentCore payments (preview) for agents on AgentCore',
+    satgate: 'External agents pay your API in Lightning or USDC',
   },
 ];
 
@@ -119,19 +119,21 @@ const CloudNativeComparisonPage = () => {
             <span className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">SatGate<sup className="text-xs font-normal">™</sup></span>
           </Link>
 
-          <div className="hidden md:flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="/protect" className="hover:text-white transition">Control Demo</Link>
-            <Link href="/pay" className="hover:text-white transition">Charge Demo</Link>
+          <div className="hidden xl:flex items-center gap-5 text-sm font-medium text-gray-400">
             <Link href="/govern" className="hover:text-white transition">Enterprise</Link>
+            <Link href="/mcp" className="hover:text-white transition">MCP</Link>
+            <Link href="/trading" className="hover:text-white transition">Trading</Link>
+            <Link href="/build" className="hover:text-white transition">Build</Link>
+            <Link href="/sandbox" className="hover:text-white transition">Demo</Link>
             <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
-            <Link href="/roi-calculator" className="hover:text-white transition">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Docs</a>
-            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Cloud</a>
+            <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="rounded-full bg-white px-3 py-1.5 font-bold text-black hover:bg-gray-200 transition">Start free trial</a>
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" className="rounded-full border border-purple-500/40 px-3 py-1.5 text-purple-300 hover:border-purple-400 hover:text-purple-200 transition">Cloud login</a>
           </div>
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex md:hidden items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition"
+            className="flex xl:hidden items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -139,15 +141,17 @@ const CloudNativeComparisonPage = () => {
           </button>
         </div>
 
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-[calc(100vh-4rem)] opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="bg-black/95 backdrop-blur-xl border-t border-gray-800 px-4 py-4 space-y-1">
-            <Link href="/protect" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Control Demo</Link>
-            <Link href="/pay" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Charge Demo</Link>
             <Link href="/govern" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Enterprise</Link>
+            <Link href="/mcp" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">MCP</Link>
+            <Link href="/trading" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Trading</Link>
+            <Link href="/build" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Build</Link>
+            <Link href="/sandbox" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Demo</Link>
             <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Pricing</Link>
-            <Link href="/roi-calculator" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">ROI Calculator</Link>
             <a href="https://cloud.satgate.io/docs" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Docs</a>
-            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Cloud</a>
+            <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Start free trial</a>
+            <a href="https://cloud.satgate.io/cloud/login" target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)} className="block text-gray-400 hover:text-white hover:bg-gray-800/50 transition py-3 px-4 rounded-lg">Cloud login</a>
           </div>
         </div>
       </nav>
@@ -196,7 +200,7 @@ const CloudNativeComparisonPage = () => {
                   <th className="text-left py-4 px-5 text-sm font-semibold text-purple-300">
                     <span className="flex items-center gap-2">
                       <Image src="/logo_white_transparent.png" alt="SatGate" width={16} height={16} />
-                      SatGate MCP Proxy
+                      SatGate
                     </span>
                   </th>
                 </tr>
@@ -248,12 +252,9 @@ const CloudNativeComparisonPage = () => {
               <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-900/50 text-cyan-400 font-bold text-sm">2</span>
               <h3 className="text-xl font-bold">The &ldquo;Financial Hallucination&rdquo; Guardrail</h3>
             </div>
-            <p className="text-gray-400 leading-relaxed mb-4">
-              Cloud providers are built to help you <em>spend</em> money — scale, availability, more compute. Their incentives don&apos;t align with cost containment.
+            <p className="text-gray-400 leading-relaxed">
+              In Control mode, SatGate checks each tool call against the agent&apos;s budget before it runs, so a runaway loop stops at the limit you set.
             </p>
-            <blockquote className="border-l-2 border-cyan-500 pl-4 text-cyan-300 italic">
-              &ldquo;AWS Bedrock wants your agents to be successful. SatGate wants your agents to be profitable.&rdquo;
-            </blockquote>
           </div>
 
           {/* Reason 3 */}
@@ -265,9 +266,6 @@ const CloudNativeComparisonPage = () => {
             <p className="text-gray-400 leading-relaxed mb-4">
               Cloud providers think in terms of &ldquo;users.&rdquo; SatGate thinks in terms of &ldquo;economies.&rdquo; As agents become autonomous economic actors, they need native payment building blocks.
             </p>
-            <blockquote className="border-l-2 border-yellow-500 pl-4 text-yellow-300 italic">
-              &ldquo;In 24 months, your agents will be paying other companies&apos; agents for data.&rdquo;
-            </blockquote>
           </div>
         </div>
       </section>

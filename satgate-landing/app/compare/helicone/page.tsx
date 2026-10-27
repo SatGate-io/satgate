@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Gauge, KeyRound, Minus, ShieldCheck, Zap 
 
 export const metadata = {
   title: { absolute: 'SatGate vs Helicone - LLM Observability vs Economic Firewall' },
-  description: 'Compare SatGate and Helicone. Helicone helps teams debug and analyze AI apps; SatGate adds spending controls for agents, MCP tool budgets, and charging external agents.',
+  description: 'Compare SatGate and Helicone. Helicone helps teams debug and analyze AI apps and can cap cost per window; SatGate puts budgets on agents’ tool and API calls and charges external agents.',
   alternates: { canonical: 'https://satgate.io/compare/helicone' },
   keywords: [
     'SatGate vs Helicone',
@@ -41,7 +41,7 @@ const rows: Array<[string, string, string]> = [
 
 const satgateWins = [
   { icon: ShieldCheck, title: 'Economic firewall before each request', body: 'SatGate decides whether an agent should access, spend, route, delegate, or pay at the gateway before forwarding to upstream APIs, MCP tools, and model calls.' },
-  { icon: Gauge, title: 'Hard budgets for autonomous workflows', body: 'Control spend by tenant, agent, workflow, delegated sub-agent, route, model, tool, session, day, and request.' },
+  { icon: Gauge, title: 'Hard budgets for each agent', body: 'Control spend per agent, sub-agent, route and MCP tool, with daily and weekly dollar limits on MCP tools.' },
   { icon: KeyRound, title: 'Scoped, revocable agent permissions', body: 'Issue expiring capabilities constrained by route, tool, budget, call count, expiry, and delegation rules instead of broad static keys.' },
   { icon: Zap, title: 'Govern payment access', body: 'Check payment details before external agents access APIs, datasets, tools, or premium capabilities at request time.' },
 ];
@@ -76,7 +76,7 @@ export default function CompareHeliconePage() {
       {
         '@type': 'Question',
         name: 'Can SatGate and Helicone work together?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can enforce agent, workflow, budget, route, MCP tool, and capability policy before requests reach an upstream AI gateway or observability layer.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can enforce per-agent budgets, route and MCP tool rules, and token permissions before requests reach an upstream AI gateway or observability layer.' },
       },
       {
         '@type': 'Question',
@@ -176,7 +176,7 @@ export default function CompareHeliconePage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ['Is SatGate a Helicone replacement?', 'Not directly. Helicone and SatGate solve overlapping but different problems. SatGate is focused on spending controls for AI agents, APIs, MCP tools, scoped authority, and request-time payments.'],
-              ['Can SatGate and Helicone work together?', 'Yes. SatGate can enforce agent, workflow, budget, route, MCP tool, and capability policy before requests reach an upstream AI gateway or observability layer.'],
+              ['Can SatGate and Helicone work together?', 'Yes. SatGate can enforce per-agent budgets, route and MCP tool rules, and token permissions before requests reach an upstream AI gateway or observability layer.'],
               ['When should I choose SatGate?', 'Choose SatGate when autonomous agents need hard budget enforcement, MCP tool spend controls, scoped revocation, delegation policy, signed receipts, or payment details for paid agents.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">

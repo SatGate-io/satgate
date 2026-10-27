@@ -33,7 +33,7 @@ const rows: Array<[string, string, string]> = [
   ['Primary job', 'Rules and receipts for AI agents', 'LLM gateway / OpenAI-compatible proxy'],
   ['Best fit', 'Agent/API spend governance, MCP tool budgets, scoped access, payment rules', 'Model access, provider abstraction, fallbacks, routing, developer LLM access'],
   ['Hard budgets before the request goes through', 'Yes', 'Partial: budgets and rate limits for LLM gateway usage'],
-  ['MCP tool budget enforcement', 'Yes', 'No native MCP economic firewall focus'],
+  ['MCP tool budget enforcement', 'Yes', 'MCP gateway with access control by key and team'],
   ['Per-tool cost attribution beyond LLM calls', 'Yes', 'Primarily LLM/model spend tracking'],
   ['Scoped revocable agent capabilities', 'Yes', 'Virtual keys for LLM gateway access'],
   ['Paid access for external agents (Lightning or USDC)', 'Yes', 'No'],
@@ -50,8 +50,8 @@ const satgateWins: Array<{ icon: typeof ShieldCheck; title: string; body: string
   },
   {
     icon: Gauge,
-    title: 'Budgets for agent workflows',
-    body: 'Control spend by tenant, agent, workflow, delegated sub-agent, route, model, MCP tool, session, day, and request.',
+    title: 'Budgets for each agent and tool',
+    body: 'Control spend per agent, sub-agent, route and MCP tool, with daily and weekly dollar limits on MCP tools.',
   },
   {
     icon: KeyRound,
@@ -108,7 +108,7 @@ export default function CompareLiteLLMPage() {
         name: 'Can SatGate and LiteLLM work together?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. LiteLLM can sit behind SatGate as an upstream LLM gateway. SatGate can enforce agent, workflow, route, MCP tool, and budget policy before requests reach LiteLLM or other upstream services.',
+          text: 'Yes. LiteLLM can sit behind SatGate as an upstream LLM gateway. SatGate can enforce per-agent budgets, route and MCP tool rules before requests reach LiteLLM or other upstream services.',
         },
       },
       {
@@ -203,7 +203,7 @@ export default function CompareLiteLLMPage() {
             <div className="mt-6 rounded-xl border border-yellow-900/50 bg-yellow-950/10 p-5">
               <h3 className="mb-2 text-lg font-bold text-white">The clean architecture</h3>
               <p className="leading-relaxed text-gray-300">
-                SatGate can sit in front of LiteLLM. SatGate decides whether the agent, workflow, budget, route, and capability are allowed; LiteLLM handles provider routing and model access behind that policy boundary.
+                SatGate can sit in front of LiteLLM. SatGate decides whether the agent, its budget, the route and its token allow the call; LiteLLM handles provider routing and model access behind that policy boundary.
               </p>
             </div>
           </div>
@@ -234,7 +234,7 @@ export default function CompareLiteLLMPage() {
           <div className="grid gap-5 md:grid-cols-2">
             {[
               ['Is SatGate a LiteLLM replacement?', 'Not directly. LiteLLM is primarily an LLM gateway and OpenAI-compatible proxy for model access, routing, fallbacks, budgets, and spend tracking. SatGate is an economic firewall for AI agents, APIs, MCP tools, scoped capabilities, and charging external agents.'],
-              ['Can SatGate and LiteLLM work together?', 'Yes. LiteLLM can sit behind SatGate as an upstream LLM gateway. SatGate can enforce agent, workflow, route, MCP tool, and budget policy before requests reach LiteLLM or other upstream services.'],
+              ['Can SatGate and LiteLLM work together?', 'Yes. LiteLLM can sit behind SatGate as an upstream LLM gateway. SatGate can enforce per-agent budgets, route and MCP tool rules before requests reach LiteLLM or other upstream services.'],
               ['When should I choose SatGate over LiteLLM?', 'Choose SatGate when the problem is spending controls across autonomous agent/API activity: hard budget enforcement, MCP tool spend, scoped revocation, delegation, signed receipts, and request-time monetization.'],
               ['When should I choose LiteLLM?', 'Choose LiteLLM when the main problem is developer model access: one interface across many LLM providers, model routing, load balancing, fallbacks, virtual keys, and LLM spend tracking.'],
             ].map(([question, answer]) => (
@@ -249,7 +249,7 @@ export default function CompareLiteLLMPage() {
         <section className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Routing is useful. Governance is different.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            LiteLLM helps developers reach models. SatGate helps platform, finance, and security teams control what autonomous agents can spend, access, delegate, and monetize before the next request leaves the building.
+            LiteLLM gives developers one gateway to many models, with budgets per key, team and agent and an MCP gateway. SatGate focuses on per-tool budgets for MCP and API calls, payment from external agents, and signed receipts.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
