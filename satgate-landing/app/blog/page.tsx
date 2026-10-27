@@ -396,7 +396,7 @@ export default function BlogPage() {
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             {[
-              ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, loop waste, payback period, and enforcement ROI.'],
+              ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, annual exposure and payback.'],
               ['/runaway-agent-cost-calculator', 'Runaway Agent Cost Calculator', 'Model loop, retry, fanout, and paid tool-call exposure.'],
               ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
               ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, routing, and signed receipt proof.'],

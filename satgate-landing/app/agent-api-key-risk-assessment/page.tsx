@@ -33,14 +33,15 @@ const risks = [
 
 export default function AgentApiKeyRiskAssessmentPage() {
   const [answers, setAnswers] = useState<Record<string, boolean>>({
-    shared: true,
-    longLived: true,
-    broadScope: true,
-    noBudget: true,
+    shared: false,
+    longLived: false,
+    broadScope: false,
+    noBudget: false,
     noRevocation: false,
-    delegation: true,
-    noAudit: true,
+    delegation: false,
+    noAudit: false,
   });
+  const [answered, setAnswered] = useState(false);
 
   const result = useMemo(() => {
     const score = risks.reduce((sum, risk) => sum + (answers[risk.key] ? risk.weight : 0), 0);
@@ -187,7 +188,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
                 label={risk.label}
                 weight={risk.weight}
                 checked={Boolean(answers[risk.key])}
-                onChange={(checked) => setAnswers((current) => ({ ...current, [risk.key]: checked }))}
+                onChange={(checked) => { setAnswered(true); setAnswers((current) => ({ ...current, [risk.key]: checked })); }}
               />
             ))}
           </div>
@@ -195,9 +196,15 @@ export default function AgentApiKeyRiskAssessmentPage() {
 
         <aside className="sticky top-6 h-fit rounded-3xl border border-orange-900/50 bg-orange-950/10 p-8">
           <div className="mb-3 flex items-center gap-2 text-orange-300"><AlertTriangle size={22} /> Risk score</div>
-          <div className="mb-3 text-7xl font-extrabold text-white">{result.score}</div>
-          <div className="mb-6 inline-flex rounded-full border border-orange-500/30 bg-black px-4 py-2 font-bold text-orange-200">{result.grade} risk</div>
-          <p className="mb-8 text-lg leading-relaxed text-gray-300">{result.summary}</p>
+          {answered ? (
+            <>
+              <div className="mb-3 text-7xl font-extrabold text-white">{result.score}</div>
+              <div className="mb-6 inline-flex rounded-full border border-orange-500/30 bg-black px-4 py-2 font-bold text-orange-200">{result.grade} risk</div>
+              <p className="mb-8 text-lg leading-relaxed text-gray-300">{result.summary}</p>
+            </>
+          ) : (
+            <p className="mb-8 text-lg leading-relaxed text-gray-300">Answer the questions to see your score.</p>
+          )}
           <div className="space-y-3 text-sm text-gray-400">
             <p><strong className="text-white">0-24:</strong> Low</p>
             <p><strong className="text-white">25-49:</strong> Medium</p>

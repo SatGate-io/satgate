@@ -4,10 +4,10 @@
   "published": "2026-04-26",
   "methodology": "Modeled runaway spend exposure for autonomous AI agents, MCP tools, retry loops, and delegated sub-agent fanout. Values are scenario estimates for category benchmarking, not customer telemetry.",
   "summary": {
-    "medianUncontrolledIncident": 1840,
-    "p90UncontrolledIncident": 18480,
+    "medianUncontrolledIncident": 9600,
+    "smallestModeledIncident": 1840,
     "largestModeledIncident": 134400,
-    "medianAvoidedWithRequestPathControls": 94.2,
+    "medianAvoidedWithRequestPathControls": 95.1,
     "topFailureMode": "retry storms against paid MCP tools and model APIs"
   },
   "scenarios": [

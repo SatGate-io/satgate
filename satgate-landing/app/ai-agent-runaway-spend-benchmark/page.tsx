@@ -30,7 +30,7 @@ export const metadata = {
 };
 
 const scenarios = [
-  { name: 'Single coding agent loop', agents: 1, callsPerMinute: 18, fanout: 1, costPerCall: '$0.06', detectionDelay: '45 min', uncontrolledCost: '$49', controlledCost: '$5', avoided: '90%' },
+  { name: 'Single coding agent loop', agents: 1, callsPerMinute: 18, fanout: 1, costPerCall: '$0.06', detectionDelay: '45 min', uncontrolledCost: '$49', controlledCost: '$5', avoided: '89%' },
   { name: 'MCP tool retry storm', agents: 12, callsPerMinute: 8, fanout: 3, costPerCall: '$0.12', detectionDelay: '60 min', uncontrolledCost: '$2,074', controlledCost: '$173', avoided: '92%' },
   { name: 'Support-agent swarm', agents: 50, callsPerMinute: 6, fanout: 4, costPerCall: '$0.04', detectionDelay: '90 min', uncontrolledCost: '$4,320', controlledCost: '$240', avoided: '94%' },
   { name: 'Premium research workflow', agents: 20, callsPerMinute: 10, fanout: 5, costPerCall: '$0.25', detectionDelay: '30 min', uncontrolledCost: '$7,500', controlledCost: '$1,250', avoided: '83%' },
@@ -232,7 +232,7 @@ export default function AiAgentRunawaySpendBenchmarkPage() {
 
       <section className="border-y border-gray-900 bg-black">
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-3">
-          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Zap className="mb-4 text-yellow-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Observe</h2><p className="leading-relaxed text-gray-400">Route agent traffic through SatGate to attribute cost by agent, workflow, route, tool, tenant, and MCP server before enforcing hard limits.</p></div>
+          <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Zap className="mb-4 text-yellow-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Observe</h2><p className="leading-relaxed text-gray-400">Route agent traffic through SatGate to see cost by agent, route, tool and MCP server before enforcing hard limits.</p></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Gauge className="mb-4 text-cyan-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Control</h2><p className="leading-relaxed text-gray-400">Enforce per-agent budgets, per-tool caps, route policy, revocation, expiry, and kill switches at the gateway before forwarding to upstream APIs.</p></div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6"><Bot className="mb-4 text-purple-300" size={28} /><h2 className="mb-3 text-2xl font-bold text-white">Prove</h2><p className="leading-relaxed text-gray-400">Keep signed receipts for budget refusals and spending, so the bill can be checked.</p></div>
         </div>

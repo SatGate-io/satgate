@@ -100,7 +100,7 @@ export default function ROICalculatorPage() {
       'Runaway loop ghost spend exposure',
       'Annual AI agent cost-risk model',
       'Savings from budget checks before the request goes through',
-      'Payback period and annual ROI estimate',
+      'Ghost spend, annual exposure and payback estimate',
       'Links from ROI exposure to rules and receipts, and to signed receipts',
     ],
     audience: [
@@ -364,8 +364,8 @@ export default function ROICalculatorPage() {
             <SliderInput label="Number of Active Agents" value={agents} min={1} max={500} step={1} onChange={setAgents} />
             <SliderInput label="Average Cost per Tool Call" value={costPerCall} min={0.01} max={1} step={0.01} format={(v) => `$${v.toFixed(2)}`} onChange={setCostPerCall} />
             <SliderInput label="Tool Calls per Agent per Day" value={callsPerDay} min={10} max={1000} step={10} onChange={setCallsPerDay} />
-            <SliderInput label="Loop / Error Frequency" value={loopFreq} min={0.1} max={10} step={0.1} format={(v) => `${v.toFixed(1)}%`} onChange={setLoopFreq} />
-            <SliderInput label="Calls before a cap stops them (N)" value={loopDuration} min={10} max={500} step={5} onChange={setLoopDuration} />
+            <SliderInput label="Share of calls that start a loop" value={loopFreq} min={0.1} max={10} step={0.1} format={(v) => `${v.toFixed(1)}%`} onChange={setLoopFreq} />
+            <SliderInput label="Calls a loop wastes before anyone notices (N)" value={loopDuration} min={10} max={500} step={5} onChange={setLoopDuration} />
           </div>
 
           {/* Results */}
@@ -373,7 +373,7 @@ export default function ROICalculatorPage() {
             {/* Metrics */}
             <div className="p-6 md:p-8 rounded-2xl bg-gray-900 border border-gray-800">
               <h2 className="text-lg font-bold text-white mb-2">Example estimate: unmanaged cost exposure</h2>
-              <p className="text-xs text-gray-500 mb-6">Formula: extra calls = agents × calls/day × 30 × loop frequency × N × cost per call. Savings assume a hard cap stops those extra calls. Pro is modeled at $99/month. Not a measurement.</p>
+              <p className="text-xs text-gray-500 mb-6">Formula: extra calls = agents × calls/day × 30 × loop frequency × N × cost per call. Savings assume a cap stops a loop almost at once. Pro is modeled at $99/month. Not a measurement.</p>
               <div className="space-y-4">
                 <div className="flex justify-between items-baseline">
                   <span className="text-gray-400 text-sm">Monthly Tool Spend</span>

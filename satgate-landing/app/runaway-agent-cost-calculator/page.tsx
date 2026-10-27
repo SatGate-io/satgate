@@ -210,7 +210,7 @@ export default function RunawayAgentCostCalculatorPage() {
           <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6 md:p-8">
             <h2 className="mb-4 text-2xl font-bold text-white">Scenario: if a cap stopped the loop at 5 minutes</h2>
             <p className="mb-6 leading-relaxed text-gray-300">
-              Five minutes is an input in this model, not a product setting. If a budget was set so new calls stop after five minutes, each incident in this model falls from <strong className="text-white">{money.format(calc.incidentCost)}</strong> to <strong className="text-white">{money.format(calc.blockedAtFiveMinutes)}</strong>.
+              Five minutes is a fixed assumption in this model, not a product setting. If a budget was set so new calls stop after five minutes, each incident in this model falls from <strong className="text-white">{money.format(calc.incidentCost)}</strong> to <strong className="text-white">{money.format(calc.blockedAtFiveMinutes)}</strong>.
             </p>
             <div className="rounded-xl border border-gray-800 bg-black p-5">
               <div className="mb-2 text-sm text-gray-400">Avoidable cost per incident</div>

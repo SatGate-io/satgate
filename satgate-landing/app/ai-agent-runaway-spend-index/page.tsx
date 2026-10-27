@@ -158,10 +158,10 @@ export default function AiAgentRunawaySpendIndexPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid gap-5 md:grid-cols-4">
           {[
-            ['Median incident', '$1,840', Gauge],
-            ['P90 incident', '$18,480', Zap],
-            ['Largest modeled', '$134,400', BarChart3],
-            ['Median avoided', '94.2%', ShieldCheck],
+            ['Median modeled incident', '$9,600', Gauge],
+            ['Smallest', '$1,840', Zap],
+            ['Largest', '$134,400', BarChart3],
+            ['Median avoided', '95.1%', ShieldCheck],
           ].map(([label, value, Icon]) => (
             <div key={label as string} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <Icon className="mb-4 text-orange-300" size={28} />
