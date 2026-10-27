@@ -123,19 +123,7 @@ export default function WhyProcessWontScaleBlogPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Scale Problem Is Already Here</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            This isn&apos;t hypothetical. The numbers are already ugly.
-          </p>
-
-          <p className="text-gray-300 leading-relaxed">
-            Gartner projects that <strong>more than 40% of AI agent projects will fail by 2027</strong> specifically due to runaway costs — not technical failure, not poor model quality, but uncontrolled spending. Fortune 500 companies collectively leaked an estimated <strong>$400 million in unbudgeted AI spend</strong> last year, much of it from agent workloads that nobody was tracking at the right granularity.
-          </p>
-
-          <p className="text-gray-300 leading-relaxed">
-            One widely reported incident involved a single agent loop that <strong>ran up $47,000 in 11 days</strong> without anyone noticing. The agent was functioning correctly — it was doing exactly what it was told. It just kept doing it, and nothing stopped it from spending.
-          </p>
-
-          <p className="text-gray-300 leading-relaxed">
-            Process didn&apos;t catch any of these. Not because the processes were bad. Because agents operate faster than humans can review.
+            Process can&apos;t keep up with that. Not because the processes are bad, but because agents operate faster than humans can review.
           </p>
 
           {/* The 9 Recommendations, Mapped */}

@@ -50,7 +50,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
         name: 'What are Observe, Control, and Prove in AI agent governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves signed receipts for allow, deny, budget, delegation, and payment-method decisions.',
+          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove keeps signed receipts for refusals and budget spends.',
         },
       },
       {
@@ -220,7 +220,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. SatGate preserves the policy basis, requesting agent, delegated scope, budget state, route, payment details when present, and final decision as a signed receipt that finance, security, and compliance can inspect later.
+            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. When SatGate signs a receipt, it records the route or tool, the budget state, payment details when present, and the decision, so finance, security, and compliance can check it later.
           </p>
           <p className="text-gray-300 leading-relaxed">
             Payment methods such as L402 can still matter, but they are not the center of the framework. They are one context SatGate can govern before value moves. The product job is broader: prove why an autonomous agent was allowed, denied or required to seek approval before execution.
@@ -271,7 +271,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Future-Proofing for the Agent Economy</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">The organizations that figure out rules and receipts for AI agents first will be the ones positioned to let agents act with real autonomy. Payment methods can be added where useful, but the durable advantage is proof: every request has authority, policy, decision, and receipt context.</p>
+              <p className="text-gray-400 text-sm m-0">The organizations that figure out rules and receipts for AI agents first will be the ones positioned to let agents act with real autonomy. Payment methods can be added where useful, but the lasting advantage is proof: SatGate signs receipts anyone can check.</p>
             </div>
           </div>
 
@@ -342,7 +342,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <h2 className="mb-6 text-2xl font-bold text-white">Observe, Control, Prove adoption questions</h2>
             <div className="space-y-5">
               {[
-                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves signed receipts for allow, deny, budget, delegation, and payment-method decisions.'],
+                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove keeps signed receipts for refusals and budget spends.'],
                 ['Why should enterprises start AI agent governance in Observe mode?', 'Observe mode gives teams real baseline data on agent spend, tool usage, retry loops, and cost outliers before hard caps are introduced, making later enforcement safer and easier to justify.'],
                 ['Is Prove the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.'],
               ].map(([question, answer]) => (

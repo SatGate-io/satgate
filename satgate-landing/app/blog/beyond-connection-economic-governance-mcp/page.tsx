@@ -555,8 +555,8 @@ There is no satgate tokens or satgate spend command.`}</pre>
             <p>
               <strong className="text-white">SatGate Cloud</strong>: Full per-tool cost attribution, delegation 
               hierarchies, and budget enforcement.{' '}
-              <a href="https://cloud.satgate.io/cloud/login" className="text-purple-400 hover:text-purple-300 underline">
-                Sign up for the beta
+              <a href="https://cloud.satgate.io/cloud/signup" className="text-purple-400 hover:text-purple-300 underline">
+                Start a free 14-day trial
               </a>{' '}
               or{' '}
               <a href="https://satgate.io/design-partners" className="text-purple-400 hover:text-purple-300 underline">

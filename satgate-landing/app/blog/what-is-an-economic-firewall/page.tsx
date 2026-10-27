@@ -138,7 +138,7 @@ export default function WhatIsEconomicFirewallPage() {
           {/* --- The Concept --- */}
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">From &ldquo;Who Are You?&rdquo; to &ldquo;What Can You Afford?&rdquo;</h2>
           <p className="text-gray-300 leading-relaxed">
-            An economic firewall adds a financial dimension to API access control. It sits at the gateway layer &mdash; the same place you&rsquo;d deploy Kong, Envoy, or any reverse proxy &mdash; and enforces budget constraints on every request that passes through it.
+            An economic firewall adds a financial dimension to API access control. It sits at the gateway layer &mdash; the same place you&rsquo;d deploy Kong, Envoy, or any reverse proxy &mdash; and, in Control, enforces budgets on every request that passes through it.
           </p>
 
           <div className="space-y-3 my-8">

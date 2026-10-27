@@ -113,7 +113,7 @@ export default function ZeroTrustInTheModelBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            There are limits to this. Not every request gets a receipt. A refusal for going over a rate limit doesn&apos;t get one, and neither does a request that never goes through SatGate.
+            There are limits to this. On the HTTP gateway, not every request gets a receipt: a refusal for going over a rate limit doesn&apos;t get one. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt. A request that never goes through SatGate gets none.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">An emergency brake</h2>

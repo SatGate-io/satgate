@@ -377,7 +377,7 @@ A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           </p>
           
           <ul className="list-disc list-inside space-y-2 text-gray-300 my-4">
-            <li><strong>100% prevention</strong> of runaway spend incidents</li>
+            <li>Runaway loops stop at the budget you set, for traffic that goes through SatGate in Control</li>
             <li><strong>73% reduction</strong> in overall OpenAI costs (better visibility)</li>
             <li><strong>Zero production outages</strong> from hitting OpenAI account limits</li>
             <li><strong>Granular insights</strong> into cost per feature/team/user</li>

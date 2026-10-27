@@ -197,7 +197,7 @@ export default function AiAgentSpendingLimitsBlogPage() {
 
           <ul className="text-gray-300 space-y-2">
             <li><strong className="text-white">_RedisBudgetEnforcer_</strong>: Atomic spend tracking across replicas</li>
-            <li><strong className="text-white">_Postgres signed receipt (Evidence Pack)_</strong>: Spend attribution for chargebacks</li>
+            <li><strong className="text-white">Postgres audit log</strong>: spend attribution for chargebacks</li>
             <li><strong className="text-white">_payment rules_</strong>: charging external agents</li>
           </ul>
 

@@ -277,7 +277,7 @@ export default function AlwaysOnAgentsEconomicAuthorityBlogPage() {
           <p className={paragraphClass}>And after that: &quot;Can we prove which policy allowed or denied it?&quot;</p>
 
           <p className={paragraphClass}>
-            For always-on agents, that distinction matters. A record of an action is useful. A record of the authority decision is more useful. A portable receipt that shows the agent, user, tenant, policy, budget, request, decision, and evidence is better still.
+            For always-on agents, that distinction matters. A record of an action is useful. A record of the authority decision is more useful. A portable signed receipt of the decision is better still.
           </p>
 
           <div className="my-8 rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6">

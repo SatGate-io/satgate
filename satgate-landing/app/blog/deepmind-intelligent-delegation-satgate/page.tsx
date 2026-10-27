@@ -308,10 +308,7 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Continuous Monitoring &amp; Signed Attestations</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Real-time observability and tamper-proof audit records (pp. 13, 16–17)</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Event streaming — every tool call, budget spend,
-                    session lifecycle, and task correlation is published as a structured event in real-time.
-                    The token spend ledger provides a complete receipt: which agent called what tool, at what cost,
-                    under which delegation chain.
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Keeps each token&apos;s lineage and signs receipts for refusals and spending.
                   </p>
                 </div>
               </div>

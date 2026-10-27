@@ -262,7 +262,7 @@ export default function AgentSwarmsCostGovernancePage() {
           </ul>
           <p className="text-gray-300 leading-relaxed mt-4">
             An economic firewall gives every stakeholder what they need: Finance gets budget enforcement, 
-            Security gets scope narrowing, Engineering gets attribution, Compliance gets an immutable signed receipt.
+            Security gets scope narrowing, Engineering gets attribution, Compliance gets signed receipts anyone can check.
           </p>
 
           <section className="not-prose mt-16 rounded-2xl border border-gray-800 bg-gray-950 p-8">

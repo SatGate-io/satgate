@@ -168,7 +168,7 @@ export default function AiAgentApiCostControlPage() {
             <li><strong className="text-white">What will this cost?</strong> Estimate or assign request/tool/provider cost before forwarding.</li>
             <li><strong className="text-white">What budget remains?</strong> Check per-agent, per-tool, per-session, or per-day limits.</li>
             <li><strong className="text-white">Should this route change?</strong> Route cheap tasks to lower-cost providers and reserve premium models for high-value work.</li>
-            <li><strong className="text-white">What should be recorded?</strong> Produce a signed receipt (Evidence Pack) with identity, spend, policy decision, and outcome.</li>
+            <li><strong className="text-white">What should be recorded?</strong> Produce a signed receipt with the spend and the decision.</li>
           </ol>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Economic firewalls: budget enforcement at the gateway layer</h2>

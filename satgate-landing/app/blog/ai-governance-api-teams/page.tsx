@@ -345,7 +345,7 @@ GET /api/governance/costs?period=2026-03-01..2026-03-19
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Gateway-layer governance</strong> means the budget enforcement happens in the infrastructure, before the request reaches the backend. Agents don't need to know about budgets. They make API calls. The gateway allows or denies based on policy. One implementation, uniformly enforced, impossible to bypass.
+            <strong className="text-white">Gateway-layer governance</strong> means the budget enforcement happens in the infrastructure, before the request reaches the backend. Agents don't need to know about budgets. They make API calls. The gateway allows or denies based on policy. One implementation, enforced the same way for every agent that goes through it.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

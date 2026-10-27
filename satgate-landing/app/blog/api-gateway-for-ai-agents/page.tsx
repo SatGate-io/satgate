@@ -4,12 +4,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "API Gateway for AI Agents: Control Tool and API Access",
-  description: "Learn how AI agent gateways enforce permission before the agent acts with Observe/Control/Prove, budgets, MCP governance, signed receipts, and payment methods.",
+  description: "Learn how AI agent gateways enforce permission before the agent acts with Observe, Control and Admit, budgets, MCP governance, signed receipts, and payment methods.",
   alternates: { canonical: 'https://satgate.io/blog/api-gateway-for-ai-agents' },
   keywords: ['API gateway for AI agents', 'AI agent gateway', 'API gateway comparison', 'agent economy gateway', 'AI API management', 'economic firewall gateway'],
   openGraph: {
     title: 'API Gateway for AI Agents: Budgets, MCP, and Tool Costs',
-    description: 'Agent-aware API gateways need Observe/Control/Prove, budgets, MCP tool controls, scoped tokens, revocation, and signed receipts.',
+    description: 'Agent-aware API gateways need Observe, Control and Admit, budgets, MCP tool controls, scoped tokens, revocation, and signed receipts.',
     url: 'https://satgate.io/blog/api-gateway-for-ai-agents',
     type: 'article',
     publishedTime: '2026-03-12T00:00:00Z',
@@ -108,7 +108,7 @@ export default function ApiGatewayForAiAgentsBlogPage() {
           <h1 className="text-4xl font-bold mb-4">API Gateway for AI Agents: Budgets, MCP Tools, and Economic Control</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Search answer</p>
-            <p className="text-gray-300">An API gateway for AI agents must do more than authenticate and route. It needs Observe/Control/Prove: authority checks before the request goes through, agent-scoped capability tokens, MCP governance, revocation, payment details, and signed receipts.</p>
+            <p className="text-gray-300">An API gateway for AI agents must do more than authenticate and route. It needs Observe, Control and Admit: authority checks before the request goes through, agent-scoped capability tokens, MCP governance, revocation, payment details, and signed receipts.</p>
           </div>
           
           <p className="text-xl text-gray-400 mb-6 italic">
@@ -337,7 +337,7 @@ tools:
             <li>✅ <strong className="text-white">Atomic budget enforcement</strong> (no race conditions at scale)</li>
             <li>✅ <strong className="text-white">Capability-based tokens</strong> (narrowed delegation, not all-or-nothing keys)</li>
             <li>✅ <strong className="text-white">Delegation chain tracking</strong> (who delegated to whom, and whose budget pays)</li>
-            <li>✅ <strong className="text-white">Signed receipts</strong> (signed proof of allow, deny, spend, and delegation decisions)</li>
+            <li>✅ <strong className="text-white">Signed receipts</strong> for refusals and for spending</li>
             <li>✅ <strong className="text-white">Structured budget exhaustion errors</strong> (agents need to reason about limits)</li>
             <li>✅ <strong className="text-white">Progressive adoption</strong> (observe → control → prove)</li>
           </ul>

@@ -145,7 +145,7 @@ export default function AdversarialBlogPage() {
             <strong>The attack:</strong> An adversary uses prompt injection to trick an agent into misclassifying a high-cost operation as a low-cost one. The agent believes it&apos;s making a simple text query. In reality, it&apos;s triggering an image generation call, a fine-tuning job, or an expensive third-party API.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            This isn&apos;t far-fetched. Prompt injection can alter an agent&apos;s understanding of what tool it&apos;s calling, what parameters it&apos;s passing, or what category of work it&apos;s performing. If your cost governance relies on the agent&apos;s self-reported action type, you&apos;re trusting the thing that just got compromised.
+            Prompt injection can alter an agent&apos;s understanding of what tool it&apos;s calling, what parameters it&apos;s passing, or what category of work it&apos;s performing. If your cost governance relies on the agent&apos;s self-reported action type, you&apos;re trusting the thing that just got compromised.
           </p>
 
           <div className="my-8 p-6 bg-green-900/10 border border-green-500/20 rounded-xl">

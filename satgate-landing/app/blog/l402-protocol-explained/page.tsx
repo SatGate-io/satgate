@@ -370,7 +370,7 @@ routes:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Access becomes permissionless.</strong> Any agent with a Lightning wallet can use any L402-protected API. No partnerships. No sales calls. No enterprise agreements. The barrier to entry for both providers and consumers drops to near zero.
+            <strong className="text-white">Access becomes permissionless.</strong> Any agent with a Lightning wallet can pay for an L402-protected API without signing up. No partnerships. No sales calls. No enterprise agreements. The barrier to entry for both providers and consumers drops to near zero.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -396,7 +396,7 @@ routes:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">For agent developers:</strong> Add Lightning wallet support to your agent and teach it to handle <code className="text-green-300 bg-black/50 px-1 rounded">402 Payment Required</code> responses. Your agent gains access to every L402-protected API on the internet — no integration work per service.
+            <strong className="text-white">For agent developers:</strong> Add Lightning wallet support to your agent and teach it to handle <code className="text-green-300 bg-black/50 px-1 rounded">402 Payment Required</code> responses. Your agent can then pay for any L402-protected API that lets it in, with no sign-up per service.
           </p>
 
           <p className="text-gray-300 leading-relaxed">

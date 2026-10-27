@@ -61,7 +61,7 @@ export default function LlmCostManagementBlogPage() {
         name: 'Is an LLM monitoring dashboard enough to control agent spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked, downgraded, or charged before spend occurs.',
+          text: 'No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked or charged before spend occurs.',
         },
       },
       {
@@ -161,7 +161,7 @@ export default function LlmCostManagementBlogPage() {
                 <tr><td className="px-4 py-3 font-semibold text-white">Cost per request</td><td className="px-4 py-3">Turns token usage into dollars before finance sees a surprise bill.</td></tr>
                 <tr><td className="px-4 py-3 font-semibold text-white">Latency per trace</td><td className="px-4 py-3">Catches slow expensive workflows, not just expensive models.</td></tr>
                 <tr><td className="px-4 py-3 font-semibold text-white">Agent and tool attribution</td><td className="px-4 py-3">Shows whether spend came from chat, MCP tools, retrieval, code execution, or delegated sub-agents.</td></tr>
-                <tr><td className="px-4 py-3 font-semibold text-white">Budget decision</td><td className="px-4 py-3">Separates passive monitoring from real enforcement: allowed, downgraded, blocked, or charged.</td></tr>
+                <tr><td className="px-4 py-3 font-semibold text-white">Budget decision</td><td className="px-4 py-3">Separates passive monitoring from real enforcement: allowed, blocked, or charged.</td></tr>
               </tbody>
             </table>
           </div>
@@ -396,7 +396,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
             <div>
               <h3 className="text-xl font-bold text-white mb-2">Is an LLM monitoring dashboard enough to control agent spend?</h3>
               <p className="text-gray-300 leading-relaxed mb-0">
-                No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked, downgraded, or charged before spend occurs.
+                No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked or charged before spend occurs.
               </p>
             </div>
             <div>
@@ -408,7 +408,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
             <div>
               <h3 className="text-xl font-bold text-white mb-2">What platforms provide an LLM cost dashboard with cost and latency per request?</h3>
               <p className="text-gray-300 leading-relaxed mb-0">
-                Observability platforms can show cost and latency per trace, but autonomous-agent teams should require more than charts. The useful pattern is dashboard plus policy: each request records token cost, latency, trace ID, customer account, agent, tool, and whether the gateway allowed, blocked, downgraded, or charged the call.
+                Observability platforms can show cost and latency per trace, but autonomous-agent teams should require more than charts. The useful pattern is dashboard plus policy: each request records token cost, latency, trace ID, customer account, agent, tool, and whether the gateway allowed, blocked or charged the call.
               </p>
             </div>
           </div>

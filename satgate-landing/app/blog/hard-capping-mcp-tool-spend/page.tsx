@@ -67,7 +67,7 @@ export default function HardCappingMcpToolSpendPage() {
         name: 'Can MCP budgets be scoped per tool or agent?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, workflow, time window, and token caveat so each agent receives only the spend authority it needs.',
+          text: 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, time window, and token caveat so each agent receives only the spend authority it needs.',
         },
       },
       {
@@ -332,7 +332,7 @@ There is no daily limit. A spent budget refuses the next call with code budget_e
               {[
                 ['How do you hard-cap MCP tool spend?', 'Put an MCP proxy or economic firewall before the request goes through, assign costs to tools, and block tools/call requests when the agent, workflow, or token budget is exhausted.'],
                 ['Why are alerts not enough for MCP cost control?', 'Alerts fire after spend has already happened. Hard caps prevent the expensive MCP tool call from reaching the upstream server once the budget is exhausted.'],
-                ['Can MCP budgets be scoped per tool or agent?', 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, workflow, time window, and token caveat so each agent receives only the spend authority it needs.'],
+                ['Can MCP budgets be scoped per tool or agent?', 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, time window, and token caveat so each agent receives only the spend authority it needs.'],
                 ['How do you stop Claude Code or Cursor from running up MCP tool bills?', 'Put a budget-aware MCP proxy between Claude Code, Cursor, or another MCP client and the upstream tool servers. The proxy prices each tool call, deducts from the agent budget, and blocks requests once the cap is exhausted.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

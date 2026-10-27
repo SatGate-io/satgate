@@ -391,7 +391,7 @@ export default function BlogPage() {
             <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Free tools</p>
             <h2 className="mb-2 text-2xl font-bold text-white">Turn the guides into enforceable agent policy</h2>
             <p className="text-gray-400">
-              Use these calculators and generators to quantify AI agent spend risk, create budget policies, and assess economic firewall readiness.
+              Use these calculators to put numbers on AI agent spend risk and grade your setup.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">

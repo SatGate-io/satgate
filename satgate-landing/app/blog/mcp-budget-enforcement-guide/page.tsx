@@ -183,8 +183,7 @@ tools:
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            The budget is embedded in the token itself. The gateway doesn&apos;t need a database lookup to 
-            know the ceiling — it reads the caveat. Spend tracking uses a lightweight ledger (Redis-backed 
+            The ceiling travels in the token, and SatGate checks what&apos;s left before each call. Spend tracking uses a lightweight ledger (Redis-backed 
             by default).
           </p>
 

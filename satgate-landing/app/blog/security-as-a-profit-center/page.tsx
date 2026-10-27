@@ -250,13 +250,13 @@ Example:
           </div>
 
           {/* Shadow Mode */}
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Shadow Mode: The Zero-Risk Pilot</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Start in Observe mode</h2>
           
           <p className="text-gray-300 leading-relaxed">
             We don&apos;t ask you to trust us. We ask you to measure us.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            SatGate&apos;s Shadow Mode is a 15-minute configuration change that observes and reports without blocking a single call. It sits in the path, tracks every tool invocation and its cost, and produces a Leakage Report — but never enforces a budget or rejects a request.
+            Start in Observe mode: a short config change that records every tool call and its cost without blocking any. After 14 days, the usage view shows what each agent spent and which tools cost the most.
           </p>
 
           <div className="grid gap-4 my-8">
@@ -265,7 +265,7 @@ Example:
                 <span className="text-2xl">⏱️</span>
                 <h4 className="text-white font-bold m-0">Day 0: Deploy</h4>
               </div>
-              <p className="text-gray-400 text-sm mb-0">15-minute config change. Point MCP clients to SatGate in shadow mode. Zero disruption to running agents.</p>
+              <p className="text-gray-400 text-sm mb-0">15-minute config change. Point MCP clients to SatGate in Observe mode. Zero disruption to running agents.</p>
             </div>
             <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
               <div className="flex items-center gap-3 mb-2">
@@ -277,14 +277,14 @@ Example:
             <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">📋</span>
-                <h4 className="text-white font-bold m-0">Day 14: Leakage Report</h4>
+                <h4 className="text-white font-bold m-0">Day 14: Review the usage</h4>
               </div>
-              <p className="text-gray-400 text-sm mb-0">Exact dollar figures: how much was wasted, which agents looped, which tools burned budget. The report makes the case — or it doesn&apos;t.</p>
+              <p className="text-gray-400 text-sm mb-0">What each agent spent and which tools cost the most. The numbers make the case, or they don&apos;t.</p>
             </div>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            If the Leakage Report shows savings that justify the platform, you flip from shadow to enforce. If it doesn&apos;t, you&apos;ve lost 15 minutes of setup time and gained 14 days of visibility you didn&apos;t have before.
+            If the usage shows savings that justify the platform, you switch from Observe to Control. If it doesn&apos;t, you&apos;ve lost 15 minutes of setup time and gained 14 days of visibility you didn&apos;t have before.
           </p>
 
           {/* The CEO Pitch */}

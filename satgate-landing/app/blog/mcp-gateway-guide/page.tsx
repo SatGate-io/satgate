@@ -176,7 +176,7 @@ gateway:
   upstreams:
     - name: github
       transport: stdio
-      command: "npx @modelcontextprotocol/server-github"
+      command: "docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server"
     - name: database
       transport: sse
       url: "https://internal.corp/mcp/database"
@@ -411,9 +411,9 @@ tools:
 upstreams:
   github:
     transport: stdio
-    command: ["npx", "-y", "@modelcontextprotocol/server-github"]
+    command: ["docker", "run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"]
     env:
-      GITHUB_TOKEN: "\${GITHUB_PAT}"
+      GITHUB_PERSONAL_ACCESS_TOKEN: "\${GITHUB_PAT}"
   slack:
     transport: stdio
     command: ["npx", "-y", "@modelcontextprotocol/server-slack"]
