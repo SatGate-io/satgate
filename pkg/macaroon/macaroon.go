@@ -2,12 +2,14 @@ package macaroon
 
 import (
 	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,6 +19,91 @@ import (
 // ErrInvalidSignature is wrapped by Verify when a token's signature chain does
 // not verify under this service's root key. Test for it with errors.Is.
 var ErrInvalidSignature = errors.New("invalid signature")
+
+// ErrRepeatedCaveat is wrapped when a single-valued caveat key appears more
+// than once in a token. Test for it with errors.Is.
+var ErrRepeatedCaveat = errors.New("single-valued caveat appears more than once")
+
+// ErrReservedCaveat is wrapped when delegation is asked to add a caveat key
+// that only the gateway writes. Test for it with errors.Is.
+var ErrReservedCaveat = errors.New("caveat key is written only by the gateway")
+
+// Caveat keys the gateway writes into an L402 challenge macaroon. Each is
+// single-valued: Verify refuses a token that carries one of them twice, and
+// Delegate refuses to add any of them.
+const (
+	CaveatPaymentHash       = "payment_hash"
+	CaveatRoute             = "route"
+	CaveatPriceSats         = "price_sats"
+	CaveatInvoiceAmountSats = "invoice_amount_sats"
+)
+
+// singleValuedCaveats lists every caveat key the gateway reads as one value.
+// Keys that attenuation may legitimately repeat (expires, scope, parent) are
+// not listed; their readers check or count every occurrence.
+var singleValuedCaveats = map[string]bool{
+	CaveatPaymentHash:       true,
+	CaveatRoute:             true,
+	CaveatPriceSats:         true,
+	CaveatInvoiceAmountSats: true,
+}
+
+// IsSingleValuedCaveat reports whether key may appear at most once in a token.
+func IsSingleValuedCaveat(key string) bool {
+	return singleValuedCaveats[key]
+}
+
+// L402IdentifierPrefix starts the identifier of every macaroon the gateway
+// issues in an L402 payment challenge. The identifier is the first input to
+// the signature chain, so only a holder of the root key can produce one.
+const L402IdentifierPrefix = "satgate-l402-v2:"
+
+// L402Binding is what an L402 challenge macaroon is issued for.
+type L402Binding struct {
+	PaymentHash string
+	Route       string
+	PriceSats   int64
+	// InvoiceAmountSats is the amount of the invoice, when the provider
+	// reports it. Zero leaves the caveat out.
+	InvoiceAmountSats int64
+}
+
+// parseCaveat splits a "key = value" caveat the way verifyCaveat does. The key
+// is trimmed so that spacing variants of a key count as the same key.
+func parseCaveat(caveat string) (key, value string, ok bool) {
+	parts := strings.SplitN(caveat, " = ", 2)
+	if len(parts) != 2 {
+		return "", "", false
+	}
+	return strings.TrimSpace(parts[0]), parts[1], true
+}
+
+// checkSingleValued refuses a token in which a single-valued key appears more
+// than once.
+func (m *Macaroon) checkSingleValued() error {
+	seen := make(map[string]bool)
+	for _, caveat := range m.Caveats {
+		key, _, ok := parseCaveat(caveat)
+		if !ok || !singleValuedCaveats[key] {
+			continue
+		}
+		if seen[key] {
+			return fmt.Errorf("%w: %s", ErrRepeatedCaveat, key)
+		}
+		seen[key] = true
+	}
+	return nil
+}
+
+// checkDelegatedCaveats refuses caveats that only the gateway may write.
+func checkDelegatedCaveats(caveats []string) error {
+	for _, caveat := range caveats {
+		if key, _, ok := parseCaveat(caveat); ok && singleValuedCaveats[key] {
+			return fmt.Errorf("%w: %s", ErrReservedCaveat, key)
+		}
+	}
+	return nil
+}
 
 // Macaroon represents a capability token using chained HMAC signatures.
 //
@@ -134,13 +221,58 @@ func (s *Service) Mint(scope string, expiresAt time.Time) (*Macaroon, error) {
 	return mac, nil
 }
 
+// MintL402 creates the macaroon of an L402 payment challenge. Its identifier
+// starts with L402IdentifierPrefix, and it carries the server-written caveats
+// payment_hash, route, price_sats and, when known, invoice_amount_sats.
+func (s *Service) MintL402(b L402Binding, expiresAt time.Time) (*Macaroon, error) {
+	if b.PaymentHash == "" || b.Route == "" || b.PriceSats <= 0 {
+		return nil, fmt.Errorf("L402 binding needs a payment hash, a route and a positive price")
+	}
+	if strings.ContainsAny(b.Route, "\r\n") {
+		return nil, fmt.Errorf("L402 route name contains a line break")
+	}
+	nonce := make([]byte, 16)
+	if _, err := rand.Read(nonce); err != nil {
+		return nil, fmt.Errorf("generate identifier nonce: %w", err)
+	}
+	mac := &Macaroon{
+		Version:    1,
+		Location:   "https://satgate.io",
+		Identifier: fmt.Sprintf("%s%d:%s", L402IdentifierPrefix, time.Now().UnixMilli(), hex.EncodeToString(nonce)),
+		Caveats: []string{
+			fmt.Sprintf("expires = %d", expiresAt.UnixMilli()),
+			"scope = l402",
+		},
+	}
+	mac.AddCaveat(CaveatPaymentHash, b.PaymentHash)
+	mac.AddCaveat(CaveatRoute, b.Route)
+	mac.AddCaveat(CaveatPriceSats, strconv.FormatInt(b.PriceSats, 10))
+	if b.InvoiceAmountSats > 0 {
+		mac.AddCaveat(CaveatInvoiceAmountSats, strconv.FormatInt(b.InvoiceAmountSats, 10))
+	}
+	mac.Signature = s.chainedSignature(mac)
+	return mac, nil
+}
+
+// IsL402Challenge reports whether the gateway issued this macaroon in an L402
+// payment challenge. Only meaningful on a macaroon returned by Verify.
+func (m *Macaroon) IsL402Challenge() bool {
+	return strings.HasPrefix(m.Identifier, L402IdentifierPrefix)
+}
+
 // Verify validates a macaroon token by reconstructing the HMAC chain
 // from the root key and comparing the final signature.
 // Accepts both binary (libmacaroon V2) and JSON (custom) formats.
+//
+// A token in which a single-valued caveat key (see IsSingleValuedCaveat)
+// appears more than once is refused.
 func (s *Service) Verify(token string) (*Macaroon, error) {
 	// Binary L402 macaroons use libmacaroon's canonical signature algorithm;
 	// verify them with the library before converting into SatGate's struct shape.
 	if mac, err := s.verifyBinary(token); err == nil {
+		if err := mac.checkSingleValued(); err != nil {
+			return nil, fmt.Errorf("caveat check failed: %w", err)
+		}
 		return mac, nil
 	}
 
@@ -160,6 +292,9 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 		if err := s.verifyCaveat(caveat); err != nil {
 			return nil, fmt.Errorf("caveat check failed: %w", err)
 		}
+	}
+	if err := mac.checkSingleValued(); err != nil {
+		return nil, fmt.Errorf("caveat check failed: %w", err)
 	}
 
 	return mac, nil
@@ -192,7 +327,13 @@ func (s *Service) verifyBinary(token string) (*Macaroon, error) {
 // This is the core macaroon attenuation property: permissions can only be
 // narrowed, never widened, because caveats are cumulative and signatures
 // are cryptographically chained.
+//
+// Caveat keys that only the gateway writes (see IsSingleValuedCaveat) are
+// refused in additionalCaveats.
 func (s *Service) Delegate(parentToken string, additionalCaveats []string) (*Macaroon, error) {
+	if err := checkDelegatedCaveats(additionalCaveats); err != nil {
+		return nil, err
+	}
 	parent, err := s.Decode(parentToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode parent: %w", err)
@@ -235,6 +376,11 @@ func (s *Service) Delegate(parentToken string, additionalCaveats []string) (*Mac
 //
 // WARNING: The caller is responsible for ensuring the parent token is valid.
 // Use Delegate() when the service has the root key available.
+//
+// This mirrors what any holder can do without the root key, so it does not
+// refuse caveat keys. A token that ends up repeating a single-valued key is
+// refused by Verify, and the L402 path accepts only macaroons the gateway
+// issued as challenges, which already carry every server-written L402 key.
 func (s *Service) DelegateWithoutVerify(parentToken string, additionalCaveats []string) (*Macaroon, error) {
 	parent, err := s.Decode(parentToken)
 	if err != nil {
@@ -509,7 +655,9 @@ func (m *Macaroon) GetExpiry() (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// GetScope returns the scope from caveats
+// GetScope returns the last scope caveat, for display. Scope caveats repeat
+// under attenuation; an access decision must use HasScope, which checks every
+// one of them.
 func (m *Macaroon) GetScope() string {
 	return m.GetCaveat("scope")
 }
@@ -523,11 +671,39 @@ func (m *Macaroon) AddCaveat(key, value string) {
 	m.Caveats = append(m.Caveats, fmt.Sprintf("%s = %s", key, value))
 }
 
-// GetCaveat retrieves a caveat value by key
+// SingleCaveat returns the value of a caveat key that must appear at most
+// once. found is false when the key is absent. err wraps ErrRepeatedCaveat
+// when the key appears more than once, in any spacing variant.
+func (m *Macaroon) SingleCaveat(key string) (value string, found bool, err error) {
+	for _, caveat := range m.Caveats {
+		k, v, ok := parseCaveat(caveat)
+		if !ok || k != key {
+			continue
+		}
+		if found {
+			return "", false, fmt.Errorf("%w: %s", ErrRepeatedCaveat, key)
+		}
+		value, found = v, true
+	}
+	return value, found, nil
+}
+
+// GetCaveat retrieves a caveat value by key.
+//
+// For a single-valued key (see IsSingleValuedCaveat) it returns the one value,
+// or "" when the key is absent or appears more than once. For any other key it
+// returns the last match: for "parent" that is the nearest delegation hop.
+// Spend does not use this for budget_id; see ResolveIssuedBudgetID.
+// Delegation caps use the narrowest positive value.
 func (m *Macaroon) GetCaveat(key string) string {
+	if singleValuedCaveats[key] {
+		value, _, err := m.SingleCaveat(key)
+		if err != nil {
+			return ""
+		}
+		return value
+	}
 	prefix := key + " = "
-	// Return LAST match. Spend does not use this for budget_id; see
-	// ResolveIssuedBudgetID. Delegation caps use the narrowest positive value.
 	result := ""
 	for _, caveat := range m.Caveats {
 		if strings.HasPrefix(caveat, prefix) {
@@ -537,9 +713,15 @@ func (m *Macaroon) GetCaveat(key string) string {
 	return result
 }
 
-// HasCaveat checks if a caveat with the given key exists
+// HasCaveat reports whether a caveat with the given key and a non-empty value
+// is present.
 func (m *Macaroon) HasCaveat(key string) bool {
-	return m.GetCaveat(key) != ""
+	for _, caveat := range m.Caveats {
+		if k, v, ok := parseCaveat(caveat); ok && k == key && v != "" {
+			return true
+		}
+	}
+	return false
 }
 
 // MacaroonWrapper wraps a Macaroon for the Mint interface

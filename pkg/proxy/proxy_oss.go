@@ -16,6 +16,7 @@ import (
 	"crypto/tls"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -23,6 +24,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -51,45 +53,16 @@ type Gateway struct {
 	// Rate limiter for admin endpoints
 	adminLimiter *rateLimiter
 
-	// L402 replay guard — tracks seen payment hashes to prevent proof reuse
-	l402Seen *replayGuard
+	// L402 consumed-proof store — records used payment hashes so each proof
+	// is accepted once. Redis when configured; otherwise in-process memory,
+	// which is correct for a single instance only.
+	l402Seen L402ReplayStore
 
 	// Optional hooks (set via SetXxx methods)
 	metricsHook MetricsHook
 
 	agentOnce sync.Once
 	agent     *agentLoop
-}
-
-// replayGuard prevents L402 preimage replay attacks using an in-memory
-// set with TTL-based expiry. Thread-safe via sync.Map.
-type replayGuard struct {
-	seen sync.Map // payment_hash → expiry time
-}
-
-func newReplayGuard(cleanupInterval time.Duration) *replayGuard {
-	rg := &replayGuard{}
-	go func() {
-		ticker := time.NewTicker(cleanupInterval)
-		defer ticker.Stop()
-		for range ticker.C {
-			now := time.Now()
-			rg.seen.Range(func(key, value any) bool {
-				if expiry, ok := value.(time.Time); ok && now.After(expiry) {
-					rg.seen.Delete(key)
-				}
-				return true
-			})
-		}
-	}()
-	return rg
-}
-
-// markSeen records a payment hash. Returns false if already seen (replay).
-func (rg *replayGuard) markSeen(paymentHash string, ttl time.Duration) bool {
-	expiry := time.Now().Add(ttl)
-	_, loaded := rg.seen.LoadOrStore(paymentHash, expiry)
-	return !loaded // true = first time (allowed), false = replay (blocked)
 }
 
 // Metrics tracks gateway statistics using atomic counters for concurrent safety.
@@ -112,6 +85,11 @@ type Options struct {
 	Macaroon   *macaroon.Service
 	Governance *governance.Service
 	Lightning  lightning.Provider
+
+	// L402ReplayStore records consumed L402 payment hashes. When nil, the
+	// gateway uses Redis if Config.Redis is enabled, and otherwise an
+	// in-process store that is correct for a single instance only.
+	L402ReplayStore L402ReplayStore
 }
 
 // New creates a new OSS Gateway.
@@ -129,6 +107,21 @@ func New(opts Options) (*Gateway, error) {
 		adminRPM = 60
 	}
 
+	replayStore := opts.L402ReplayStore
+	if replayStore == nil {
+		var err error
+		replayStore, err = newConfiguredReplayStore(opts.Config.Redis)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if replayStore == nil {
+		replayStore = newMemoryReplayStore(5 * time.Minute)
+		if hasL402Route(opts.Config) {
+			log.Warn().Msg("L402 consumed-proof store is in process memory: correct for a single gateway instance only. Configure redis for restarts or more than one replica.")
+		}
+	}
+
 	g := &Gateway{
 		config:       opts.Config,
 		macaroonSvc:  opts.Macaroon,
@@ -137,7 +130,7 @@ func New(opts Options) (*Gateway, error) {
 		proxies:      make(map[string]*httputil.ReverseProxy),
 		metrics:      &Metrics{},
 		adminLimiter: newRateLimiter(adminRPM),
-		l402Seen:     newReplayGuard(5 * time.Minute),
+		l402Seen:     replayStore,
 	}
 
 	// Initialize proxies for configured upstreams
@@ -405,83 +398,137 @@ func (g *Gateway) handleL402(w http.ResponseWriter, r *http.Request, route *conf
 	token := extractL402Token(r)
 	if token != "" {
 		// Verify L402 token (macaroon:preimage format)
-		if g.verifyL402Token(r.Context(), token, route) {
+		err := g.verifyL402Token(r.Context(), token, route)
+		if err == nil {
 			g.proxyRequest(w, r, route)
 			return
 		}
+		if errors.Is(err, errL402ReplayStoreUnavailable) {
+			http.Error(w, "Payment verification unavailable", http.StatusServiceUnavailable)
+			return
+		}
+		log.Debug().Err(err).Str("route", route.Name).Msg("L402: payment proof refused")
 	}
 
 	// No valid payment - issue challenge
 	g.issueL402Challenge(w, r, route)
 }
 
-// verifyL402Token verifies an L402 payment proof.
-func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *config.Route) bool {
-	log.Info().Str("token_len", fmt.Sprintf("%d", len(token))).Msg("verifyL402Token: starting verification")
-
+// verifyL402Token verifies an L402 payment proof for the route being served.
+//
+// The proof is accepted only when the macaroon was issued by this gateway as
+// an L402 challenge, its single-valued route and price caveats match the
+// route and its current price, the preimage hashes to its payment_hash, and
+// the payment hash has not been consumed before. The payment hash is consumed
+// only after every other check passes.
+func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *config.Route) error {
 	// L402 format: macaroon:preimage
 	parts := strings.SplitN(token, ":", 2)
 	if len(parts) != 2 {
-		log.Warn().Str("token_len", fmt.Sprintf("%d", len(token))).Msg("L402: invalid token format, expected macaroon:preimage")
-		return false
+		return fmt.Errorf("invalid token format, expected macaroon:preimage")
 	}
-
 	macaroonStr, preimageHex := parts[0], parts[1]
-	log.Info().
-		Int("macaroon_len", len(macaroonStr)).
-		Int("preimage_len", len(preimageHex)).
-		Msg("verifyL402Token: parsed token components")
 
-	// Verify macaroon signature
+	// Verify macaroon signature and caveats (a repeated single-valued caveat
+	// is refused here).
 	mac, err := g.macaroonSvc.Verify(macaroonStr)
 	if err != nil {
-		log.Warn().Err(err).Str("macaroon_len", fmt.Sprintf("%d", len(macaroonStr))).Msg("L402: macaroon verification failed")
-		return false
+		return fmt.Errorf("macaroon verification failed: %w", err)
+	}
+	if !mac.IsL402Challenge() {
+		return fmt.Errorf("macaroon was not issued as an L402 challenge")
 	}
 
-	// Check for payment_hash caveat
-	paymentHash := mac.GetCaveat("payment_hash")
-	if paymentHash == "" {
-		log.Warn().Msg("L402: no payment_hash caveat in macaroon")
-		return false
+	paymentHash, err := requiredL402Caveat(mac, macaroon.CaveatPaymentHash)
+	if err != nil {
+		return err
 	}
-	log.Info().Str("payment_hash", paymentHash).Msg("verifyL402Token: found payment_hash in macaroon")
+	boundRoute, err := requiredL402Caveat(mac, macaroon.CaveatRoute)
+	if err != nil {
+		return err
+	}
+	boundPrice, err := requiredL402Caveat(mac, macaroon.CaveatPriceSats)
+	if err != nil {
+		return err
+	}
+	invoiceAmount, hasInvoiceAmount, err := mac.SingleCaveat(macaroon.CaveatInvoiceAmountSats)
+	if err != nil {
+		return err
+	}
+
+	// Binding: the proof serves only the route it was issued for, at the
+	// price that route has now.
+	if route.Policy.PriceSats <= 0 {
+		return fmt.Errorf("route %q has no price", route.Name)
+	}
+	currentPrice := strconv.FormatInt(route.Policy.PriceSats, 10)
+	if boundRoute != route.Name {
+		return fmt.Errorf("proof was issued for route %q, not %q", boundRoute, route.Name)
+	}
+	if boundPrice != currentPrice {
+		return fmt.Errorf("proof was issued at %s sats, route %q now costs %s sats", boundPrice, route.Name, currentPrice)
+	}
+	if hasInvoiceAmount && invoiceAmount != currentPrice {
+		return fmt.Errorf("invoice amount %s sats does not match route price %s sats", invoiceAmount, currentPrice)
+	}
 
 	// CRYPTOGRAPHIC PROOF: Verify that SHA256(preimage) == payment_hash
 	// This is the definitive proof of payment - no need to query the Lightning node
 	preimageBytes, err := hex.DecodeString(preimageHex)
 	if err != nil {
-		log.Warn().Err(err).Msg("L402: invalid preimage hex")
-		return false
+		return fmt.Errorf("invalid preimage hex")
 	}
-
-	// Compute SHA256 of preimage
 	hash := sha256.Sum256(preimageBytes)
 	computedHash := hex.EncodeToString(hash[:])
-
-	log.Info().
-		Str("computed", computedHash).
-		Str("expected", paymentHash).
-		Bool("match", computedHash == paymentHash).
-		Msg("verifyL402Token: hash comparison")
-
-	if computedHash != paymentHash {
-		log.Warn().
-			Str("computed", computedHash).
-			Str("expected", paymentHash).
-			Msg("L402: preimage hash mismatch - payment verification failed")
-		return false
+	if subtle.ConstantTimeCompare([]byte(computedHash), []byte(paymentHash)) != 1 {
+		return fmt.Errorf("preimage does not match payment_hash")
 	}
 
-	// Replay guard: each payment proof can only be used once.
-	// TTL of 24h — after that the macaroon's own expiry caveats should reject it.
-	if !g.l402Seen.markSeen(paymentHash, 24*time.Hour) {
-		log.Warn().Str("payment_hash", paymentHash[:16]+"...").Msg("L402: replay detected — payment proof already used")
-		return false
+	// Replay guard: each payment proof can only be used once. The record
+	// outlives the macaroon (l402ReplayTTL >= l402MacaroonLifetime).
+	storeCtx, cancel := context.WithTimeout(ctx, l402ReplayStoreTimeout)
+	defer cancel()
+	first, err := g.l402Seen.Consume(storeCtx, paymentHash, l402ReplayTTL)
+	if err != nil {
+		log.Error().Err(err).Msg("L402: consumed-proof store unavailable; refusing proof")
+		return fmt.Errorf("%w: %v", errL402ReplayStoreUnavailable, err)
+	}
+	if !first {
+		return fmt.Errorf("payment proof already used")
 	}
 
-	log.Info().Str("payment_hash", paymentHash[:16]+"...").Msg("L402: payment verified via preimage ✓")
-	return true
+	log.Info().Str("route", route.Name).Str("payment_hash", shortHash(paymentHash)).Msg("L402: payment verified via preimage")
+	return nil
+}
+
+// requiredL402Caveat returns the value of a server-written L402 caveat that
+// must appear exactly once with a non-empty value.
+func requiredL402Caveat(mac *macaroon.Macaroon, key string) (string, error) {
+	value, found, err := mac.SingleCaveat(key)
+	if err != nil {
+		return "", err
+	}
+	if !found || value == "" {
+		return "", fmt.Errorf("macaroon has no %s caveat", key)
+	}
+	return value, nil
+}
+
+func shortHash(h string) string {
+	if len(h) > 16 {
+		return h[:16] + "..."
+	}
+	return h
+}
+
+// hasL402Route reports whether any configured route uses the l402 policy.
+func hasL402Route(cfg *config.Config) bool {
+	for _, route := range cfg.Routes {
+		if route.Policy.Kind == "l402" {
+			return true
+		}
+	}
+	return false
 }
 
 // issueL402Challenge issues an HTTP 402 payment challenge.
@@ -506,16 +553,18 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 	invoice := inv.Bolt11
 	paymentHash := inv.PaymentHash
 
-	// Create macaroon with payment_hash caveat
-	mac, err := g.macaroonSvc.Mint("l402", time.Now().Add(1*time.Hour))
+	// Create the challenge macaroon, bound to this payment, route and price.
+	mac, err := g.macaroonSvc.MintL402(macaroon.L402Binding{
+		PaymentHash:       paymentHash,
+		Route:             route.Name,
+		PriceSats:         priceSats,
+		InvoiceAmountSats: inv.Amount,
+	}, time.Now().Add(l402MacaroonLifetime))
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to mint L402 macaroon")
 		http.Error(w, "Internal error", http.StatusInternalServerError)
 		return
 	}
-	mac.AddCaveat("payment_hash", paymentHash)
-	// CRITICAL: Recalculate signature after adding caveats!
-	mac.Signature = g.macaroonSvc.RecalculateSignature(mac)
 	// Use binary format for L402 challenge (standard libmacaroon V2 — compatible with lnget/Aperture)
 	macaroonStr, err := g.macaroonSvc.EncodeBinary(mac)
 	if err != nil {
@@ -608,7 +657,11 @@ func (g *Gateway) handleL402MockPay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mac, err := g.macaroonSvc.Verify(req.Macaroon)
-	if err != nil || mac.GetCaveat("payment_hash") != req.PaymentHash {
+	var macHash string
+	if err == nil && mac.IsL402Challenge() {
+		macHash, _, err = mac.SingleCaveat(macaroon.CaveatPaymentHash)
+	}
+	if err != nil || macHash == "" || macHash != req.PaymentHash {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": "macaroon does not match payment_hash"})

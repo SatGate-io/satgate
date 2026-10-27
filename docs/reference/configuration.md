@@ -106,6 +106,11 @@ redis:
   db: 0
 ```
 
+In the open-source gateway, an enabled Redis holds the L402 consumed-proof
+store, shared by every instance that uses it. Without Redis that store is in
+process memory and correct for a single instance only. See
+[L402 Consumed-Proof Store](../configuration/lightning-providers.md#l402-consumed-proof-store).
+
 ### PostgreSQL
 ```yaml
 postgres:

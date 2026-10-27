@@ -13,6 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alicebob/miniredis/v2"
+
 	"github.com/satgate-io/satgate/pkg/config"
 	"github.com/satgate-io/satgate/pkg/governance"
 	"github.com/satgate-io/satgate/pkg/lightning"
@@ -334,9 +336,8 @@ func newHTTPTestEnvWithAccessibleLN(t *testing.T, cfg *config.Config) (*httpTest
 	return env, mockLN
 }
 
-// TestHTTPProxy_L402PaymentFlowE2E tests the full L402 flow using JSON-encoded
-// macaroons (the binary encoding via gopkg.in/macaroon.v2 uses a different HMAC
-// chain than our manual implementation, so we construct the L402 token directly).
+// TestHTTPProxy_L402PaymentFlowE2E tests the full L402 flow with the binary
+// challenge macaroon the gateway issues, paid with the invoice's preimage.
 func TestHTTPProxy_L402PaymentFlowE2E(t *testing.T) {
 	upstream := newUpstream(t)
 	defer upstream.Close()
@@ -391,15 +392,23 @@ func TestHTTPProxy_L402PaymentFlowE2E(t *testing.T) {
 		t.Fatalf("no invoice for payment_hash %s", paymentHash)
 	}
 
-	// Step 5: Construct L402 token using JSON encoding (which round-trips correctly)
-	// Mint macaroon with payment_hash caveat, encode as JSON, combine with preimage
-	mac, err := env.MacSvc.Mint("l402", time.Now().Add(time.Hour))
+	// Step 5: Present the challenge macaroon with the preimage.
+	macaroonStr := challengeMacaroon(t, wwwAuth)
+
+	// A macaroon built outside the challenge (an unbound one carrying only
+	// payment_hash, as challenges did before route and price binding) is
+	// refused even with the right preimage, and does not consume the payment.
+	unbound, err := env.MacSvc.Mint("l402", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatalf("mint: %v", err)
 	}
-	mac.AddCaveat("payment_hash", paymentHash)
-	mac.Signature = env.MacSvc.RecalculateSignature(mac)
-	macaroonStr := env.MacSvc.Encode(mac)
+	unbound.AddCaveat("payment_hash", paymentHash)
+	unbound.Signature = env.MacSvc.RecalculateSignature(unbound)
+	rr = env.doRequest(t, "GET", "/paid/data",
+		map[string]string{"Authorization": "L402 " + env.MacSvc.Encode(unbound) + ":" + inv.Preimage}, nil)
+	if rr.Code == http.StatusOK {
+		t.Fatal("unbound macaroon should not be accepted as a payment proof")
+	}
 
 	l402Token := macaroonStr + ":" + inv.Preimage
 	rr = env.doRequest(t, "GET", "/paid/data",
@@ -422,6 +431,71 @@ func TestHTTPProxy_L402PaymentFlowE2E(t *testing.T) {
 		map[string]string{"Authorization": "L402 " + fakeToken}, nil)
 	if rr.Code == http.StatusOK {
 		t.Fatal("fake preimage should not succeed")
+	}
+}
+
+func challengeMacaroon(t *testing.T, wwwAuth string) string {
+	t.Helper()
+	const start = `L402 macaroon="`
+	if !strings.HasPrefix(wwwAuth, start) {
+		t.Fatalf("bad challenge format")
+	}
+	rest := strings.TrimPrefix(wwwAuth, start)
+	end := strings.Index(rest, `"`)
+	if end <= 0 {
+		t.Fatalf("challenge has no macaroon")
+	}
+	return rest[:end]
+}
+
+// TestHTTPProxy_L402ProofConsumedAcrossInstances runs two gateways that share
+// a Redis consumed-proof store: a proof used on one is refused on the other,
+// and a proof for one route is refused on another route.
+func TestHTTPProxy_L402ProofConsumedAcrossInstances(t *testing.T) {
+	upstream := newUpstream(t)
+	defer upstream.Close()
+	mr := miniredis.RunT(t)
+
+	newCfg := func() *config.Config {
+		return &config.Config{
+			Server: config.ServerConfig{Listen: ":0"},
+			Admin:  config.AdminConfig{Token: "test-admin"},
+			Redis:  &config.RedisConfig{Enabled: true, Addr: mr.Addr()},
+			Upstreams: map[string]config.Upstream{
+				"backend": {URL: upstream.URL},
+			},
+			Routes: []config.Route{
+				{Name: "cheap", Match: config.RouteMatch{PathPrefix: "/cheap/"}, Upstream: "backend",
+					Policy: config.RoutePolicy{Kind: "l402", PriceSats: 5}},
+				{Name: "dear", Match: config.RouteMatch{PathPrefix: "/dear/"}, Upstream: "backend",
+					Policy: config.RoutePolicy{Kind: "l402", PriceSats: 500}},
+			},
+		}
+	}
+	envA, lnA := newHTTPTestEnvWithAccessibleLN(t, newCfg())
+	envB, _ := newHTTPTestEnvWithAccessibleLN(t, newCfg())
+
+	rr := envA.doRequest(t, "GET", "/cheap/x", nil, nil)
+	if rr.Code != http.StatusPaymentRequired {
+		t.Fatalf("expected 402, got %d", rr.Code)
+	}
+	mac := challengeMacaroon(t, rr.Header().Get("WWW-Authenticate"))
+	var body map[string]interface{}
+	json.NewDecoder(rr.Body).Decode(&body)
+	inv := lnA.GetInvoice(body["payment_hash"].(string))
+	if inv == nil {
+		t.Fatal("no invoice for challenge")
+	}
+	auth := map[string]string{"Authorization": "L402 " + mac + ":" + inv.Preimage}
+
+	if rr := envA.doRequest(t, "GET", "/dear/x", auth, nil); rr.Code == http.StatusOK {
+		t.Fatal("cheap-route proof accepted on dear route")
+	}
+	if rr := envA.doRequest(t, "GET", "/cheap/x", auth, nil); rr.Code != http.StatusOK {
+		t.Fatalf("first use on instance A: want 200, got %d", rr.Code)
+	}
+	if rr := envB.doRequest(t, "GET", "/cheap/x", auth, nil); rr.Code == http.StatusOK {
+		t.Fatal("proof used on instance A accepted again on instance B")
 	}
 }
 

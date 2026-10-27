@@ -102,6 +102,8 @@ Expected result:
 - HTTP status: `200 OK`
 - The upstream response is returned.
 - Reusing the same `AUTHORIZATION` fails because SatGate's L402 replay guard permits each payment proof once.
+- The proof is bound to the route and price it was issued for: it does not unlock a different L402 route, and it stops working if the route's `priceSats` changes. See [L402 Payment Proof Binding](../configuration/lightning-providers.md#l402-payment-proof-binding-open-source-gateway).
+- Without Redis the replay guard is in process memory, which is correct for a single gateway instance only; configure `redis` before running more than one replica.
 
 ## What this proves
 
