@@ -80,7 +80,7 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is enforcement before the request goes through: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate shows what your agent calls, and in Control it stops a tool call that is over budget, not allowed, or from a revoked token before it runs.' },
       },
       {
         '@type': 'Question',
@@ -149,7 +149,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for Claude Desktop</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and keep a signed receipt for approval holds, budget and permission denials, and budget spends.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Start in Observe and turn on Control when you know your limits. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">
@@ -186,7 +186,7 @@ export default function SatGateIntegrationPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is SatGate just another observability dashboard?</h3>
-              <p className="leading-relaxed text-gray-400">No. SatGate can observe traffic, but its core role is enforcement before the request goes through: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.</p>
+              <p className="leading-relaxed text-gray-400">No. SatGate shows what your agent calls, and in Control it stops a tool call that is over budget, not allowed, or from a revoked token before it runs.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Can SatGate start in observe-only mode?</h3>

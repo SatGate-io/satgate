@@ -58,7 +58,7 @@ const controls = [
   {
     icon: BarChart3,
     title: 'Audit and attribution',
-    body: 'Emit receipts showing who spent what, on which tool, through which route, why policy allowed or denied it, and which signed receipt preserves the proof.',
+    body: 'Sign receipts that show what was spent or refused, on which tool or route, with a refusal code.',
   },
 ];
 
@@ -181,7 +181,7 @@ export default function AiAgentCostControlPage() {
         '@type': 'ListItem',
         position: 2,
         name: 'Agent-level attribution',
-        description: 'Every request maps to tenant, workflow, agent, delegated sub-agent, token, route, and tool.',
+        description: 'Every request maps to the agent’s token, its route and its tool.',
       },
       {
         '@type': 'ListItem',
@@ -193,7 +193,7 @@ export default function AiAgentCostControlPage() {
         '@type': 'ListItem',
         position: 4,
         name: 'Signed receipt capture',
-        description: 'SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Finance and security can review the receipts.',
+        description: 'Signed receipts anyone can check. Finance and security can review them.',
       },
     ],
   };
@@ -261,7 +261,7 @@ export default function AiAgentCostControlPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            SatGate checks permission before the agent acts. Budget enforcement, revocation and signed receipts run on each request that goes through SatGate, before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
+            SatGate checks permission before the agent acts. In Control, budgets and revokes are enforced on each request that goes through SatGate, before autonomous agents can spend against OpenAI, Claude, MCP, or paid API budgets.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -310,7 +310,7 @@ export default function AiAgentCostControlPage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">What SatGate controls</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            SatGate is not just an observability dashboard. It checks what an agent is allowed to do, and keeps a signed receipt, on each request that goes through SatGate.
+            SatGate is not just an observability dashboard. It checks what an agent is allowed to do on each request that goes through SatGate, and signs receipts anyone can check.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -326,7 +326,7 @@ export default function AiAgentCostControlPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Move to Control. Keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</h2>
+        <h2 className="text-3xl font-bold text-white mb-8">Start with Observe. Move to Control. Keep signed receipts anyone can check.</h2>
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="text-purple-300 font-mono text-sm mb-3">01 / OBSERVE</div>
@@ -351,7 +351,7 @@ export default function AiAgentCostControlPage() {
           <h2 className="text-3xl font-bold text-white mb-8">High-intent use cases</h2>
           <div className="grid md:grid-cols-2 gap-5">
             {[
-              ['AI API budget enforcement', 'Enforce per-agent and per-workflow spend caps before OpenAI, Claude, MCP, or paid API requests leave your environment.', '/ai-api-budget-enforcement'],
+              ['AI API budget enforcement', 'Enforce per-agent and per-tool spend caps before OpenAI, Claude, MCP, or paid API requests leave your environment.', '/ai-api-budget-enforcement'],
               ['Agent spending limits', 'Set hard caps by task, route, model, tool, tenant, session, and delegated sub-agent.', '/agent-spending-limits'],
               ['Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.', '/build'],
               ['MCP tool spend control', 'Attach cost to tool calls and stop runaway Cursor, Claude Desktop, Claude Code, or OpenClaw workflows.', '/mcp'],
@@ -378,9 +378,9 @@ export default function AiAgentCostControlPage() {
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
               ['Inline enforcement', 'Budget policy runs before model, API, or MCP tool execution — not after a billing export.'],
-              ['Agent-level attribution', 'Every request maps to tenant, workflow, agent, delegated sub-agent, token, route, and tool.'],
+              ['Agent-level attribution', 'Every request maps to the agent’s token, its route and its tool.'],
               ['Revocable authority', 'Credentials can expire, narrow, delegate safely, or be killed without rotating shared API keys.'],
-              ['Signed receipt capture', 'SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Finance and security can review the receipts.'],
+              ['Signed receipt capture', 'Signed receipts anyone can check. Finance and security can review them.'],
             ].map(([title, body]) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -396,7 +396,7 @@ export default function AiAgentCostControlPage() {
           <h2 className="text-3xl font-bold text-white mb-8">AI agent cost-control requirements</h2>
           <div className="grid md:grid-cols-2 gap-5">
             {[
-              ['Attribute spend before optimizing it', 'Every request should carry tenant, agent, workflow, token, route, model, and tool context so finance and platform teams can see who created the cost.'],
+              ['Attribute spend before optimizing it', 'Every request should carry the agent’s token, route and tool, so finance and platform teams can see who created the cost.'],
               ['Enforce budgets before API calls execute', 'Budget policy is checked before the request goes through. Alerts, dashboards, and billing exports are useful, but they are too late to stop runaway loops.'],
               ['Use scoped, revocable credentials', 'Autonomous agents should not hold unlimited API keys. Capabilities need expiry, caveats, spend ceilings, route limits, and emergency revocation.'],
               ['Treat MCP tools as economic resources', 'MCP tool calls can trigger paid APIs, searches, code agents, or data lookups. Cost policy has to follow the tool call, not just the LLM token bill.'],
@@ -444,7 +444,7 @@ export default function AiAgentCostControlPage() {
           <p className="mb-2 text-sm font-mono uppercase tracking-wide text-purple-300">Cost-control toolkit</p>
           <h2 className="mb-4 text-3xl font-bold text-white">Turn spend exposure into enforceable controls</h2>
           <p className="mb-10 max-w-3xl text-lg leading-relaxed text-gray-400">
-            The commercial page should lead buyers from awareness to action: estimate the risk, generate the policy, then enforce it before the request goes through.
+            Estimate the risk, set your limits, then let SatGate enforce them before each request goes through.
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[

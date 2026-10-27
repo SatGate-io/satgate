@@ -104,7 +104,7 @@ export default function CapabilityLifecycleDemo() {
             Control the full authority lifecycle: issue, delegate, narrow, revoke, prove
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            SatGate turns macaroons and caveats into auditable controls: scoped authority, child spend caps, delegation depth, next-request revocation, and signed receipt audit records before governed access to paid APIs, models, or MCP tools. Observe who is acting, control what can happen, and prove the decision trail.
+            SatGate turns tokens into limits you can check: narrower permissions, smaller budgets and handoff limits for sub-agents, and revokes that stop the next request. Observe who is acting, control what can happen, and prove the decision trail.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#demo" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -210,7 +210,7 @@ export default function CapabilityLifecycleDemo() {
             <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Receipt preview</p>
             <h2 className="mb-4 text-3xl font-bold text-white">Proof after revocation</h2>
             <p className="mb-6 text-lg leading-relaxed text-gray-400">
-              A complete lifecycle record does not stop at “token issued.” It captures the child capability’s narrower caveats, visible depth limit, next-request revocation result, and receipt context.
+              The token’s history shows the child’s narrower limits and its handoff limit. After a revoke, the next request is refused.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               {[

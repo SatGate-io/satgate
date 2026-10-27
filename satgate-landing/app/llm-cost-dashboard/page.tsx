@@ -94,7 +94,7 @@ export default function LlmCostDashboardPage() {
         name: 'How does SatGate turn LLM cost dashboards into enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation and MCP tool policy on each request that goes through SatGate, before forwarding to upstream services.',
+          text: 'SatGate shows spend by agent and route, and in Control enforces budgets, revokes and MCP tool limits before forwarding each request.',
         },
       },
       {
@@ -249,7 +249,7 @@ export default function LlmCostDashboardPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate turn LLM cost dashboards into enforcement?</h3>
-              <p className="leading-relaxed text-gray-400">SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation and MCP tool policy on each request that goes through SatGate, before forwarding to upstream services.</p>
+              <p className="leading-relaxed text-gray-400">SatGate shows spend by agent and route, and in Control enforces budgets, revokes and MCP tool limits before forwarding each request.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What should teams do after finding LLM spend risk?</h3>

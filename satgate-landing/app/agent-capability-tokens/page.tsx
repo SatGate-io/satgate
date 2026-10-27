@@ -111,7 +111,7 @@ export default function Page() {
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Identity is not permission</h3><p className="leading-relaxed text-gray-400">A verified agent can still be overpowered if the token does not constrain what it can do.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budgets belong in the credential path</h3><p className="leading-relaxed text-gray-400">Spend limits, call ceilings, and route policy need to be evaluated before forwarding traffic.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegation should narrow</h3><p className="leading-relaxed text-gray-400">A parent agent should be able to create a narrower child token, never a broader one.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Budget spends, and refusals over a budget, a missing payment or a tool permission, emit a receipt with capability hash, remaining budget, route, outcome, decision_reason, policy_version and Evidence Pack id.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Each receipt carries the route or tool, the decision, decision_reason, policy_version and, for budgeted calls, the remaining budget and a capability hash.</p></div>
           </div>
         </div>
       </section>
@@ -132,7 +132,7 @@ export default function Page() {
             ['Delegate', 'A child worker receives linked authority from the parent.'],
             ['Narrow', 'Child authority shrinks: lower spend cap, fewer tools, shorter TTL, visible depth.'],
             ['Revoke', 'SatGate rejects the next governed request at the gateway policy check.'],
-            ['Receipt', 'The signed receipt shows lineage, caveats, decision, spend, and receipt IDs.'],
+            ['Receipt', 'The signed receipt shows the decision, the spend and a hash of the token used.'],
           ].map(([title, body]) => (
             <Link key={title} href="/capability-lifecycle-demo" className="rounded-2xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/60 hover:bg-cyan-950/10">
               <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>

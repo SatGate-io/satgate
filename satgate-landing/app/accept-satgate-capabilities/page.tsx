@@ -5,7 +5,7 @@ import { ArrowLeft, BadgeCheck, CheckCircle2, FileCheck2, ShieldCheck, XCircle }
 export const metadata: Metadata = {
   title: { absolute: "Accept SatGate Capabilities" },
   description:
-    "Define what it means for an upstream API to accept SatGate-scoped capabilities: verify bounded authority, execute the allowed action, and return receipts without implying marketplace reputation.",
+    "What an API must do to accept SatGate tokens: check the token, run only what it allows, and return a receipt.",
   keywords: [
     "SatGate capabilities",
     "capability accepting API",
@@ -118,6 +118,7 @@ export default function AcceptSatGateCapabilitiesPage() {
             <h1 className="max-w-4xl text-5xl font-black tracking-tight text-white sm:text-6xl">
               Accept SatGate capabilities without pretending there is a marketplace.
             </h1>
+            <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">This is a draft specification.</p>
             <p className="mt-6 max-w-2xl text-xl leading-9 text-gray-300">
               Acceptance means an upstream verifies SatGate-scoped authority before action and returns receipt-grade evidence after the decision. It does not mean SatGate ranks, endorses, or reputationally scores that upstream.
             </p>

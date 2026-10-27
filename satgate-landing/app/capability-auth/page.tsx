@@ -32,7 +32,7 @@ const faqs = [
   ['Why are capabilities useful for AI agents?', 'Agents act autonomously, call tools repeatedly, and delegate work. Capabilities limit blast radius by encoding scope, budget, expiry, revocation, and delegation into the authority the agent actually uses.'],
   ['How are capabilities different from API keys?', 'API keys usually prove broad account ownership. Capabilities are narrower: they describe what this agent can access and spend right now, and they can be narrowed or revoked without rotating a shared secret.'],
   ['Can capabilities include budget limits?', 'Yes. SatGate treats economic policy as part of authorization. A capability can carry or reference budget, per-tool pricing, route scope, tenant context, and delegation depth.'],
-  ['Are macaroons capability tokens?', 'Macaroons are a practical way to implement narrowed capability-style authority because caveats can constrain scope, time, budget, route, and delegation.'],
+  ['Are macaroons capability tokens?', 'SatGate’s tokens are macaroons, which can only be narrowed: each handoff can cut the scope, time, budget, routes and further handoffs.'],
 ];
 
 export default function CapabilityAuthPage() {
@@ -147,7 +147,7 @@ export default function CapabilityAuthPage() {
           {[
             ['API keys', 'Useful for simple server-to-server access, but usually too broad for autonomous agents and weak at scoped delegation.'],
             ['OAuth', 'Strong for user consent and identity delegation, but often too heavyweight and human-centered for short-lived agent tool authority.'],
-            ['Macaroons', 'A practical token format for narrowed capabilities because caveats can narrow scope, time, budget, route, and delegation.'],
+            ['Macaroons', 'The token format SatGate uses for agent permissions.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-2xl font-bold text-white mb-3">{title}</h3>

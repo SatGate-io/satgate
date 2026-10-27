@@ -173,8 +173,8 @@ export default function AgentsLandingPage() {
                 </div>
               </div>
               <p className="text-gray-400 text-sm mb-4 leading-relaxed">
-                SatGate proxies MCP tool calls from AI agents to your tool servers. Every tool/call is intercepted, 
-                cost-attributed, and governed — the agent sees standard MCP, your tools see standard MCP.
+                SatGate proxies MCP tool calls from AI agents to your tool servers. SatGate checks each tool call
+                and records what it cost. The agent and your tools both see standard MCP.
               </p>
               <div className="bg-black rounded-lg p-4 font-mono text-xs text-gray-400 mb-4">
                 <div className="text-gray-600"># Cursor / Claude Code MCP config (token from Cloud → MCP Setup)</div>
@@ -213,7 +213,7 @@ export default function AgentsLandingPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Observe</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 See every governed API call, tool invocation, and credit spent — without blocking anything.
-                Shadow reporting shows what enforcement <em>would</em> have caught.
+                Observe shows what enforcement <em>would</em> have caught, before you turn it on.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Real-time monitoring</li>
@@ -244,7 +244,7 @@ export default function AgentsLandingPage() {
               <p className="text-gray-400 text-sm leading-relaxed">
                 Monetize your APIs. Approved external agents are admitted under a charge policy
                 (<code className="text-xs">policy: charge</code>): scoped, paid access per request
-                via payment methods (L402), without sharing long-lived API keys or requiring a subscription.
+                via Lightning (L402) or USDC on Base (x402), without sharing long-lived API keys or requiring a subscription.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> charging external agents</li>
@@ -261,7 +261,7 @@ export default function AgentsLandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-4">
-              <Zap size={12} /> EZ Pass — Autonomous Agent Authentication
+              <Zap size={12} /> Tokens for agents that start on their own
             </div>
             <h2 className="text-3xl font-bold text-white mb-4">
               Agents authenticate themselves. No humans required.
@@ -314,7 +314,7 @@ export default function AgentsLandingPage() {
                 <GitBranch className="text-cyan-400" size={16} />
                 <h4 className="text-cyan-300 font-semibold text-sm">Delegation Hierarchies</h4>
               </div>
-              <p className="text-gray-500 text-xs">Agents can delegate sub-tokens to other agents. Revoke the parent — the entire swarm stops. Full tree visibility in the dashboard.</p>
+              <p className="text-gray-500 text-xs">Agents can delegate sub-tokens to other agents. Revoke the parent and the next request from every helper it started is refused. Full tree visibility in the dashboard.</p>
             </div>
           </div>
         </div>
@@ -336,17 +336,17 @@ export default function AgentsLandingPage() {
               {
                 icon: <Shield className="text-purple-400" size={24} />,
                 title: 'Macaroon Authentication',
-                desc: 'Every governed agent gets a cryptographic bearer token with built-in scope, expiry, and budget caveats. Not an API key — a capability.',
+                desc: 'Every governed agent gets a cryptographic bearer token with built-in scope, expiry, and budget caveats.',
               },
               {
                 icon: <DollarSign className="text-yellow-400" size={24} />,
                 title: 'Per-Request Cost Attribution',
-                desc: 'Know exactly which agent called which API or tool and what it cost. Shadow reports show where the money goes before you enforce.',
+                desc: 'Know exactly which agent called which API or tool and what it cost. Observe shows where the money goes before you enforce.',
               },
               {
                 icon: <GitBranch className="text-cyan-400" size={24} />,
                 title: 'Delegation Hierarchies',
-                desc: 'Department → team → agent. Each level gets a budget. Parent tokens delegate to children. Spending rolls up automatically.',
+                desc: 'Department, team, agent: each gets its own budget, carved from the one above it. Parent tokens delegate to children.',
               },
               {
                 icon: <Lock className="text-red-400" size={24} />,
@@ -418,7 +418,7 @@ export default function AgentsLandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Image src="/logo_white_transparent.png" alt="SatGate" width={20} height={20} />
-            <span className="text-sm text-gray-500">SatGate™ — The Economic Firewall</span>
+            <span className="text-sm text-gray-500">SatGate™: the economic firewall</span>
           </div>
           <div className="flex gap-6 text-sm text-gray-500">
             <Link href="/" className="hover:text-gray-300 transition">Home</Link>

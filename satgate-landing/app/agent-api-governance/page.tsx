@@ -92,7 +92,7 @@ export default function AgentApiGovernancePage() {
         name: 'What is agent API governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Agent API governance checks identity, delegated permissions, budgets, route scope and revocation before the request goes through. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
+          text: 'Agent API governance checks identity, delegated permissions, budgets, route scope and revocation before the request goes through.',
         },
       },
       {
@@ -241,7 +241,7 @@ export default function AgentApiGovernancePage() {
         <div className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold text-white mb-4">Agent API governance principles</h2>
           <p className="text-gray-400 max-w-3xl mb-10 text-lg">
-            Governance is not a login screen. It checks permission before the agent acts, on each request that goes through SatGate. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
+            Governance is not a login screen. It checks permission before the agent acts, on each request that goes through SatGate.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -288,7 +288,7 @@ export default function AgentApiGovernancePage() {
             ['Budget', 'External or manual', 'Embedded or enforced inline'],
             ['Delegation', 'Copied or shared', 'Narrowed: sub-agents get less authority'],
             ['Revocation', 'Rotate key or change config', 'Revoke/expire capability before next request'],
-            ['Audit', 'Often aggregate usage only', 'signed receipt per agent/tool/request'],
+            ['Audit', 'Often aggregate usage only', 'signed receipts for refusals and for spending in Control'],
           ].map(([a, b, c]) => (
             <div key={a} className="grid md:grid-cols-3 border-t border-gray-800 text-gray-300">
               <div className="p-4 font-semibold text-white">{a}</div>
@@ -302,12 +302,12 @@ export default function AgentApiGovernancePage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-8">
           <div className="min-w-0">
-            <h2 className="text-3xl font-bold text-white mb-6">Observe, Control, Prove agent API use</h2>
+            <h2 className="text-3xl font-bold text-white mb-6">Observe, Control and Admit</h2>
             <div className="space-y-4">
               {[
                 ['Observe', 'Attribute calls by agent, worker, route, tenant, and workflow so real access and spend patterns are visible before policy tightens.'],
                 ['Control', 'Issue scoped capabilities, enforce budgets and route policy, narrow delegation, and revoke authority before the next request.'],
-                ['Prove', 'Issue signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.'],
+                ['Admit', 'Give external agents limited access, and charge them where you want to.'],
               ].map(([title, body]) => (
                 <div key={title} className="rounded-xl border border-gray-800 bg-black p-5">
                   <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
@@ -332,7 +332,7 @@ export default function AgentApiGovernancePage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is agent API governance?</h3>
               <p className="text-gray-400 leading-relaxed">
-                Agent API governance checks identity, delegated permissions, budgets, route scope and revocation before the request goes through. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
+                Agent API governance checks identity, delegated permissions, budgets, route scope and revocation before the request goes through.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

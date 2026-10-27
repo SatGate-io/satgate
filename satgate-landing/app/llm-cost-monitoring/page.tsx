@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'LLM Cost Monitoring: Dashboards, Alerts, and Real-Time Enforcement',
-    description: 'A practical guide to monitoring LLM cost and converting observability into budget enforcement on each request that goes through SatGate for AI agents.',
+    description: 'A practical guide to monitoring LLM cost and turning it into budgets SatGate enforces in Control for AI agents.',
     url: 'https://satgate.io/llm-cost-monitoring',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -120,7 +120,7 @@ export default function LlmCostMonitoringPage() {
             LLM Cost Monitoring Is the Warning Light. Enforcement Is the Brake.
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Monitoring tells you which models, tools, users, and agents create spend. SatGate turns that visibility into budgets on each request that goes through SatGate, revocation and structured denials before runaway cost becomes a bill.
+            Monitoring tells you which models, tools, users, and agents create spend. In Control, SatGate turns that visibility into budgets, revokes and structured denials on each request, before runaway cost becomes a bill.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/llm-cost-dashboard" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

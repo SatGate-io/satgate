@@ -76,7 +76,7 @@ export default function Page() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'What is AI API budget enforcement?', acceptedAnswer: { '@type': 'Answer', text: 'AI API budget enforcement checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through SatGate, before an autonomous agent can spend against an API or model provider.' } },
+      { '@type': 'Question', name: 'What is AI API budget enforcement?', acceptedAnswer: { '@type': 'Answer', text: 'In Control, SatGate checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through it, before an autonomous agent can spend against an API or model provider.' } },
       { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.' } },
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before the request goes through.' } },
       { '@type': 'Question', name: 'How is AI API budget enforcement different from provider spend alerts?', acceptedAnswer: { '@type': 'Answer', text: 'Provider spend alerts notify teams after usage crosses a threshold. AI API budget enforcement checks request cost, remaining budget, identity, route, and policy before the API call executes.' } },
@@ -158,7 +158,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is AI API budget enforcement?</h3>
               <p className="text-gray-400 leading-relaxed">
-                AI API budget enforcement checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through SatGate, before an autonomous agent can spend against an API or model provider.
+                In Control, SatGate checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through it, before an autonomous agent can spend against an API or model provider.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

@@ -35,17 +35,17 @@ export const metadata: Metadata = {
 const layers = [
   {
     icon: KeyRound,
-    title: "Authority — before the call",
+    title: "Before the call: limits",
     body: "Delegate scoped capability to an agent: routes, tools, budget, expiry, tenant, policy version, and delegation depth.",
   },
   {
     icon: ShieldCheck,
-    title: "Decision — at the call",
+    title: "At the call: decision",
     body: "SatGate checks policy on each request that goes through it, before APIs, MCP tools, or payment methods run.",
   },
   {
     icon: ReceiptText,
-    title: "Evidence — after the call",
+    title: "After the call: receipt",
     body: "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Each receipt comes in an Evidence Pack.",
   },
 ];
@@ -71,7 +71,7 @@ const faqs = [
   {
     question: "Is SatGate a payment processor?",
     answer:
-      "No. Authorization and settlement are separate. Charge/L402 is an optional settlement rail; Fiat402 is internal budget control. Consult trust metadata for adapter status. AgentCore Payments and Pay.sh are planned, not available integrations.",
+      "No. Authorization and settlement are separate. Lightning (L402) and USDC (x402) are optional ways for external agents to pay; Fiat402 is internal budget control. Consult trust metadata for adapter status. AgentCore Payments and Pay.sh are planned, not available integrations.",
   },
   {
     question: "How is this different from OAuth or API keys?",
@@ -157,7 +157,7 @@ export default function AgentAuthorityLayerPage() {
               Agent Permissions and Receipts
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a finite budget and permitted scope, enforce them on each request that goes through SatGate, and retain the recorded decision.
+              Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a budget and allowed scope; in Control, SatGate enforces them on each request and signs receipts for refusals and for spending.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
               Use internal budget controls for your agents and scoped admission for external agents. Payment adapters have different availability. Confirm the chosen integration before relying on it.

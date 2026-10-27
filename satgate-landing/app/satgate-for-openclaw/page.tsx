@@ -3,7 +3,7 @@ import { ArrowRight, Bot, DollarSign, Gauge, KeyRound, ShieldCheck, Terminal, Wo
 
 export const metadata = {
   title: { absolute: 'SatGate for OpenClaw Agents' },
-  description: 'Use SatGate as the Agent Permissions and Receipts for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
+  description: 'Use SatGate to set permissions and keep receipts for OpenClaw’s sub-agents, tool calls and API spend.',
   alternates: { canonical: 'https://satgate.io/satgate-for-openclaw' },
   keywords: [
     'SatGate for OpenClaw',
@@ -15,7 +15,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate for OpenClaw Agents',
-    description: 'Use SatGate as the Agent Permissions and Receipts for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
+    description: 'Use SatGate to set permissions and keep receipts for OpenClaw’s sub-agents, tool calls and API spend.',
     url: 'https://satgate.io/satgate-for-openclaw',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -23,7 +23,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate for OpenClaw Agents',
-    description: 'Use SatGate as the Agent Permissions and Receipts for governed OpenClaw execution across sub-agents, tools, MCP calls, model routes, and API spend.',
+    description: 'Use SatGate to set permissions and keep receipts for OpenClaw’s sub-agents, tool calls and API spend.',
   },
 };
 
@@ -139,7 +139,7 @@ export default function SatGateIntegrationPage() {
           <ul className="space-y-3 text-gray-300">
               <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Attribute spend across agents, sub-agents, tools, models, routes, and workflows.</li>
               <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Enforce per-agent and per-task budgets before expensive requests execute.</li>
-              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Use L402 when paid agents or autonomous agents should pay for protected APIs.</li>
+              <li className="rounded-lg border border-gray-800 bg-black/60 p-4">Use Admit when external agents should pay for your APIs, in Lightning or USDC.</li>
           </ul>
         </div>
       </section>
@@ -147,7 +147,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for OpenClaw</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and keep a signed receipt for approval holds, budget and permission denials, and budget spends.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Start in Observe and turn on Control when you know your limits. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">

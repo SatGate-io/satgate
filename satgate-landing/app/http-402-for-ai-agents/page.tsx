@@ -31,7 +31,7 @@ export const metadata = {
 
 const flows = [
   ['Card checkout', 'Agent receives a temporary card credential and fills a merchant checkout.', 'Good for web purchases, but not request-native API monetization.'],
-  ['x402', 'API returns a 402 payment challenge for USDC on Base.', 'x402 payments still pass SatGate permission checks and get signed receipts. AgentCore Payments and Pay.sh are planned.'],
+  ['x402', 'API returns a 402 payment challenge for USDC on Base.', 'x402 payments still pass SatGate’s permission checks. AgentCore Payments and Pay.sh are planned.'],
   ['Shared payment token', 'Agent receives a payment token for a supported 402 machine-payment flow.', 'Specific to one payment method; treat it as a subpattern of payment details that still needs governance.'],
   ['payment details', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'Payment details can support request-native paid API access; SatGate governs the decision and receipt.'],
   ['Policy-only 402 observation', 'SatGate records and evaluates payment challenges even when another payment method completes payment.', 'Useful for audit, deny/allow rules, and spend governance.'],
@@ -235,7 +235,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Govern paid agent access before the agent acts</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            HTTP 402 can carry payment context. SatGate turns that context into governed action: authority, policy, budget and proof. Each payment gets a signed receipt when signing succeeds.
+            HTTP 402 can carry payment context. SatGate turns that context into governed action: authority, policy, budget and proof. SatGate signs a receipt when it refuses an agent for a missing payment.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
