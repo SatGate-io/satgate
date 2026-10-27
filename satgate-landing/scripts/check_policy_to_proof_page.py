@@ -52,12 +52,12 @@ MCP_AUTHORITY_PAGES = {
 
 capability_lifecycle_required_phrases = [
     "Capability lifecycle control",
-    "Control the full authority lifecycle: issue, delegate, narrow, revoke, prove",
+    "Give an agent a token, hand part of it to a helper, and revoke both",
     "Macaroons and caveats, translated into enterprise controls",
     "Narrowing becomes bounded authority",
     "The token’s history shows the child’s narrower limits",
-    "Decision proof",
-    "This is the capability lifecycle enterprises can govern.",
+    "Next-request revocation",
+    "Try it with your own agents.",
     "next-request revocation",
     "signed receipt proof",
 ]
