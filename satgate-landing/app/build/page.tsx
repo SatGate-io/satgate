@@ -91,7 +91,7 @@ const buildDocLinks = [
   { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "What a token holds: who issued it, who it’s for, allowed tools, budget, expiry, extra limits and how far it can be handed off." },
   { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control." },
   { title: "Trust metadata", href: `${docsBase}/reference/satgate-trust-metadata.md`, body: trustMetadataNote },
-  { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Check a live receipt against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
+  { title: "Open verifier", href: "https://github.com/SatGate-io/satgate/tree/main/tools", body: "Check a live receipt against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
   { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt. A self-hosted gateway signs with your own key." },
   { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Run OpenAI tool calls through SatGate and verify the receipts." },
   { title: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md`, body: "Enforce limits on Anthropic tool use in your own gateway, not inside the model provider." },

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, FileText, GitBranch, Handshake, Layers3, ReceiptText, ShieldCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, GitBranch, Handshake, Layers3, ReceiptText, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
   title: { absolute: "SatGate for Payment Methods | Agent Permissions and Receipts" },
@@ -47,16 +47,15 @@ const flow = [
 
 const railQuestions = [
   "Were permissions passed down to this agent before the transaction?",
-  "Which policy, tenant, budget, route, tool, and delegation chain applied?",
+  "Which route or tool was it, and how much budget was left?",
   "Did the decision happen before value moved or an upstream action executed?",
   "Can a partner, customer, auditor, or fraud team verify the artifact without trusting a dashboard screenshot?",
 ];
 
 const publicArtifacts = [
-  ["Public verifier", "https://github.com/SatGate-io/evidence-pack-verifier"],
+  ["Public verifier", "https://github.com/SatGate-io/satgate/tree/main/tools"],
   ["Live signed receipt (Evidence Pack)", "https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE"],
   ["Receipt schema", "https://satgate.io/.well-known/satgate-receipt.schema.json"],
-  ["Partner brief PDF", "/briefs/satgate-agent-authority-rails-brief.pdf"],
 ];
 
 const jsonLd = {
@@ -103,16 +102,13 @@ export default function RailPartnersPage() {
               Agent permissions for L402 and x402 payments.
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Payment methods can authorize value movement. SatGate proves the agent was allowed to attempt it: who passed permissions down, which policy applied, what budget was left, and what evidence exists after the decision.
+              SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a permission, and when an agent spends from a budget in Control. A partner can check it against SatGate&apos;s published keys. Who handed which token to whom is in the owner&apos;s SatGate account.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
               Payment methods keep changing. SatGate’s permissions and receipts work with x402 and L402 today. AgentCore Payments and Pay.sh are planned.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a href="/briefs/satgate-agent-authority-rails-brief.pdf" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-                Download partner brief <FileText size={18} />
-              </a>
-              <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
+              <Link href="/mcp" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
                 See agent permissions and receipts <ArrowRight size={18} />
               </Link>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
@@ -141,7 +137,7 @@ export default function RailPartnersPage() {
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">Partner fit</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">SatGate is useful when a payment method does not want to become the whole governance stack.</h2>
           <p className="mt-5 text-lg leading-8 text-gray-400">
-            A single payment method sees the transaction. Enterprises need proof across tools, APIs, delegations, budgets, denials, and retries. SatGate preserves that chain of permissions and gives partners a verifiable artifact to evaluate.
+            A single payment method sees the transaction. Enterprises need proof across tools, APIs, delegations, budgets, denials, and retries. SatGate keeps who handed which token to whom in the owner&apos;s account, and gives partners signed receipts they can check.
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
@@ -181,7 +177,7 @@ export default function RailPartnersPage() {
             A signed receipt (Evidence Pack) can be checked outside SatGate. Anyone can download it and check the signature with the open-source verifier and SatGate&apos;s published keys.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <a href="https://github.com/SatGate-io/evidence-pack-verifier" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+            <a href="https://github.com/SatGate-io/satgate/tree/main/tools" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
               Open verifier <ArrowRight size={18} />
             </a>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">
