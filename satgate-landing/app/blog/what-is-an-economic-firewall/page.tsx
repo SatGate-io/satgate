@@ -106,7 +106,7 @@ export default function WhatIsEconomicFirewallPage() {
 
           {/* --- The $480 Story --- */}
           <p className="text-xl text-gray-300 leading-relaxed">
-            A developer we work with left a Claude Code agent running overnight on a research task. Six hours later, it had made 3,200 web search calls. The invoice: <strong>$480</strong>.
+            Picture a Claude Code agent left running overnight on a research task. Six hours later, it had made 3,200 web search calls. The invoice: <strong>$480</strong>.
           </p>
           <p className="text-gray-300 leading-relaxed">
             The agent wasn&rsquo;t malicious. It wasn&rsquo;t buggy. It was doing exactly what it was told &mdash; recursively searching, cross-referencing, and expanding its context. It just never had a reason to stop. Nothing in the stack told it that &ldquo;enough&rdquo; existed.
@@ -138,7 +138,7 @@ export default function WhatIsEconomicFirewallPage() {
           {/* --- The Concept --- */}
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">From &ldquo;Who Are You?&rdquo; to &ldquo;What Can You Afford?&rdquo;</h2>
           <p className="text-gray-300 leading-relaxed">
-            An economic firewall adds a financial dimension to API access control. It sits at the gateway layer &mdash; the same place you&rsquo;d deploy Kong, Envoy, or any reverse proxy &mdash; and enforces budget constraints on every request that passes through it.
+            An economic firewall adds a financial dimension to API access control. It sits at the gateway layer (the same place you&rsquo;d deploy Kong, Envoy, or any reverse proxy) and, in Control, enforces budgets on every request that passes through it.
           </p>
 
           <div className="space-y-3 my-8">
@@ -202,7 +202,7 @@ export default function WhatIsEconomicFirewallPage() {
             Endpoint-level cost tracking isn&rsquo;t granular enough for AI agents. When an agent calls an MCP server, a single &ldquo;endpoint&rdquo; might expose dozens of tools with wildly different costs: <code>web_search</code> at $0.015 per call, <code>code_execution</code> at $0.002, <code>dalle_generate</code> at $0.08.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            An economic firewall tracks costs at the <strong>tool level</strong>, not just the endpoint level. You can see that Agent-47 spent $12.30 on web searches, $0.80 on code execution, and $34.00 on image generation &mdash; all through the same MCP server. You can set per-tool budgets. You can block expensive tools while allowing cheap ones.
+            An economic firewall tracks costs at the <strong>tool level</strong>, not just the endpoint level. You can see that Agent-47 spent $12.30 on web searches, $0.80 on code execution, and $34.00 on image generation, all through the same MCP server. You can price each tool and block the expensive ones.
           </p>
           <p className="text-gray-300 leading-relaxed">
             This matters because cost attribution is the foundation of cost control. If you can&rsquo;t see where money is going at the tool level, you can&rsquo;t make informed decisions about where to set limits.
@@ -218,29 +218,24 @@ export default function WhatIsEconomicFirewallPage() {
           </p>
 
           <pre className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-sm font-mono text-gray-300 overflow-x-auto my-8">
-{`// Agent A's token: $500 budget, read-write scope
-const agentAToken = "macaroon:v1:abc...";
+{`Agent A's token: $500 budget, all tools
 
-// Agent A attenuates for Agent B
-const agentBToken = attenuate(agentAToken, {
-  budget: 50,          // $50 cap (deducted from A's budget)
-  scope: "read-only",  // Can't write
-  tools: ["web_search", "summarize"],  // Only these tools
-  expires: "2h"        // Auto-expires
-});
+Agent A's owner hands Agent B a narrower token:
+  budget   $50 (carved out of A's budget)
+  tools    web_search, summarize
+  expires  in 2 hours
 
-// Agent B CANNOT:
-// - Spend more than $50
-// - Write anything
-// - Call dalle_generate or code_execution
-// - Escalate its own permissions`}
+Agent B CANNOT:
+- Spend more than $50
+- Call dalle_generate or code_execution
+- Widen its own token`}
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            The constraints are cryptographic, not policy-based. Agent B can&rsquo;t modify or forge the token to escalate its privileges. It can only further narrow &mdash; passing an even more restricted token to Agent C. This creates a natural delegation hierarchy where capabilities only flow downward.
+            In the dashboard, Agent A&rsquo;s owner hands Agent B a narrower token: $50 carved out of A&rsquo;s budget, two tools, two hours. B can only narrow it further, passing an even more restricted token to Agent C. SatGate checks every call against it. This creates a natural delegation hierarchy where capabilities only flow downward.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            No central policy server. No admin portal. No RBAC matrix to maintain. The token <em>is</em> the policy.
+            No RBAC matrix to maintain.
           </p>
 
           {/* --- Three-Layer Model --- */}
@@ -265,7 +260,7 @@ const agentBToken = attenuate(agentAToken, {
               </div>
               <div>
                 <p className="text-white font-semibold text-lg">Control</p>
-                <p className="text-gray-400">Enforce budgets in real time. Hard caps, per-tool limits, delegation constraints. When the budget is spent, the request is blocked.</p>
+                <p className="text-gray-400">Enforce budgets in real time. Hard caps, per-tool prices, delegation limits. When the budget is spent, the request is blocked.</p>
               </div>
             </div>
             <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 flex items-start gap-4">

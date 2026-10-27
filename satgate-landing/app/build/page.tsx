@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Build agents that work within a budget",
     description:
-      "Give agents a task, a budget and a list of allowed tools. Read the public docs, and see which APIs are public and which are not available yet.",
+      "Give agents a task, a budget and a list of allowed tools, then check the signed receipts with the open-source verifier.",
   },
 };
 
@@ -51,92 +51,28 @@ const discovery = `# Public metadata. No account or install needed
 curl -fsS https://satgate.io/.well-known/satgate
 curl -fsS https://satgate.io/llms.txt`;
 
-const quickstart = `import os
-from satgate import SatGate
-
-satgate = SatGate(api_key=os.getenv("SATGATE_API_KEY"))
-
-capability = satgate.issue(
-    task="research market prices",
-    agent="research-agent",
-    allow=["mcp:web.search", "api:prices.read"],
-    budget_usd=25,
-    expires_in="1h",
-)
-
-receipt = satgate.pay(
-    upstream="https://api.example.com/search",
-    capability=capability,
-    max_usd=4.20,
-)
-
-verified = satgate.verify(receipt)
-print(verified.decision, verified.evidence_pack_id)`;
-
-const nodeExample = `import { SatGate } from "@satgate/sdk";
-
-const satgate = new SatGate({ apiKey: process.env.SATGATE_API_KEY });
-
-const capability = await satgate.issue({
-  task: "compare supplier prices",
-  agent: "procurement-agent",
-  allow: ["mcp:browser.search", "api:supplier.quote"],
-  budgetUsd: 25,
-  expiresIn: "1h",
-});
-
-const receipt = await satgate.pay({
-  upstream: "https://api.example.com/search",
-  capability,
-  maxUsd: 4.20,
-});
-
-const verified = await satgate.verify(receipt);
-console.log(verified.decision, verified.evidencePackId);`;
-
 const installCommands = String.raw`# Install today (public packages):
 pip install satgate
 npm install @satgate/sdk`;
-
-const curlExample = String.raw`curl https://api.satgate.io/v1/issue \
-  -H "Authorization: Bearer $SATGATE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent": "research-agent",
-    "task": "research market prices",
-    "allow": ["mcp:web.search", "api:prices.read"],
-    "budget_usd": 25,
-    "expires_in": "1h"
-  }'
-
-curl https://api.satgate.io/v1/pay \
-  -H "Authorization: Bearer $SATGATE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"capability":"cap_...","upstream":"https://api.example.com/search","max_usd":4.20}'
-
-curl https://api.satgate.io/v1/verify \
-  -H "Authorization: Bearer $SATGATE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"receipt":"rcpt_..."}'`;
 
 const primitives = [
   {
     icon: KeyRound,
     title: "Issue a token",
-    label: "satgate.issue",
-    body: "Give an agent a token for one task: its budget, the routes it may call, when it expires and how many times it can hand work off.",
+    label: "SatGate Cloud",
+    body: "In the SatGate Cloud dashboard, mint a token for one agent with its budget, the tools or routes it may call and when it expires.",
   },
   {
     icon: Route,
     title: "Make the call",
-    label: "satgate.pay",
-    body: "The agent calls MCP tools, APIs or paid routes through SatGate. SatGate checks your rules and the agent’s spending cap before the call runs or any money moves.",
+    label: "MCP or HTTP",
+    body: "Send the agent’s tool calls or API calls through SatGate. In Control, SatGate checks the budget and permissions before each call runs.",
   },
   {
     icon: ReceiptText,
     title: "Check the receipt",
-    label: "satgate.verify",
-    body: "Verify the receipt the call returned. Keep it for audits, incident reviews or billing questions.",
+    label: "open-source verifier",
+    body: "Check a signed receipt with the open-source verifier against SatGate’s published keys. Keep it for audits, incident reviews or billing questions.",
   },
 ];
 
@@ -155,15 +91,14 @@ const buildDocLinks = [
   { title: "Capability schema", href: `${docsBase}/reference/capability-schema.md`, body: "What a token holds: who issued it, who it’s for, allowed tools, budget, expiry, extra limits and how far it can be handed off." },
   { title: "Receipt schema", href: `${docsBase}/reference/receipt-schema.md`, body: "The signed record SatGate writes. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control." },
   { title: "Trust metadata", href: `${docsBase}/reference/satgate-trust-metadata.md`, body: trustMetadataNote },
-  { title: "Open verifier", href: "https://github.com/SatGate-io/evidence-pack-verifier", body: "Check a live receipt against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
-  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools. When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt." },
-  { title: "Raw HTTP", href: `${docsBase}/guides/raw-http.md`, body: "Curl commands for issue, pay and verify. The API they call is not available yet." },
+  { title: "Open verifier", href: "https://github.com/SatGate-io/satgate/tree/main/tools", body: "Check a live receipt against the issuer’s published keys (JWKS). Uses RFC 8785 canonical JSON and Ed25519 signatures." },
+  { title: "MCP integration", href: `${docsBase}/guides/mcp-gateway.md`, body: "Put SatGate in front of MCP tools. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt. A self-hosted gateway signs with your own key." },
   { title: "OpenAI tools", href: `${docsBase}/guides/openai-tools.md`, body: "Run OpenAI tool calls through SatGate and verify the receipts." },
   { title: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md`, body: "Enforce limits on Anthropic tool use in your own gateway, not inside the model provider." },
   { title: "LangChain", href: `${docsBase}/guides/langchain-integration.md`, body: "Keep LangChain for orchestration and add SatGate where the tools are called." },
   { title: "CrewAI", href: `${docsBase}/guides/crewai.md`, body: "Give each CrewAI tool its own token, with signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission." },
 
-  { title: "API overview", href: `${docsBase}/api/overview.md`, body: "The lower-level gateway APIs and how they map to issue, pay and verify." },
+  { title: "API overview", href: `${docsBase}/api/overview.md`, body: "The gateway’s lower-level APIs." },
   { title: "Python SDK", href: `${docsBase}/sdks/python.md`, body: "Install and set up the Python SDK." },
   { title: "Node.js SDK", href: `${docsBase}/sdks/nodejs.md`, body: "Install and set up the Node.js SDK." },
 ];
@@ -174,7 +109,6 @@ const runtimeChips = [
   { label: "Anthropic tools", href: `${docsBase}/guides/anthropic-tools.md` },
   { label: "LangChain", href: `${docsBase}/guides/langchain-integration.md` },
   { label: "CrewAI", href: `${docsBase}/guides/crewai.md` },
-  { label: "Raw HTTP", href: `${docsBase}/guides/raw-http.md` },
 ];
 
 const allowedReceipt = {
@@ -221,13 +155,6 @@ const jsonLd = {
         { "@type": "Thing", name: "agent payment controls" },
       ],
     },
-    {
-      "@type": "SoftwareSourceCode",
-      name: "SatGate issue/pay/verify illustration (API not available yet)",
-      codeSampleType: "code snippet",
-      programmingLanguage: "Python",
-      text: quickstart,
-    },
   ],
 };
 
@@ -256,7 +183,7 @@ export default function BuildPage() {
               Give your agent a task and a budget. It can see which tools it may use, hand smaller budgets to sub-agents, and handle a refusal without working around your rules.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Agents may choose SatGate because it helps them get work done. Your limits have to hold either way, so SatGate sits between the agent and the tools it calls.
+              Your limits hold whatever the agent decides, because SatGate sits between the agent and the tools it calls.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
@@ -290,7 +217,7 @@ export default function BuildPage() {
               <p className="mb-2 text-xs font-mono uppercase tracking-[0.18em] text-cyan-300">SDK access</p>
               <pre className="max-w-full overflow-x-auto rounded-xl bg-black p-4 text-sm leading-6 text-gray-300"><code>{installCommands}</code></pre>
               <p className="mt-3 text-sm leading-6 text-gray-500">
-                The issue, pay and verify SDK methods are not backed by a live API yet. <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Read the docs →</a>
+                <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:text-cyan-200">Read the docs →</a>
               </p>
             </div>
           </div>
@@ -299,7 +226,7 @@ export default function BuildPage() {
 
       <section className="mx-auto max-w-6xl px-6 pt-16">
         <h2 className="text-3xl font-bold text-white">What you can try today</h2>
-        <p className="mt-4 max-w-3xl text-lg text-gray-400">The public demo is a simulated HTTP demo that runs on your machine with local test keys. It shows an agent finding the price, making allowed calls and running out of budget. It doesn’t cover trusted issuers, sub-agent budgets, MCP or real payments.</p>
+        <p className="mt-4 max-w-3xl text-lg text-gray-400">The public demo is a simulation that runs on your machine. It shows an agent finding the price, making allowed calls and running out of budget.</p>
         <div className="mt-6 flex flex-wrap gap-4">
           <a href="https://github.com/SatGate-io/satgate/tree/main/demo" className="rounded-lg bg-white px-6 py-3 font-bold text-black">Read the demo instructions</a>
           <a href="https://cloud.satgate.io/cloud/signup" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-gray-700 px-6 py-3 font-bold text-white">Start free trial</a>
@@ -329,10 +256,10 @@ export default function BuildPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="mb-10 max-w-3xl">
-          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Not available yet</p>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Issue. Pay. Verify.</h2>
+          <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">How it works today</p>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Issue. Call. Check.</h2>
           <p className="mt-4 text-lg leading-8 text-gray-400">
-            The issue, pay and verify SDK methods are not backed by a live API yet. The examples below show the intended calls; you can’t run them end to end. The public SDK packages install on their own.
+            Mint a token with a budget in SatGate Cloud, send your agent&apos;s calls through SatGate, then check the receipt with the open-source verifier.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
@@ -354,13 +281,10 @@ export default function BuildPage() {
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Payments and internal budgets.</h2>
             <div className="mt-5 space-y-5 text-lg leading-8 text-gray-400">
               <p>
-                Fiat402 handles internal budgets: your agent spends from its budget and no money moves. L402 handles paid access for external agents: a Lightning payment unlocks the route. Either way, SatGate still checks permissions. Paying never replaces them.
+                Fiat402 handles internal budgets: your agent spends from its budget and no money moves. Admit handles paid access for external agents: a Lightning (L402) or USDC on Base (x402) payment unlocks the route. Either way, SatGate still checks permissions. Paying never replaces them.
               </p>
               <p>
-                See <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a> for published adapter status, meaning which payment methods are live. AgentCore Payments and Pay.sh remain planned. A guide for a payment method doesn’t mean it’s live, so check before you build on it.
-              </p>
-              <p>
-                You set the rules. Agents use the tokens you give them. The APIs they call get proof that each request was allowed, within budget and recorded.
+                See <a href="https://satgate.io/.well-known/satgate" className="text-cyan-300 hover:text-cyan-200">/.well-known/satgate</a> for published adapter status, meaning which payment methods are live.
               </p>
             </div>
           </div>
@@ -382,30 +306,6 @@ export default function BuildPage() {
               <Link href="/policy-to-proof" className="text-cyan-300 hover:text-cyan-200">What is evidence_pack_id? →</Link>
               <Link href="/security" className="text-cyan-300 hover:text-cyan-200">How are signatures verified? →</Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-          <div>
-            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Examples</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Example calls. The API they call is not available yet.</h2>
-          </div>
-        </div>
-
-        <div className="mb-6 min-w-0 rounded-2xl border border-gray-800 bg-gray-950">
-          <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs text-gray-500">Python example (API not available yet)</div>
-          <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{quickstart}</code></pre>
-        </div>
-        <div className="grid min-w-0 gap-6 lg:grid-cols-2">
-          <div className="min-w-0 rounded-2xl border border-gray-800 bg-gray-950">
-            <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] text-gray-500">Node example</div>
-            <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{nodeExample}</code></pre>
-          </div>
-          <div className="min-w-0 rounded-2xl border border-gray-800 bg-gray-950">
-            <div className="border-b border-gray-800 px-5 py-3 font-mono text-xs uppercase tracking-[0.18em] text-gray-500">HTTP example</div>
-            <pre className="max-w-full overflow-x-auto p-5 text-sm leading-6 text-gray-300"><code>{curlExample}</code></pre>
           </div>
         </div>
       </section>
@@ -483,7 +383,7 @@ export default function BuildPage() {
         <Braces className="mx-auto mb-6 text-cyan-300" size={36} />
         <h2 className="mx-auto max-w-3xl text-3xl font-bold text-white sm:text-4xl">Try it on one real workflow.</h2>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-gray-400">
-          To test a new agent with sub-agents, talk to us about a pilot. We’ll agree on the setup, the integrations and the limits before you start. The public demo and the beta examples alone won’t give you the full picture.
+          To test a new agent with sub-agents, talk to us about a pilot. We’ll agree on the setup, the integrations and the limits before you start.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a href="https://github.com/SatGate-io/satgate/blob/main/docs/index.md" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">

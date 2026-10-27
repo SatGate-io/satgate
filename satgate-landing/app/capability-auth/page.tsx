@@ -32,7 +32,7 @@ const faqs = [
   ['Why are capabilities useful for AI agents?', 'Agents act autonomously, call tools repeatedly, and delegate work. Capabilities limit blast radius by encoding scope, budget, expiry, revocation, and delegation into the authority the agent actually uses.'],
   ['How are capabilities different from API keys?', 'API keys usually prove broad account ownership. Capabilities are narrower: they describe what this agent can access and spend right now, and they can be narrowed or revoked without rotating a shared secret.'],
   ['Can capabilities include budget limits?', 'Yes. SatGate treats economic policy as part of authorization. A capability can carry or reference budget, per-tool pricing, route scope, tenant context, and delegation depth.'],
-  ['Are macaroons capability tokens?', 'Macaroons are a practical way to implement narrowed capability-style authority because caveats can constrain scope, time, budget, route, and delegation.'],
+  ['Are macaroons capability tokens?', 'SatGate’s tokens are macaroons, which can only be narrowed: each handoff can cut the scope, time, budget, routes and further handoffs.'],
 ];
 
 export default function CapabilityAuthPage() {
@@ -87,7 +87,7 @@ export default function CapabilityAuthPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">
-              Generate capability policy <ArrowRight size={18} />
+              Build with SatGate <ArrowRight size={18} />
             </Link>
             <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white hover:border-emerald-500 transition">
               Compare macaroons and API keys
@@ -147,7 +147,7 @@ export default function CapabilityAuthPage() {
           {[
             ['API keys', 'Useful for simple server-to-server access, but usually too broad for autonomous agents and weak at scoped delegation.'],
             ['OAuth', 'Strong for user consent and identity delegation, but often too heavyweight and human-centered for short-lived agent tool authority.'],
-            ['Macaroons', 'A practical token format for narrowed capabilities because caveats can narrow scope, time, budget, route, and delegation.'],
+            ['Macaroons', 'The token format SatGate uses for agent permissions.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-2xl font-bold text-white mb-3">{title}</h3>
@@ -177,7 +177,7 @@ export default function CapabilityAuthPage() {
           {[
             ['/mcp', 'MCP gateway', 'Apply capabilities to tool calls.'],
             ['/agent-capability-tokens', 'Agent capability tokens', 'See how scoped authority is encoded.'],
-            ['/govern', 'AI agent governance', 'Observe, Control, and Prove agent actions.'],
+            ['/govern', 'AI agent governance', 'Observe and control what agents do, with receipts you can check.'],
             ['/blog/how-to-add-budget-limits-to-openai-api-calls', 'Budget limits', 'Attach spend policy to access.'],
           ].map(([href, title, body]) => (
             <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-gray-950 p-5 hover:border-emerald-700 transition">

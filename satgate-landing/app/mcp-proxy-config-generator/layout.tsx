@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'MCP Proxy Config Generator',
+  title: 'Cloud MCP connect snippet',
   description:
     'Copy the Cloud MCP connect snippet for Cursor, Claude Desktop, Claude Code or OpenClaw. A new token starts at 1,000 credits.',
   alternates: { canonical: 'https://satgate.io/mcp-proxy-config-generator' },
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     'agent tool governance',
   ],
   openGraph: {
-    title: 'MCP Proxy Config Generator',
+    title: 'Cloud MCP connect snippet',
     description:
       'Copy the Cloud MCP connect snippet for Cursor, Claude Desktop, Claude Code or OpenClaw.',
     url: 'https://satgate.io/mcp-proxy-config-generator',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MCP Proxy Config Generator',
+    title: 'Cloud MCP connect snippet',
     description:
       'Copy the Cloud MCP connect snippet for Cursor, Claude Desktop, Claude Code or OpenClaw.',
   },

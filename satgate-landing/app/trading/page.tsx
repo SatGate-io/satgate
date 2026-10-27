@@ -35,7 +35,7 @@ const whatItDoes = [
   { icon: Users, text: 'Run agents from different AI apps on one Robinhood account, each with its own limits.' },
   { icon: Lock, text: 'Lock your agent to your Robinhood Agentic account, so it can\'t read your other accounts.' },
   { icon: DollarSign, text: 'Set dollar limits per order, per day and per week, and have any order over a limit refused.' },
-  { icon: Receipt, text: 'Get signed receipts for orders SatGate refuses for breaking your rules, and stop your agent with one button.' },
+  { icon: Receipt, text: 'Every action your agent takes is recorded in a signed receipt, and you can stop your agent with one button.' },
 ];
 
 const comparisonTitle = 'What Robinhood gives you, and what SatGate adds';
@@ -66,13 +66,13 @@ const comparisonRows = [
     topic: 'Orders that were stopped',
     robinhood: 'Orders your agent places show up in the Activity section of its account in the Robinhood app.',
     satgate:
-      'When SatGate refuses an order for being over a limit, outside the Agentic account or not allowed, it signs a receipt for the refusal. If SatGate can\'t make the receipt, the order is still stopped.',
+      'Every action your agent takes is recorded in a signed receipt, including orders SatGate refuses for being over a limit, outside the Agentic account or not allowed. If SatGate can\'t make the receipt, the order is still stopped.',
   },
   {
     topic: 'More than one agent',
     robinhood: 'Every agent you connect gets the same access. Its one safety setting is trade approvals.',
     satgate:
-      'Connect agents from different AI apps, such as Claude, ChatGPT and Grok, and give each its own limits. One can look only while another makes small trades, all in your Agentic account.',
+      'Connect agents from the AI apps you already use and give each its own limits. One can look only while another makes small trades, all in your Agentic account.',
   },
 ];
 

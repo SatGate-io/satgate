@@ -46,7 +46,7 @@ export default function CompareBifrostPage() {
         name: 'What is the main difference between SatGate and Bifrost?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on spending controls: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and payment rules for L402 and x402.',
+          text: 'Bifrost focuses on fast LLM routing across providers, with budgets per virtual key, team and customer. SatGate focuses on budgets for your agents’ tool and API calls, per-tool cost attribution, scoped agent tokens, and payment from external agents in Lightning (L402) or USDC (x402).',
         },
       },
       {
@@ -83,7 +83,7 @@ export default function CompareBifrostPage() {
           </div>
           <h1 className="text-4xl font-bold mb-4">SatGate vs Bifrost</h1>
           <p className="text-xl text-gray-400">
-            Both are AI gateways. One routes calls. The other governs spend.
+            Both are gateways. They focus on different calls.
           </p>
         </div>
 
@@ -91,10 +91,8 @@ export default function CompareBifrostPage() {
         <section className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-800/30 rounded-xl p-6 mb-12">
           <h2 className="text-lg font-bold text-white mb-3">TL;DR</h2>
           <p className="text-gray-400 leading-relaxed">
-            <strong className="text-white">Bifrost</strong> is excellent at routing LLM calls efficiently across providers with minimal latency. 
-            <strong className="text-white"> SatGate</strong> is built for <em>spending controls</em>: hard budget enforcement, 
-            per-tool cost attribution, and monetization. If your agents need to call LLMs fast, use Bifrost. 
-            If you need to control what they spend, use SatGate.
+            Both are gateways. <strong className="text-white">Bifrost</strong> focuses on fast LLM routing with budgets per key and team.
+            <strong className="text-white"> SatGate</strong> focuses on budgets for your agents&apos; tool and API calls, payment from external agents, and signed receipts.
           </p>
         </section>
 
@@ -114,7 +112,7 @@ export default function CompareBifrostPage() {
                 <tr className="border-b border-gray-800">
                   <td className="py-4 font-medium text-gray-300">Hard budget enforcement</td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
-                  <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
+                  <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                 </tr>
                 <tr className="border-b border-gray-800">
                   <td className="py-4 font-medium text-gray-300">Per-tool cost attribution</td>
@@ -122,7 +120,7 @@ export default function CompareBifrostPage() {
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
                 <tr className="border-b border-gray-800">
-                  <td className="py-4 font-medium text-gray-300">API monetization (L402)</td>
+                  <td className="py-4 font-medium text-gray-300">Paid access for external agents (Lightning or USDC)</td>
                   <td className="py-4 text-center"><Check className="inline text-green-400" size={18} /></td>
                   <td className="py-4 text-center"><X className="inline text-red-400" size={18} /></td>
                 </tr>
@@ -204,8 +202,7 @@ export default function CompareBifrostPage() {
                 <div className="bg-gray-800/50 rounded-lg p-4">
                   <p className="text-gray-500 font-medium text-sm mb-2">Bifrost</p>
                   <p className="text-gray-400 text-sm">
-                    <strong className="text-gray-300">Soft limits.</strong> Budget tracking with alerts, but requests still go through. 
-                    You find out what you spent after the fact.
+                    <strong className="text-gray-300">Budgets per key and team.</strong> Hard budgets and rate limits on virtual keys, teams and customers for LLM traffic.
                   </p>
                 </div>
               </div>
@@ -229,8 +226,7 @@ export default function CompareBifrostPage() {
                 <div className="bg-gray-800/50 rounded-lg p-4">
                   <p className="text-gray-500 font-medium text-sm mb-2">Bifrost</p>
                   <p className="text-gray-400 text-sm">
-                    <strong className="text-gray-300">Request-level tracking.</strong> You see which requests were made, 
-                    but no native cost attribution per tool or team.
+                    <strong className="text-gray-300">Cost tracking per key and team.</strong> Cost tracking and budgets per virtual key, team and customer for LLM calls.
                   </p>
                 </div>
               </div>
@@ -341,7 +337,7 @@ export default function CompareBifrostPage() {
           <h2 className="text-xl font-bold mb-6">SatGate vs Bifrost questions</h2>
           <div className="space-y-5">
             {[
-              ['What is the main difference between SatGate and Bifrost?', 'Bifrost focuses on routing LLM traffic across providers. SatGate focuses on spending controls: hard budget enforcement, per-tool cost attribution, scoped agent credentials, and payment rules for L402 and x402.'],
+              ['What is the main difference between SatGate and Bifrost?', 'Bifrost focuses on fast LLM routing across providers, with budgets per virtual key, team and customer. SatGate focuses on budgets for your agents’ tool and API calls, per-tool cost attribution, scoped agent tokens, and payment from external agents in Lightning (L402) or USDC (x402).'],
               ['Can SatGate and Bifrost be used together?', 'Yes. SatGate can sit before Bifrost to enforce budget and policy controls, while Bifrost handles downstream LLM routing, failover, and provider optimization.'],
               ['When should teams choose SatGate over an LLM router?', 'Choose SatGate when the priority is preventing runaway agent spend, enforcing per-agent or per-tool budgets, attributing costs to teams, or charging external agents for API access.'],
             ].map(([question, answer]) => (

@@ -33,14 +33,15 @@ const risks = [
 
 export default function AgentApiKeyRiskAssessmentPage() {
   const [answers, setAnswers] = useState<Record<string, boolean>>({
-    shared: true,
-    longLived: true,
-    broadScope: true,
-    noBudget: true,
+    shared: false,
+    longLived: false,
+    broadScope: false,
+    noBudget: false,
     noRevocation: false,
-    delegation: true,
-    noAudit: true,
+    delegation: false,
+    noAudit: false,
   });
+  const [answered, setAnswered] = useState(false);
 
   const result = useMemo(() => {
     const score = risks.reduce((sum, risk) => sum + (answers[risk.key] ? risk.weight : 0), 0);
@@ -168,7 +169,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
               Run assessment <ArrowRight size={18} />
             </a>
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
-              Generate token policy
+              Build with SatGate
             </Link>
             <Link href="/agent-api-governance" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-orange-500">
               Agent API governance
@@ -187,7 +188,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
                 label={risk.label}
                 weight={risk.weight}
                 checked={Boolean(answers[risk.key])}
-                onChange={(checked) => setAnswers((current) => ({ ...current, [risk.key]: checked }))}
+                onChange={(checked) => { setAnswered(true); setAnswers((current) => ({ ...current, [risk.key]: checked })); }}
               />
             ))}
           </div>
@@ -195,9 +196,15 @@ export default function AgentApiKeyRiskAssessmentPage() {
 
         <aside className="sticky top-6 h-fit rounded-3xl border border-orange-900/50 bg-orange-950/10 p-8">
           <div className="mb-3 flex items-center gap-2 text-orange-300"><AlertTriangle size={22} /> Risk score</div>
-          <div className="mb-3 text-7xl font-extrabold text-white">{result.score}</div>
-          <div className="mb-6 inline-flex rounded-full border border-orange-500/30 bg-black px-4 py-2 font-bold text-orange-200">{result.grade} risk</div>
-          <p className="mb-8 text-lg leading-relaxed text-gray-300">{result.summary}</p>
+          {answered ? (
+            <>
+              <div className="mb-3 text-7xl font-extrabold text-white">{result.score}</div>
+              <div className="mb-6 inline-flex rounded-full border border-orange-500/30 bg-black px-4 py-2 font-bold text-orange-200">{result.grade} risk</div>
+              <p className="mb-8 text-lg leading-relaxed text-gray-300">{result.summary}</p>
+            </>
+          ) : (
+            <p className="mb-8 text-lg leading-relaxed text-gray-300">Answer the questions to see your score.</p>
+          )}
           <div className="space-y-3 text-sm text-gray-400">
             <p><strong className="text-white">0-24:</strong> Low</p>
             <p><strong className="text-white">25-49:</strong> Medium</p>
@@ -217,7 +224,7 @@ export default function AgentApiKeyRiskAssessmentPage() {
             {[
               [LockKeyhole, 'Scope', 'Limit routes, tools, tenants, actions, data, and delegation for one task or workflow.'],
               [ShieldCheck, 'Control', 'Attach budgets, expiry, per-request ceilings, kill switches, and revocation checks.'],
-              [ReceiptText, 'Audit', 'Record identity, capability, budget, route, tool, policy, decision, and outcome.'],
+              [ReceiptText, 'Audit', 'Keep a signed record of what was allowed or refused, on which route or tool, against which budget.'],
             ].map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof LockKeyhole;
               return (
@@ -255,13 +262,13 @@ export default function AgentApiKeyRiskAssessmentPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-orange-950/20 p-8 md:p-12">
-          <h2 className="mb-4 text-3xl font-bold text-white">Move from API keys to economic capabilities.</h2>
+          <h2 className="mb-4 text-3xl font-bold text-white">Move from shared API keys to tokens with limits.</h2>
           <p className="mb-8 max-w-3xl text-lg leading-relaxed text-gray-300">
-            SatGate turns agent access into policy on each request that goes through SatGate: scoped authority, spend limits, revocation, audit, and payment controls at the gateway before forwarding.
+            SatGate checks each agent request against its permissions, budget and revoke status before forwarding it.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Generate token policy <ArrowRight size={18} />
+              Build with SatGate <ArrowRight size={18} />
             </Link>
             <Link href="/agent-capability-tokens" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               Agent capability tokens

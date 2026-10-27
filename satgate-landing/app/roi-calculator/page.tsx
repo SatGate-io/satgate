@@ -50,8 +50,8 @@ export default function ROICalculatorPage() {
   const [agents, setAgents] = useState(50);
   const [costPerCall, setCostPerCall] = useState(0.05);
   const [callsPerDay, setCallsPerDay] = useState(200);
-  const [loopFreq, setLoopFreq] = useState(2);
-  const [loopDuration, setLoopDuration] = useState(150);
+  const [loopFreq, setLoopFreq] = useState(0.1);
+  const [loopDuration, setLoopDuration] = useState(50);
 
   const calc = useMemo(() => {
     const monthlyToolSpend = agents * callsPerDay * costPerCall * 30;
@@ -100,7 +100,7 @@ export default function ROICalculatorPage() {
       'Runaway loop ghost spend exposure',
       'Annual AI agent cost-risk model',
       'Savings from budget checks before the request goes through',
-      'Payback period and annual ROI estimate',
+      'Ghost spend, annual exposure and payback estimate',
       'Links from ROI exposure to rules and receipts, and to signed receipts',
     ],
     audience: [
@@ -364,16 +364,16 @@ export default function ROICalculatorPage() {
             <SliderInput label="Number of Active Agents" value={agents} min={1} max={500} step={1} onChange={setAgents} />
             <SliderInput label="Average Cost per Tool Call" value={costPerCall} min={0.01} max={1} step={0.01} format={(v) => `$${v.toFixed(2)}`} onChange={setCostPerCall} />
             <SliderInput label="Tool Calls per Agent per Day" value={callsPerDay} min={10} max={1000} step={10} onChange={setCallsPerDay} />
-            <SliderInput label="Loop / Error Frequency" value={loopFreq} min={0.1} max={10} step={0.1} format={(v) => `${v.toFixed(1)}%`} onChange={setLoopFreq} />
-            <SliderInput label="Calls before a cap stops them (N)" value={loopDuration} min={10} max={500} step={5} onChange={setLoopDuration} />
+            <SliderInput label="Share of calls that start a loop" value={loopFreq} min={0.1} max={10} step={0.1} format={(v) => `${v.toFixed(1)}%`} onChange={setLoopFreq} />
+            <SliderInput label="Calls a loop wastes before anyone notices (N)" value={loopDuration} min={10} max={500} step={5} onChange={setLoopDuration} />
           </div>
 
           {/* Results */}
           <div className="space-y-6">
             {/* Metrics */}
             <div className="p-6 md:p-8 rounded-2xl bg-gray-900 border border-gray-800">
-              <h2 className="text-lg font-bold text-white mb-2">Unmanaged cost exposure (estimate)</h2>
-              <p className="text-xs text-gray-500 mb-6">Formula: extra calls = agents × calls/day × 30 × loop frequency × N × cost per call. Savings assume a hard cap stops those extra calls. Pro is modeled at $99/month. Not a measurement.</p>
+              <h2 className="text-lg font-bold text-white mb-2">Example estimate: unmanaged cost exposure</h2>
+              <p className="text-xs text-gray-500 mb-6">Formula: extra calls = agents × calls/day × 30 × loop frequency × N × cost per call. Savings assume a cap stops a loop almost at once. Pro is modeled at $99/month. Not a measurement.</p>
               <div className="space-y-4">
                 <div className="flex justify-between items-baseline">
                   <span className="text-gray-400 text-sm">Monthly Tool Spend</span>
@@ -455,7 +455,7 @@ export default function ROICalculatorPage() {
             {[
               { href: '/policy-to-proof', title: 'Map ROI to Rules and Receipts', body: 'Connect exposure to enforceable checks, receipts, and a signed receipt (Evidence Pack).' },
               { href: '/govern', title: 'Govern agent execution', body: 'Put authority, budget, and audit policy in place before the request goes through.' },
-              { href: '/build', title: 'Build with SatGate', body: 'Mint an agent token with a budget, expiry and revoke.' },
+              { href: '/build', title: 'Build with SatGate', body: 'SDKs, receipts and how to put SatGate in front of your tools.' },
             ].map((item) => (
               <Link key={item.href} href={item.href} className="block rounded-xl border border-gray-800 bg-black/40 p-5 transition hover:border-cyan-500/40 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{item.title}</h3>
@@ -622,7 +622,7 @@ export default function ROICalculatorPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Turn this ROI model into proof</h2>
           <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-            SatGate checks permission before the agent acts, records every policy decision as a receipt, and packages the evidence for review.
+            SatGate checks permission before the agent acts and signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

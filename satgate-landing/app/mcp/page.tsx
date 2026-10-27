@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Bot, Gauge, ShieldCheck, Terminal } from 'lucide
 
 export const metadata = {
   title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and signed receipts for priced calls and budget or tool refusals.',
+  description: 'Put SatGate in front of MCP tools: per-tool budgets, scoped permissions, revocation, and a signed receipt for every action your agents take on SatGate Cloud MCP.',
   alternates: { canonical: 'https://satgate.io/mcp' },
   keywords: [
     'MCP governance',
@@ -17,7 +17,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-    description: 'Budgets and permissions for MCP tools, and signed receipts for priced calls and for budget or tool-permission refusals.',
+    description: 'Budgets and permissions for MCP tools. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt.',
     url: 'https://satgate.io/mcp',
     type: 'website',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -25,7 +25,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MCP Gateway for AI Agents: Budgets, Permissions, Receipts',
-    description: 'Budgets and permissions for MCP tools, and signed receipts for priced calls and for budget or tool-permission refusals.',
+    description: 'Budgets and permissions for MCP tools. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt.',
   },
 };
 
@@ -101,7 +101,7 @@ export default function MCPPage() {
         name: 'What is MCP governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, signed receipts, and risk actions before agents execute tools.',
+          text: 'MCP governance means limits on what AI agents can do with MCP tools: budgets, allowed tools and revokes checked before a tool runs, and signed receipts afterward.',
         },
       },
       {
@@ -117,7 +117,7 @@ export default function MCPPage() {
         name: 'How does SatGate control MCP spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate can proxy MCP traffic and enforce per-tool prices, token budgets, capability caveats and revocation before tool calls reach the upstream MCP server.',
+          text: 'SatGate sits in front of your MCP tools. In Control, it checks each call’s price, the agent’s budget, its allowed tools and whether its token was revoked, before the tool runs.',
         },
       },
     ],
@@ -186,7 +186,7 @@ export default function MCPPage() {
             MCP for your agents, with a budget
           </h2>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300">
-            SatGate sits in front of MCP tools. You see what each agent calls, you cap it, and you get a signed receipt when a priced call is allowed or a call is refused for budget or permission.
+            SatGate sits in front of MCP tools. You see what each agent calls and you cap it. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt.
           </p>
         </div>
       </section>
@@ -209,10 +209,10 @@ export default function MCPPage() {
         <ul className="grid gap-5 md:grid-cols-3">
           <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Observe.</span> See which agent called which tool, and what each call would cost, without blocking anything.</li>
           <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Control.</span> Give each agent token a credit budget and a tool allowlist. A call past either limit is refused before it reaches the MCP server.</li>
-          <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Admit.</span> Charge external agents on the HTTP routes you choose. Each route takes Lightning, USDC on Base, or both. You set how many requests a Lightning payment buys; a USDC payment buys one. See <Link href="/pricing" className="text-purple-300 hover:text-purple-200">pricing</Link>.</li>
+          <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Admit.</span> Charge external agents on the HTTP routes you choose. On each paid route you pick Lightning, USDC on Base, or both. You set how many requests a Lightning payment buys; a USDC payment buys one. See <Link href="/pricing" className="text-purple-300 hover:text-purple-200">pricing</Link>.</li>
         </ul>
         <p className="mt-6 max-w-4xl text-gray-400">
-          When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt. The open-source MCP proxy does not sign one unless that signer is set. To prove what an agent was allowed to do, export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
+          On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt. To prove what an agent was allowed to do, export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
         </p>
       </section>
 
@@ -221,7 +221,7 @@ export default function MCPPage() {
           {[
             ['Price every tool', 'Assign cost profiles to MCP tools so agents cannot treat expensive operations like free function calls.'],
             ['Enforce before the call runs', 'Block over-budget or out-of-scope tool calls before they reach the upstream MCP server.'],
-            ['Audit budget and tool refusals', 'When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt.'],
+            ['Receipts you can check', 'Check a SatGate Cloud receipt with the open-source verifier against SatGate’s published keys.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>
@@ -235,9 +235,9 @@ export default function MCPPage() {
         <h2 className="mb-8 text-3xl font-bold text-white">MCP governance FAQ</h2>
         <div className="space-y-5">
           {[
-            ['What is MCP governance?', 'MCP governance is the control layer around Model Context Protocol tool calls: budgets, scoped authority, revocation, signed receipts, and risk actions before agents execute tools.'],
+            ['What is MCP governance?', 'MCP governance means limits on what AI agents can do with MCP tools: budgets, allowed tools and revokes checked before a tool runs, and signed receipts afterward.'],
             ['Why do MCP tools need budget enforcement?', 'Autonomous agents can call paid or risky tools repeatedly, delegate work, or loop. MCP budget enforcement stops over-budget tool calls before the request goes through instead of discovering spend after the fact.'],
-            ['How does SatGate control MCP spend?', 'SatGate can proxy MCP traffic and enforce per-tool prices, token budgets, capability caveats and revocation before tool calls reach the upstream MCP server.'],
+            ['How does SatGate control MCP spend?', 'SatGate sits in front of your MCP tools. In Control, it checks each call’s price, the agent’s budget, its allowed tools and whether its token was revoked, before the tool runs.'],
           ].map(([question, answer]) => (
             <div key={question} className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-3 text-xl font-bold text-white">{question}</h3>

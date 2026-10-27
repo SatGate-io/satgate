@@ -26,8 +26,7 @@ if RAILS.exists():
         "permissions and receipts work with x402 and L402 today",
         "Rules and Receipts",
         "Evidence Pack",
-        "https://github.com/SatGate-io/evidence-pack-verifier",
-        "/briefs/satgate-agent-authority-rails-brief.pdf",
+        "https://github.com/SatGate-io/satgate/tree/main/tools",
     ]:
         if needle not in rails:
             errors.append(f"/partners/rails missing anchor: {needle}")

@@ -3,7 +3,7 @@ import { ArrowRight, Bot, Coins, KeyRound, LockKeyhole, ReceiptText, Zap } from 
 
 export const metadata = {
   title: 'L402 Payment Rules for APIs',
-  description: 'Understand L402 as one payment method for agent/API access. SatGate gives delegated clients bounded economic authority, applies rules and receipts before the call runs, and preserves signed receipts after payment.',
+  description: 'Understand L402 as one payment method for agent/API access. SatGate checks an external agent’s permissions and payment before the call runs, and signs a receipt when it refuses one for a missing payment.',
   alternates: { canonical: 'https://satgate.io/l402-agent-payments' },
   keywords: [
     'L402 payment rules',
@@ -55,7 +55,7 @@ const steps = [
   {
     icon: ReceiptText,
     title: 'Usage is attributed',
-    body: 'Every paid request is tied to delegated permissions, agent identity, route, price, policy, and settlement evidence.',
+    body: 'Every paid request is tied to the route, the price and the payment.',
   },
   {
     icon: Coins,
@@ -174,7 +174,7 @@ export default function L402AgentPaymentsPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(250,204,21,0.17),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(34,211,238,0.15),transparent_32%)]" />
         <div className="relative max-w-6xl mx-auto px-6 py-24">
           <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-950/20 px-4 py-2 text-sm text-yellow-200 mb-8">
-            <Zap size={16} /> payment details for delegated agents
+            <Zap size={16} /> Lightning payments (L402) for external agents
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-5xl mb-8">
@@ -182,7 +182,7 @@ export default function L402AgentPaymentsPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed mb-10">
-            Payment details can carry HTTP 402 payment proof. SatGate gives delegated clients bounded economic authority: it decides whether a human or platform delegated enough authority, unlocks only scoped access, and preserves proof for every paid action.
+            Payment details can carry HTTP 402 payment proof. SatGate checks whether a person or platform gave the agent enough permission, unlocks only the access allowed, and signs a receipt when it refuses an agent for a missing payment.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -207,7 +207,7 @@ export default function L402AgentPaymentsPage() {
               Traditional API monetization assumes a human signs up, enters a card, picks a plan, stores a key, and then integrates. Delegated agent/API access needs a request-native flow: request resource, receive price, present proof, unlock scoped access, continue task.
             </p>
             <p>
-              L402 gives that flow an internet-native shape. SatGate treats it as payment details, governed by policy and proof before the request goes through.
+              L402 gives that flow an internet-native shape. SatGate treats L402 as one way to pay, checked against your rules before the request goes through.
             </p>
           </div>
         </div>
@@ -281,7 +281,7 @@ export default function L402AgentPaymentsPage() {
             ['Machine-readable price', 'Delegated clients need a price and payment challenge in the protocol flow, not a human checkout page or sales form.'],
             ['Payment before access', 'SatGate verifies payment details before forwarding the protected API request upstream.'],
             ['Scoped unlocks', 'Payment should unlock the requested route, tool, dataset, or capability — not a broad reusable API key.'],
-            ['Signed receipts', 'Every paid request should record delegated permissions, agent identity, route, price, payment proof, policy decision, and a signed receipt.'],
+            ['Signed receipts', 'SatGate checks the price and the payment before access, and signs a receipt when it refuses an agent for a missing payment.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
@@ -323,7 +323,7 @@ HTTP/1.1 200 OK
           <div className="rounded-2xl border border-gray-800 bg-black p-6">
             <div className="text-yellow-300 font-mono text-sm mb-3">RECEIPT</div>
             <h3 className="text-xl font-bold text-white mb-3">Preserve the receipt</h3>
-            <p className="text-gray-400 leading-relaxed">Use L402 payment proof as one input to a signed receipt that records authority, rail, price, and decision.</p>
+            <p className="text-gray-400 leading-relaxed">SatGate checks the L402 payment proof before the request goes through, and signs a receipt when it refuses an agent for a missing payment.</p>
           </div>
         </div>
       </section>
@@ -397,7 +397,7 @@ HTTP/1.1 200 OK
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Govern L402-paid access with Rules and Receipts</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            L402 can prove payment. SatGate proves the action was authorized: who acted, what policy applied, which rail was used, what was paid, and why access was allowed or denied.
+            L402 can prove payment. SatGate&apos;s receipt records which payment method was used, what was paid and SatGate&apos;s decision.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

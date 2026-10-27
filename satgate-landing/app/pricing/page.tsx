@@ -34,7 +34,7 @@ const faqs = [
   },
   {
     q: 'Does a pilot require code changes?',
-    a: 'Usually not. Most pilots start with a DNS, proxy or MCP config change in front of one API endpoint or tool. We make sure that works before adding more.',
+    a: 'Usually not. Most pilots start by sending one service or tool through SatGate. We make sure that works before adding more.',
   },
   {
     q: 'What does the design-partner pilot cost?',
@@ -110,7 +110,7 @@ const PricingPage = () => {
         name: 'SatGate Personal',
         price: '9.99',
         priceCurrency: 'USD',
-        description: 'For people who let an AI app trade for them. 30 days free. No card to start. $9.99/month. Dollar limits per order, per day and per week. Your agent sees only your Robinhood Agentic account. Orders over an amount you pick wait for your yes. One budget your AI apps can share. Signed receipts for orders SatGate refuses for breaking your rules, kept at least 90 days. Stop any agent with one button.',
+        description: 'For people who let an AI app trade for them. 30 days free. No card to start. $9.99/month. Dollar limits per order, per day and per week. Your agent sees only your Robinhood Agentic account. Orders over an amount you pick wait for your yes. One budget your AI apps can share. Every action your agent takes is recorded in a signed receipt. Stop any agent with one button.',
         availability: 'https://schema.org/InStock',
         url: personalSignupUrl,
         itemOffered: { '@type': 'Service', name: 'SatGate Personal', serviceType: 'AI agent governance' },
@@ -220,7 +220,7 @@ const PricingPage = () => {
               <span className="text-gray-500 text-xs">Let external agents in, and charge them</span>
             </div>
           </div>
-          <p className="mt-4 text-center text-sm text-gray-400">Control and Admit sign receipts, and Observe can too. Anyone can check a signed receipt with the open-source verifier.</p>
+          <p className="mt-4 text-center text-sm text-gray-400">Control, Admit and Observe sign receipts. Anyone can check one with the open-source verifier.</p>
         </div>
       </section>
 
@@ -266,7 +266,7 @@ const PricingPage = () => {
               <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Your agent sees only your Robinhood Agentic account</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Orders over an amount you pick wait for your yes</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />One budget your AI apps can share</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Signed receipts for orders SatGate refuses for breaking your rules, kept at least 90 days</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Every action your agent takes is recorded in a signed receipt</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Stop any agent with one button</li>
             </ul>
             <a
@@ -369,7 +369,7 @@ const PricingPage = () => {
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Budgets</td>
                   <td className="py-3 px-4">None. You find out when the bill arrives</td>
-                  <td className="py-3 px-4 text-white">Hard caps, checked on every priced call</td>
+                  <td className="py-3 px-4 text-white">In Control, hard caps checked before each priced call</td>
                 </tr>
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Who spent what</td>
@@ -389,12 +389,12 @@ const PricingPage = () => {
                 <tr className="border-b border-gray-800/50">
                   <td className="py-3 px-4 text-gray-300">Runaway agents</td>
                   <td className="py-3 px-4">No limit on spend</td>
-                  <td className="py-3 px-4 text-white">Cut off automatically at the cap</td>
+                  <td className="py-3 px-4 text-white">In Control, cut off at the cap</td>
                 </tr>
                 <tr>
                   <td className="py-3 px-4 text-gray-300">Payments</td>
                   <td className="py-3 px-4">None built in</td>
-                  <td className="py-3 px-4 text-white">Charge external agents on the routes you choose. Each route takes Lightning, USDC on Base (x402), or both. You set how many requests one Lightning payment buys. One USDC payment buys one request. Each payment gets a signed receipt when signing succeeds.</td>
+                  <td className="py-3 px-4 text-white">Charge external agents on the routes you choose. On each paid route you pick Lightning, USDC on Base (x402), or both. You set how many requests one Lightning payment buys. One USDC payment buys one request. SatGate signs a receipt when it refuses an agent for a missing payment.</td>
                 </tr>
               </tbody>
             </table>
@@ -409,7 +409,7 @@ const PricingPage = () => {
             <div className="text-center">
               <div className="text-3xl mb-3">🛡</div>
               <h3 className="font-bold text-white mb-2">Save money</h3>
-              <p className="text-gray-400 text-sm">Stop a $500 runaway loop at $2. When an agent hits its cap, SatGate cuts it off.</p>
+              <p className="text-gray-400 text-sm">Set a $2 cap and a runaway loop stops at $2. In Control, SatGate cuts an agent off at its cap.</p>
             </div>
             <div className="text-center">
               <div className="text-3xl mb-3">⚡</div>
@@ -419,7 +419,7 @@ const PricingPage = () => {
             <div className="text-center">
               <div className="text-3xl mb-3">💰</div>
               <h3 className="font-bold text-white mb-2">Earn money</h3>
-              <p className="text-gray-400 text-sm">Charge external agents on the routes you choose. Each route takes Lightning, USDC on Base, or both. One USDC payment on Base buys one request. On Lightning routes you choose how many requests one payment buys. Each payment gets a signed receipt when signing succeeds.</p>
+              <p className="text-gray-400 text-sm">Charge external agents on the routes you choose. On each paid route you pick Lightning, USDC on Base, or both. One USDC payment on Base buys one request. On Lightning routes you choose how many requests one payment buys. SatGate signs a receipt when it refuses an agent for a missing payment.</p>
             </div>
           </div>
         </div>

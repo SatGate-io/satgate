@@ -67,7 +67,7 @@ const sandboxDemos = [
     href: '/pay',
     icon: Zap,
     eyebrow: '3 · Charge external agents',
-    body: 'Make an external agent pay before its request goes through. Payment refusals get a signed receipt, and so do most paid requests.',
+    body: 'Make an external agent pay before its request goes through. SatGate signs a receipt when it refuses an agent for a missing payment.',
   },
 ];
 const goldenPathSteps: Array<{
@@ -203,7 +203,7 @@ function GoldenPathSection() {
             ))}
             <article className={`rounded-2xl border p-4 ${goldenToneClasses.proof}`}>
               <h3 className="font-bold text-white">7 · Receipt exported</h3>
-              <p className="mt-2 text-sm text-gray-300">Signed receipt (Evidence Pack) <code className="text-cyan-200">ep_demo_2026_05_10_001</code> bundles every receipt above with the policy, the agent, the budget and the hashes. It is sample data with a placeholder signature, so it will not pass a signature check.</p>
+              <p className="mt-2 text-sm text-gray-300">A real Evidence Pack holds one signed receipt. This one (<code className="text-cyan-200">ep_demo_2026_05_10_001</code>) is sample data with a placeholder signature, so it will not pass a signature check.</p>
               <div className="mt-4"><ProofCtas compact /></div>
             </article>
           </div>
@@ -535,12 +535,12 @@ export default function SandboxPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate stop unauthorized agent spend?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Before SatGate forwards a request, it checks who the agent is, what its token allows, how much budget is left and whether the token was revoked. If any check fails, the request stops at SatGate.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Before SatGate forwards a request, it checks the agent’s token: what it allows, how much budget is left and whether it was revoked. If any check fails, the request stops at SatGate.' },
       },
       {
         '@type': 'Question',
         name: 'Is the demo for AI agent cost control or security?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for a budget spend, and for a refusal over a budget, a missing payment or a tool permission.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits.' },
       },
     ],
   };
@@ -775,8 +775,8 @@ export default function SandboxPage() {
           <div className="grid gap-4 md:grid-cols-3">
             {[
               ['What does the SatGate demo show?', 'Four things: creating a token for an agent, limiting what it can call, capping what it can spend, and charging external agents before they get in.'],
-              ['How does SatGate stop unauthorized agent spend?', 'Before SatGate forwards a request, it checks who the agent is, what its token allows, how much budget is left and whether the token was revoked. If any check fails, the request stops at SatGate.'],
-              ['Is the demo for AI agent cost control or security?', 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits, with a receipt for a budget spend, and for a refusal over a budget, a missing payment or a tool permission.'],
+              ['How does SatGate stop unauthorized agent spend?', 'Before SatGate forwards a request, it checks the agent’s token: what it allows, how much budget is left and whether it was revoked. If any check fails, the request stops at SatGate.'],
+              ['Is the demo for AI agent cost control or security?', 'Both. SatGate checks permissions and budget on the same request, so one gateway handles access limits and spending limits.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-gray-900 p-5">
                 <h3 className="mb-2 font-bold text-white">{question}</h3>

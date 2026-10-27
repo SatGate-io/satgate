@@ -65,7 +65,7 @@ REQUIRED = {
         "Give your agent a task and a budget",
     ],
     "app/paid-agent-payments/page.tsx": [
-        "Agents consume. Humans and platforms buy.",
+        "You set the rules. External agents pay to get in.",
         "Governed Paid API Access for Agents",
         "A human or platform passes permissions down",
     ],

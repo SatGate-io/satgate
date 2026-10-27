@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, CreditCard, Gauge, KeyRound, ShieldCheck, Wal
 
 export const metadata = {
   title: { absolute: 'Stripe Link for Agents vs SatGate' },
-  description: 'Compare Stripe Link for Agents and SatGate: agent wallets and payment credentials vs spending checks before the request goes through, budgets, audit, and L402.',
+  description: 'Compare Stripe Link for Agents and SatGate: agent wallets and payment credentials vs spending checks before the request goes through, budgets, audit, and paid access in Lightning or USDC.',
   alternates: { canonical: 'https://satgate.io/stripe-link-agents-vs-satgate' },
   keywords: [
     'Stripe Link for Agents vs SatGate',
@@ -33,7 +33,7 @@ const comparison = [
   ['Primary job', 'Provide payment credentials and approval flows', 'Govern agent/API spending on each request that goes through SatGate'],
   ['Best fit', 'Purchases on merchant sites and payment-token flows', 'APIs, models, MCP tools, delegated agents, budgets, and monetization'],
   ['Control point', 'Wallet / credential issuance', 'Gateway policy check before forwarding to an upstream API, model, or tool'],
-  ['Budget enforcement', 'User approval and future granular controls', 'Per-agent, route, tool, tenant, workflow, and time-window budgets'],
+  ['Budget enforcement', 'Per-purchase limits, an approved budget, or approval of each purchase', 'Per-agent, sub-agent, route and tool budgets, and daily or weekly dollar limits on trade orders'],
   ['API metering', 'Not the core product', 'Core Observe capability'],
   ['Payment method', 'Cards and shared payment tokens', 'SatGate payment rules record payment details for API monetization'],
   ['Governance question', 'Can this agent pay?', 'Should this agent access, spend, delegate, route, or pay now?'],
@@ -170,7 +170,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <h2 className="text-3xl font-bold text-white mb-8">Why payment approval is not enough</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            ['Budgets', 'A paid credential does not prove the agent is within route, tenant, model, or workflow budget.'],
+            ['Budgets', 'A paid credential does not prove the agent is within its route or tool budget.'],
             ['Scope', 'Agents need scoped authority, not broad long-lived access just because a payment method exists.'],
             ['Audit', 'Finance and security need to know which agent, tool, route, policy, and proof were involved.'],
             ['Monetization', 'API providers need request-native pricing and payment rules when agents become customers.'],
@@ -196,7 +196,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
             <KeyRound className="text-cyan-300 mb-5" size={34} />
             <h2 className="text-2xl font-bold text-white mb-4">Use SatGate when the question is permission</h2>
             <p className="text-gray-300 leading-relaxed">
-              If agents are calling your APIs, models, MCP tools, or delegated workflows, you need policy before access: identity, budget, route, revocation, metering, audit, and optional L402 monetization.
+              If agents are calling your APIs, models, MCP tools, or delegated workflows, you need policy before access: identity, budget, route, revocation, metering, audit, and optional paid access in Lightning or USDC.
             </p>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function StripeLinkAgentsVsSatGatePage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-yellow-950/20 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Control agent economics before payment becomes risk</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            SatGate gives API teams an economic firewall that checks before the request goes through: meter every agent call, enforce budgets, revoke authority, and monetize with L402 when APIs expose a payment method for delegated agents.
+            SatGate gives API teams an economic firewall that checks before the request goes through: meter every agent call, enforce budgets, revoke authority, and charge external agents in Lightning or USDC on the routes you choose.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/economic-firewall-readiness-grader" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

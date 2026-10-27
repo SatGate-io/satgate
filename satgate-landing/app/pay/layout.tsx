@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: { absolute: "L402 Payment Rules Demo | SatGate" },
   alternates: { canonical: "https://satgate.io/pay" },
   description:
-    "See SatGate govern delegated paid API access with payment details, payment proof, scoped permissions, and signed receipts at the gateway before forwarding.",
+    "See how payment comes before access for external agents, and the receipt SatGate signs when it refuses one for a missing payment.",
   keywords: [
     "L402 payment rules demo",
     "SatGate payment rules",

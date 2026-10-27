@@ -170,8 +170,8 @@ for needle in REQUIRED_BUILD_STRINGS:
         errors.append(f"/build missing trust metadata string: {needle}")
 if "for published adapter status" not in build_text:
     errors.append("/build should separate supported rails from planned rails")
-if "AgentCore Payments and Pay.sh remain planned" not in build_text:
-    errors.append("/build should call AgentCore Payments and Pay.sh planned rails")
+if "for published adapter status, meaning which payment methods are live" not in build_text:
+    errors.append("/build should point to /.well-known/satgate for which payment methods are live")
 
 doc_text = DOC.read_text() if DOC.exists() else ""
 for needle in REQUIRED_DOC_STRINGS:

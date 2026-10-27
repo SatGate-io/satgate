@@ -94,7 +94,7 @@ export default function LlmCostDashboardPage() {
         name: 'How does SatGate turn LLM cost dashboards into enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation and MCP tool policy on each request that goes through SatGate, before forwarding to upstream services.',
+          text: 'SatGate shows spend by agent and route, and in Control enforces budgets, revokes and MCP tool limits before forwarding each request.',
         },
       },
       {
@@ -169,7 +169,7 @@ export default function LlmCostDashboardPage() {
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Shared API keys hide the agent or workflow responsible.</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">MCP tool costs often live outside model-provider billing.</li>
             <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Dashboards cannot revoke a runaway sub-agent by themselves.</li>
-            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Account caps can break every workload when one agent misbehaves.</li>
+            <li className="rounded-lg border border-gray-800 bg-black/50 p-3">Provider limits stop at the project or workspace. Agents that share one stop together when it hits its cap.</li>
           </ul>
         </div>
       </section>
@@ -195,13 +195,13 @@ export default function LlmCostDashboardPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="mb-3 font-mono text-sm text-cyan-300">01 / OBSERVE</div>
-            <h3 className="mb-3 text-xl font-bold text-white">See every cost center</h3>
-            <p className="leading-relaxed text-gray-400">Capture model, API, MCP, and tool spend by agent, team, tenant, route, and workflow.</p>
+            <h3 className="mb-3 text-xl font-bold text-white">See spend by agent</h3>
+            <p className="leading-relaxed text-gray-400">See spend by agent, team, route and tool.</p>
           </div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="mb-3 font-mono text-sm text-purple-300">02 / ANALYZE</div>
             <h3 className="mb-3 text-xl font-bold text-white">Find budget risk</h3>
-            <p className="leading-relaxed text-gray-400">Identify retry storms, model drift, prompt bloat, expensive tool paths, missing attribution, and high-risk agents.</p>
+            <p className="leading-relaxed text-gray-400">Spot loops, retries and expensive tools before you set limits.</p>
           </div>
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <div className="mb-3 font-mono text-sm text-green-300">03 / CONTROL</div>
@@ -220,7 +220,7 @@ export default function LlmCostDashboardPage() {
           </p>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
-              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
+              ['/build', 'Build with SatGate', 'SDKs, receipts and how to put SatGate in front of your tools.'],
               ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
               ['/policy-to-proof', 'Rules and Receipts', 'How budget spends, and refusals over a budget, a missing payment or a tool permission, become signed receipts.'],
               ['/runaway-agent-cost-calculator', 'Runaway cost calculator', 'Estimate what a looping or retrying agent can spend in an hour.'],
@@ -249,7 +249,7 @@ export default function LlmCostDashboardPage() {
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">How does SatGate turn LLM cost dashboards into enforcement?</h3>
-              <p className="leading-relaxed text-gray-400">SatGate observes agent/API spend, attributes it by agent and route, then enforces budgets, revocation and MCP tool policy on each request that goes through SatGate, before forwarding to upstream services.</p>
+              <p className="leading-relaxed text-gray-400">SatGate shows spend by agent and route, and in Control enforces budgets, revokes and MCP tool limits before forwarding each request.</p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What should teams do after finding LLM spend risk?</h3>

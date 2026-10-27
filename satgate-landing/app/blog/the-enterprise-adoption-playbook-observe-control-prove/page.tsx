@@ -50,7 +50,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
         name: 'What are Observe, Control, and Prove in AI agent governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves signed receipts for allow, deny, budget, delegation, and payment-method decisions.',
+          text: 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove keeps signed receipts for refusals and budget spends.',
         },
       },
       {
@@ -114,7 +114,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             The problem isn&apos;t technical. It&apos;s organizational. And the solution isn&apos;t a product — it&apos;s a strategy.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            At SatGate, we built three distinct modes — <strong>Fiat</strong>, <strong>Fiat402</strong>, and <strong>L402</strong> — not because we couldn&apos;t pick one architecture. We built them because enterprise adoption doesn&apos;t happen in a single step. <strong>Observe, Control, Prove</strong> is a change management framework disguised as a product taxonomy.
+            SatGate has three modes: <strong>Observe</strong> watches and blocks nothing, <strong>Control</strong> enforces budgets, and <strong>Admit</strong> charges external agents. Receipts come with every stage. Enterprise adoption doesn&apos;t happen in a single step, so this post walks your own agents from Observe to Control, with receipts as the proof.
           </p>
 
           {/* Why Big Bang Fails */}
@@ -141,13 +141,13 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <div className="flex items-center gap-3 mb-4">
               <Eye className="text-blue-400" size={28} />
               <h2 className="text-2xl font-bold text-white m-0">Stage 1: Observe</h2>
-              <span className="px-3 py-1 rounded-full bg-blue-900/40 border border-blue-500/30 text-blue-300 text-sm font-mono">Fiat Mode</span>
+              <span className="px-3 py-1 rounded-full bg-blue-900/40 border border-blue-500/30 text-blue-300 text-sm font-mono">Observe mode</span>
             </div>
             <p className="text-blue-200 text-lg font-medium mb-0">Audit everything. Enforce nothing. Break nothing.</p>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            Fiat mode is SatGate deployed in shadow mode. Every agent request flows through the gateway. Every tool call is logged. Every cost is tracked. But nothing is blocked.
+            Observe mode puts SatGate in the request path without blocking. Every agent request flows through the gateway. Every tool call is logged. Every cost is tracked. But nothing is blocked.
           </p>
           <p className="text-gray-300 leading-relaxed">
             Think of it as a network tap for agent economics. You&apos;re passively capturing the data you need to make informed decisions — without introducing any risk to running workloads.
@@ -170,13 +170,13 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <div className="flex items-center gap-3 mb-4">
               <Shield className="text-purple-400" size={28} />
               <h2 className="text-2xl font-bold text-white m-0">Stage 2: Control</h2>
-              <span className="px-3 py-1 rounded-full bg-purple-900/40 border border-purple-500/30 text-purple-300 text-sm font-mono">Fiat402 Mode</span>
+              <span className="px-3 py-1 rounded-full bg-purple-900/40 border border-purple-500/30 text-purple-300 text-sm font-mono">Control mode</span>
             </div>
             <p className="text-purple-200 text-lg font-medium mb-0">Hard caps. Real enforcement. Budget hits zero, requests stop.</p>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            This is where governance gets teeth. Fiat402 mode moves from passive observation to active budget enforcement. And the distinction matters: these are hard caps, not soft alerts. When an agent&apos;s budget reaches zero, the next request is blocked. Not flagged, not logged-and-allowed — blocked.
+            This is where governance gets teeth. Control mode (also called fiat402) moves from passive observation to active budget enforcement. And the distinction matters: these are hard caps, not soft alerts. When an agent&apos;s budget reaches zero, the next request is blocked. Not flagged, not logged-and-allowed: blocked.
           </p>
           <p className="text-gray-300 leading-relaxed">
             The reason this works — and the reason it doesn&apos;t cause chaos — is that you&apos;ve already spent weeks in Observe mode gathering real data. You&apos;re not guessing. You&apos;re setting budgets based on measured consumption patterns, with headroom for variance.
@@ -187,10 +187,9 @@ export default function EnterpriseAdoptionPlaybookPage() {
             Budget enforcement isn&apos;t one-size-fits-all. SatGate supports granular policy across multiple dimensions:
           </p>
           <ul className="text-gray-300 space-y-2">
-            <li><strong>Per agent:</strong> The research agent gets $100/day. The code review agent gets $30/day. Each is independently capped.</li>
+            <li><strong>Per agent:</strong> The research agent&apos;s token gets $100 of budget. Each is independently capped.</li>
             <li><strong>Per tool:</strong> Premium APIs get tighter limits than commodity ones. Your $0.50/call image generation endpoint has different economics than your $0.001/call text lookup.</li>
-            <li><strong>Per team:</strong> Engineering gets one budget envelope. Marketing gets another. Neither can dip into the other&apos;s allocation.</li>
-            <li><strong>Per department:</strong> Roll up team budgets into department-level constraints that finance can track against quarterly planning.</li>
+            <li><strong>Per team:</strong> Give each team lead a token and let them hand out smaller ones. Neither team can dip into the other&apos;s allocation.</li>
           </ul>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Delegation Hierarchies via Macaroons</h3>
@@ -198,7 +197,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             This is where the architecture gets elegant. SatGate uses macaroon-based tokens for delegation — a cryptographic scheme where a parent token can create child tokens with equal or lesser permissions, but a child can never exceed its parent.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            In practice: the VP of Engineering gets a $10,000/month token. She delegates $2,000 to each of five team leads. Each team lead delegates $500 to their agents. The math is self-enforcing. No agent, no team, and no department can spend more than its allocation — not because a dashboard sends a warning, but because the cryptographic token literally cannot authorize the overspend.
+            In practice: the VP of Engineering gets a $10,000 token. She delegates $2,000 to each of five team leads. Each team lead delegates $500 to their agents. SatGate checks every call against the token&apos;s remaining budget, and a helper&apos;s budget is carved out of its parent&apos;s, so no agent or team can spend more than its allocation.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Blast Radius Containment</h3>
@@ -214,13 +213,13 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <div className="flex items-center gap-3 mb-4">
               <Zap className="text-yellow-400" size={28} />
               <h2 className="text-2xl font-bold text-white m-0">Stage 3: Prove</h2>
-              <span className="px-3 py-1 rounded-full bg-yellow-900/40 border border-yellow-500/30 text-yellow-300 text-sm font-mono">Signed Receipt Mode</span>
+              <span className="px-3 py-1 rounded-full bg-yellow-900/40 border border-yellow-500/30 text-yellow-300 text-sm font-mono">Receipts</span>
             </div>
             <p className="text-yellow-200 text-lg font-medium mb-0">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. SatGate preserves the policy basis, requesting agent, delegated scope, budget state, route, payment details when present, and final decision as a signed receipt that finance, security, and compliance can inspect later.
+            Prove is the stage where governance stops being a dashboard claim and becomes an artifact. When SatGate signs a receipt, it records the route or tool, the budget state, payment details when present, and the decision, so finance, security, and compliance can check it later.
           </p>
           <p className="text-gray-300 leading-relaxed">
             Payment methods such as L402 can still matter, but they are not the center of the framework. They are one context SatGate can govern before value moves. The product job is broader: prove why an autonomous agent was allowed, denied or required to seek approval before execution.
@@ -264,14 +263,14 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Risk Mitigation with Hard Boundaries</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">Hard caps protect the organization while you build toward greater agent autonomy. You don&apos;t need to solve the trust problem philosophically — you solve it mathematically. A token with $200 remaining can only spend $200. The rest is off the table.</p>
+              <p className="text-gray-400 text-sm m-0">Hard caps protect the organization while you build toward greater agent autonomy. SatGate checks every call against the token&apos;s remaining budget, and a helper&apos;s budget is carved out of its parent&apos;s. A token with $200 remaining can only spend $200. The rest is off the table.</p>
             </div>
             <div className="p-4 bg-gray-900 border border-gray-800 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="text-green-400" size={18} />
                 <h4 className="font-bold text-white m-0">Future-Proofing for the Agent Economy</h4>
               </div>
-              <p className="text-gray-400 text-sm m-0">The organizations that figure out rules and receipts for AI agents first will be the ones positioned to let agents act with real autonomy. Payment methods can be added where useful, but the durable advantage is proof: every request has authority, policy, decision, and receipt context.</p>
+              <p className="text-gray-400 text-sm m-0">The organizations that figure out rules and receipts for AI agents first will be the ones positioned to let agents act with real autonomy. Payment methods can be added where useful, but the lasting advantage is proof: SatGate signs receipts anyone can check.</p>
             </div>
           </div>
 
@@ -323,11 +322,10 @@ export default function EnterpriseAdoptionPlaybookPage() {
             The beauty of progressive adoption is that Step 1 is small, safe, and immediately valuable.
           </p>
           <ol className="text-gray-300 space-y-3">
-            <li><strong>Deploy SatGate in Fiat (Observe) mode.</strong> Fifteen minutes. Nothing gets blocked. Point your agent traffic through the proxy and assign cost values to your tools.</li>
+            <li><strong>Deploy SatGate in Observe mode.</strong> Fifteen minutes. Nothing gets blocked. Point your agent traffic through the proxy and assign cost values to your tools.</li>
             <li><strong>Let it run for two weeks.</strong> Collect baseline data. Identify your top spenders, noisiest agents, and most expensive tool calls.</li>
             <li><strong>Present the data to stakeholders.</strong> You now have an evidence-based case for budget enforcement — with specific numbers, not hypotheticals.</li>
-            <li><strong>Activate Fiat402 (Control) mode.</strong> Set budgets based on your observed baselines plus a reasonable margin. Monitor for the first week and adjust.</li>
-            <li><strong>Activate Prove mode.</strong> Preserve signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</li>
+            <li><strong>Turn on Control.</strong> Set budgets based on your observed baselines plus a reasonable margin. Monitor for the first week and adjust.</li>
           </ol>
 
           <p className="text-gray-300 leading-relaxed mt-6">
@@ -342,7 +340,7 @@ export default function EnterpriseAdoptionPlaybookPage() {
             <h2 className="mb-6 text-2xl font-bold text-white">Observe, Control, Prove adoption questions</h2>
             <div className="space-y-5">
               {[
-                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove preserves signed receipts for allow, deny, budget, delegation, and payment-method decisions.'],
+                ['What are Observe, Control, and Prove in AI agent governance?', 'Observe tracks agent usage and costs without blocking. Control enforces budgets and scoped policy for internal agents. Prove keeps signed receipts for refusals and budget spends.'],
                 ['Why should enterprises start AI agent governance in Observe mode?', 'Observe mode gives teams real baseline data on agent spend, tool usage, retry loops, and cost outliers before hard caps are introduced, making later enforcement safer and easier to justify.'],
                 ['Is Prove the same as internal budget enforcement?', 'No. Internal budget enforcement controls spend for agents you own. Prove is the evidence layer. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.'],
               ].map(([question, answer]) => (
@@ -368,10 +366,10 @@ export default function EnterpriseAdoptionPlaybookPage() {
                 View on GitHub
               </a>
               <a 
-                href="/playground"
+                href="/pricing"
                 className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-purple-500 transition no-underline"
               >
-                Try the Playground
+                Start free trial
               </a>
             </div>
           </div>

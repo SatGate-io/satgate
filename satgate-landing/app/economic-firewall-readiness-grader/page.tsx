@@ -36,7 +36,7 @@ const questions: Question[] = [
     id: 'revocation',
     category: 'Revocation',
     prompt: 'Can you revoke or narrow an agent capability before the next request without rotating global API keys?',
-    fix: 'Replace broad keys with scoped, expiring capabilities and immediate kill switches.',
+    fix: 'Replace broad keys with scoped, expiring capabilities and a revoke that stops the next request.',
   },
   {
     id: 'delegation',
@@ -48,13 +48,13 @@ const questions: Question[] = [
     id: 'audit',
     category: 'Audit evidence',
     prompt: 'Can finance/security/platform teams reconstruct who had authority, what happened, why it was allowed or denied, and which policy decided?',
-    fix: 'Record the authority chain, policy decision, denial reason, estimated cost, remaining budget, route, tool, credential, and upstream outcome for receipt export.',
+    fix: 'Keep signed receipts with the route or tool, the decision, a refusal code and, when the budget was evaluated, the budget left.',
   },
   {
     id: 'routing',
-    category: 'Economic routing',
+    category: 'Model routing',
     prompt: 'Can routine agent work route to cheaper providers while premium models require budget or justification?',
-    fix: 'Add model/route policy that defaults to economical paths and reserves premium calls for justified work.',
+    fix: 'Use a model router for this. SatGate caps what each agent spends on the routes and tools it calls.',
   },
   {
     id: 'paidRails',
@@ -75,17 +75,18 @@ function grade(score: number) {
   if (score >= 70) return { label: 'B', title: 'Close, with gaps', color: 'text-cyan-300', summary: 'You have real building blocks, but a few checks before the request goes through need tightening.' };
   if (score >= 50) return { label: 'C', title: 'Observable but fragile', color: 'text-yellow-300', summary: 'You can probably explain activity after the fact, but agents can still outrun authority policy.' };
   if (score >= 30) return { label: 'D', title: 'High authority risk', color: 'text-orange-400', summary: 'Agents can likely access, spend, delegate, or call tools faster than you can stop them.' };
-  return { label: 'F', title: 'Not ready for autonomous authority', color: 'text-red-400', summary: 'This is static-key/dashboard territory. Check each request that goes through SatGate before scaling agents.' };
+  return { label: 'F', title: 'Not ready for autonomous authority', color: 'text-red-400', summary: 'Put budget and permission checks in front of your agents’ calls before you scale them.' };
 }
 
 export default function EconomicFirewallReadinessGraderPage() {
-  const [answers, setAnswers] = useState<Record<string, Answer>>(() => Object.fromEntries(questions.map((q) => [q.id, 0])) as Record<string, Answer>);
+  const [answers, setAnswers] = useState<Partial<Record<string, Answer>>>({});
+  const answered = Object.keys(answers).length > 0;
 
   const result = useMemo(() => {
-    const earned = questions.reduce((sum, q) => sum + answers[q.id], 0);
+    const earned = questions.reduce((sum, q) => sum + (answers[q.id] ?? 0), 0);
     const max = questions.length * 2;
     const score = Math.round((earned / max) * 100);
-    const missing = questions.filter((q) => answers[q.id] < 2);
+    const missing = questions.filter((q) => (answers[q.id] ?? 0) < 2);
     return { score, grade: grade(score), missing };
   }, [answers]);
 
@@ -208,27 +209,36 @@ export default function EconomicFirewallReadinessGraderPage() {
 
         <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
           <div className="rounded-3xl border border-cyan-900/60 bg-cyan-950/10 p-8">
-            <div className="mb-4 flex items-center justify-between gap-6">
-              <div>
+            {answered ? (
+              <>
+                <div className="mb-4 flex items-center justify-between gap-6">
+                  <div>
+                    <div className="text-sm text-gray-400">Readiness score</div>
+                    <div className="text-5xl font-extrabold text-white">{result.score}</div>
+                  </div>
+                  <div className={`text-7xl font-black ${result.grade.color}`}>{result.grade.label}</div>
+                </div>
+                <h2 className="mb-3 text-2xl font-bold text-white">{result.grade.title}</h2>
+                <p className="leading-relaxed text-gray-300">{result.grade.summary}</p>
+              </>
+            ) : (
+              <>
                 <div className="text-sm text-gray-400">Readiness score</div>
-                <div className="text-5xl font-extrabold text-white">{result.score}</div>
-              </div>
-              <div className={`text-7xl font-black ${result.grade.color}`}>{result.grade.label}</div>
-            </div>
-            <h2 className="mb-3 text-2xl font-bold text-white">{result.grade.title}</h2>
-            <p className="leading-relaxed text-gray-300">{result.grade.summary}</p>
+                <p className="mt-3 leading-relaxed text-gray-300">Answer the questions to see your score.</p>
+              </>
+            )}
           </div>
 
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-6">
             <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-white"><CircleAlert className="text-yellow-300" size={22} /> Priority fixes</h3>
             <div className="space-y-3">
-              {result.missing.map((q) => (
+              {answered && result.missing.map((q) => (
                 <div key={q.id} className="rounded-xl border border-gray-800 bg-black p-4">
                   <div className="mb-1 font-bold text-white">{q.category}</div>
                   <p className="text-sm leading-relaxed text-gray-400">{q.fix}</p>
                 </div>
               ))}
-              {result.missing.length === 0 && (
+              {answered && result.missing.length === 0 && (
                 <div className="rounded-xl border border-green-900/60 bg-green-950/20 p-4 text-green-300">
                   Strong posture. Next step: validate controls with live traffic and conversion paths.
                 </div>
@@ -244,9 +254,9 @@ export default function EconomicFirewallReadinessGraderPage() {
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
               [KeyRound, 'Authority', 'Agent identity, scoped credentials, expiry, narrowing, and revocation.'],
-              [Gauge, 'Budget and authority limits', 'Budgets checked before the request goes through, scoped permissions, per-tool caps, model routing, and loop prevention.'],
-              [ReceiptText, 'Evidence', 'Signed receipt trails that explain authority, spend context, policy decision, denial reason, route, and outcome.'],
-              [BadgeCheck, 'Payment details', 'Observe, Control, and Prove paths for internal agents and paid calls.'],
+              [Gauge, 'Budget and authority limits', 'Budgets checked before the request goes through, scoped permissions, per-tool caps, and revokes.'],
+              [ReceiptText, 'Evidence', 'Keep signed receipts with the route or tool, the decision, a refusal code and, when the budget was evaluated, the budget left.'],
+              [BadgeCheck, 'Payment details', 'Observe and Control for your agents, receipts for both, and payment rules for paid calls.'],
             ].map(([Icon, title, body]) => {
               const TypedIcon = Icon as typeof KeyRound;
               return (

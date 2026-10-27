@@ -95,7 +95,7 @@ const apiKeyBody =
 
 const audiences = [
   ["Platform teams", "One place to connect agents to your APIs and MCP tools, with limits per agent instead of shared keys."],
-  ["Security teams", "Signed receipts for budget, payment and tool refusals, the chain of handoffs in the dashboard, and an off switch that reaches every helper."],
+  ["Security teams", "Signed receipts anyone can check, the chain of handoffs in the dashboard, and an off switch that reaches every helper."],
   ["Finance teams", "Budgets checked before the spend in Control, and spending per agent on the Usage page."],
 ];
 

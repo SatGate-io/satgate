@@ -67,7 +67,7 @@ export default function HardCappingMcpToolSpendPage() {
         name: 'Can MCP budgets be scoped per tool or agent?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, workflow, time window, and token caveat so each agent receives only the spend authority it needs.',
+          text: 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, time window, and token caveat so each agent receives only the spend authority it needs.',
         },
       },
       {
@@ -145,7 +145,7 @@ export default function HardCappingMcpToolSpendPage() {
 
           <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-6 my-8">
             <p className="text-red-300 font-mono text-sm mb-0">
-              💸 Real scenario: A developer left Claude Code running overnight with a web search MCP server. The agent hit a reasoning loop, called <code>brave_search</code> 3,200 times in 6 hours. Cost: $480 in API credits. The agent was technically working — just not productively.
+              💸 Picture a Claude Code agent left running overnight with a web search MCP server. The agent hit a reasoning loop, called <code>brave_search</code> 3,200 times in 6 hours. Cost: $480 in API credits. The agent was technically working, just not productively.
             </p>
           </div>
 
@@ -159,7 +159,7 @@ export default function HardCappingMcpToolSpendPage() {
             When the budget is exhausted, the proxy refuses the call with a <code className="text-purple-300">budget_exhausted</code> error. The agent receives a clean &quot;Budget exceeded&quot; message and stops. No infinite loops. No surprise bills.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            The enforcement mechanism uses <strong className="text-white">L402 macaroons</strong> — cryptographic tokens with embedded budget constraints. Unlike API keys (which grant unlimited access until revoked), a macaroon can encode: &quot;This agent can spend up to $5 on search tools, expiring in 1 hour.&quot; The constraints are baked into the token itself and verified on every call.
+            The enforcement uses <strong className="text-white">macaroon tokens</strong> with the budget and allowed tools built in. Unlike API keys (which grant unlimited access until revoked), a macaroon can encode: &quot;This agent can spend up to $5 on search tools, expiring in 1 hour.&quot; The constraints are baked into the token itself and verified on every call.
           </p>
 
           {/* Comparison Table */}
@@ -283,7 +283,8 @@ export default function HardCappingMcpToolSpendPage() {
             <code className="text-cyan-300">{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
 Send the agent's calls through the gateway with that token.
 There is no satgate token create or satgate token attenuate command.
-There is no daily limit. A spent budget refuses the next call with code budget_exhausted.`}</code>
+For trading tools, you can also set daily and weekly dollar limits on orders in the dashboard.
+A spent budget refuses the next call with code budget_exhausted.`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -332,7 +333,7 @@ There is no daily limit. A spent budget refuses the next call with code budget_e
               {[
                 ['How do you hard-cap MCP tool spend?', 'Put an MCP proxy or economic firewall before the request goes through, assign costs to tools, and block tools/call requests when the agent, workflow, or token budget is exhausted.'],
                 ['Why are alerts not enough for MCP cost control?', 'Alerts fire after spend has already happened. Hard caps prevent the expensive MCP tool call from reaching the upstream server once the budget is exhausted.'],
-                ['Can MCP budgets be scoped per tool or agent?', 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, workflow, time window, and token caveat so each agent receives only the spend authority it needs.'],
+                ['Can MCP budgets be scoped per tool or agent?', 'Yes. MCP budgets can be scoped by agent, delegated sub-agent, tool, route, time window, and token caveat so each agent receives only the spend authority it needs.'],
                 ['How do you stop Claude Code or Cursor from running up MCP tool bills?', 'Put a budget-aware MCP proxy between Claude Code, Cursor, or another MCP client and the upstream tool servers. The proxy prices each tool call, deducts from the agent budget, and blocks requests once the cap is exhausted.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

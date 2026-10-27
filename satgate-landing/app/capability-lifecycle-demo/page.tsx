@@ -1,8 +1,8 @@
 import CapabilityLifecycleDemo from './CapabilityLifecycleDemo';
 
 export const metadata = {
-  title: 'Capability Lifecycle Control | Issue, Delegate, Revoke, Prove',
-  description: 'Observe, control, and prove the capability lifecycle: issue, delegate, narrow, revoke, enforce caveats, cap child spend, and export signed receipts (Evidence Packs).',
+  title: 'Capability lifecycle | Issue, hand off and revoke agent tokens',
+  description: 'Give an agent a token, hand a narrower one to a helper with a smaller budget, revoke both on the next request, and export the signed receipts.',
   alternates: { canonical: 'https://satgate.io/capability-lifecycle-demo' },
   keywords: [
     'capability lifecycle control',
@@ -15,7 +15,7 @@ export const metadata = {
   ],
   openGraph: {
     title: 'SatGate Capability Lifecycle Control',
-    description: 'Issue capability → delegate → narrow → revoke → prove, with customer-visible caveats, delegation depth, child spend caps, next-request revocation, and signed receipt audit records.',
+    description: 'Issue a token, hand a narrower one to a helper, revoke both: delegation depth, child spend caps, next-request revocation and signed receipts.',
     url: 'https://satgate.io/capability-lifecycle-demo',
     type: 'article',
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -23,7 +23,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SatGate Capability Lifecycle Control',
-    description: 'Issue capability → delegate → narrow → revoke → prove, with scoped authority, child spend caps, next-request revocation, and signed receipt proof.',
+    description: 'Issue a token, hand a narrower one to a helper, revoke both: child spend caps, next-request revocation and signed receipts.',
   },
 };
 

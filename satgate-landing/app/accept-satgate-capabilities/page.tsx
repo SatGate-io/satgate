@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, BadgeCheck, CheckCircle2, FileCheck2, ShieldCheck, XCircle } from "lucide-react";
+import { ArrowLeft, BadgeCheck, CheckCircle2, FileCheck2, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
   title: { absolute: "Accept SatGate Capabilities" },
   description:
-    "Define what it means for an upstream API to accept SatGate-scoped capabilities: verify bounded authority, execute the allowed action, and return receipts without implying marketplace reputation.",
+    "What an API must do to accept SatGate tokens: check the token, run only what it allows, and return a receipt.",
   keywords: [
     "SatGate capabilities",
     "capability accepting API",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Accept SatGate capabilities",
     description:
-      "A precise upstream acceptance story: scoped capability verification in, receipt emission out. No marketplace, no reputation claim.",
+      "What an API must do to accept SatGate tokens: check the token before it runs the call, and return a receipt after.",
     url: "https://satgate.io/accept-satgate-capabilities",
     type: "website",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "SatGate: an economic firewall for AI agents" }],
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Accept SatGate capabilities",
-    description: "Capability verification in. Receipt emission out. No network-wide reputation claim.",
+    description: "Check the SatGate token before the call. Return a receipt after it.",
   },
 };
 
@@ -39,7 +39,7 @@ const badgeCopy = [
   {
     label: "Short disclaimer",
     value: "Capability verification + receipts only",
-    body: "The badge does not mean SatGate endorses the upstream, ranks it, audits its business, or provides network-wide reputation.",
+    body: "The badge means the API checks SatGate tokens. It does not mean SatGate endorses or ranks the API.",
   },
   {
     label: "Machine signal",
@@ -62,7 +62,6 @@ const criteria = [
   { title: "Capability accepted", body: "A valid scoped capability for the upstream audience and route is accepted before execution." },
   { title: "Capability denied", body: "An expired, wrong-audience, wrong-route, over-budget, or untrusted-issuer capability is rejected with a receipt-grade denial." },
   { title: "Receipt returned", body: "Priced calls, paid calls and refusals return a receipt with `schema_version`, `schema_url`, `receipt_id`, `evidence_pack_id`, `issuer`, `issuer_kid`, `decision`, `decision_reason`, `policy_version`, `timestamp`, `canonicalization`, `hash_algorithm`, `signature_algorithm`, `receipt_hash`, and `signature`." },
-  { title: "Trust remains bounded", body: "The upstream makes no marketplace, ranking, reputation, or endorsement claim. Acceptance proves verification behavior, not global trust." },
 ];
 
 const mockReceipt = {
@@ -70,7 +69,7 @@ const mockReceipt = {
   schema_url: "https://satgate.io/.well-known/satgate-receipt.schema.json",
   receipt_id: "rcpt_mock_accept_001",
   evidence_pack_id: "ep_mock_accept_001",
-  issuer: "https://satgate.io",
+  issuer: "https://api.satgate.io",
   issuer_kid: "satgate-mock-2026-05",
   acceptor_id: "https://api.internal.example/satgate-mock",
   decision: "allowed",
@@ -116,10 +115,11 @@ export default function AcceptSatGateCapabilitiesPage() {
               <BadgeCheck size={16} /> Upstream acceptance
             </div>
             <h1 className="max-w-4xl text-5xl font-black tracking-tight text-white sm:text-6xl">
-              Accept SatGate capabilities without pretending there is a marketplace.
+              Accept SatGate capabilities in your API.
             </h1>
+            <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">This is a draft specification.</p>
             <p className="mt-6 max-w-2xl text-xl leading-9 text-gray-300">
-              Acceptance means an upstream verifies SatGate-scoped authority before action and returns receipt-grade evidence after the decision. It does not mean SatGate ranks, endorses, or reputationally scores that upstream.
+              Acceptance means an upstream verifies SatGate-scoped authority before action and returns receipt-grade evidence after the decision.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/build" className="rounded-full bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-cyan-100">Build with capabilities</Link>
@@ -133,7 +133,7 @@ export default function AcceptSatGateCapabilitiesPage() {
               <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-300 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-black">
                 <BadgeCheck size={14} /> Accepts SatGate capabilities
               </div>
-              <p className="text-sm leading-6 text-emerald-50">Verifies scoped SatGate capabilities and returns SatGate-compatible receipts. Acceptance means capability verification and receipt emission. No marketplace, ranking, reputation, or endorsement claim.</p>
+              <p className="text-sm leading-6 text-emerald-50">Verifies scoped SatGate capabilities and returns SatGate-compatible receipts. Acceptance means capability verification and receipt emission.</p>
             </div>
             <pre className="mt-5 max-w-full overflow-x-auto rounded-2xl bg-black p-5 text-xs leading-6 text-gray-300"><code>{JSON.stringify(mockReceipt, null, 2)}</code></pre>
           </div>
@@ -160,7 +160,7 @@ export default function AcceptSatGateCapabilitiesPage() {
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-2">
           <div>
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Minimal integration checklist</p>
-            <h2 className="mb-6 text-3xl font-bold text-white">Enough to prove acceptance. Not enough to claim reputation.</h2>
+            <h2 className="mb-6 text-3xl font-bold text-white">What an API needs to do.</h2>
             <div className="space-y-4">
               {checklist.map((item) => (
                 <div key={item} className="flex gap-3 rounded-2xl border border-gray-800 bg-black p-4">
@@ -185,36 +185,12 @@ export default function AcceptSatGateCapabilitiesPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <div>
-            <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-red-300">No overclaiming</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">What the badge does not mean.</h2>
-            <div className="mt-6 space-y-4 text-lg leading-8 text-gray-400">
-              <p>It does not mean SatGate operates a directory of trusted APIs.</p>
-              <p>It does not mean the upstream is endorsed, ranked, audited, or safer than another upstream.</p>
-              <p>It means one integration path has evidence: scoped capability verification before execution and receipt emission after the decision.</p>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-red-400/20 bg-red-400/5 p-6">
-            <div className="mb-4 flex items-center gap-2 text-red-200"><XCircle size={20} /> Forbidden badge copy</div>
-            <ul className="space-y-3 text-gray-300">
-              <li>“SatGate trusted marketplace member”</li>
-              <li>“SatGate certified reputation score”</li>
-              <li>“SatGate endorsed API”</li>
-              <li>“Network-approved upstream”</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
       <section className="border-t border-gray-900 bg-gray-950/70">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <div className="rounded-3xl border border-gray-800 bg-black p-8 md:flex md:items-center md:justify-between md:gap-8">
             <div>
               <p className="mb-2 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Internal mock first</p>
               <h2 className="text-3xl font-bold text-white">Use the mock acceptor until a real upstream is ready.</h2>
-              <p className="mt-3 max-w-2xl text-gray-400">The mock example is deliberately labeled internal: it proves the acceptance shape without claiming public network adoption.</p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3 md:mt-0">
               <Link href="/examples/mock-acceptor-metadata.v0.json" className="rounded-full border border-gray-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400">Mock metadata</Link>

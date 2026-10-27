@@ -65,7 +65,7 @@ export default function L402ProtocolExplainedBlogPage() {
         name: 'Is L402 the same as enterprise budget enforcement?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit at the gateway policy check before forwarding.',
+          text: 'No. L402 is Lightning payment for external API monetization; each payment buys the number of requests the route sells. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit at the gateway policy check before forwarding.',
         },
       },
     ],
@@ -107,7 +107,7 @@ export default function L402ProtocolExplainedBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            AI agents break that assumption. An agent making 1,500 API calls per prompt doesn&apos;t have a credit card. A sub-agent spawned at 3 AM to translate a document can&apos;t wait for human approval. An autonomous research pipeline that discovers a new data source mid-task can&apos;t pause to sign up for a developer account.
+            AI agents break that assumption. An agent making hundreds of API calls per task doesn&apos;t have a credit card. A sub-agent spawned at 3 AM to translate a document can&apos;t wait for human approval. An autonomous research pipeline that discovers a new data source mid-task can&apos;t pause to sign up for a developer account.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -264,10 +264,10 @@ budget_id = "budget-xyz-789"
           </div>
 
           <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-6 my-6">
-            <h4 className="text-white font-bold mb-2">✅ L402: Pay-Per-Request with Instant Settlement</h4>
+            <h4 className="text-white font-bold mb-2">✅ L402: Pay Per Use with Instant Settlement</h4>
             <p className="text-gray-300 text-sm">
               <br />• Zero signup — payment <em>is</em> the authentication
-              <br />• Pay only for what you use, per request
+              <br />• Pay per use: each payment buys the number of requests the route sells
               <br />• Macaroon tokens support safe delegation to sub-agents
               <br />• Payment settles before the response is sent — no invoicing
               <br />• Minimum viable customer: any agent with a Lightning wallet
@@ -344,15 +344,15 @@ routes:
 # 2. Gateway checks for valid L402 token in Authorization header
 # 3. No token → return 402 with Lightning invoice for 50 sats
 # 4. Valid token → proxy request to target backend
-# 5. L402 is per-payment: no budget tracking needed`}</code>
+# 5. Where one payment buys N requests, the gateway counts them`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            The key difference between L402 and SatGate&apos;s other policy modes: <strong className="text-white">L402 is per-payment with no budget enforcement.</strong> Each request is a discrete payment. The gateway validates the L402 token format — it doesn&apos;t track cumulative spend or enforce budget ceilings. That&apos;s by design: L402 is a micropayment protocol, not a cost management framework.
+            The key difference between L402 and SatGate&apos;s other policy modes: <strong className="text-white">L402 is payment, not a budget.</strong> The gateway checks the payment proof and, where one payment buys N requests, counts them. It doesn&apos;t keep a spending budget for the payer. That&apos;s by design: L402 is a micropayment protocol, not a cost management framework.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            For use cases that need budget enforcement on top of payments — say, an enterprise that wants agents to pay per-call but also cap total department spend — SatGate offers the <code className="text-green-300 bg-black/50 px-1 rounded">fiat402</code> policy, which combines payment requirements with Redis-backed budget tracking. Different tool for different requirements.
+            For your own agents, the Control policy (also called <code className="text-green-300 bg-black/50 px-1 rounded">fiat402</code>) caps spend from a credit budget. External agents pay on Admit routes. The two are separate policies.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Bigger Picture: L402 as Agent Economy Infrastructure</h2>
@@ -370,7 +370,7 @@ routes:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Access becomes permissionless.</strong> Any agent with a Lightning wallet can use any L402-protected API. No partnerships. No sales calls. No enterprise agreements. The barrier to entry for both providers and consumers drops to near zero.
+            <strong className="text-white">Access becomes permissionless.</strong> Any agent with a Lightning wallet can pay for an L402-protected API without signing up. No partnerships. No sales calls. No enterprise agreements. The barrier to entry for both providers and consumers drops to near zero.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -396,7 +396,7 @@ routes:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">For agent developers:</strong> Add Lightning wallet support to your agent and teach it to handle <code className="text-green-300 bg-black/50 px-1 rounded">402 Payment Required</code> responses. Your agent gains access to every L402-protected API on the internet — no integration work per service.
+            <strong className="text-white">For agent developers:</strong> Add Lightning wallet support to your agent and teach it to handle <code className="text-green-300 bg-black/50 px-1 rounded">402 Payment Required</code> responses. Your agent can then pay for any L402-protected API that lets it in, with no sign-up per service.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -410,7 +410,7 @@ routes:
               {[
                 ['What is the L402 protocol?', 'L402 is a machine-native API payment protocol that combines HTTP 402 Payment Required, Lightning invoices, and macaroon tokens so delegated software can present payment proof for API access without a per-request human checkout flow.'],
                 ['How does a delegated agent use L402 for paid API access?', 'The delegated client requests a protected API, receives a 402 response with a Lightning invoice and macaroon, presents proof, then retries with Authorization: L402 <macaroon>:<preimage> as proof of payment.'],
-                ['Is L402 the same as enterprise budget enforcement?', 'No. L402 is per-request Lightning payment for external API monetization. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit at the gateway policy check before forwarding.'],
+                ['Is L402 the same as enterprise budget enforcement?', 'No. L402 is Lightning payment for external API monetization; each payment buys the number of requests the route sells. Enterprise budget enforcement controls internal agent spend with policies, caps, revocation, and audit at the gateway policy check before forwarding.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

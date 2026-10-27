@@ -126,7 +126,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What Zero Trust Actually Assumes</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            Before we can talk about where Zero Trust breaks, we need to be precise about what it assumes. The NIST SP 800-207 Zero Trust Architecture standard defines five core tenets. Every one of them has an implicit dependency on human-scale behavior:
+            Before we can talk about where Zero Trust breaks, we need to be precise about what it assumes. NIST SP 800-207 lists seven basic tenets of Zero Trust. Five of them assume human-scale behavior:
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -216,7 +216,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Capability-based tokens eliminate this bottleneck entirely. The token <em>is</em> the policy decision, pre-computed and cryptographically sealed. Validating a macaroon token is a local operation — check the HMAC chain, verify the caveats haven&apos;t been violated, done. No round-trip to a policy engine. No identity lookup. No contextual risk assessment. The authorization decision was made when the token was minted.
+            Capability-based tokens remove most of this bottleneck. The token carries its own limits, signed into it. Checking it means checking the HMAC chain and the caveats, then a fast check against SatGate&apos;s budget store and revoke list. No identity lookup. No contextual risk assessment.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Budget Problem: Zero Trust Has No Concept of Cost</h2>
@@ -230,7 +230,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            This isn&apos;t a theoretical risk. It&apos;s happening right now. Companies deploying AI agents are discovering that traditional security gives them a binary answer — access or no access — when what they need is a continuous answer: access <em>within these economic constraints</em>.
+            It&apos;s happening right now. Companies deploying AI agents are discovering that traditional security gives them a binary answer (access or no access) when what they need is a continuous answer: access <em>within these economic constraints</em>.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -265,7 +265,7 @@ export default function ZeroTrustForAIAgentsBlogPage() {
               <br />• Permissions travel <em>with</em> the token (embedded as caveats)
               <br />• Delegation = create a narrowed copy of the token (weaker, never stronger)
               <br />• Budget is a first-class constraint inside the token
-              <br />• Validation is local — no external lookup required
+              <br />• Signature checks are local; budget and revoke checks are one fast lookup
             </p>
           </div>
 
@@ -303,7 +303,7 @@ Token: search-worker-12
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            This is what safe delegation looks like. The parent agent gives its child exactly the authority needed — no more — and it&apos;s mathematically impossible for the child to escalate. The budget constraint is cryptographically enforced, not policy-enforced. No one can edit a database to give themselves more budget. The math doesn&apos;t allow it.
+            This is what safe delegation looks like. The parent agent gives its child exactly the authority needed, no more, and the child can&apos;t escalate. An agent can&apos;t raise its own budget or widen its token: the limits are signed into the token, and SatGate checks every call against the budget store and the revoke list before it goes through.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">What Agent-Native Zero Trust Actually Looks Like</h2>
@@ -347,7 +347,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Admit mode (payment methods, <code className="text-sm">policy: charge</code>)</strong> — requires payment before access. Payment is one policy input; SatGate still evaluates scoped authority and configured access policy. Approved external agents can pay per request and receive scoped access without a subscription. On supported receipt paths, admission can produce a signed receipt: payment proves value moved, while the receipt records the authority decision.
+            <strong className="text-white">Admit mode (payment methods, <code className="text-sm">policy: charge</code>)</strong>: requires payment before access. Payment is one policy input; SatGate still evaluates scoped authority and configured access policy. External agents pay in Lightning or USDC for the access your route sells, with no subscription. SatGate signs a receipt when it refuses an agent for a missing payment.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -373,7 +373,7 @@ Token: search-worker-12
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">Phase 4: Open external access.</strong> If you want external agents to consume your APIs, add L402 payment support. Now any agent on the internet can pay for access without your sales team being involved. Zero Trust stays in place for your internal users. Capability-based security handles the agent economy.
+            <strong className="text-white">Phase 4: Open external access.</strong> If you want external agents to consume your APIs, turn on Admit for the routes you want to charge for. Now any agent on the internet can pay for access without your sales team being involved. Zero Trust stays in place for your internal users. Capability-based security handles the agent economy.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Bottom Line</h2>

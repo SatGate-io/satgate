@@ -122,7 +122,7 @@ export default function IntegrationsPage() {
         name: 'How does SatGate govern MCP integrations?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and signed receipts (Evidence Packs) before expensive tool calls execute.',
+          text: 'SatGate sits between your agent and its MCP servers and checks each tool call’s permissions and, in Control, its budget, before it runs.',
         },
       },
       {
@@ -130,7 +130,7 @@ export default function IntegrationsPage() {
         name: 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. SatGate is designed to sit around existing agent tools, APIs, and MCP servers and check each request before it goes through, adding Observe, Control, and Prove modes without replacing the client workflow.',
+          text: 'No. SatGate sits between your existing agent tools and the APIs and MCP servers they call, so you keep your client as it is.',
         },
       },
     ],
@@ -172,7 +172,7 @@ export default function IntegrationsPage() {
         <section className="mt-14 rounded-3xl border border-purple-900/50 bg-gradient-to-br from-purple-950/25 to-cyan-950/20 p-8 md:p-12">
           <h2 className="mb-4 text-3xl font-bold text-white">Why integration pages matter</h2>
           <p className="max-w-4xl text-lg leading-relaxed text-gray-300">
-            Agent governance is adopted inside real workflows. SatGate sits between agent clients and upstream APIs, MCP servers, and paid tools so teams can observe, control, and prove before autonomous requests create cost or risk.
+            Agent governance is adopted inside real workflows. SatGate sits between your agents and the APIs, MCP servers and paid tools they call, so you can see and limit what they do before it costs you, with receipts you can check.
           </p>
         </section>
 
@@ -186,11 +186,11 @@ export default function IntegrationsPage() {
               ],
               [
                 'How does SatGate govern MCP integrations?',
-                'SatGate can sit between agent clients and MCP servers to enforce per-tool budgets, scoped capabilities, revocation, risk actions, and signed receipts (Evidence Packs) before expensive tool calls execute.',
+                'SatGate sits between your agent and its MCP servers and checks each tool call’s permissions and, in Control, its budget, before it runs.',
               ],
               [
                 'Do teams need to replace Cursor, Claude, or OpenClaw to use SatGate?',
-                'No. SatGate is designed to sit around existing agent tools, APIs, and MCP servers and check each request before it goes through, adding Observe, Control, and Prove modes without replacing the client workflow.',
+                'No. SatGate sits between your existing agent tools and the APIs and MCP servers they call, so you keep your client as it is.',
               ],
             ].map(([question, answer]) => (
               <div key={question}>

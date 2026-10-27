@@ -130,7 +130,7 @@ export default function L402ApiPricingCalculatorPage() {
         name: 'Is L402 the same as Fiat402?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate payment methods. SatGate can preserve payment details without conflating them.',
+          text: 'No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402 (USDC on Base) is the other live way to pay on SatGate. AgentCore Payments and Pay.sh are planned.',
         },
       },
       {
@@ -197,10 +197,10 @@ export default function L402ApiPricingCalculatorPage() {
         </div>
 
         <aside className="sticky top-6 h-fit rounded-3xl border border-yellow-900/50 bg-yellow-950/10 p-8">
-          <div className="mb-3 flex items-center gap-2 text-yellow-300"><Calculator size={22} /> Suggested price per payment (estimate)</div>
+          <div className="mb-3 flex items-center gap-2 text-yellow-300"><Calculator size={22} /> Suggested price per request (estimate)</div>
           <div className="mb-2 text-5xl font-extrabold text-white">{usd.format(calc.pricePerRequest)}</div>
-          <div className="mb-2 text-sm text-gray-400">Per request only if one payment buys one request. If one payment buys N requests, divide this price by N.</div>
-          <div className="mb-6 text-sm text-gray-400">About {number.format(calc.satsPerRequest)} sats at the example rate above. The rate is only for this conversion. It is not a forecast.</div>
+          <div className="mb-2 text-sm text-gray-400">If one payment buys N requests, set the price per payment to N × this.</div>
+          <div className="mb-6 text-sm text-gray-400">About {number.format(calc.satsPerRequest)} sats per request at the example rate above. The rate is only for this conversion. It is not a forecast.</div>
           <div className="grid gap-4">
             <div className="rounded-xl border border-gray-800 bg-black p-4"><div className="text-sm text-gray-500">Paid requests/day</div><div className="text-2xl font-bold text-white">{number.format(calc.paidRequestsPerDay)}</div></div>
             <div className="rounded-xl border border-gray-800 bg-black p-4"><div className="text-sm text-gray-500">Monthly revenue</div><div className="text-2xl font-bold text-white">{usd0.format(calc.monthlyRevenue)}</div></div>
@@ -218,12 +218,12 @@ export default function L402ApiPricingCalculatorPage() {
           </p>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              [Bot, 'Identify the agent', 'Know which agent, tenant, route, resource, and workflow is asking to spend.'],
-              [Coins, 'Price the resource', 'Attach a per-request price or pricing tier to the protected API route.'],
+              [Bot, 'Identify the agent', 'Know which agent token and route is asking to spend.'],
+              [Coins, 'Price the resource', 'Set a price per payment on the route, and how many requests one payment buys.'],
               [ReceiptText, 'Verify proof', 'Accept payment details as proof before forwarding the paid API request.'],
               [Gauge, 'Respect budget', 'Check remaining budget and policy so an agent cannot spend beyond its allowed task.'],
               [Zap, 'Unlock instantly', 'Let software customers pay and proceed without account setup or invoice friction.'],
-              [Calculator, 'Audit economics', 'Record route, price, payment proof, budget, and outcome for analysis.'],
+              [Calculator, 'Audit economics', 'Signed receipts record the route, price and payment.'],
             ].map(([Icon, title, body]) => {
               const CardIcon = Icon as typeof Bot;
               return (
@@ -258,7 +258,7 @@ export default function L402ApiPricingCalculatorPage() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">Is L402 the same as Fiat402?</h3>
               <p className="text-gray-400 leading-relaxed">
-                No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402, AgentCore Payments, and Pay.sh are also separate payment methods. SatGate can preserve payment details without conflating them.
+                No. L402 is Lightning-based payment for API access. Fiat402 is separate. x402 (USDC on Base) is the other live way to pay on SatGate. AgentCore Payments and Pay.sh are planned.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

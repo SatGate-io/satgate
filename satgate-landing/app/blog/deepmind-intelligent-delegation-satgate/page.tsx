@@ -115,8 +115,8 @@ export default function DeepMindDelegationPage() {
             </a>
             {' '}— a framework for how autonomous agents should safely decompose tasks, transfer authority,
             and maintain accountability across delegation chains. The paper is dense, thorough, and arrives at
-            a conclusion we find familiar: <strong>agents need narrowed capability tokens, specifically
-            macaroons, to delegate safely.</strong>
+            a conclusion we find familiar: <strong>agents need narrowed capability tokens, such as
+            macaroons or Biscuits, to delegate safely.</strong>
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -251,10 +251,9 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Authority Thresholds &amp; Kill Switches</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Human-in-the-loop intervention when risk exceeds tolerance (pp. 18–19)</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Enforcement modes (Observe → Control → Prove)
-                    let operators graduate trust incrementally. Budget alerts trigger before limits hit.
-                    Token revocation is immediate — one API call kills an agent&apos;s access across the
-                    entire delegation tree.
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> SatGate&apos;s modes (Observe, then Control) let operators
+                    tighten trust step by step, with receipts across both. Budget alerts trigger before limits hit.
+                    A revoke refuses the next request of the agent and every helper it handed work to.
                   </p>
                 </div>
               </div>
@@ -273,7 +272,7 @@ export default function DeepMindDelegationPage() {
                     <span className="text-cyan-400 font-mono text-xs">SatGate →</span> L402 — Lightning Network micropayment settlement.
                     Instant, autonomous, no intermediary, no gas fees. Where the paper proposes heavyweight smart contracts,
                     SatGate uses Lightning for sub-cent machine-to-machine payments that settle in milliseconds.
-                    For enterprises not ready for crypto, Fiat402 provides the same budget controls over fiat rails.
+                    For your own agents, Fiat402 budgets in credits need no crypto.
                   </p>
                 </div>
               </div>
@@ -289,8 +288,8 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Escrow + Staking + Slashing</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Economic penalties and bonds to incentivize correct behavior (pp. 19–21)</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Budget enforcement with auto-revocation.
-                    When a token&apos;s budget runs out, SatGate refuses its next priced request before it reaches the upstream.
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Budget enforcement: when a token&apos;s budget runs out,
+                    SatGate refuses its next priced request before it reaches the upstream.
                     On revoke, unspent child credits atomically return to the parent via a Lua-scripted Redis cascade.
                     The economic incentive is structural: agents that overspend lose access.
                   </p>
@@ -308,10 +307,7 @@ export default function DeepMindDelegationPage() {
                   <p className="text-white font-semibold mb-1">Continuous Monitoring &amp; Signed Attestations</p>
                   <p className="text-gray-500 text-sm mb-2">Paper: Real-time observability and tamper-proof audit records (pp. 13, 16–17)</p>
                   <p className="text-gray-300 text-sm">
-                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Event streaming — every tool call, budget spend,
-                    session lifecycle, and task correlation is published as a structured event in real-time.
-                    The token spend ledger provides a complete receipt: which agent called what tool, at what cost,
-                    under which delegation chain.
+                    <span className="text-cyan-400 font-mono text-xs">SatGate →</span> Keeps each token&apos;s lineage and signs receipts for refusals and spending.
                   </p>
                 </div>
               </div>
@@ -403,8 +399,8 @@ export default function DeepMindDelegationPage() {
 
           <p className="text-gray-300 leading-relaxed">
             JWTs can&apos;t do this. API keys can&apos;t do this. OAuth scopes are static at grant time.
-            Macaroons are the only credential building block where the <em>holder</em> can reduce their own authority
-            and pass it downstream — which is exactly what agent delegation requires.
+            Macaroons let the <em>holder</em> reduce their own authority and pass it on, which is what agent
+            delegation needs.
           </p>
 
           {/* What the paper doesn't cover */}
@@ -438,8 +434,8 @@ export default function DeepMindDelegationPage() {
               <p className="text-gray-300 text-sm m-0">
                 <strong className="text-white">Enterprises need a trust gradient, not a binary switch.</strong> The
                 paper discusses trust establishment. In practice, operators want to observe first, then control, then
-                prove. SatGate&apos;s three-mode progression (Observe → Control → Prove) lets teams build confidence
-                incrementally without rearchitecting.
+                prove. SatGate&apos;s modes (Observe, then Control) let operators tighten trust step by step, with
+                receipts across both.
               </p>
             </div>
             <div className="flex items-start gap-3">

@@ -67,11 +67,11 @@ export default function DesignPartnersPage() {
   };
 
   const faqs = [
-    { q: 'How long is the program?', a: '90 days. At the end, both sides review the governed workload, policy outcomes, signed receipt use, support burden, and operating evidence before deciding whether to expand, contract, or stop.' },
-    { q: 'Is it really free?', a: 'Yes. The design-partner path starts with an agreed staging lane and no credit card. You get visibility into agent traffic and help shape the authority, budget, revocation, and signed receipt workflows that matter in your environment.' },
+    { q: 'How long is the program?', a: '90 days. At the end we look at what SatGate allowed and refused, what your agents spent, how you used the receipts and how much help you needed, then decide together whether to expand, scale back or stop.' },
+    { q: 'Is it really free?', a: 'Yes, and there’s no credit card. You get visibility into agent traffic and help shape the authority, budget, revocation, and signed receipt workflows that matter in your environment.' },
     { q: 'Do I need to change my code?', a: 'Usually no. Most pilots start with a DNS, proxy, or MCP configuration change around one staging endpoint or tool. We verify the path together before expanding.' },
-    { q: 'Where does my data go?', a: 'The data path, environment, and custody boundaries are documented before activation. Most pilots start in staging or another bounded lane. Enterprise self-host installs the same SatGate binary in your own environment.' },
-    { q: 'Is this for production traffic?', a: 'Design partners usually start in staging or a bounded pilot lane. The goal is to verify policy before the request goes through, plus revocation, budgets, and signed receipts, before expanding scope.' },
+    { q: 'Where does my data go?', a: 'Before we start, we write down where your data goes and who holds what. Enterprise self-host installs the same SatGate binary in your own environment.' },
+    { q: 'Is this for production traffic?', a: 'Usually not at first. The goal is to verify policy before the request goes through, plus revocation, budgets, and signed receipts, before expanding scope.' },
   ];
 
   const webPageJsonLd = {
@@ -190,7 +190,7 @@ export default function DesignPartnersPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            This page is for larger teams that want help. You can also <a href="https://cloud.satgate.io/cloud/signup" className="text-cyan-300 hover:text-cyan-200 underline underline-offset-4">start a 14-day free trial</a> of Pro features, with no credit card. The pilot gates one MCP tool, REST API, or LLM endpoint in an agreed staging or bounded lane. Measure which agent had authority, what it spent, what was denied, and what signed receipts were preserved before either side expands the scope.
+            This page is for larger teams that want help. You can also <a href="https://cloud.satgate.io/cloud/signup" className="text-cyan-300 hover:text-cyan-200 underline underline-offset-4">start a 14-day free trial</a> of Pro features, with no credit card. The pilot starts with one tool or API in a test setup you choose. You see what your agents spent, what was refused and which receipts SatGate signed before either side expands the pilot.
           </p>
           <a href="#apply" className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition">
             Apply Now <ArrowRight size={18} />
@@ -213,7 +213,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">Free Observe Mode</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Full visibility into your AI agent traffic in a bounded staging lane. See API calls, tokens, costs, refusals and signed receipts across MCP servers, REST APIs and LLM endpoints.
+                See what your agents call and spend, by agent and route, across MCP servers, REST APIs and LLM endpoints.
               </p>
             </div>
 
@@ -259,7 +259,7 @@ export default function DesignPartnersPage() {
                 <h3 className="font-bold text-lg">One Endpoint or Tool</h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Point one staging API endpoint or MCP tool through SatGate. One DNS change or config update, no code modifications.
+                Send one tool or API through SatGate. Usually no code changes.
               </p>
             </div>
 
@@ -294,7 +294,7 @@ export default function DesignPartnersPage() {
       <section className="py-20 px-6 border-t border-gray-800">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">How It Works</h2>
-          <p className="text-gray-500 text-center mb-12">A staged path from application to one bounded, instrumented workload.</p>
+          <p className="text-gray-500 text-center mb-12">From application to one workload running through SatGate.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[
@@ -326,7 +326,7 @@ export default function DesignPartnersPage() {
                 step: '4',
                 title: 'Your Reports',
                 time: 'Week 3+',
-                desc: 'Your data, your dashboards. Cost attribution, refusals, revocations and signed receipt reports, all yours.',
+                desc: 'Your data in your dashboard: spend by agent and route, refusals, revokes and the receipts SatGate signed.',
                 color: 'yellow',
                 icon: <BarChart3 size={20} />,
               },

@@ -29,10 +29,10 @@ export const metadata = {
 };
 
 const controls = [
-  { icon: Fingerprint, title: 'Agent identity', body: 'Bind each credential to an agent, task, tenant, workflow, route, model, or MCP server.' },
+  { icon: Fingerprint, title: 'Agent identity', body: 'Give each agent its own token, limited to the routes, tools and MCP servers it needs.' },
   { icon: KeyRound, title: 'Scoped permissions', body: 'Limit routes, tools, methods, customers, delegation, and request types instead of issuing broad API keys.' },
   { icon: Clock, title: 'Expiry by default', body: 'Make credentials expire with the work: minutes, sessions, jobs, customers, or delegated sub-tasks.' },
-  { icon: Ban, title: 'Revocation checks', body: 'Block the next request when a token, task, agent, route, or budget is no longer allowed.' },
+  { icon: Ban, title: 'Revocation checks', body: 'Block the next request when a token is revoked or expired, or its budget runs out.' },
   { icon: ReceiptText, title: 'Budget caveats', body: 'Attach spend caps, call ceilings, per-tool limits, and remaining-budget checks on each request that goes through SatGate.' },
   { icon: GitBranch, title: 'Narrowed delegation', body: 'Let agents delegate narrower credentials to sub-agents without expanding parent authority.' },
 ];
@@ -90,7 +90,7 @@ export default function Page() {
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Identity proves who the agent is. Capability proves authority. For autonomous agents, the token should encode routes, tools, budgets, expiry, delegation limits, and revocation checks before access is granted.</p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/capability-lifecycle-demo" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">Walk lifecycle demo <ArrowRight size={18} /></Link>
-            <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Mint an agent token</Link>
+            <a href="https://cloud.satgate.io/docs/guides/mint-identity" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Mint an agent token</a>
             <Link href="/blog/macaroon-tokens-vs-api-keys" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">Macaroons vs API keys</Link>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function Page() {
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Identity is not permission</h3><p className="leading-relaxed text-gray-400">A verified agent can still be overpowered if the token does not constrain what it can do.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budgets belong in the credential path</h3><p className="leading-relaxed text-gray-400">Spend limits, call ceilings, and route policy need to be evaluated before forwarding traffic.</p></div>
               <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Delegation should narrow</h3><p className="leading-relaxed text-gray-400">A parent agent should be able to create a narrower child token, never a broader one.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">Budget spends, and refusals over a budget, a missing payment or a tool permission, emit a receipt with capability hash, remaining budget, route, outcome, decision_reason, policy_version and Evidence Pack id.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit needs token context</h3><p className="leading-relaxed text-gray-400">SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Each receipt carries the route or tool, the decision, decision_reason and policy_version. It carries the remaining budget when SatGate evaluated the budget (tool-scope and argument-rule refusals skip that check), and a capability hash where one is recorded.</p></div>
           </div>
         </div>
       </section>
@@ -132,7 +132,7 @@ export default function Page() {
             ['Delegate', 'A child worker receives linked authority from the parent.'],
             ['Narrow', 'Child authority shrinks: lower spend cap, fewer tools, shorter TTL, visible depth.'],
             ['Revoke', 'SatGate rejects the next governed request at the gateway policy check.'],
-            ['Receipt', 'The signed receipt shows lineage, caveats, decision, spend, and receipt IDs.'],
+            ['Receipt', 'The signed receipt shows the decision, the spend and a hash of the token used.'],
           ].map(([title, body]) => (
             <Link key={title} href="/capability-lifecycle-demo" className="rounded-2xl border border-gray-800 bg-gray-950 p-5 transition hover:border-cyan-500/60 hover:bg-cyan-950/10">
               <h3 className="mb-2 text-lg font-bold text-white">{title}</h3>
@@ -158,15 +158,6 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-          <h2 className="text-3xl font-bold text-white">Credential policy example</h2>
-          <Link href="/build" className="inline-flex items-center gap-2 font-semibold text-cyan-300 transition hover:text-cyan-200">
-            Mint a scoped agent token <ArrowRight size={16} />
-          </Link>
-        </div>
-        <pre className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950 p-6 text-sm text-green-300"><code>{`delegation_depth = 1`}</code></pre>
-      </section>
 
       <section className="border-t border-gray-900 bg-black">
         <div className="mx-auto max-w-6xl px-6 py-20">

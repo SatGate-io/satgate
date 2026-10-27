@@ -73,9 +73,9 @@ const evidenceQuestions = [
     body: "A budget, missing-payment or tool-permission reason code attached to the blocked invoice call.",
   },
   {
-    question: "Can we prove revocation worked?",
+    question: "Does revoke work?",
     artifact: "Post-revoke denial",
-    body: "The next request after a revoke is refused.",
+    body: "Try the token again: the next request is refused.",
   },
 ];
 
@@ -89,25 +89,25 @@ const demoSteps = [
 ];
 
 const standardsMappings = [
-  ["Delegation chain", "SOC 2 CC6.3 / NIST AC-3", "Least-privilege narrowing across parent and worker permissions."],
-  ["Spend ledger", "SOC 2 CC1.4 / FinOps attribution", "Governance evidence for who created spend, on which route/tool, under which token."],
+  ["Delegation chain", "Narrower permissions for each helper", "Least-privilege narrowing across parent and worker permissions."],
+  ["Spend ledger", "Spend by token", "Which token spent what, on which route or tool."],
 ];
 
 const personas = [
   {
     title: "Auditor",
     icon: ClipboardCheck,
-    quote: "I get the authority trail in one export instead of opening a forensics ticket.",
+    quote: "Receipts for refusals and spending in one export, checkable against SatGate’s published keys.",
   },
   {
     title: "CISO",
     icon: ShieldAlert,
-    quote: "Revocation isn’t a promise. The next request after a revoke is refused.",
+    quote: "A revoke that holds: the next request after it is refused.",
   },
   {
     title: "FinOps lead",
     icon: WalletCards,
-    quote: "Spend is attributed to the agent, the token, and the route — not a shared API key.",
+    quote: "Spend tied to the agent’s token and the route, not a shared API key.",
   },
 ];
 
@@ -120,31 +120,28 @@ const evidencePack = {
   subject: "worker-agent:invoice-reconciler",
   payment_context: {
     default_market: "internal_enterprise_agents",
-    internal_rail: "existing_iam_service_account_or_api_key_billing",
     optional_external_rails: ["x402", "l402"],
-    note: "The same authority chain and receipts can cover an internal agent call, or a governed bridge call to an external paid API.",
   },
   authority_chain: [
     {
       kind: "root_grant",
-      subject: "dean-agent:finance-automation",
+      subject: "finance-agent:automation",
       issuer_kid: "satgate-mint-2026-05",
       caveats: ["tenant_id = acme-finance", "delegation_depth = 1"],
     },
     {
       kind: "delegation",
       subject: "worker-agent:invoice-reconciler",
-      parent: "dean-agent:finance-automation",
+      parent: "finance-agent:automation",
     },
   ],
   receipts: [
-    { receipt_id: "rcpt_spend_search_003", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:23:18Z", route: "/v1/invoices/search", amount_usd: "0.18", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:01d8..." },
-    { receipt_id: "rcpt_spend_compare_004", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:02Z", route: "/v1/invoices/compare", amount_usd: "0.42", payment_protocol: "internal_api", settlement: { rail: "internal_ledger", cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:a923..." },
+    { receipt_id: "rcpt_spend_search_003", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:23:18Z", route: "/v1/invoices/search", amount_usd: "0.18", payment_protocol: "internal_api", settlement: { cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:01d8..." },
+    { receipt_id: "rcpt_spend_compare_004", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:02Z", route: "/v1/invoices/compare", amount_usd: "0.42", payment_protocol: "internal_api", settlement: { cost_center: "FIN-AP-042" }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:a923..." },
     { receipt_id: "rcpt_paid_ocr_005", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "spend", ts: "2026-05-09T14:24:44Z", route: "/v1/invoices/ocr", mcp_tool: "document_ai.ocr", amount_usd: "0.18", payment_protocol: "x402", settlement: { chain: "base", tx: "REDACTED_DEMO_SAMPLE", ms: 187 }, decision_reason: "allowed_under_policy", result: "allowed", receipt_hash: "sha256:deb5..." },
     { receipt_id: "rcpt_denial_scope_006", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:08Z", decision_reason: "scope_violation:no_customer_data_export", reason_code: "scope_violation:no_customer_data_export", result: "blocked", receipt_hash: "sha256:9b0f..." },
     { receipt_id: "rcpt_denial_budget_007", evidence_pack_id: "ep_demo_2026_05_09_001", policy_version: "pol_invoice_reconciliation@2026-05-09", type: "denial", ts: "2026-05-09T14:25:33Z", decision_reason: "budget_exhausted", reason_code: "budget_exhausted", result: "blocked", receipt_hash: "sha256:c3f6..." },
   ],
-  chain_root: "sha256:f04ed8430b11c8975cc5ef35919ee078fc4cb166cd8d611ed0d94b7da69df09d",
   signature: "ed25519:REDACTED_DEMO_SAMPLE_DO_NOT_VERIFY",
 };
 
@@ -196,7 +193,7 @@ export default function PolicyToProofPage() {
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div>
               <p className="mb-5 max-w-2xl rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm leading-6 text-gray-300">
-                Monday morning, your auditor asks who authorized the agent that tried to export customer data on Friday night. This is what they get.
+                Monday morning, your auditor asks what your agents were refused on Friday night, and how they can trust the answer. This is what they get.
               </p>
               <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
                 From policy to proof for agentic API access.
@@ -241,7 +238,7 @@ export default function PolicyToProofPage() {
                 {JSON.stringify(evidencePack, null, 2)}
               </pre>
               <p className="mt-3 text-xs leading-5 text-gray-500">
-                Inline hashes are shortened for readability. Full hashes, payment rail context, ed25519 signature, and verification block are in the downloadable JSON.
+                Inline hashes are shortened for readability. Full hashes, payment rail context and a placeholder signature are in the downloadable sample.
               </p>
             </div>
           </div>
@@ -257,7 +254,7 @@ export default function PolicyToProofPage() {
               Most enterprise agents do not need a wallet to call internal APIs. They need bounded delegated permissions, budget controls, revocation, and audit evidence around the credentials they already have.
             </p>
             <p className="mt-4 text-base leading-7 text-gray-500">
-              When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution for x402 and L402 payments. Payment proves value moved. SatGate proves the agent was allowed to move it.
+              When that same internal workflow crosses into an external paid API, SatGate keeps the proof intact: internal scope and delegation, plus spend attribution for x402 and L402 payments.
             </p>
           </div>
         </div>
@@ -269,7 +266,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Why now</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Agents are moving from demos to workflows. Spend rails are arriving with them.</h2>
             <p className="mt-5 text-xl leading-8 text-gray-300">
-              Enterprises need proof of authority before those rails scale. Payment rails authorize value movement. SatGate authorizes behavior and preserves proof. Payment proves value moved. SatGate proves the agent was allowed to move it.
+              Teams need limits and receipts before agents spend at scale. Payment rails authorize value movement. SatGate authorizes behavior and preserves proof. A payment shows money moved. SatGate’s receipt shows what SatGate decided.
             </p>
           </div>
 
@@ -310,19 +307,19 @@ export default function PolicyToProofPage() {
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">The contrast</p>
-            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Logs tell you something happened. Evidence proves who had authority.</h2>
+            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Logs tell you something happened. A signed receipt shows what SatGate decided.</h2>
           </div>
           <div className="mt-10 grid gap-5 lg:grid-cols-2">
             <div className="rounded-3xl border border-red-400/20 bg-red-400/5 p-7">
               <p className="text-sm font-bold uppercase tracking-[0.22em] text-red-200">Other gateways</p>
               <h3 className="mt-4 text-2xl font-black text-white">200/402 status codes in a log.</h3>
               <p className="mt-4 text-base leading-7 text-gray-400">
-                You reconstruct authority from six systems, three hours of joins, shared API keys, cloud invoices, and dashboard screenshots — with no chain-of-custody.
+                Today you piece it together from logs, invoices, shared API keys and screenshots.
               </p>
             </div>
             <div className="rounded-3xl border border-emerald-400/20 bg-emerald-400/5 p-7">
               <p className="text-sm font-bold uppercase tracking-[0.22em] text-emerald-200">SatGate</p>
-              <h3 className="mt-4 text-2xl font-black text-white">Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, exportable as a list.</h3>
+              <h3 className="mt-4 text-2xl font-black text-white">Signed receipts anyone can check, exportable as a list.</h3>
               <p className="mt-4 text-base leading-7 text-gray-400">
                 The signed receipt (Evidence Pack) is not a logging afterthought. It is generated by the same authority path that enforces the decision.
               </p>
@@ -341,7 +338,7 @@ export default function PolicyToProofPage() {
               <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Answer the audit questions after the invoice-reconciler acts.</h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-gray-500">
-              Receipts and the audit log answer these questions without a forensics project across logs, invoices and gateway dashboards. Token lineage shows who handed work to whom; matching receipts preserve the allow and deny sequence, including paid requests.
+              Receipts and the audit log answer these questions without a forensics project across logs, invoices and gateway dashboards. Token lineage shows who handed work to whom, and the signed receipts show what SatGate refused and what was spent in Control.
             </p>
           </div>
 
@@ -360,10 +357,10 @@ export default function PolicyToProofPage() {
       <section className="border-b border-white/10 px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Maps to audit controls</p>
-            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Audit-fluent, not just audit-flavored.</h2>
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">For audit teams</p>
+            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Records an auditor can check.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The receipt gives security and audit teams a starting control map instead of making them translate raw gateway logs without receipt hashes, policy versions, and decision reasons.
+              Each receipt carries a hash, the decision and a refusal code, so security and audit teams don&apos;t start from raw gateway logs.
             </p>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2">
@@ -393,7 +390,7 @@ export default function PolicyToProofPage() {
                 <figcaption className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-purple-300">
                   What the {title} gets
                 </figcaption>
-                <blockquote className="text-lg font-semibold leading-8 text-white">“{quote}”</blockquote>
+                <p className="text-lg font-semibold leading-8 text-white">{quote}</p>
               </figure>
             ))}
           </div>
@@ -423,7 +420,7 @@ export default function PolicyToProofPage() {
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-purple-300">Demo path</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Mint → Delegate → Spend → Deny → Revoke → Export.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The demo ends on the exported receipts across the invoice-reconciler lifecycle: signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.
+              The demo ends on the exported receipts across the invoice-reconciler lifecycle.
             </p>
             <p className="mt-4 text-sm leading-6 text-gray-500">
               Read the six-step lifecycle below, or watch the 90-second cut.
@@ -458,7 +455,7 @@ export default function PolicyToProofPage() {
                 <PlayCircle size={22} />
                 <span className="text-sm font-bold uppercase tracking-[0.2em]">Receipt walkthrough</span>
               </div>
-              <h3 className="text-2xl font-black text-white">See how agent permissions become audit-ready proof.</h3>
+              <h3 className="text-2xl font-black text-white">See how receipts work.</h3>
               <p className="mt-4 text-sm leading-6 text-gray-400">
                 Watch a governed agent receive scoped authority, delegate work, hit policy decisions, and export a signed receipt your security and audit teams can review.
               </p>
@@ -478,10 +475,10 @@ export default function PolicyToProofPage() {
               <div className="max-w-3xl">
                 <div className="mb-3 flex items-center gap-2 text-emerald-300">
                   <CheckCircle2 size={20} />
-                  <span className="text-sm font-bold uppercase tracking-[0.2em]">Buyer promise</span>
+                  <span className="text-sm font-bold uppercase tracking-[0.2em]">What you get</span>
                 </div>
                 <p className="text-2xl font-black leading-snug text-white">
-                  SatGate lets enterprises delegate limited authority to AI agents. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
+                  SatGate lets you give AI agents limited permissions, and signs receipts anyone can check.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <a

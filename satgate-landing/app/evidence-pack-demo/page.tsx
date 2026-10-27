@@ -32,60 +32,53 @@ export const metadata: Metadata = {
 };
 
 const pack = evidencePack;
-const policy = pack.policy_snapshot;
 const budget = pack.budget_snapshot;
-const subject = pack.subject;
 const receipts = pack.receipts;
 const authorityChain = pack.authority_chain;
 const rootGrant = authorityChain[0];
 const delegatedGrant = authorityChain[1];
-const paidEvents = pack.payment_context.events;
 
 if (!rootGrant || !delegatedGrant) {
   throw new Error('Receipt demo fixture must include a root grant and a delegated grant.');
 }
 
-const rootIssuerName = rootGrant.issuer?.display_name ?? rootGrant.issuer?.id ?? 'authorized issuer';
-const rootSubjectName = rootGrant.subject.display_name ?? rootGrant.subject.id;
-const delegatedParentName = delegatedGrant.parent_subject?.display_name ?? delegatedGrant.parent_subject?.id ?? 'parent agent';
-const delegatedSubjectName = delegatedGrant.subject.display_name ?? delegatedGrant.subject.id;
-
+// What a real signed receipt carries today (public/evidence/mcp-budget-refusal-20261005.json).
 const answerCards = [
   {
-    icon: KeyRound,
-    question: 'Who allowed it?',
-    answer: `${rootIssuerName} issued a token to ${rootSubjectName}.`,
-    detail: `Issuer key: ${rootGrant.issuer_kid}`,
-  },
-  {
-    icon: BadgeCheck,
-    question: 'Which agent acted?',
-    answer: `${subject.display_name} acted as ${subject.id}.`,
-    detail: `Tenant: ${pack.tenant.name}`,
+    icon: ReceiptText,
+    question: 'Which tool or route?',
+    answer: 'The tool or route the agent called.',
+    detail: 'For example, a tool name on an MCP server or a path on your API.',
   },
   {
     icon: ShieldCheck,
-    question: 'Under which policy?',
-    answer: `${policy.policy_name} ${policy.policy_version}, checked before each action ran.`,
-    detail: `Policy ID: ${policy.policy_id}; mode: ${policy.mode}; digest: ${policy.policy_digest}`,
-  },
-  {
-    icon: WalletCards,
-    question: 'Under which budget?',
-    answer: `${budget.budget_id} allowed ${budget.delegated_limit} ${budget.currency}. ${budget.spent} was spent before requests started being refused.`,
-    detail: `Cost center: ${budget.cost_center}; exhausted: ${budget.exhausted ? 'yes' : 'no'}`,
-  },
-  {
-    icon: ReceiptText,
-    question: 'Was work handed off?',
-    answer: `${delegatedParentName} gave ${delegatedSubjectName} a narrower token.`,
-    detail: 'The sub-agent’s token allows less: fewer permissions, a smaller budget and no further handoffs.',
+    question: 'What did SatGate decide?',
+    answer: 'Whether SatGate allowed the call or refused it.',
+    detail: 'With the time SatGate decided.',
   },
   {
     icon: ClipboardCheck,
-    question: 'Was anything paid?',
-    answer: `${paidEvents.length} payment events are recorded, from the internal budget (${pack.payment_context.internal_rail}) and outside payment methods.`,
-    detail: `Outside payment methods: ${pack.payment_context.external_rails.join(', ')}`,
+    question: 'Why was it refused?',
+    answer: 'A refusal code, such as budget_exhausted.',
+    detail: 'Other codes cover a missing payment or a tool the agent may not use.',
+  },
+  {
+    icon: WalletCards,
+    question: 'What did it cost?',
+    answer: 'The amount checked and the budget left.',
+    detail: 'On calls that spend from a budget.',
+  },
+  {
+    icon: KeyRound,
+    question: 'Which token?',
+    answer: 'A hash of the token used, on calls that spend from a budget.',
+    detail: 'The raw token is blanked out.',
+  },
+  {
+    icon: BadgeCheck,
+    question: 'Who signed it?',
+    answer: 'SatGate, with a key anyone can check against SatGate’s published keys.',
+    detail: 'The agent never writes or edits its own record.',
   },
 ];
 
@@ -134,7 +127,7 @@ export default function EvidencePackDemoPage() {
                 Who allowed what?
               </h1>
               <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-                This is a sample that shows how a workflow&apos;s receipts could be read together. A real Evidence Pack holds one receipt. This page lays the sample out so you can read it: which agent acted, the rules and budget it ran under, the handoff to a sub-agent, payments, and the receipts.
+                This sample shows a planned audit view of one workflow. Today a real Evidence Pack holds one signed receipt, which shows the tool or route, the decision and a refusal code.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <a href="/evidence-packs/sample-evidence-pack.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -156,19 +149,9 @@ export default function EvidencePackDemoPage() {
                   <dd className="mt-1 font-mono text-cyan-100">{pack.evidence_pack_id}</dd>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                  <dt className="text-gray-500">Agent</dt>
-                  <dd className="mt-1 font-semibold text-white">{subject.display_name}</dd>
-                  <dd className="font-mono text-xs text-gray-400">{subject.id}</dd>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
                   <dt className="text-gray-500">Budget</dt>
                   <dd className="mt-1 font-semibold text-white">{budget.spent} / {budget.delegated_limit} {budget.currency} spent</dd>
                   <dd className="text-xs text-gray-400">{budget.remaining} left after the budget ran out and requests were refused.</dd>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                  <dt className="text-gray-500">Receipts</dt>
-                  <dd className="mt-1 font-semibold text-white">{pack.receipt_chain.receipt_count} receipts, chained together</dd>
-                  <dd className="break-all font-mono text-xs text-gray-400">{pack.chain_root}</dd>
                 </div>
               </dl>
             </div>
@@ -179,8 +162,8 @@ export default function EvidencePackDemoPage() {
       <section className="border-b border-white/10 px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">What the pack tells you</p>
-            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Six questions, answered from the receipts.</h2>
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">What a receipt tells you</p>
+            <h2 className="text-3xl font-black tracking-tight sm:text-5xl">What a real receipt shows.</h2>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {answerCards.map(({ icon: Icon, question, answer, detail }) => (
@@ -237,10 +220,9 @@ export default function EvidencePackDemoPage() {
           <div className="mb-10 max-w-3xl">
             <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Receipt timeline</p>
             <h2 className="text-3xl font-black tracking-tight sm:text-5xl">Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.</h2>
-            <p className="mt-4 text-sm leading-6 text-gray-400">In this sample the mint, delegation, revocation and export rows are illustrations. SatGate does not sign receipts for those steps; the token&apos;s lineage and the audit log record them.</p>
           </div>
           <div className="space-y-3">
-            {receipts.map((receipt) => (
+            {receipts.filter((receipt) => receipt.type === 'spend' || receipt.type === 'denial').map((receipt) => (
               <article key={receipt.receipt_id} className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:grid-cols-[0.25fr_0.9fr_1fr_0.8fr] md:items-center">
                 <div className="font-mono text-xs text-gray-500">
                   <div>#{receipt.seq} · {receipt.ts.slice(11, 19)}</div>
@@ -271,11 +253,6 @@ export default function EvidencePackDemoPage() {
             <p className="mt-4 text-sm leading-6 text-gray-300">
               This sample records spending from an internal budget and one paid call to a document-AI service over x402. The payment shows money moved. The receipt shows the sub-agent was allowed to spend it.
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {[pack.payment_context.internal_rail, ...pack.payment_context.external_rails].map((rail) => (
-                <span key={rail} className="rounded-full border border-cyan-300/30 bg-black/30 px-3 py-1 text-xs font-bold text-cyan-100">{rail}</span>
-              ))}
-            </div>
           </div>
           <div className="rounded-3xl border border-purple-300/20 bg-purple-300/5 p-7">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-200">Signature</p>
@@ -295,10 +272,11 @@ export default function EvidencePackDemoPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-200">In short</p>
-              <h2 className="mt-3 max-w-3xl text-3xl font-black text-white">One file shows who allowed what, what was refused, what was spent and paid, and the receipts to back it up.</h2>
+              <h2 className="mt-3 max-w-3xl text-3xl font-black text-white">A real Evidence Pack holds one signed receipt for one decision. Check a real one on the verify page.</h2>
             </div>
             <div className="flex shrink-0 flex-col gap-3">
-              <a href="/evidence-packs/sample-evidence-pack.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">Download JSON <Download size={18} /></a>
+              <Link href="/verify-evidence-pack" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-black transition hover:bg-gray-200">Check a real receipt <ArrowRight size={18} /></Link>
+              <a href="/evidence-packs/sample-evidence-pack.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-300/40 px-5 py-3 font-bold text-emerald-100 transition hover:border-emerald-200">Download JSON <Download size={18} /></a>
               <a href="/evidence-packs/evidence-pack.schema.v1.json" className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-300/40 px-5 py-3 font-bold text-emerald-100 transition hover:border-emerald-200">Schema <ArrowRight size={18} /></a>
             </div>
           </div>

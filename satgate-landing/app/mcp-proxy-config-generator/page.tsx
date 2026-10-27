@@ -57,7 +57,7 @@ export default function McpProxyConfigGeneratorPage() {
           </div>
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">MCP connect snippet</h1>
           <p className="mb-8 text-xl leading-relaxed text-gray-300">
-            These are the connect snippets MCP Setup gives Cursor, Claude Desktop, Claude Code and OpenClaw. They do not set a dollar budget, and they do not add flags SatGate does not read.
+            These are the connect snippets MCP Setup gives Cursor, Claude Desktop, Claude Code and OpenClaw.
           </p>
           <a href="https://cloud.satgate.io/cloud/signup" className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
             Start free trial <ArrowRight size={18} />

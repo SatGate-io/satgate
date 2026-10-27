@@ -31,11 +31,11 @@ export const metadata = {
 };
 
 const controls = [
-  { icon: Bot, title: 'Agent identity', body: 'Attribute requests to the tenant, agent, task, workflow, route, model, MCP tool, and delegated sub-agent.' },
+  { icon: Bot, title: 'Agent identity', body: 'See requests by agent token, route, MCP tool and MCP task.' },
   { icon: DollarSign, title: 'Budget checks', body: 'Evaluate remaining spend, tool costs and route budgets before forwarding.' },
   { icon: KeyRound, title: 'Scoped credentials', body: 'Use expiring capabilities instead of broad static keys so authority matches the job.' },
-  { icon: Ban, title: 'Revocation', body: 'Block the next request when a credential, workflow, route, budget, or agent should stop.' },
-  { icon: ReceiptText, title: 'Audit trails', body: 'Record allow/deny decisions with policy, budget remaining, route, tool, estimated cost, and outcome.' },
+  { icon: Ban, title: 'Revocation', body: 'Block the next request when a token is revoked or its budget runs out.' },
+  { icon: ReceiptText, title: 'Signed receipts', body: 'Refusals and spending, with the route or tool, the cost and, when SatGate checked the budget, the budget left.' },
   { icon: BarChart3, title: 'Benchmark risk', body: 'Model loops, retry storms, fanout, detection delay, and avoided spend with benchmark-backed scenarios.' },
 ];
 
@@ -76,7 +76,7 @@ export default function Page() {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
-      { '@type': 'Question', name: 'What is AI API budget enforcement?', acceptedAnswer: { '@type': 'Answer', text: 'AI API budget enforcement checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through SatGate, before an autonomous agent can spend against an API or model provider.' } },
+      { '@type': 'Question', name: 'What is AI API budget enforcement?', acceptedAnswer: { '@type': 'Answer', text: 'In Control, SatGate checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through it, before an autonomous agent can spend against an API or model provider.' } },
       { '@type': 'Question', name: 'Why are dashboards not enough?', acceptedAnswer: { '@type': 'Answer', text: 'Dashboards and billing alerts report spend after requests complete. Autonomous agents can loop, retry, and delegate fast enough that budget policy must be enforced at the gateway before forwarding.' } },
       { '@type': 'Question', name: 'How does SatGate help?', acceptedAnswer: { '@type': 'Answer', text: 'SatGate checks identity, budget, route, tool scope, credential caveats, expiry, revocation, and audit policy before the request goes through.' } },
       { '@type': 'Question', name: 'How is AI API budget enforcement different from provider spend alerts?', acceptedAnswer: { '@type': 'Answer', text: 'Provider spend alerts notify teams after usage crosses a threshold. AI API budget enforcement checks request cost, remaining budget, identity, route, and policy before the API call executes.' } },
@@ -126,10 +126,10 @@ export default function Page() {
         <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
           <h3 className="mb-4 text-xl font-bold text-white">What good policy includes</h3>
           <div className="space-y-4">
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budget before forwarding</h3><p className="leading-relaxed text-gray-400">Check remaining daily, session, per-agent, per-tool, and per-request budget before traffic reaches the upstream provider.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Policy by agent and workflow</h3><p className="leading-relaxed text-gray-400">Separate budgets by tenant, workflow, route, model, MCP server, delegated sub-agent, and task instead of one account-level cap.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Stop loops automatically</h3><p className="leading-relaxed text-gray-400">Deny the next request when a loop, retry storm, fanout chain, or high-cost tool call crosses policy.</p></div>
-              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Audit allow and deny decisions</h3><p className="leading-relaxed text-gray-400">Record allow/deny decisions with identity, route, estimated cost, budget remaining, policy, and revocation state.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Budget before forwarding</h3><p className="leading-relaxed text-gray-400">Check the agent’s remaining budget, and daily or weekly dollar limits on trade orders, before traffic reaches the provider.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Policy by agent</h3><p className="leading-relaxed text-gray-400">Separate budgets per agent, sub-agent, route and MCP server instead of one account-level cap.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Stop loops at the budget</h3><p className="leading-relaxed text-gray-400">When a loop or retry storm uses up the budget, the next request is refused.</p></div>
+              <div className="rounded-xl border border-gray-800 bg-black p-6"><h3 className="mb-2 text-xl font-bold text-white">Signed receipts</h3><p className="leading-relaxed text-gray-400">Signed receipts for refusals and spending, with the route and cost, and the budget left when SatGate checked the budget.</p></div>
           </div>
         </div>
       </section>
@@ -158,7 +158,7 @@ export default function Page() {
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">
               <h3 className="mb-2 text-xl font-bold text-white">What is AI API budget enforcement?</h3>
               <p className="text-gray-400 leading-relaxed">
-                AI API budget enforcement checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through SatGate, before an autonomous agent can spend against an API or model provider.
+                In Control, SatGate checks budgets, per-request cost, route policy, tool scope, expiry, and revocation on each request that goes through it, before an autonomous agent can spend against an API or model provider.
               </p>
             </div>
             <div className="rounded-xl border border-gray-800 bg-gray-950 p-6">

@@ -31,10 +31,9 @@ export const metadata = {
 
 const flows = [
   ['Card checkout', 'Agent receives a temporary card credential and fills a merchant checkout.', 'Good for web purchases, but not request-native API monetization.'],
-  ['x402', 'API returns a 402 payment challenge for USDC on Base.', 'x402 payments still pass SatGate permission checks and get signed receipts. AgentCore Payments and Pay.sh are planned.'],
+  ['x402', 'API returns a 402 payment challenge for USDC on Base.', 'x402 payments still pass SatGate’s permission checks. AgentCore Payments and Pay.sh are planned.'],
   ['Shared payment token', 'Agent receives a payment token for a supported 402 machine-payment flow.', 'Specific to one payment method; treat it as a subpattern of payment details that still needs governance.'],
-  ['payment details', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'Payment details can support request-native paid API access; SatGate governs the decision and receipt.'],
-  ['Policy-only 402 observation', 'SatGate records and evaluates payment challenges even when another payment method completes payment.', 'Useful for audit, deny/allow rules, and spend governance.'],
+  ['L402 (Lightning)', 'API returns a Lightning-backed 402 challenge and verifies proof before access.', 'L402 can support request-native paid API access; SatGate governs the decision and receipt.'],
 ];
 
 export default function Http402ForAiAgentsPage() {
@@ -115,7 +114,7 @@ export default function Http402ForAiAgentsPage() {
             That challenge may point to different payment methods: card-based credentials, shared payment tokens, invoices with payment details, or future protocols. But the payment challenge is not the governance layer.
           </p>
           <p>
-            SatGate sits at the gateway before forwarding and applies policy: identify the agent, confirm authority, estimate cost, enforce budgets, decide whether the payment method is allowed, record the challenge, and unlock only scoped access after proof.
+            On a paid route SatGate checks the agent&apos;s token and permissions, asks for payment in the methods you allow, and lets the request through only after the payment checks out.
           </p>
         </div>
         <div className="rounded-2xl border border-yellow-900/50 bg-yellow-950/10 p-6">
@@ -156,7 +155,7 @@ export default function Http402ForAiAgentsPage() {
           {[
             { icon: Bot, title: 'Agent requests', body: 'An agent calls a paid API, model endpoint, MCP tool, or dataset.' },
             { icon: Network, title: 'SatGate evaluates', body: 'Policy checks identity, scope, budget, route, tenant, and allowed payment method.' },
-            { icon: Braces, title: '402 is handled', body: 'SatGate can issue, observe, or audit a payment challenge depending on the route.' },
+            { icon: Braces, title: '402 is handled', body: 'On a paid route, SatGate answers with a 402 that says how to pay, and checks the payment before letting the request through.' },
             { icon: ShieldCheck, title: 'Access is governed', body: 'Only approved, scoped, metered, auditable access proceeds upstream.' },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="rounded-xl border border-gray-800 bg-gray-950 p-6">
@@ -235,7 +234,7 @@ export default function Http402ForAiAgentsPage() {
         <div className="rounded-3xl border border-yellow-900/60 bg-gradient-to-br from-yellow-950/20 to-cyan-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">Govern paid agent access before the agent acts</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            HTTP 402 can carry payment context. SatGate turns that context into governed action: authority, policy, budget and proof. Each payment gets a signed receipt when signing succeeds.
+            HTTP 402 can carry payment context. SatGate turns that context into governed action: authority, policy, budget and proof. SatGate signs a receipt when it refuses an agent for a missing payment.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

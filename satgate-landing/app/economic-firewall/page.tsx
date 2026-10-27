@@ -33,7 +33,7 @@ const capabilities = [
   {
     icon: KeyRound,
     title: 'Agent identity',
-    body: 'Know which agent, sub-agent, token, route and tool is behind every call.',
+    body: 'Know which token, route and tool is behind every call, and which agent you gave that token.',
   },
   {
     icon: Shield,
@@ -48,7 +48,7 @@ const capabilities = [
   {
     icon: Activity,
     title: 'Receipts',
-    body: 'SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Each receipt shows why a request was refused or what it cost. Export them as Evidence Packs.',
+    body: 'Signed receipts anyone can check. Each receipt shows the decision, with a refusal code or the amount spent. Export them as Evidence Packs.',
   },
   {
     icon: WalletCards,
@@ -95,7 +95,7 @@ export default function EconomicFirewallPage() {
         name: 'Why do AI agents need economic firewalls?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Agents loop, retry, hand off work and call paid tools with no person approving each request. SatGate blocks what isn’t allowed before it runs. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
+          text: 'Agents loop, retry, hand off work and call paid tools with no person approving each request. SatGate blocks what isn’t allowed before it runs.',
         },
       },
       {
@@ -156,7 +156,7 @@ export default function EconomicFirewallPage() {
         '@type': 'ListItem',
         position: 3,
         name: 'Charge external agents',
-        description: 'Decide what external agents can reach and which routes they pay for. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
+        description: 'Decide what external agents can reach and which routes they pay for.',
       },
     ],
   };
@@ -230,7 +230,7 @@ export default function EconomicFirewallPage() {
           <p>It started with one rule: an external agent pays before it uses your API. That makes abusing your API expensive. It raises the cost of an attack; it does not make one impossible.</p>
           <p>The same idea works for your own agents. Each one gets a budget and a list of what it may do, and SatGate checks both before a request runs. Observe shows usage without blocking; Control enforces the limits. Your own agents don&apos;t pay anyone. They spend from the budget you set.</p>
           <p>Make SatGate the only way to reach your API, and keep your API keys behind it, so agents can&apos;t go around it.</p>
-          <p><strong className="text-white">Receipts on HTTP and MCP.</strong> SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. This covers HTTP APIs and MCP tools, and anyone can check the receipts. A receipt shows what SatGate decided. It is not a compliance certificate.</p>
+          <p><strong className="text-white">Receipts on HTTP and MCP.</strong> SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt. This covers HTTP APIs and MCP tools, and anyone can check the receipts. A receipt shows what SatGate decided. It is not a compliance certificate.</p>
         </div>
       </section>
 
@@ -259,7 +259,7 @@ export default function EconomicFirewallPage() {
               'Is this action allowed?',
               'Is there budget left, and is the token still valid and not revoked?',
               'Does this route charge, and has the agent paid?',
-              'Allow or refuse. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
+              'Allow or refuse.',
             ].map((item) => (
               <div key={item} className="flex items-start gap-3 rounded-lg border border-gray-800 bg-black/50 p-3">
                 <CheckCircle2 className="text-cyan-300 mt-0.5" size={18} />
@@ -328,13 +328,13 @@ export default function EconomicFirewallPage() {
           <div className="rounded-2xl border border-purple-900/50 bg-purple-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Observe</h2>
             <p className="text-gray-300 leading-relaxed">
-              Start by watching agent traffic without blocking anything. See usage and cost by agent, model, route, tool, team and workflow, so security, finance and platform teams all see the same numbers.
+              Start by watching agent traffic without blocking anything. See usage and cost by agent, route, tool and team, so security, finance and platform teams all see the same numbers.
             </p>
           </div>
           <div className="rounded-2xl border border-cyan-900/50 bg-cyan-950/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">Control</h2>
             <p className="text-gray-300 leading-relaxed">
-              Then enforce limits on the risky routes: permissions, budgets, expiry and revokes, all checked before your API is called. When SatGate blocks a request, the receipt says why.
+              Then enforce limits on the risky routes: permissions, budgets, expiry and revokes, all checked before your API is called. When SatGate blocks a request, the receipt records a refusal code.
             </p>
           </div>
           <div className="rounded-2xl border border-yellow-800/50 bg-yellow-950/10 p-6">
@@ -366,7 +366,7 @@ export default function EconomicFirewallPage() {
               ['Rate limiting', 'How many requests?', 'Knows nothing about money, model cost, tool prices or budgets.'],
               ['Provider billing dashboard', 'What did we spend?', 'Tells you after the fact, and usually not per agent.'],
               ['Static API keys', 'Who has access?', 'No budgets, no expiry, no narrower keys for sub-agents, no per-request pricing.'],
-              ['Economic firewall', 'Should this agent be allowed to do this, right now, at this price?', 'Checks permissions, budget and payment on every request.'],
+              ['Economic firewall', 'Should this agent be allowed to do this, right now, at this price?', 'Checks permissions on every request, budgets in Control and payment on paid routes.'],
             ].map(([a, b, c]) => (
               <div key={a} className="grid md:grid-cols-3 border-t border-gray-800 text-gray-300">
                 <div className="p-4 font-semibold text-white">{a}</div>
@@ -388,7 +388,7 @@ export default function EconomicFirewallPage() {
           {[
             ['1', 'See what your agents do', 'List which agents, sub-agents, routes, models and MCP tools are in use, and what they cost, before you change anything.', '/agent-control-plane'],
             ['2', 'Set limits', 'Turn on Control for the risky routes: budget caps, narrower tokens, expiry and revokes.', '/build'],
-            ['3', 'Charge external agents', 'Decide what external agents can reach and which routes they pay for. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.', '/policy-to-proof'],
+            ['3', 'Charge external agents', 'Decide what external agents can reach and which routes they pay for.', '/policy-to-proof'],
           ].map(([step, title, body, href]) => (
             <Link key={step} href={href} className="rounded-2xl border border-gray-800 bg-gray-950 p-6 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
               <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/15 font-mono text-cyan-200">{step}</div>
@@ -411,7 +411,7 @@ export default function EconomicFirewallPage() {
             {[
               ['/economic-firewall-readiness-grader', 'Readiness grader', 'Grade your setup on identity, budgets, revokes, audit records, MCP tools and payments.'],
               ['/roi-calculator', 'ROI calculator', 'Estimate runaway agent spend, wasted cost and payback.'],
-              ['/build', 'Build with SatGate', 'Mint an agent token with a budget, expiry and revoke.'],
+              ['/build', 'Build with SatGate', 'SDKs, receipts and how to put SatGate in front of your tools.'],
             ].map(([href, title, body]) => (
               <Link key={href} href={href} className="rounded-xl border border-gray-800 bg-black p-5 transition hover:border-cyan-500/50 hover:bg-cyan-950/20">
                 <h3 className="mb-2 font-bold text-white">{title}</h3>
@@ -428,15 +428,13 @@ export default function EconomicFirewallPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               ['/policy-to-proof', 'Rules and Receipts', 'How budget spends, and refusals over a budget, a missing payment or a tool permission, become signed receipts.'],
-              ['/mcp', 'MCP', 'Budgets and permissions for MCP tools. When a receipt signer is configured, a priced call and a budget or tool-permission refusal get a signed receipt.'],
+              ['/mcp', 'MCP', 'Budgets and permissions for MCP tools. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt.'],
               ['/govern', 'Control AI agents', 'Budgets and permissions for your own agents, with receipts you can export.'],
               ['/agent-control-plane', 'Agent control plane', 'Permissions, handoffs, spend, audit and revokes for large fleets of agents.'],
-              ['/mcp', 'MCP governance', 'Budgets, revokes and receipts for MCP tool calls.'],
               ['/agent-api-governance', 'Agent API governance', 'Identity, handoffs, revokes and audit for agent API calls.'],
               ['/ai-agent-cost-control', 'AI agent cost control', 'Stop runaway agent spend with hard budgets.'],
               ['/ai-api-budget-enforcement', 'AI API budget enforcement', 'Check the budget before a model, tool or API call goes out.'],
-              ['/agent-spending-limits', 'Agent spending limits', 'Spending caps by task, workflow, sub-agent, route, model and tool.'],
-              ['/mcp', 'MCP cost control', 'Control paid tool calls, retries, SaaS actions, cloud tasks, and data lookups.'],
+              ['/agent-spending-limits', 'Agent spending limits', 'Spending caps per agent, sub-agent, route and tool.'],
               ['/agent-payment-controls', 'Agent payment controls', 'Rules for agent wallets, budgets and 402 payment requests.'],
               ['/http-402-for-ai-agents', 'HTTP 402 for AI agents', 'Understand payment challenges, shared payment tokens, and L402.'],
               ['/l402-agent-payments', 'L402 agent payments', 'How L402 ties a Lightning payment to API access.'],
@@ -458,7 +456,7 @@ export default function EconomicFirewallPage() {
             {[
               ['What is an economic firewall?', 'A gateway that checks each AI agent request before it reaches your API. Your own agents spend from budgets you set. External agents must follow your access rules and, on paid routes, pay first.'],
               ['How is an economic firewall different from rate limiting?', 'Rate limiting counts requests. An economic firewall also knows which agent is calling, what it may do, how much budget it has left and whether it has paid.'],
-              ['Why do AI agents need economic firewalls?', 'Agents loop, retry, hand off work and call paid tools with no person approving each request. SatGate blocks what isn’t allowed before it runs. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.'],
+              ['Why do AI agents need economic firewalls?', 'Agents loop, retry, hand off work and call paid tools with no person approving each request. SatGate blocks what isn’t allowed before it runs.'],
               ['Is an economic firewall the same as an API gateway?', 'No. An API gateway routes and secures traffic. An economic firewall adds per-agent permissions and budgets, tokens that can be narrowed for sub-agents, revokes, payment, and signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.'],
               ['How do I know whether I need an economic firewall?', 'When your agents can call paid models, APIs or MCP tools faster than a person can review what they do and spend. Start by listing which agents call what, then grade your setup with the readiness grader.'],
               ['What is the first economic firewall control to implement?', 'Start with Observe: see which agent, route and tool is behind each request, without blocking anything. Then turn on Control for the risky routes, with budgets and revokes. Add Admit when you want external agents to pay.'],
@@ -476,7 +474,7 @@ export default function EconomicFirewallPage() {
         <div className="rounded-3xl border border-cyan-900/60 bg-gradient-to-br from-cyan-950/30 to-purple-950/30 p-8 md:p-12">
           <h2 className="text-3xl font-bold text-white mb-4">SatGate checks every agent request before it runs</h2>
           <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mb-8">
-            Put SatGate in front of your API or MCP tools. See every agent call, limit what agents can reach and spend, charge external agents where you choose, and keep signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission.
+            Put SatGate in front of your API or MCP tools. See every agent call, limit what agents can reach and spend, and charge external agents where you choose.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-bold hover:bg-gray-200 transition">

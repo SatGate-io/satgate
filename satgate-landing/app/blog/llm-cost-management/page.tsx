@@ -61,7 +61,7 @@ export default function LlmCostManagementBlogPage() {
         name: 'Is an LLM monitoring dashboard enough to control agent spend?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked, downgraded, or charged before spend occurs.',
+          text: 'No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked or charged before spend occurs.',
         },
       },
       {
@@ -161,7 +161,7 @@ export default function LlmCostManagementBlogPage() {
                 <tr><td className="px-4 py-3 font-semibold text-white">Cost per request</td><td className="px-4 py-3">Turns token usage into dollars before finance sees a surprise bill.</td></tr>
                 <tr><td className="px-4 py-3 font-semibold text-white">Latency per trace</td><td className="px-4 py-3">Catches slow expensive workflows, not just expensive models.</td></tr>
                 <tr><td className="px-4 py-3 font-semibold text-white">Agent and tool attribution</td><td className="px-4 py-3">Shows whether spend came from chat, MCP tools, retrieval, code execution, or delegated sub-agents.</td></tr>
-                <tr><td className="px-4 py-3 font-semibold text-white">Budget decision</td><td className="px-4 py-3">Separates passive monitoring from real enforcement: allowed, downgraded, blocked, or charged.</td></tr>
+                <tr><td className="px-4 py-3 font-semibold text-white">Budget decision</td><td className="px-4 py-3">Separates passive monitoring from real enforcement: allowed, blocked, or charged.</td></tr>
               </tbody>
             </table>
           </div>
@@ -198,7 +198,7 @@ export default function LlmCostManagementBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            OpenAI's usage tiers and spending limits help at the account level. But account-level limits are a sledgehammer. When your support agent hits the cap, your code-generation agent goes down too. There's no granularity.
+            Provider limits stop at the project or workspace. Agents that share one stop together when it hits its cap.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">2. Observability Platforms (LangSmith, Helicone, Portkey)</h3>
@@ -207,11 +207,7 @@ export default function LlmCostManagementBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            But they share a fundamental design choice: <strong className="text-white">they sit in the observation path, not the enforcement path.</strong> They record what happened. They don't block what shouldn't happen.
-          </p>
-
-          <p className="text-gray-300 leading-relaxed">
-            Some offer "budget alerts" — when spend crosses a threshold, they notify you. But notification is not enforcement. Between the alert firing and a human reading their Slack, the agent has already made another 200 calls. At $0.06 per GPT-4o request, that's $12 more in the 30 seconds it took you to read the message.
+            Tracing tools like LangSmith record what happened. Gateways like Portkey and Helicone can cap a key's spend or rate. None of them gives each agent a budget it can hand on, smaller, to a helper.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">3. Cloud Billing Controls (AWS Budgets, GCP Quotas)</h3>
@@ -268,14 +264,13 @@ Authorization: Bearer macaroon_v1_agent42_budget500
 
 # Gateway checks budget BEFORE proxying
 → Agent 42 remaining budget: 340 credits
-→ Estimated cost of gpt-4o call: 15 credits
+→ This route costs 15 credits
 → Budget sufficient: ALLOW
 
 # If budget exhausted:
 → Agent 42 remaining budget: 8 credits
-→ Estimated cost: 15 credits
-→ HTTP 402 Payment Required
-→ {"error": "budget_exhausted", "remaining": 8, "required": 15}`}</code>
+→ This route costs 15 credits
+→ HTTP 402 budget_exhausted ("Insufficient credits for this request")`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -288,21 +283,16 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           </p>
 
           <ul className="text-gray-300 space-y-2">
-            <li><strong className="text-white">Per agent:</strong> Research Agent gets 1,000 credits/day. Code Agent gets 5,000.</li>
-            <li><strong className="text-white">Per tool:</strong> GPT-4o calls cost 15 credits. GPT-4o-mini costs 1 credit. DALL-E costs 50.</li>
-            <li><strong className="text-white">Per user:</strong> Free tier users get 100 credits. Enterprise gets 10,000.</li>
-            <li><strong className="text-white">Per workflow:</strong> The "quarterly report" workflow gets a 500-credit budget per execution.</li>
+            <li><strong className="text-white">Per agent:</strong> Research Agent gets a 1,000-credit token for the day. Code Agent gets 5,000.</li>
+            <li><strong className="text-white">Per tool:</strong> A web search costs 5 credits. A database query costs 3.</li>
+            <li><strong className="text-white">Per user:</strong> Give each free tier user a 100-credit token. Enterprise users get 10,000.</li>
+            <li><strong className="text-white">Per run:</strong> Give each run of the quarterly report its own 500-credit token.</li>
           </ul>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
             <code className="text-green-300">{`tools:
   defaultCost: 1
   costs:
-    gpt-4o: 15
-    gpt-4o-mini: 1
-    claude-3-opus: 25
-    claude-3-haiku: 1
-    dall-e-3: 50
     web_search: 5
     database_query: 3`}</code>
           </pre>
@@ -337,7 +327,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            With capability-based budgets, the orchestrator <em>delegates a portion</em> of its budget to each sub-agent. The research agent gets 2,000 credits. Each scraper gets 200. Summarizers get 50. The total can never exceed the parent's allocation. It's hierarchical and cryptographically enforced — the constraint lives in the credential, not in a policy document.
+            With capability-based budgets, the orchestrator <em>delegates a portion</em> of its budget to each sub-agent. The research agent gets 2,000 credits. Each scraper gets 200. Summarizers get 50. The total can never exceed the parent's allocation. Each helper's budget is carved out of its parent's, and the gateway checks spend before every call.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Rules and Receipts Approach</h2>
@@ -347,7 +337,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            The architecture is simple: every API call passes through the gateway. The gateway checks the caller's budget (encoded in a macaroon token), deducts the cost, and either proxies the request or returns HTTP 402. No SDK changes. No prompt engineering. No "please be careful with costs."
+            The architecture is simple: every API call passes through the gateway. The gateway checks the caller's macaroon token and its remaining budget, deducts the cost, and either proxies the request or returns HTTP 402. No SDK changes. No prompt engineering. No "please be careful with costs."
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -396,7 +386,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
             <div>
               <h3 className="text-xl font-bold text-white mb-2">Is an LLM monitoring dashboard enough to control agent spend?</h3>
               <p className="text-gray-300 leading-relaxed mb-0">
-                No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked, downgraded, or charged before spend occurs.
+                No. Monitoring dashboards explain what happened after calls execute. Autonomous agents also need budget enforcement before the request goes through so expensive LLM, API, and MCP tool calls can be blocked or charged before spend occurs.
               </p>
             </div>
             <div>
@@ -408,7 +398,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
             <div>
               <h3 className="text-xl font-bold text-white mb-2">What platforms provide an LLM cost dashboard with cost and latency per request?</h3>
               <p className="text-gray-300 leading-relaxed mb-0">
-                Observability platforms can show cost and latency per trace, but autonomous-agent teams should require more than charts. The useful pattern is dashboard plus policy: each request records token cost, latency, trace ID, customer account, agent, tool, and whether the gateway allowed, blocked, downgraded, or charged the call.
+                Observability platforms can show cost and latency per trace, but autonomous-agent teams should require more than charts. The useful pattern is dashboard plus policy: each request records token cost, latency, trace ID, customer account, agent, tool, and whether the gateway allowed, blocked or charged the call.
               </p>
             </div>
           </div>
@@ -421,7 +411,7 @@ Authorization: Bearer macaroon_v1_agent42_budget500
 
           <ol className="text-gray-300 space-y-3">
             <li><strong className="text-white">Audit your current spend.</strong> Who's calling what, and how much does it cost? If you can't answer this by agent and by tool, you have a visibility problem.</li>
-            <li><strong className="text-white">Set budget policies.</strong> Not alerts — policies. "Agent X gets 1,000 credits per day" is a policy. "Alert me when Agent X exceeds $50" is a notification.</li>
+            <li><strong className="text-white">Set budget policies.</strong> Not alerts: policies. "Agent X's token has 1,000 credits" is a policy. "Alert me when Agent X exceeds $50" is a notification.</li>
             <li><strong className="text-white">Enforce at the gateway.</strong> Move cost control from application code to infrastructure. Your agents shouldn't know or care about budgets — the gateway handles it.</li>
             <li><strong className="text-white">Iterate on allocations.</strong> Use monitoring data to adjust budgets. Some agents need more, some need less. The enforcement layer makes this safe to experiment with.</li>
           </ol>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { ArrowRight, Ban, CheckCircle2, GitBranch, KeyRound, Lock, ReceiptText, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Lock, ShieldCheck, Sparkles } from 'lucide-react';
 
 const lifecycle = [
   {
@@ -43,11 +43,11 @@ const lifecycle = [
   },
   {
     id: 'prove',
-    label: '5. Prove',
-    title: 'Export the proof trail',
-    buyer: 'Security, finance, and compliance receive the receipt: who authorized what, which limits applied, why the request was blocked, and what spend remained.',
-    technical: 'The signed receipt (Evidence Pack) includes parent/child lineage, caveats, policy version, decision, remaining budget, revocation state, and receipt IDs.',
-    status: 'Proved',
+    label: '5. Export receipts',
+    title: 'Export the signed receipts',
+    buyer: 'SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a permission, and when an agent spends from a budget in Control. Security, finance and compliance can export them.',
+    technical: 'A receipt names the route or tool, the decision and a refusal code. A SatGate Cloud receipt can be checked with the open-source verifier against our published keys.',
+    status: 'Exported',
     evidence: 'Receipt ready',
   },
 ] as const;
@@ -58,24 +58,13 @@ const caveats = [
   { label: 'Tenant', value: 'acme-prod', buyer: 'only this customer environment' },
   { label: 'Task', value: 'invoice-reconciliation', buyer: 'only this job' },
   { label: 'Route scope', value: '/invoices/read-only', buyer: 'only this API path and action set' },
-  { label: 'Parent budget', value: '$25.00', buyer: 'total spend ceiling' },
-  { label: 'Child spend cap', value: '$5.00', buyer: 'child capability cannot exhaust the parent budget' },
-  { label: 'Child spend used', value: '$0.28 / $5.00', buyer: 'remaining spend stays visible' },
+  { label: 'Parent budget', value: '2,500 credits', buyer: 'total spend ceiling' },
+  { label: 'Child spend cap', value: '500 credits', buyer: 'child capability cannot exhaust the parent budget' },
+  { label: 'Child spend used', value: '28 / 500 credits', buyer: 'remaining spend stays visible' },
   { label: 'Delegation depth', value: '1 child level', buyer: 'limits downstream delegation chains' },
   { label: 'Allowed child tools', value: 'repo_search, invoice_read', buyer: 'approved read-only tools' },
   { label: 'Denied tools', value: 'payment_release, vendor_update', buyer: 'high-risk actions are blocked' },
   { label: 'TTL', value: '15 minutes', buyer: 'expires with the task window' },
-];
-
-const proofRows = [
-  ['receipt_id', 'rcpt_cap_8f41', 'The receipt for this decision.'],
-  ['parent_token_id', 'cap_parent_1042', 'Shows who delegated the authority.'],
-  ['child_token_id', 'cap_child_77ac', 'Shows which worker tried to act.'],
-  ['delegation_depth', '1 / 1', 'Shows this governed child is at the configured delegation limit.'],
-  ['decision', 'deny_after_revoke', 'Shows the gateway blocked before the call runs.'],
-  ['remaining_budget_usd', '4.72', 'Shows spend left when revoked.'],
-  ['policy_version', 'capability-lifecycle-v3', 'Shows the exact rule set used.'],
-  ['evidence_pack_id', 'evp_agent_authority_20260510', 'Bundles the proof for audit.'],
 ];
 
 const controlTranslations = [
@@ -84,7 +73,7 @@ const controlTranslations = [
   ['Narrowing', 'Making a child capability narrower than the parent. Delegation adds caveats without removing or widening parent limits; gateway policy enforces the result.'],
   ['Delegation depth', 'How many handoffs are allowed before the chain must stop.'],
   ['Revocation check', 'A revocation control evaluated before the next model, API, or MCP tool call.'],
-  ['Signed receipt', 'An audit bundle showing who authorized what, which limits were evaluated, and why SatGate allowed or denied the request.'],
+  ['Signed receipt', 'SatGate’s signed record of a refusal or a spend, with the route or tool, the decision and a refusal code, that anyone can check.'],
 ];
 
 export default function CapabilityLifecycleDemo() {
@@ -101,10 +90,10 @@ export default function CapabilityLifecycleDemo() {
             <ShieldCheck size={16} /> Capability lifecycle control
           </div>
           <h1 className="mb-8 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">
-            Control the full authority lifecycle: issue, delegate, narrow, revoke, prove
+            Give an agent a token, hand part of it to a helper, and revoke both
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            SatGate turns macaroons and caveats into auditable controls: scoped authority, child spend caps, delegation depth, next-request revocation, and signed receipt audit records before governed access to paid APIs, models, or MCP tools. Observe who is acting, control what can happen, and prove the decision trail.
+            SatGate turns tokens into limits you can check: narrower permissions, smaller budgets and handoff limits for sub-agents, and revokes that stop the next request.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <a href="#demo" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -205,55 +194,20 @@ export default function CapabilityLifecycleDemo() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <div>
-            <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Receipt preview</p>
-            <h2 className="mb-4 text-3xl font-bold text-white">Proof after revocation</h2>
-            <p className="mb-6 text-lg leading-relaxed text-gray-400">
-              A complete lifecycle record does not stop at “token issued.” It captures the child capability’s narrower caveats, visible depth limit, next-request revocation result, and receipt context.
-            </p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                [KeyRound, 'Scoped authority', 'route, tool, budget, tenant, task'],
-                [GitBranch, 'Delegation lineage', 'parent → child with depth visible'],
-                [Ban, 'Next-request revocation', 'blocked before the next request'],
-                [ReceiptText, 'Audit proof', 'signed receipt (Evidence Pack) IDs'],
-              ].map(([Icon, title, body]) => {
-                const CardIcon = Icon as typeof KeyRound;
-                return (
-                  <div key={String(title)} className="rounded-xl border border-gray-800 bg-gray-950 p-5">
-                    <CardIcon className="mb-3 text-cyan-300" size={24} />
-                    <h3 className="mb-1 font-bold text-white">{String(title)}</h3>
-                    <p className="text-sm text-gray-400">{String(body)}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div className="overflow-hidden rounded-2xl border border-gray-800">
-            <div className="grid grid-cols-[0.85fr_1.05fr_1.45fr] gap-3 bg-gray-900/80 px-4 py-3 text-sm font-bold uppercase tracking-wide text-gray-400">
-              <div>Field</div><div>Value</div><div>Decision proof</div>
-            </div>
-            {proofRows.map(([field, value, proof]) => (
-              <div key={field} className="grid grid-cols-[0.85fr_1.05fr_1.45fr] gap-3 border-t border-gray-800 px-4 py-4 text-sm">
-                <div className="break-words font-mono text-cyan-200">{field}</div>
-                <div className="break-words font-mono text-gray-200">{value}</div>
-                <div className="break-words text-gray-400">{proof}</div>
-              </div>
-            ))}
-          </div>
+        <div className="max-w-4xl">
+          <h2 className="mb-4 text-3xl font-bold text-white">Next-request revocation</h2>
+          <p className="mb-6 text-lg leading-relaxed text-gray-400">
+            The token’s history shows the child’s narrower limits and its handoff limit. After a revoke, the token’s next request is refused before it reaches your service.
+          </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 pb-24 pt-4">
         <div className="rounded-3xl border border-purple-900/60 bg-gradient-to-br from-purple-950/30 to-cyan-950/25 p-8 md:p-12">
-          <h2 className="mb-4 text-3xl font-bold text-white">This is the capability lifecycle enterprises can govern.</h2>
-          <p className="mb-8 max-w-4xl text-lg leading-relaxed text-gray-300">
-            Issue the capability, delegate a narrower child, express the caveats in plain language, revoke before the next governed request, and export the proof. That is how macaroon-style caveats become enterprise-ready controls on what an agent is allowed to do.
-          </p>
+          <h2 className="mb-8 text-3xl font-bold text-white">Try it with your own agents.</h2>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
-              Generate capability policy <ArrowRight size={18} />
+              Build with SatGate <ArrowRight size={18} />
             </Link>
             <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-cyan-500">
               See how rules and receipts work

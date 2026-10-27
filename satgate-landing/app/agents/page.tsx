@@ -100,7 +100,7 @@ export default function AgentsLandingPage() {
 
           <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10">
             HTTP APIs and MCP tool calls — authenticated, logged, cost-tracked, and budget-enforced. 
-            Per-agent budgets. Delegation hierarchies. Next-request revocation. Connect in 5 minutes.
+            Per-agent budgets. Delegation hierarchies. Next-request revocation.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -149,10 +149,9 @@ export default function AgentsLandingPage() {
               </p>
               <div className="bg-black rounded-lg p-4 font-mono text-xs text-gray-400 mb-4">
                 <div className="text-gray-600"># Route config</div>
-                <div><span className="text-purple-400">path:</span> /openai/*</div>
-                <div><span className="text-purple-400">upstream:</span> https://api.openai.com</div>
-                <div><span className="text-purple-400">policy:</span> control</div>
-                <div><span className="text-purple-400">cost_credits:</span> 10</div>
+                <div>- <span className="text-purple-400">match:</span> {'{'} pathPrefix: /openai/ {'}'}</div>
+                <div>&nbsp;&nbsp;<span className="text-purple-400">upstream:</span> https://api.openai.com</div>
+                <div>&nbsp;&nbsp;<span className="text-purple-400">policy:</span> {'{'} kind: control, costCredits: 10 {'}'}</div>
               </div>
               <ul className="space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Reverse proxy for any HTTP API</li>
@@ -173,8 +172,8 @@ export default function AgentsLandingPage() {
                 </div>
               </div>
               <p className="text-gray-400 text-sm mb-4 leading-relaxed">
-                SatGate proxies MCP tool calls from AI agents to your tool servers. Every tool/call is intercepted, 
-                cost-attributed, and governed — the agent sees standard MCP, your tools see standard MCP.
+                SatGate proxies MCP tool calls from AI agents to your tool servers. SatGate checks each tool call
+                and records what it cost. The agent and your tools both see standard MCP.
               </p>
               <div className="bg-black rounded-lg p-4 font-mono text-xs text-gray-400 mb-4">
                 <div className="text-gray-600"># Cursor / Claude Code MCP config (token from Cloud → MCP Setup)</div>
@@ -213,12 +212,12 @@ export default function AgentsLandingPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Observe</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 See every governed API call, tool invocation, and credit spent — without blocking anything.
-                Shadow reporting shows what enforcement <em>would</em> have caught.
+                Observe shows what enforcement <em>would</em> have caught, before you turn it on.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Real-time monitoring</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Cost attribution by agent</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Shadow Report analytics</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-400 shrink-0" /> Usage by agent and route</li>
               </ul>
             </div>
 
@@ -228,7 +227,7 @@ export default function AgentsLandingPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Control</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Set per-agent budgets. Get alerts at thresholds.
-                Block requests when budgets are exhausted. HTTP agents get a 402. No surprise bills.
+                Block requests when budgets are exhausted. HTTP agents get a 402.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-cyan-400 shrink-0" /> Per-agent credit budgets</li>
@@ -243,12 +242,12 @@ export default function AgentsLandingPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Admit</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Monetize your APIs. Approved external agents are admitted under a charge policy
-                (<code className="text-xs">policy: charge</code>): scoped, paid access per request
-                via payment methods (L402), without sharing long-lived API keys or requiring a subscription.
+                (<code className="text-xs">policy: {'{'} kind: charge, priceSats: 10 {'}'}</code>): scoped, paid access
+                via Lightning (L402) or USDC on Base (x402), without sharing long-lived API keys or requiring a subscription.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-gray-500">
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> charging external agents</li>
-                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Per-request pricing</li>
+                <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Your price per payment, for 1 to unlimited requests</li>
                 <li className="flex items-center gap-2"><CheckCircle size={14} className="text-yellow-400 shrink-0" /> Agent-native monetization</li>
               </ul>
             </div>
@@ -261,7 +260,7 @@ export default function AgentsLandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-4">
-              <Zap size={12} /> EZ Pass — Autonomous Agent Authentication
+              <Zap size={12} /> Tokens for agents that start on their own
             </div>
             <h2 className="text-3xl font-bold text-white mb-4">
               Agents authenticate themselves. No humans required.
@@ -307,14 +306,14 @@ export default function AgentsLandingPage() {
                 <DollarSign className="text-amber-400" size={16} />
                 <h4 className="text-amber-300 font-semibold text-sm">Economic Firewall</h4>
               </div>
-              <p className="text-gray-500 text-xs">Every token carries a spending cap. When credits hit zero, SatGate refuses the next priced request (HTTP 402 on HTTP routes). No surprise bills. No runaway agents.</p>
+              <p className="text-gray-500 text-xs">Every token can carry a spending cap. When credits hit zero, SatGate refuses the next priced request (HTTP 402 on HTTP routes).</p>
             </div>
             <div className="bg-cyan-950/20 border border-cyan-900/30 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-2">
                 <GitBranch className="text-cyan-400" size={16} />
                 <h4 className="text-cyan-300 font-semibold text-sm">Delegation Hierarchies</h4>
               </div>
-              <p className="text-gray-500 text-xs">Agents can delegate sub-tokens to other agents. Revoke the parent — the entire swarm stops. Full tree visibility in the dashboard.</p>
+              <p className="text-gray-500 text-xs">Agents can delegate sub-tokens to other agents. Revoke the parent and the next request from every helper it started is refused. Full tree visibility in the dashboard.</p>
             </div>
           </div>
         </div>
@@ -327,7 +326,7 @@ export default function AgentsLandingPage() {
             Why agents need an Economic Firewall
           </h2>
           <p className="text-gray-400 text-center max-w-2xl mx-auto mb-12">
-            AI agents don&apos;t have credit cards. They have API access. Without governance,
+            AI agents spend through API keys, and a key has no budget. Without governance,
             every request is an unaudited transaction on your cloud bill.
           </p>
 
@@ -336,17 +335,17 @@ export default function AgentsLandingPage() {
               {
                 icon: <Shield className="text-purple-400" size={24} />,
                 title: 'Macaroon Authentication',
-                desc: 'Every governed agent gets a cryptographic bearer token with built-in scope, expiry, and budget caveats. Not an API key — a capability.',
+                desc: 'Every governed agent gets a cryptographic bearer token with built-in scope, expiry, and budget caveats.',
               },
               {
                 icon: <DollarSign className="text-yellow-400" size={24} />,
                 title: 'Per-Request Cost Attribution',
-                desc: 'Know exactly which agent called which API or tool and what it cost. Shadow reports show where the money goes before you enforce.',
+                desc: 'Know exactly which agent called which API or tool and what it cost. Observe shows where the money goes before you enforce.',
               },
               {
                 icon: <GitBranch className="text-cyan-400" size={24} />,
                 title: 'Delegation Hierarchies',
-                desc: 'Department → team → agent. Each level gets a budget. Parent tokens delegate to children. Spending rolls up automatically.',
+                desc: 'Department, team, agent: each gets its own budget, carved from the one above it. Parent tokens delegate to children.',
               },
               {
                 icon: <Lock className="text-red-400" size={24} />,
@@ -418,7 +417,7 @@ export default function AgentsLandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Image src="/logo_white_transparent.png" alt="SatGate" width={20} height={20} />
-            <span className="text-sm text-gray-500">SatGate™ — The Economic Firewall</span>
+            <span className="text-sm text-gray-500">SatGate™: the economic firewall</span>
           </div>
           <div className="flex gap-6 text-sm text-gray-500">
             <Link href="/" className="hover:text-gray-300 transition">Home</Link>

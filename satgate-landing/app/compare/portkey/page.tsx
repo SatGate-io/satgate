@@ -33,7 +33,7 @@ const rows: Array<[string, string, string]> = [
   ['MCP tool budget enforcement', 'Yes', 'Not the primary economic-control focus'],
   ['Per-tool cost attribution beyond LLM calls', 'Yes', 'Primarily LLM/app traffic or gateway telemetry'],
   ['Scoped revocable agent capabilities', 'Yes', 'Adjacent access controls, not SatGate-style narrowed capabilities'],
-  ['L402 paid-agent API payments', 'Yes', 'No native payment rules equivalent'],
+  ['Paid access for external agents (Lightning or USDC)', 'Yes', 'No native payment rules equivalent'],
   ['AI gateway / model traffic management', 'Partial', 'Yes'],
   ['Observability and analytics', 'Yes, economic audit oriented', 'Yes'],
   ['Open-source/self-hostable posture', 'Yes', 'Varies by product and deployment tier'],
@@ -41,7 +41,7 @@ const rows: Array<[string, string, string]> = [
 
 const satgateWins = [
   { icon: ShieldCheck, title: 'Economic firewall before each request', body: 'SatGate decides whether an agent should access, spend, route, delegate, or pay at the gateway before forwarding to upstream APIs, MCP tools, and model calls.' },
-  { icon: Gauge, title: 'Hard budgets for autonomous workflows', body: 'Control spend by tenant, agent, workflow, delegated sub-agent, route, model, tool, session, day, and request.' },
+  { icon: Gauge, title: 'Hard budgets for each agent', body: 'Control spend per agent, sub-agent, route and MCP tool, with daily and weekly dollar limits on trade orders.' },
   { icon: KeyRound, title: 'Scoped, revocable agent permissions', body: 'Issue expiring capabilities constrained by route, tool, budget, call count, expiry, and delegation rules instead of broad static keys.' },
   { icon: Zap, title: 'Govern payment access', body: 'Check payment details before external agents access APIs, datasets, tools, or premium capabilities at request time.' },
 ];
@@ -76,7 +76,7 @@ export default function ComparePortkeyPage() {
       {
         '@type': 'Question',
         name: 'Can SatGate and Portkey work together?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can enforce agent, workflow, budget, route, MCP tool, and capability policy before requests reach an upstream AI gateway or observability layer.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'Yes. SatGate can enforce per-agent budgets, route and MCP tool rules, and token permissions before requests reach an upstream AI gateway or observability layer.' },
       },
       {
         '@type': 'Question',
@@ -99,7 +99,7 @@ export default function ComparePortkeyPage() {
         <div className="mb-12">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 px-3 py-1 text-xs font-mono text-cyan-300">Comparison</div>
           <h1 className="mb-6 max-w-5xl text-5xl font-extrabold tracking-tight md:text-7xl">SatGate vs Portkey</h1>
-          <p className="max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Portkey is a serious production GenAI platform: AI Gateway, observability, guardrails, governance, prompt management, and MCP access. SatGate is narrower and sharper: spending controls for autonomous agent/API activity before the request goes through.</p>
+          <p className="max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">Portkey (now Prisma AIRS AI Gateway) is a serious production GenAI platform: AI Gateway, observability, guardrails, governance, prompt management, and MCP access. SatGate is narrower and sharper: spending controls for autonomous agent/API activity before the request goes through.</p>
         </div>
 
         <section className="mb-12 rounded-2xl border border-cyan-800/30 bg-gradient-to-r from-cyan-950/20 to-purple-950/20 p-6">
@@ -157,7 +157,7 @@ export default function ComparePortkeyPage() {
             {([
               ['Hard agent budget enforcement', true, 'Policy decisions before expensive agent/API activity executes.'],
               ['MCP tool cost policy', true, 'Prices, limits, risk tiers, and audit evidence per tool call.'],
-              ['L402 payment rules', true, 'Payment details recorded at request time for external agent or API access.'],
+              ['Paid access for external agents (Lightning or USDC)', true, 'Payment details recorded at request time for external agent or API access.'],
               ['Broad AI gateway/observability suite', false, 'This is where Portkey may be the better fit; SatGate governs the economics around that layer.'],
             ] as Array<[string, boolean, string]>).map(([label, yes, body]) => (
               <div key={label} className="rounded-xl border border-gray-800 bg-black p-5">
@@ -176,7 +176,7 @@ export default function ComparePortkeyPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ['Is SatGate a Portkey replacement?', 'Not directly. Portkey and SatGate solve overlapping but different problems. SatGate is focused on spending controls for AI agents, APIs, MCP tools, scoped authority, and request-time payments.'],
-              ['Can SatGate and Portkey work together?', 'Yes. SatGate can enforce agent, workflow, budget, route, MCP tool, and capability policy before requests reach an upstream AI gateway or observability layer.'],
+              ['Can SatGate and Portkey work together?', 'Yes. SatGate can enforce per-agent budgets, route and MCP tool rules, and token permissions before requests reach an upstream AI gateway or observability layer.'],
               ['When should I choose SatGate?', 'Choose SatGate when autonomous agents need hard budget enforcement, MCP tool spend controls, scoped revocation, delegation policy, signed receipts, or payment details for paid agents.'],
             ].map(([question, answer]) => (
               <div key={question} className="rounded-xl border border-gray-800 bg-black p-5">

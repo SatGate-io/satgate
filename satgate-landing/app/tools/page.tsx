@@ -48,7 +48,7 @@ const tools = [
   {
     href: '/roi-calculator',
     title: 'AI Agent ROI Calculator',
-    description: 'Estimate ghost spend, loop waste, payback period, and ROI from budget checks before the request goes through.',
+    description: 'Estimate ghost spend, annual exposure and payback.',
     icon: Calculator,
   },
   {
@@ -66,7 +66,7 @@ const tools = [
   {
     href: '/ai-agent-runaway-spend-index',
     title: 'AI Agent Runaway Spend Index',
-    description: 'Track monthly modeled runaway spend exposure, MCP tool cost failures, fanout risk, and avoided cost from controls before the request goes through.',
+    description: 'A modeled snapshot (April 2026) of runaway spend in five failure modes.',
     icon: BarChart3,
   },
   {
@@ -192,7 +192,7 @@ export default function ToolsPage() {
             AI Agent Cost Control Tools
           </h1>
           <p className="mb-10 max-w-4xl text-xl leading-relaxed text-gray-300 md:text-2xl">
-            Quantify runaway agent spend, generate enforceable budget policy, govern MCP tools, and grade your economic firewall readiness before autonomous agents hit production scale.
+            Put numbers on runaway agent spend, copy the MCP connect snippet, and grade your economic firewall readiness before autonomous agents hit production scale.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Link href="/govern" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -222,7 +222,7 @@ export default function ToolsPage() {
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 lg:grid-cols-3">
           {[
             ['Measure', 'Start with calculators to estimate ghost spend, runaway loop exposure, and payback period.'],
-            ['Generate', 'Turn risk models into concrete OpenAI and MCP budget policies your control plane can enforce.'],
+            ['Connect', 'Copy the Cloud MCP snippet for your client.'],
             ['Govern', 'Use readiness scoring to prioritize identity, revocation, audit, routing, and payment rules gaps.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">

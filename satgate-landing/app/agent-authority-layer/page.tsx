@@ -35,26 +35,26 @@ export const metadata: Metadata = {
 const layers = [
   {
     icon: KeyRound,
-    title: "Authority — before the call",
+    title: "Before the call: limits",
     body: "Delegate scoped capability to an agent: routes, tools, budget, expiry, tenant, policy version, and delegation depth.",
   },
   {
     icon: ShieldCheck,
-    title: "Decision — at the call",
+    title: "At the call: decision",
     body: "SatGate checks policy on each request that goes through it, before APIs, MCP tools, or payment methods run.",
   },
   {
     icon: ReceiptText,
-    title: "Evidence — after the call",
+    title: "After the call: receipt",
     body: "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. Each receipt comes in an Evidence Pack.",
   },
 ];
 
 const audiences = [
   ["Enterprises", "Govern agent scope, budgets, revocation, and tenant boundaries before spend or data leaves."],
-  ["Payment rails", "Get a recourse trail for autonomous-agent activity without owning every governance question."],
-  ["Upstream APIs", "Decide which agents deserve preferential trust, rate limits, and lower fraud friction."],
-  ["Agent platforms", "Check protocol and adapter status, then test delegation and recovery in the chosen runtime."],
+  ["Payment providers", "Signed receipts for refusals you can check."],
+  ["Upstream APIs", "See which agents call you, and charge external agents on the routes you choose."],
+  ["Agent platforms", "Try delegation and revoke on one workflow first."],
   ["Insurers and fraud teams", "Inspect signed decision records alongside other evidence. A receipt alone is not an underwriting or fraud verdict."],
 ];
 
@@ -63,7 +63,7 @@ const publicSpecs = [
   ["Live signed receipt (Evidence Pack) example", "https://api.satgate.io/v1/evidence/evid_GrXvKUgtdqNbuQ5lZzqRMpZrOoU2VAnE"],
   ["Receipt JSON schema", "https://satgate.io/.well-known/satgate-receipt.schema.json"],
   ["Issuer JWKS", "https://api.satgate.io/.well-known/jwks.json"],
-  ["Open verifier", "https://github.com/SatGate-io/evidence-pack-verifier"],
+  ["Open verifier", "https://github.com/SatGate-io/satgate/tree/main/tools"],
   ["Rail partner brief", "/partners/rails"],
 ];
 
@@ -71,7 +71,7 @@ const faqs = [
   {
     question: "Is SatGate a payment processor?",
     answer:
-      "No. Authorization and settlement are separate. Charge/L402 is an optional settlement rail; Fiat402 is internal budget control. Consult trust metadata for adapter status. AgentCore Payments and Pay.sh are planned, not available integrations.",
+      "No. Authorization and settlement are separate. Lightning (L402) and USDC (x402) are optional ways for external agents to pay; Fiat402 is internal budget control. Consult trust metadata for adapter status. AgentCore Payments and Pay.sh are planned, not available integrations.",
   },
   {
     question: "How is this different from OAuth or API keys?",
@@ -157,10 +157,10 @@ export default function AgentAuthorityLayerPage() {
               Agent Permissions and Receipts
             </h1>
             <p className="mt-6 max-w-3xl text-xl leading-8 text-gray-300">
-              Useful agent work needs <span className="text-white">bounded authority to act.</span> Set a finite budget and permitted scope, enforce them on each request that goes through SatGate, and retain the recorded decision.
+              Useful agent work needs <span className="text-white">limited permission to act.</span> Set a budget and allowed scope; in Control, SatGate enforces them on each request and signs receipts for refusals and for spending.
             </p>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-gray-400">
-              Use internal budget controls for your agents and scoped admission for external agents. Payment adapters have different availability. Confirm the chosen integration before relying on it.
+              Use internal budget controls for your agents and scoped admission for external agents.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/build" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
@@ -178,10 +178,10 @@ export default function AgentAuthorityLayerPage() {
             </div>
             <div className="space-y-4">
               {[
-                "The authenticated principal and the delegated permissions.",
+                "Which token was used and what it allowed.",
                 "Whether the requested action matched the configured policy.",
                 "The signed decision and associated scope and budget context.",
-                "An artifact to verify against independently trusted issuer keys.",
+                "A receipt you can check against SatGate’s published keys.",
               ].map((item) => (
                 <div key={item} className="rounded-2xl border border-white/10 bg-black/50 p-4 text-gray-300">
                   {item}
@@ -197,7 +197,7 @@ export default function AgentAuthorityLayerPage() {
           <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-purple-300">The authority gap</p>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">Check authorization before protected work.</h2>
           <p className="mt-5 text-lg leading-8 text-gray-400">
-            Agents now spend money, call APIs, delegate to other agents, and act on behalf of humans and platforms. Infrastructure built for humans clicking buttons does not prove the agent had bounded authority before the action happened.
+            Agents now spend money, call APIs, delegate to other agents, and act on behalf of humans and platforms.
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
@@ -218,9 +218,9 @@ export default function AgentAuthorityLayerPage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="mb-10 max-w-3xl">
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-emerald-300">Authorization and settlement are separate</p>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">The governance contract has to travel with the agent.</h2>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Who it helps</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              Payment cannot override scope, expiry, revocation or tenant boundaries. Evaluate SatGate on a workload: can an authorized agent finish its task, and can an unauthorized request reach the protected resource? Receipt verification supports that evaluation; integration breadth alone does not establish protection.
+              Payment cannot override scope, expiry, revocation or tenant boundaries.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -240,10 +240,10 @@ export default function AgentAuthorityLayerPage() {
             <p className="mb-3 text-sm font-mono uppercase tracking-[0.22em] text-cyan-300">Public proof surface</p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Anyone can verify a SatGate receipt. That is the point.</h2>
             <p className="mt-5 text-lg leading-8 text-gray-400">
-              The open verifier checks receipt hashes and Ed25519 signatures using keys admitted from a trusted issuer. Public key discovery alone does not establish that trust. Keep artifact integrity separate from the quality or truth of the work.
+              The open verifier checks receipt hashes and Ed25519 signatures using keys admitted from a trusted issuer. Keep artifact integrity separate from the quality or truth of the work.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a href="https://github.com/SatGate-io/evidence-pack-verifier" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
+              <a href="https://github.com/SatGate-io/satgate/tree/main/tools" className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-black transition hover:bg-gray-200">
                 Open verifier <ArrowRight size={18} />
               </a>
               <Link href="/policy-to-proof" className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-700 px-6 py-3 font-bold text-white transition hover:border-purple-500">

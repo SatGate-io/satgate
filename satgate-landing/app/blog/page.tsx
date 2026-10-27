@@ -124,7 +124,7 @@ const posts = [
   {
     slug: 'why-process-wont-scale-for-ai-agent-costs',
     title: "InformationWeek Says Control AI Agent Costs With Process. Here's Why That Won't Scale.",
-    description: "InformationWeek's 9 recommendations for AI agent cost control are solid for 2025. But when agents make 1,500 calls per prompt and operate 24/7, process can't keep pace. 7 of 9 are automatable at the infrastructure layer.",
+    description: "InformationWeek's 9 recommendations for AI agent cost control are solid for 2025. But when agents make hundreds of calls per task and run around the clock, process can't keep pace. 7 of 9 are automatable at the infrastructure layer.",
     date: '2026-03-28',
     readTime: '10 min read',
     author: 'SatGate Team',
@@ -214,7 +214,7 @@ const posts = [
   {
     slug: 'ai-agent-spending-limits',
     title: 'AI Agent Spending Limits: Hard Budgets by Agent, Tool, and Workflow',
-    description: 'Set AI agent spending limits with hard budgets by agent, tool, model, workflow, and time window before API or MCP calls execute.',
+    description: 'Set AI agent spending limits with hard budgets per agent, tool and route, and daily or weekly dollar limits on trade orders.',
     date: '2026-03-10',
     readTime: '9 min read',
     author: 'Matt Dean',
@@ -259,7 +259,7 @@ const posts = [
   {
     slug: 'security-as-a-profit-center',
     title: 'Security as a Profit Center: Why Your Economic Firewall Pays for Itself',
-    description: 'Every security tool tells you how many attacks it stopped. SatGate tells you how many dollars it saved. Here\'s the CFO math on why spending controls are a profit center.',
+    description: 'Here\'s the CFO math on why spending controls pay for themselves.',
     date: '2026-02-14',
     readTime: '12 min read',
     author: 'Matt Dean',
@@ -391,12 +391,12 @@ export default function BlogPage() {
             <p className="mb-2 text-sm font-mono uppercase tracking-wide text-cyan-300">Free tools</p>
             <h2 className="mb-2 text-2xl font-bold text-white">Turn the guides into enforceable agent policy</h2>
             <p className="text-gray-400">
-              Use these calculators and generators to quantify AI agent spend risk, create budget policies, and assess economic firewall readiness.
+              Use these calculators to put numbers on AI agent spend risk and grade your setup.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             {[
-              ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, loop waste, payback period, and enforcement ROI.'],
+              ['/roi-calculator', 'AI Agent ROI Calculator', 'Estimate ghost spend, annual exposure and payback.'],
               ['/runaway-agent-cost-calculator', 'Runaway Agent Cost Calculator', 'Model loop, retry, fanout, and paid tool-call exposure.'],
               ['/mcp-proxy-config-generator', 'MCP connect snippet', 'Route Cursor or Claude Code through SatGate with the snippet from MCP Setup.'],
               ['/economic-firewall-readiness-grader', 'Economic Firewall Readiness Grader', 'Score identity, budgets, MCP tools, revocation, routing, and signed receipt proof.'],
@@ -475,19 +475,6 @@ export default function BlogPage() {
           </div>
         </section>
 
-        {/* Newsletter CTA */}
-        <section className="mt-16 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-3">Stay Updated</h2>
-          <p className="text-gray-400 mb-6">
-            Get insights on API economics and agent governance delivered to your inbox.
-          </p>
-          <a 
-            href="mailto:contact@satgate.io?subject=Newsletter%20Subscription"
-            className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition"
-          >
-            Subscribe to Updates
-          </a>
-        </section>
       </div>
     </div>
   );

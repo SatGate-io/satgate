@@ -30,7 +30,7 @@ export const metadata = {
 const controls = [
   { icon: DollarSign, title: 'Budget before the call runs', body: 'Check remaining spend, request ceilings, route cost, and policy before forwarding the call.' },
   { icon: KeyRound, title: 'Scoped capabilities', body: 'Replace broad static keys with expiring, revocable credentials constrained by route, tool, calls, and spend.' },
-  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop a risky task, tool or agent session on its next request, without rotating every shared secret.' },
+  { icon: ShieldCheck, title: 'Revocation and kill switches', body: 'Stop an agent’s token on its next request, without rotating every shared secret.' },
   { icon: Workflow, title: 'MCP and API governance', body: 'Apply the same economic policy across MCP servers, internal APIs, model providers, and paid tools.' },
 ];
 
@@ -78,7 +78,7 @@ export default function SatGateIntegrationPage() {
       {
         '@type': 'Question',
         name: 'Is SatGate just another observability dashboard?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate can observe traffic, but its core role is enforcement before the request goes through: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'No. SatGate shows what your agent calls, and in Control it stops a tool call that is over budget, not allowed, or from a revoked token before it runs.' },
       },
       {
         '@type': 'Question',
@@ -147,7 +147,7 @@ export default function SatGateIntegrationPage() {
       <section className="border-y border-gray-900 bg-gray-950/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="mb-4 text-3xl font-bold text-white">SatGate controls for Cursor</h2>
-          <p className="mb-10 max-w-3xl text-lg text-gray-400">Use SatGate as the governance layer around agentic tool use: Observe first, Control when limits are known, and record approval holds, budget and permission denials, and budget spends with signed receipts.</p>
+          <p className="mb-10 max-w-3xl text-lg text-gray-400">Start in Observe and turn on Control when you know your limits. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt.</p>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {controls.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-gray-800 bg-black p-6 transition hover:border-cyan-900/70">
@@ -167,8 +167,8 @@ export default function SatGateIntegrationPage() {
         </div>
         <ol className="space-y-5 text-gray-300">
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">1</span><span>Route Cursor MCP/tool traffic through SatGate or a SatGate-protected proxy.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">2</span><span>Mint a scoped capability for the workspace, task, model route, or developer.</span></li>
-              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Set per-run budgets, max calls, allowed tools, and expiry.</span></li>
+              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">2</span><span>Give each developer or task its own token.</span></li>
+              <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">3</span><span>Set its budget, allowed tools and end date.</span></li>
               <li className="flex gap-4"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-400 text-sm font-black text-black">4</span><span>Observe denied/allowed requests with agent, route, tool, and spend attribution.</span></li>
         </ol>
       </section>
@@ -179,7 +179,7 @@ export default function SatGateIntegrationPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               ['Can SatGate control Cursor MCP tools?', 'Yes. SatGate can sit in front of MCP servers or paid API tools used by Cursor and enforce budgets, allowed routes, tool scopes, expiry, and revocation before the tool call executes.'],
-              ['Is SatGate just another observability dashboard?', 'No. SatGate can observe traffic, but its core role is enforcement before the request goes through: budgets, revocation, route policy, capabilities, audit, and L402 payment at the gateway before forwarding.'],
+              ['Is SatGate just another observability dashboard?', 'No. SatGate shows what your agent calls, and in Control it stops a tool call that is over budget, not allowed, or from a revoked token before it runs.'],
               ['Can SatGate start in observe-only mode?', 'Yes. Teams can start with Observe to map agent and tool spend, then graduate to Control policies once safe limits are clear.'],
             ].map(([question, answer]) => (
               <div key={question}>

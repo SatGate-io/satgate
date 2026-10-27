@@ -102,7 +102,7 @@ export default function StartAt1CreditBlogPage() {
         <article className="prose prose-invert prose-lg max-w-none">
           
           <p className="text-gray-300 text-lg leading-relaxed">
-            You just deployed SatGate. You're staring at the MCP Cost Profile screen, trying to decide: should web search cost 1 credit or 10? Should image generation be 50 credits or 500? Should that internal database query be basically free at 0.1 credits?
+            You just deployed SatGate. You're staring at the MCP Cost Profile screen, trying to decide: should web search cost 1 credit or 10? Should image generation be 50 credits or 500? Should that internal database query cost anything at all?
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -151,7 +151,7 @@ export default function StartAt1CreditBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            Then switch to Control mode and assign budgets. The magic happens automatically: agents start optimizing their behavior to stretch budgets further. They batch operations, cache results, and find creative alternatives to expensive tools.
+            Then switch to Control mode and assign budgets. Agents see each tool&apos;s cost and their remaining budget, so agents built to use it can stretch the budget.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">Example</h2>
@@ -198,7 +198,7 @@ export default function StartAt1CreditBlogPage() {
           </div>
 
           <p className="text-gray-300 leading-relaxed">
-            The result? Before hard enforcement even started, image generation dropped to emergency-use-only, teams started batching LLM calls, and the monthly bill dropped 34% while productivity stayed constant. Control then locked in a behavior pattern that had already been proven in Observe.
+            In this example, teams could cut image generation to what they need and batch LLM calls before enforcement starts. Control then locked in a behavior pattern that had already been proven in Observe.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-8 mb-4">Why This Works</h2>

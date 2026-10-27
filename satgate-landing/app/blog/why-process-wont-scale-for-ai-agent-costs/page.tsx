@@ -58,7 +58,7 @@ export default function WhyProcessWontScaleBlogPage() {
         name: 'Which AI agent cost controls should be automated?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Budget checks, model routing, per-tool cost attribution, workflow spend tracking, policy templates, token quotas, and real-time denials should be automated at the gateway or economic firewall layer.',
+          text: 'Budget checks, per-tool cost attribution, token budgets, and real-time denials should be automated at the gateway or economic firewall layer.',
         },
       },
       {
@@ -105,7 +105,7 @@ export default function WhyProcessWontScaleBlogPage() {
           {/* Opening */}
           <p className="text-gray-300 text-lg leading-relaxed">
             InformationWeek recently published{' '}
-            <a href="https://www.informationweek.com/ai-or-machine-learning/a-practical-guide-to-controlling-ai-agent-costs-before-they-spiral" className="text-cyan-400 hover:text-cyan-300" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.informationweek.com/machine-learning-ai/a-practical-guide-to-controlling-ai-agent-costs-before-they-spiral" className="text-cyan-400 hover:text-cyan-300" target="_blank" rel="noopener noreferrer">
               &quot;A Practical Guide to Controlling AI Agent Costs Before They Spiral&quot;
             </a>
             {' '}— a solid rundown of nine recommendations for managing AI agent spending. The advice is sensible. Track costs per workflow. Use cheaper models for low-stakes tasks. Set token quotas. Cache where you can.
@@ -116,26 +116,14 @@ export default function WhyProcessWontScaleBlogPage() {
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            When a single agent makes 1,500 API calls to resolve one prompt — and you have 200 agents running 24/7 across a dozen business units — organizational processes can&apos;t keep pace. Spreadsheet reviews, quarterly audits, and manual quota-setting weren&apos;t designed for systems that make economic decisions at machine speed. InformationWeek&apos;s recommendations describe the <em>what</em>. What&apos;s missing is the <em>how</em> — specifically, how to enforce these controls without humans in the loop.
+            When one agent can make hundreds of calls for a single task, and you have 200 agents running 24/7 across a dozen business units, organizational processes can&apos;t keep pace. Spreadsheet reviews, quarterly audits, and manual quota-setting weren&apos;t designed for systems that make economic decisions at machine speed. InformationWeek&apos;s recommendations describe the <em>what</em>. What&apos;s missing is the <em>how</em>: specifically, how to enforce these controls without humans in the loop.
           </p>
 
           {/* The Scale Problem */}
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Scale Problem Is Already Here</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            This isn&apos;t hypothetical. The numbers are already ugly.
-          </p>
-
-          <p className="text-gray-300 leading-relaxed">
-            Gartner projects that <strong>more than 40% of AI agent projects will fail by 2027</strong> specifically due to runaway costs — not technical failure, not poor model quality, but uncontrolled spending. Fortune 500 companies collectively leaked an estimated <strong>$400 million in unbudgeted AI spend</strong> last year, much of it from agent workloads that nobody was tracking at the right granularity.
-          </p>
-
-          <p className="text-gray-300 leading-relaxed">
-            One widely reported incident involved a single agent loop that <strong>ran up $47,000 in 11 days</strong> without anyone noticing. The agent was functioning correctly — it was doing exactly what it was told. It just kept doing it, and nothing stopped it from spending.
-          </p>
-
-          <p className="text-gray-300 leading-relaxed">
-            Process didn&apos;t catch any of these. Not because the processes were bad. Because agents operate faster than humans can review.
+            Process can&apos;t keep up with that. Not because the processes are bad, but because agents operate faster than humans can review.
           </p>
 
           {/* The 9 Recommendations, Mapped */}
@@ -155,7 +143,7 @@ export default function WhyProcessWontScaleBlogPage() {
             This is model routing — sending cheap queries to cheap models and reserving expensive models for complex reasoning. It&apos;s absolutely the right instinct. But doing it manually, per workflow, per team, is a full-time job that grows linearly with your agent fleet.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            At the infrastructure layer, this becomes <strong>per-tool cost attribution with model routing policies</strong>. The gateway knows what each tool costs, routes accordingly, and enforces the policy without anyone reviewing a spreadsheet. The decision is encoded once; enforcement is continuous.
+            At the infrastructure layer, this becomes <strong>per-tool cost attribution</strong>. SatGate prices each tool and route, so an agent that reaches for the expensive one spends its budget faster; model choice stays in your app. The decision is encoded once; enforcement is continuous.
           </p>
 
           <h3 className="text-xl font-semibold text-white mt-8 mb-3">#3: Use LLMs to Predict Workflow Costs</h3>
@@ -176,12 +164,12 @@ export default function WhyProcessWontScaleBlogPage() {
 
           <h3 className="text-xl font-semibold text-white mt-8 mb-3">#5: Optimize Cost-Effective Workflows</h3>
           <p className="text-gray-300 leading-relaxed">
-            Once you know what works, encode it. But &quot;optimize workflows&quot; as a manual practice means someone has to study every agent&apos;s delegation tree, identify waste, and restructure it. At scale, this requires <strong>a governance graph that shows delegation trees and spend flow</strong> — a visual, queryable map of which agents delegated to which sub-agents, what tools they called, and what each branch cost. The optimization opportunities become obvious when you can see the flow.
+            Once you know what works, encode it. But &quot;optimize workflows&quot; as a manual practice means someone has to study every agent&apos;s delegation tree, identify waste, and restructure it. At scale, this requires <strong>a governance graph</strong>: a map of which agents delegated to which helpers, next to each token&apos;s spend. The optimization opportunities become obvious when you can see the flow.
           </p>
 
           <h3 className="text-xl font-semibold text-white mt-8 mb-3">#6: Repeat Cost-Effective Workflows</h3>
           <p className="text-gray-300 leading-relaxed">
-            Once you find a workflow that&apos;s cost-effective, replicate it. InformationWeek frames this as institutional knowledge. At the infrastructure layer, it&apos;s <strong>policy templates that encode cost-effective patterns</strong>. Instead of hoping teams share best practices, you define a governance policy once and apply it across agents. The pattern is reusable, version-controlled, and enforced automatically.
+            Once you find a workflow that&apos;s cost-effective, replicate it. InformationWeek frames this as institutional knowledge. At the infrastructure layer: give each copy of that workflow a token with the same budget and tools.
           </p>
 
           <h3 className="text-xl font-semibold text-white mt-8 mb-3">#7: Cache Data and Content</h3>
@@ -200,11 +188,11 @@ export default function WhyProcessWontScaleBlogPage() {
             If the quota is a configuration value in the orchestration layer, the agent can read it, respect it, or ignore it. If the quota is a soft limit that triggers an alert, someone has to be watching. If the quota is a setting in a dashboard that requires manual action when exceeded, you&apos;ve built a process that fails at 3 AM on a Saturday.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            The infrastructure-level version is <strong>budget caveats baked into bearer tokens</strong>. The agent&apos;s credential — the thing it presents to authenticate every API call — has the budget limit cryptographically embedded in it. The agent cannot overspend on governed routes because the gateway rejects any call that would exceed the budget. Not because the agent chooses to stop. Because the <em>credential</em> enforces the limit. This is the difference between a{' '}
+            The infrastructure-level version is <strong>budget caveats baked into bearer tokens</strong>. The gateway checks every call against the budget on the agent&apos;s token, so the agent can&apos;t choose to keep going on governed routes. This is the difference between a{' '}
             <a href="/blog/what-is-an-economic-firewall" className="text-cyan-400 hover:text-cyan-300">policy and a control</a>.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            <a href="/blog/can-adversaries-game-your-economic-firewall" className="text-cyan-400 hover:text-cyan-300">Macaroon-based caveats</a> make this possible. The budget is narrowed — delegated downward and never inflated. A sub-agent can receive a fraction of the parent&apos;s budget, but never more than the parent has. The math is cryptographic, not organizational.
+            <a href="/blog/can-adversaries-game-your-economic-firewall" className="text-cyan-400 hover:text-cyan-300">Macaroon-based caveats</a> make this possible. The budget is narrowed: delegated downward and never inflated. A sub-agent can receive a fraction of the parent&apos;s budget, but never more than the parent has. The gateway enforces it, not an org chart.
           </p>
 
           <h3 className="text-xl font-semibold text-white mt-8 mb-3">#9: Avoid Unnecessary Deployments</h3>
@@ -234,7 +222,7 @@ export default function WhyProcessWontScaleBlogPage() {
             The better framing: <strong>enterprises should get all the <em>what</em>. The economic firewall controls the <em>how much</em>.</strong>
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Don&apos;t restrict what agents can do. Restrict how much they can spend doing it. Give them full autonomy within hard economic boundaries. The agent can call any tool, delegate to any sub-agent, pursue any strategy — as long as the total cost stays within the cryptographically enforced budget.
+            Don&apos;t restrict what agents can do. Restrict how much they can spend doing it. Give them full autonomy within hard economic boundaries. The agent can call any tool, delegate to any sub-agent, pursue any strategy, as long as the total cost stays within the budget the gateway enforces.
           </p>
           <p className="text-gray-300 leading-relaxed">
             This is the difference between a cage and a budget. One limits capability. The other limits liability.
@@ -275,7 +263,7 @@ export default function WhyProcessWontScaleBlogPage() {
             <div className="space-y-5">
               {[
                 ['Why does process-based AI agent cost control fail at scale?', 'Process-based cost control fails because autonomous agents make API and tool calls faster than humans can review dashboards, spreadsheets, or invoices. Controls need to execute before each costly request.'],
-                ['Which AI agent cost controls should be automated?', 'Budget checks, model routing, per-tool cost attribution, workflow spend tracking, policy templates, token quotas, and real-time denials should be automated at the gateway or economic firewall layer.'],
+                ['Which AI agent cost controls should be automated?', 'Budget checks, per-tool cost attribution, token budgets, and real-time denials should be automated at the gateway or economic firewall layer.'],
                 ['What is the alternative to manual AI cost governance?', 'The alternative is spending controls before the request goes through: every agent request is checked against budget, revocation and audit policy at the gateway before forwarding to upstream APIs, models, or MCP tools.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">

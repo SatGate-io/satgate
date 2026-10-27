@@ -20,14 +20,14 @@ export default function VerifyEvidencePackPage() {
           <p className="mt-10 text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Check it yourself</p>
           <h1 className="mt-4 text-5xl font-black tracking-tight sm:text-6xl">Don&apos;t trust us. Check it yourself.</h1>
           <p className="mt-6 text-xl leading-8 text-gray-300">
-            You don&apos;t need a SatGate account to check a signed receipt (Evidence Pack). Download the pack and SatGate&apos;s published public keys, then run the open-source verifier. It confirms SatGate signed the receipt and that nothing in it was changed afterward.
+            You don&apos;t need a SatGate account to check a signed receipt (Evidence Pack). Download the pack and SatGate&apos;s published public keys, then run the open-source verifier. It confirms SatGate signed the receipt and that what it signed hasn&apos;t changed since.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href="https://github.com/SatGate-io/satgate/tree/main/tools" className="rounded-lg bg-white px-5 py-3 text-center font-bold text-black hover:bg-gray-200">Get verifier tool</a>
             <a href={samplePackFile} className="rounded-lg border border-cyan-300/40 px-5 py-3 text-center font-bold text-cyan-100 hover:border-cyan-200">Download a real receipt</a>
           </div>
           <p className="mt-4 text-sm leading-6 text-gray-400">
-            This is the budget refusal from the MCP demo video on the home page: a tool call refused with <code>budget_exhausted</code> after the agent&apos;s 3-credit budget ran out. It&apos;s signed with the hosted MCP service&apos;s key. The <a href={livePackUrl} className="text-cyan-200 underline underline-offset-4">live copy</a> stays up until the plan&apos;s retention period ends; the downloaded file verifies the same way.
+            This is the budget refusal from the MCP demo video on the home page: a tool call refused with <code>budget_exhausted</code> after the agent&apos;s 3-credit budget ran out. It&apos;s signed with the hosted MCP service&apos;s key. The downloaded file verifies the same way as the <a href={livePackUrl} className="text-cyan-200 underline underline-offset-4">live copy</a>.
           </p>
         </div>
       </section>
@@ -52,7 +52,8 @@ export default function VerifyEvidencePackPage() {
         <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
           <article className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-2xl font-black">Run the verifier</h2>
-            <pre className="mt-5 overflow-x-auto rounded-xl bg-black p-4 text-sm text-gray-300"><code>{`python3 -m venv .venv-verify
+            <pre className="mt-5 overflow-x-auto rounded-xl bg-black p-4 text-sm text-gray-300"><code>{`git clone https://github.com/SatGate-io/satgate && cd satgate
+python3 -m venv .venv-verify
 . .venv-verify/bin/activate
 pip install cryptography rfc8785
 curl -fsS https://satgate.io${samplePackFile} -o pack.json
@@ -82,8 +83,7 @@ python tools/verify_evidence_pack.py pack.json \
           <ul className="mt-6 space-y-3 text-gray-300">
             <li>• Signing keys are stored as platform secrets.</li>
             <li>• Receipts are kept on SatGate&apos;s servers.</li>
-            <li>• Anyone with a receipt link can open it, until the retention period ends or the pack is deleted. Share links with care.</li>
-            <li>• A pass means the receipt is intact and SatGate signed it. It says nothing about what your API did next, whether a payment settled, or regulatory compliance.</li>
+            <li>• Anyone with a receipt link can open it. Share links with care.</li>
           </ul>
         </div>
       </section>

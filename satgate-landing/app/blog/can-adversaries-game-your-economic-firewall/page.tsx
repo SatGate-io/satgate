@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, Shield, AlertTriangle, Lock, Eye, Target, Layers, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Shield, Lock, Eye, Target, Layers, CheckCircle } from 'lucide-react';
 
 export const metadata = {
   title: { absolute: 'Can Adversaries Game Your Economic Firewall? - SatGate Blog' },
@@ -145,7 +145,7 @@ export default function AdversarialBlogPage() {
             <strong>The attack:</strong> An adversary uses prompt injection to trick an agent into misclassifying a high-cost operation as a low-cost one. The agent believes it&apos;s making a simple text query. In reality, it&apos;s triggering an image generation call, a fine-tuning job, or an expensive third-party API.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            This isn&apos;t far-fetched. Prompt injection can alter an agent&apos;s understanding of what tool it&apos;s calling, what parameters it&apos;s passing, or what category of work it&apos;s performing. If your cost governance relies on the agent&apos;s self-reported action type, you&apos;re trusting the thing that just got compromised.
+            Prompt injection can alter an agent&apos;s understanding of what tool it&apos;s calling, what parameters it&apos;s passing, or what category of work it&apos;s performing. If your cost governance relies on the agent&apos;s self-reported action type, you&apos;re trusting the thing that just got compromised.
           </p>
 
           <div className="my-8 p-6 bg-green-900/10 border border-green-500/20 rounded-xl">
@@ -248,15 +248,15 @@ export default function AdversarialBlogPage() {
               <h3 className="text-lg font-bold text-green-300 m-0">The Defense: Operational Modes + Temporal Controls</h3>
             </div>
             <p className="text-gray-300 leading-relaxed">
-              <strong>Shadow and Observe modes</strong> let you monitor agent spending patterns before you enforce hard limits. Both modes build a baseline of normal behavior. When spending deviates from that baseline — even if every individual request is within policy — the anomaly surfaces.
+              <strong>Observe mode</strong> shows each agent&apos;s spend over time, so you can see a slow drain before you set limits.
             </p>
             <p className="text-gray-300 leading-relaxed mb-0">
               <strong>Time-based budget refresh periods</strong> limit cumulative damage. Instead of a single lifetime budget of $500, you set $50 per day with automatic refresh. A slow drain that would take weeks to exhaust a lifetime budget now has to extract value within each refresh window. The economics of patience-based attacks get much worse when the budget resets.
             </p>
           </div>
 
-          {/* Why Cryptographic Enforcement Wins */}
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Why Cryptographic Enforcement Beats Policy Enforcement</h2>
+          {/* Limits in the token, spend checked by SatGate */}
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Limits signed into the token, spend checked before each call</h2>
 
           <p className="text-gray-300 leading-relaxed">
             Every attack vector above shares a common thread: they exploit the gap between what the system <em>checks</em> and what the system <em>enforces</em>.
@@ -265,24 +265,24 @@ export default function AdversarialBlogPage() {
             Traditional API key management is all-or-nothing. A valid key gets full access. A compromised key means full exposure. You can layer rate limits and monitoring on top, but the key itself carries no constraints. It&apos;s a skeleton key. You&apos;re relying on the lock to be smart, not the key.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            Macaroon-based tokens invert this model. The token itself carries its constraints — budget limits, tool restrictions, time bounds, delegation depth. These constraints are cryptographically chained. A child token cannot have more authority than its parent. This isn&apos;t a policy check that can be bypassed. It&apos;s a mathematical guarantee.
+            Macaroon-based tokens invert this model. The token&apos;s limits (budget cap, tool restrictions, time bounds, delegation depth) are signed into it, so a compromised agent can&apos;t widen them, and a child token can&apos;t have more than its parent.
           </p>
 
           <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 bg-red-900/10 border border-red-500/20 rounded-xl">
-              <h3 className="text-lg font-bold text-red-300 mb-3 flex items-center gap-2">
-                <AlertTriangle size={18} /> Policy Enforcement
+            <div className="p-5 bg-cyan-900/10 border border-cyan-500/20 rounded-xl">
+              <h3 className="text-lg font-bold text-cyan-300 mb-3 flex items-center gap-2">
+                <Lock size={18} /> Limits in the token
               </h3>
               <p className="text-gray-400 text-sm mb-0">
-                &quot;We check your budget in a database before approving the request.&quot; The database can be wrong. The check can be skipped. The logic can be fooled. The enforcement point is software that can have bugs, race conditions, or configuration errors.
+                Scope, expiry, budget cap and delegation depth are signed into the token. Changing them breaks the signature, so an agent can&apos;t give itself more.
               </p>
             </div>
             <div className="p-5 bg-green-900/10 border border-green-500/20 rounded-xl">
               <h3 className="text-lg font-bold text-green-300 mb-3 flex items-center gap-2">
-                <Lock size={18} /> Cryptographic Enforcement
+                <Shield size={18} /> Spend checked by SatGate
               </h3>
               <p className="text-gray-400 text-sm mb-0">
-                &quot;Your budget is baked into your credential, and the credential can&apos;t be modified without invalidating it.&quot; The enforcement isn&apos;t in a separate system that can be circumvented — it&apos;s in the token the agent must present. The math doesn&apos;t have configuration errors.
+                In Control, SatGate checks spend against its own budget store before each call, and fails closed if the store can&apos;t answer.
               </p>
             </div>
           </div>
@@ -337,8 +337,8 @@ export default function AdversarialBlogPage() {
             <div className="flex items-start gap-3 p-4 bg-gray-900/50 border border-gray-800 rounded-lg">
               <CheckCircle className="text-green-400 mt-1 flex-shrink-0" size={20} />
               <div>
-                <h4 className="text-white font-bold mb-1">Shadow mode for anomaly detection</h4>
-                <p className="text-gray-400 text-sm mb-0">Run in observation mode before enforcement mode. Build a behavioral baseline. Detect anomalies while they&apos;re still data points, not incidents.</p>
+                <h4 className="text-white font-bold mb-1">Observe before you enforce</h4>
+                <p className="text-gray-400 text-sm mb-0">Run in Observe mode before Control. See each agent&apos;s spend over time and spot a slow drain while it&apos;s still small.</p>
               </div>
             </div>
           </div>
@@ -384,7 +384,7 @@ export default function AdversarialBlogPage() {
         <section className="mt-16 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-3">Ready to Secure Your Agent Economy?</h2>
           <p className="text-gray-400 mb-6">
-            SatGate provides cryptographic budget enforcement for AI agents — not just cost tracking.
+            SatGate enforces budgets for AI agents before they spend, not just cost tracking.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

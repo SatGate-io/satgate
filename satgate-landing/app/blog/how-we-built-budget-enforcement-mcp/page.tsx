@@ -163,7 +163,7 @@ export default function McpProxyBlogPage() {
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            OSS provides <code>InMemoryBudgetEnforcer</code> — a mutex-protected map. Simple, fast, not durable across restarts. Enterprise provides <code>RedisBudgetEnforcer</code> — atomic Lua scripts, idempotent spend tracking, Postgres signed receipt (Evidence Pack).
+            OSS provides <code>InMemoryBudgetEnforcer</code>: a mutex-protected map. Simple, fast, not durable across restarts. Enterprise provides <code>RedisBudgetEnforcer</code>: atomic Lua scripts, idempotent spend tracking, a Postgres audit log.
           </p>
 
           <p className="text-gray-300 leading-relaxed">When budget hits zero:</p>
@@ -197,7 +197,7 @@ export default function McpProxyBlogPage() {
 └── 500 credits remaining
 
 Result:
-  research-agent: 60 calls → 402 EXHAUSTED
+  research-agent: 60 calls → budget_exhausted
   content-agent:  still operational ✓
   orchestrator:   500 credits remaining ✓`}</code>
           </pre>

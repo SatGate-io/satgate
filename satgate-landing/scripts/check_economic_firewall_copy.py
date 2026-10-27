@@ -9,7 +9,7 @@ REQUIRED = {
         "Economic firewall for agents", "An economic firewall",
         "for AI agents.", "External agents: access and payment", "Your agents: budgets", "Admit",
         "Receipts anyone can check", "makes abuse more expensive",
-        "Paying never gets an agent past your access rules", "Control and Admit sign receipts. Observe signs them on HTTP",
+        "Paying never gets an agent past your access rules", "Control, Admit and Observe all sign receipts.",
     ],
     "app/page.tsx": ["Economic Firewall for AI Agents", "within budget", "external agents"],
     "app/economic-firewall/page.tsx": [
@@ -21,8 +21,8 @@ REQUIRED = {
         "Give your agent a task and a budget", "Look before you install",
         "Handoffs, refusals and retries", "same call", "Talk to us about a pilot",
         "https://github.com/SatGate-io/satgate/tree/main/demo",
-        "simulated HTTP demo", "issue, pay and verify SDK methods are not backed by a live API yet",
-        "The API they call is not available yet", "pip install satgate", "npm install @satgate/sdk",
+        "The public demo is a simulation that runs on your machine", "Issue. Call. Check.",
+        "Mint a token with a budget in SatGate Cloud", "pip install satgate", "npm install @satgate/sdk",
         "Check that a retried call isn’t charged twice",
     ],
     "app/agent-authority-layer/page.tsx": [

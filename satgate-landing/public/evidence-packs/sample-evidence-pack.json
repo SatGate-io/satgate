@@ -69,7 +69,7 @@
         "id": "agent:dean-finance-automation",
         "kind": "agent",
         "tenant_id": "tenant_acme_finance",
-        "display_name": "Dean finance automation",
+        "display_name": "Finance automation",
         "authn_method": "macaroon",
         "token_fingerprint": "sha256:demo_parent_token_fingerprint"
       },
@@ -140,7 +140,7 @@
         "id": "agent:dean-finance-automation",
         "kind": "agent",
         "tenant_id": "tenant_acme_finance",
-        "display_name": "Dean finance automation",
+        "display_name": "Finance automation",
         "authn_method": "macaroon",
         "token_fingerprint": "sha256:demo_parent_token_fingerprint"
       },
@@ -148,7 +148,7 @@
         "id": "agent:dean-finance-automation",
         "kind": "agent",
         "tenant_id": "tenant_acme_finance",
-        "display_name": "Dean finance automation",
+        "display_name": "Finance automation",
         "authn_method": "macaroon",
         "token_fingerprint": "sha256:demo_parent_token_fingerprint"
       },
@@ -232,7 +232,7 @@
         "id": "agent:dean-finance-automation",
         "kind": "agent",
         "tenant_id": "tenant_acme_finance",
-        "display_name": "Dean finance automation",
+        "display_name": "Finance automation",
         "authn_method": "macaroon",
         "token_fingerprint": "sha256:demo_parent_token_fingerprint"
       },
