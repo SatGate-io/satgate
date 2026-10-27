@@ -22,8 +22,8 @@ REQUIRED_PHRASES = {
     ],
     "app/components/HomeClient.tsx": [
         "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, ready to export",
-        "Allowed receipts",
-        "Paid receipts",
+        "Allowed: 1,203",
+        "Refused: 12,847",
         "Export Evidence Pack",
     ],
     "app/pricing/page.tsx": [

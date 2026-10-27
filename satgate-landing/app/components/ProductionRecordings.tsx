@@ -27,7 +27,7 @@ export default function ProductionRecordings({ heading }: { heading: string }) {
         <p className="text-xs text-gray-500 mt-3">The agent in the recording is the dashboard&apos;s built-in demo agent.</p>
 
         <h3 className="text-xl font-bold mt-16 mb-2">Your agents&apos; tool calls: only the tools you allow, within budget</h3>
-        <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Add an MCP server, mint a token with a 3-credit budget that can call one tool, and copy its config into Claude Code, Cursor, Hermes, OpenClaw or any other MCP client. A tool outside the list is refused before it runs. Once the budget is spent, the next call is refused too. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. The open-source verifier checks the receipts.</p>
+        <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Add an MCP server, mint a token with a 3-credit budget that can call one tool, and copy its config into Claude Code, Cursor, Hermes, OpenClaw or any other MCP client. A tool outside the list is refused before it runs. Once the budget is spent, the next call is refused too. The open-source verifier checks the receipts.</p>
         <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-purple-500/10">
           <video
             controls
@@ -66,7 +66,7 @@ export default function ProductionRecordings({ heading }: { heading: string }) {
         <p className="text-xs text-gray-500 mt-3">The agents in the recording are scripted MCP clients. The orders are real: three Bitcoin buys, $7 in total. Account numbers are masked.</p>
 
         <h3 id="usdc-recording" className="text-xl font-bold mt-16 mb-2 scroll-mt-20">External agents: pay before they get in</h3>
-        <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a route to Admit and choose how external agents pay: USDC on Base, sats over Lightning, or both, each with its own price. An agent with no wallet gets 402 Payment Required and never reaches your API. In the recording, a second agent sends one cent in USDC, the payment settles on Base, and the call goes through. Sending the same payment again is refused. With USDC, each payment buys one request. On Lightning you choose how many requests one payment buys, and on sat-priced routes the price can rise under load, up to a ceiling you set; unpaid 402s don&apos;t raise it. Paying never gets an agent past your access rules. Payment refusals get a signed receipt, and so do most paid requests.</p>
+        <p className="text-gray-400 mb-6 max-w-2xl mx-auto">Set a route to Admit and choose how external agents pay: USDC on Base, sats over Lightning, or both, each with its own price. An agent with no wallet gets 402 Payment Required and never reaches your API. In the recording, a second agent sends one cent in USDC, the payment settles on Base, and the call goes through. Sending the same payment again is refused. With USDC, each payment buys one request. On Lightning you choose how many requests one payment buys, and on sat-priced routes the price can rise under load, up to a ceiling you set; unpaid 402s don&apos;t raise it. Paying never gets an agent past your access rules. SatGate signs a receipt when it refuses an agent for a missing payment.</p>
         <div className="relative rounded-xl overflow-hidden border border-gray-700/50 shadow-2xl shadow-yellow-500/10">
           <video
             controls

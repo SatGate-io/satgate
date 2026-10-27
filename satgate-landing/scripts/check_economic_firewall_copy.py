@@ -9,7 +9,7 @@ REQUIRED = {
         "Economic firewall for agents", "An economic firewall",
         "for AI agents.", "External agents: access and payment", "Your agents: budgets", "Admit",
         "Receipts anyone can check", "makes abuse more expensive",
-        "Paying never gets an agent past your access rules", "Control and Admit sign receipts. Observe signs them on HTTP",
+        "Paying never gets an agent past your access rules", "Control, Admit and Observe all sign receipts.",
     ],
     "app/page.tsx": ["Economic Firewall for AI Agents", "within budget", "external agents"],
     "app/economic-firewall/page.tsx": [

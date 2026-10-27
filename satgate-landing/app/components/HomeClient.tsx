@@ -206,8 +206,7 @@ const LandingPage = () => {
             {/* Proof strip */}
             <div className="mt-6 space-y-2 text-xs text-gray-500">
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> REST · GraphQL · MCP</span>
-                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Gateway · Sidecar · MCP Proxy</span>
+                <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Works with web APIs and AI tool servers</span>
                 <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-500" /> Checks each request first</span>
               </div>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -333,7 +332,7 @@ const LandingPage = () => {
               </p>
               <ul className="text-xs text-gray-500 space-y-1">
                 <li>✓ Never blocks a request for being over budget; requests still need a valid token</li>
-                <li>✓ Usage broken down by team and cost center</li>
+                <li>✓ Usage broken down by team</li>
                 <li>✓ See which agents, tools and routes cost the most before you change anything</li>
                 <li>✓ Built to add little overhead</li>
               </ul>
@@ -403,12 +402,12 @@ const LandingPage = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Receipts anyone can check</h3>
-                <p className="text-gray-500 text-sm">Control and Admit sign receipts. Observe signs them on HTTP when receipts are on for your plan.</p>
+                <p className="text-gray-500 text-sm">Control, Admit and Observe all sign receipts.</p>
               </div>
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
-              SatGate signs a receipt when it refuses a request over a budget, a missing payment or a tool permission, and when an agent spends from a budget. Each receipt comes in an Evidence Pack you can export.
-              Your auditor can check the signatures with the open-source verifier, without having to trust us.
+              SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control. On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt. Each receipt comes in an Evidence Pack you can export.
+              Your auditor can check the signatures with the open-source verifier and SatGate&apos;s published keys, with no need to trust the AI company.
               A receipt shows what SatGate decided. It is not a compliance certificate.
             </p>
             <div className="flex flex-wrap gap-4 text-sm text-gray-500">
@@ -465,9 +464,9 @@ const LandingPage = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-2">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-mono mb-3">
-              🚗💨 HOW IT WORKS
+              How a request gets checked
             </span>
-            <h2 className="text-2xl font-bold mb-2">Badge in once. Fly through every gate.</h2>
+            <h2 className="text-2xl font-bold mb-2">Get a token once. SatGate checks each request.</h2>
             <p className="text-gray-400 text-sm max-w-xl mx-auto">
               An agent gets a token when it starts, like putting an E-ZPass on the windshield. After that, SatGate checks and meters each request as it passes.
             </p>
@@ -475,31 +474,25 @@ const LandingPage = () => {
           <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap text-sm mt-8">
             <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
               <Bot className="text-gray-300 mb-1" size={24} />
-              <span className="text-gray-300 font-medium">Agent Starts</span>
-              <span className="text-[10px] text-gray-500">K8s / AWS / OIDC</span>
+              <span className="text-gray-300 font-medium">Agent starts</span>
+              <span className="text-[10px] text-gray-500">In your cloud</span>
             </div>
             <span className="text-gray-600 text-xl">→</span>
             <div className="flex flex-col items-center p-3 bg-purple-900/30 border border-purple-500/30 rounded-lg">
               <Key className="text-purple-400 mb-1" size={24} />
-              <span className="text-purple-400 font-medium">Mint</span>
-              <span className="text-[10px] text-gray-500">Badge in (once)</span>
-            </div>
-            <span className="text-gray-600 text-xl">→</span>
-            <div className="flex flex-col items-center p-3 bg-cyan-900/30 border border-cyan-500/30 rounded-lg">
-              <Lock className="text-cyan-400 mb-1" size={24} />
-              <span className="text-cyan-400 font-medium">EZ Pass</span>
-              <span className="text-[10px] text-gray-500">Capability token</span>
+              <span className="text-purple-400 font-medium">Gets a token</span>
+              <span className="text-[10px] text-gray-500">Once</span>
             </div>
             <span className="text-gray-600 text-xl">→</span>
             <div className="flex flex-col items-center p-3 bg-green-900/30 border border-green-500/30 rounded-lg">
               <Shield className="text-green-400 mb-1" size={24} />
-              <span className="text-green-400 font-medium">Toll Gate</span>
-              <span className="text-[10px] text-gray-500">Verify · Meter · Budget</span>
+              <span className="text-green-400 font-medium">SatGate checks</span>
+              <span className="text-[10px] text-gray-500">Each request</span>
             </div>
             <span className="text-gray-600 text-xl">→</span>
             <div className="flex flex-col items-center p-3 bg-gray-800 rounded-lg">
               <Activity className="text-gray-300 mb-1" size={24} />
-              <span className="text-gray-300 font-medium">Upstream</span>
+              <span className="text-gray-300 font-medium">Your service</span>
               <span className="text-[10px] text-gray-500">Your API</span>
             </div>
           </div>
@@ -518,7 +511,7 @@ const LandingPage = () => {
             </span>
             <h2 className="text-2xl font-bold mb-3">Built for agents that hand work to other agents</h2>
             <p className="text-gray-400 text-sm max-w-2xl mx-auto">
-              A 2026 paper on AI delegation describes a problem we see in practice: when agents hand work to other agents,
+              A 2026 paper on AI delegation (<a href="https://arxiv.org/abs/2602.11865" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-gray-200">Tomasev et al.</a>) describes a problem we see in practice: when agents hand work to other agents,
               each one needs clear limits on what it can do and spend. One approach it proposes is tokens that can only be
               narrowed as they are passed down, such as <span className="text-blue-300">macaroons</span>.
             </p>
@@ -550,10 +543,7 @@ const LandingPage = () => {
             </div>
           </div>
           <p className="text-gray-500 text-xs text-center">
-            We built SatGate because standing API keys and after-the-fact alerts are a bad fit for autonomous systems. The paper put words to a problem we were already seeing in agent deployments.{' '}
-            <span className="text-gray-600 ml-1">
-              - <a href="https://arxiv.org/abs/2602.11865" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 underline underline-offset-2">Tomasev et al., 2026</a>
-            </span>
+            We built SatGate because standing API keys and after-the-fact alerts are a bad fit for autonomous systems. The paper put words to a problem we were already seeing in agent deployments.
           </p>
         </div>
       </section>
@@ -639,12 +629,12 @@ const LandingPage = () => {
                 step: "1",
                 title: "Pick a policy",
                 description: "Set a policy per route: public for health checks and docs, protected for everything else.",
-                code: `routes:\n  - match: { pathExact: /healthz }\n    policy: { kind: public }\n  - match: { pathPrefix: /v1/ }\n    policy: { kind: observe }\n  - match: { pathPrefix: /premium/ }\n    policy: { kind: charge }`
+                code: `routes:\n  - match: { pathExact: /healthz }\n    policy: { kind: public }\n  - match: { pathPrefix: /v1/ }\n    policy: { kind: observe }\n  - match: { pathPrefix: /premium/ }\n    policy: { kind: charge, priceSats: 10 }`
               },
               {
                 step: "2",
                 title: "Apply it",
-                description: "Apply it when you are ready. Every version is kept, with an audit entry for who changed what, so you can roll back.",
+                description: "Apply it when you are ready. Every version is kept with an audit entry for who changed what, and on Pro and Enterprise you can roll back.",
                 code: `v3 (applied) ← current\nv2 (available)\nv1 (available)\n\nAudit entry: who, when, diff`
               },
               {
@@ -657,7 +647,7 @@ const LandingPage = () => {
                 step: "4",
                 title: "Check what happened",
                 description: "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, ready to export as Evidence Packs.",
-                code: `Illustrative sample, not live customer data\nAllowed receipts: 1,203\nDenied receipts: 12,847\nPaid receipts:   $847 settled\n\n→ Export Evidence Pack`
+                code: `Example only\nAllowed: 1,203\nRefused: 12,847\nPaid:    $847\n\n→ Export Evidence Pack`
               }
             ].map((item, i) => (
               <div key={i} className="relative">
@@ -686,9 +676,9 @@ const LandingPage = () => {
           <h2 className="mb-8 text-3xl font-bold text-white">Questions</h2>
           <div className="space-y-6">
             {[
-              ['What is SatGate?', 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set and charges external agents on the routes you choose. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.'],
+              ['What is SatGate?', 'SatGate is a gateway that sits in front of your APIs and MCP tools. It keeps your own agents within the budgets and permissions you set and charges external agents on the routes you choose.'],
               ['How does SatGate control what agents do?', 'Before a request reaches your API or MCP tool, SatGate checks the agent’s permissions, its remaining budget and whether its token was revoked. If a check fails, the request stops at SatGate.'],
-              ['How do I give an agent a budget?', 'You set the budget, the permissions and how many times it can hand work to a sub-agent. The agent gets a token with those limits built in. SatGate signs a receipt when it refuses a request over a budget, a missing payment or a tool permission, and when an agent spends from a budget.'],
+              ['How do I give an agent a budget?', 'You set the budget, the permissions and how many times it can hand work to a sub-agent. The agent gets a token with those limits built in.'],
             ].map(([question, answer]) => (
               <div key={question} className="border-t border-gray-800 pt-6 first:border-t-0 first:pt-0">
                 <h3 className="mb-2 text-xl font-bold text-white">{question}</h3>
