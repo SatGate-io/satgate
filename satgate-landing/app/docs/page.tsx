@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 
 const docs = [
   ['Verify a signed receipt', '/verify-evidence-pack', 'Check a signed receipt yourself with SatGate’s published keys.'],
-  ['Rules and Receipts', '/policy-to-proof', 'How SatGate’s rules and receipts work.'],
+  ['Rules and receipts', '/policy-to-proof', 'How SatGate’s rules and receipts work.'],
   ['Signed receipt demo', '/evidence-pack-demo', 'See what a receipt looks like.'],
-  ['MCP Gateway', '/mcp', 'Budgets and allowed tools for MCP tool calls.'],
+  ['MCP gateway', '/mcp', 'Budgets and allowed tools for MCP tool calls.'],
   ['Build with SatGate', '/build', 'SDK and developer starting point.'],
 ];
 

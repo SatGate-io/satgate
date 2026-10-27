@@ -337,7 +337,7 @@ export default function WhyRoutingIsntGovernancePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/pricing" 
+              href="/pricing"
               className="inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition"
             >
               Start free trial

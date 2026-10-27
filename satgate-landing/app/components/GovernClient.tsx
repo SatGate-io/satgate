@@ -690,7 +690,7 @@ export default function GovernPage() {
                 <li>• Delegated workers inherit narrower limits</li>
                 <li>• Policy, budget, and scope denials stop requests before execution</li>
                 <li>• The next request after a revoke is refused</li>
-                <li className="text-green-400 font-medium">• Receipt exports show what was spent and a refusal code for each refused request</li>
+                <li className="text-green-400 font-medium">• Receipt exports show what was spent and a refusal code for the refusals SatGate signs</li>
               </ul>
             </div>
           </div>
@@ -706,7 +706,7 @@ export default function GovernPage() {
             </div>
             <h2 className="text-3xl font-bold mb-4">Your internal APIs now serve agents</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Internal services now get requests from agents, not only from people and apps. SatGate checks those requests before they run and signs receipts you can check later. 
+              Internal services now get requests from agents, not only from people and apps. SatGate checks those requests before they run and signs receipts you can check later.
               It&apos;s not just usage tracking. It&apos;s <span className="text-white font-medium">rules and receipts for AI agents</span>.
             </p>
           </div>

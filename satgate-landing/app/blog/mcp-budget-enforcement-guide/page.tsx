@@ -272,7 +272,7 @@ tools:
           </ul>
           <p className="text-gray-300 leading-relaxed mt-4">
             The dashboard&apos;s Usage page shows spend by agent token, tool and cost center over time.
-            Start in Observe mode to see the data, then switch to Control 
+            Start in Observe mode to see the data, then switch to Control
             when you&apos;re ready to enforce.
           </p>
 

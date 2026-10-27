@@ -228,6 +228,7 @@ economic_required_phrases = [
     "Is there budget left, and is the token still valid and not revoked?",
     "Does this route charge, and has the agent paid?",
     "'Allow or refuse.',",
+    "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
     "Payment never widens what an agent can do.",
     "Receipts on HTTP and MCP.",
     "no money moves",
@@ -274,7 +275,7 @@ readiness_required_phrases = [
     "Assess whether your agent/API stack is ready for autonomous authority",
     "See SatGate governance",
     "See how rules and receipts work",
-    "a refusal code and the budget left",
+    "a refusal code and, when the budget was evaluated, the budget left",
 ]
 
 readiness_forbidden_phrases = [

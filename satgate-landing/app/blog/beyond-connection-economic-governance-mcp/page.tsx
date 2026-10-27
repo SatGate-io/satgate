@@ -484,7 +484,7 @@ X-SatGate-Budget-Remaining-Credits: 0
 
             <p>
               The revoked intern bot? Someone&apos;s experimental agent tried to escalate its own delegation 
-              permissions. SatGate refused the wider token, and the owner revoked the bot. That&apos;s the security 
+              permissions. SatGate refused the wider token, and the owner revoked the bot. That&apos;s the security
               story: not just cost control, but <strong className="text-white">agent governance</strong>.
             </p>
 

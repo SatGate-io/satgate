@@ -212,7 +212,7 @@ export default function MCPPage() {
           <li className="rounded-2xl border border-gray-800 bg-black p-6 text-gray-400"><span className="font-bold text-white">Admit.</span> Charge external agents on the HTTP routes you choose. On each paid route you pick Lightning, USDC on Base, or both. You set how many requests a Lightning payment buys; a USDC payment buys one. See <Link href="/pricing" className="text-purple-300 hover:text-purple-200">pricing</Link>.</li>
         </ul>
         <p className="mt-6 max-w-4xl text-gray-400">
-          On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt. If you run the open-source MCP proxy yourself, it signs with your own key once you set one. To prove what an agent was allowed to do, export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
+          On SatGate Cloud MCP, every action your agents take is recorded in a signed receipt. To prove what an agent was allowed to do, export those receipts as an Evidence Pack and <Link href="/verify-evidence-pack" className="text-purple-300 hover:text-purple-200">verify them yourself</Link>. For the budget model in detail, read the <Link href="/blog/mcp-budget-enforcement-guide" className="text-purple-300 hover:text-purple-200">MCP budget enforcement guide</Link>, or start from the <Link href="/build" className="text-purple-300 hover:text-purple-200">developer page</Link>.
         </p>
       </section>
 
@@ -221,7 +221,7 @@ export default function MCPPage() {
           {[
             ['Price every tool', 'Assign cost profiles to MCP tools so agents cannot treat expensive operations like free function calls.'],
             ['Enforce before the call runs', 'Block over-budget or out-of-scope tool calls before they reach the upstream MCP server.'],
-            ['Receipts you can check', 'Check any receipt with the open-source verifier against SatGate’s published keys.'],
+            ['Receipts you can check', 'Check a SatGate Cloud receipt with the open-source verifier against SatGate’s published keys.'],
           ].map(([title, body]) => (
             <div key={title} className="rounded-2xl border border-gray-800 bg-black p-6">
               <h2 className="mb-3 text-2xl font-bold text-white">{title}</h2>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, Menu, X, Shield, DollarSign, Globe, Zap, Eye, Lock, Cloud, Bot } from 'lucide-react';
+import { ArrowRight, Menu, X, Shield, DollarSign, Globe, Zap, Lock, Cloud, Bot } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
@@ -24,12 +24,6 @@ const comparisonRows = [
     icon: <Shield size={16} className="text-gray-400" />,
     cloud: 'Blunt — general "least privilege" IAM roles',
     satgate: 'Per-tool and per-token constraints',
-  },
-  {
-    feature: 'Cost Attribution',
-    icon: <Eye size={16} className="text-gray-400" />,
-    cloud: 'Usually billed by service, not by agent tool',
-    satgate: 'Surgical — real-time per-tool visibility',
   },
   {
     feature: 'Authentication',
