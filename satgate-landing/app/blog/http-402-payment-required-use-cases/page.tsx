@@ -3,12 +3,12 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
   title: "HTTP 402 Payment Required: Meaning and API Examples",
-  description: "Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402.",
+  description: "Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402 and x402.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
   openGraph: {
     title: 'HTTP 402 Payment Required: Meaning and API Examples',
-    description: 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402.',
+    description: 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402 and x402.',
     url: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     type: 'article',
     publishedTime: '2026-04-02T00:00:00Z',
@@ -17,7 +17,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'HTTP 402 Payment Required: Meaning and API Examples',
-    description: 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402.',
+    description: 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402 and x402.',
   },
 };
 
@@ -293,7 +293,7 @@ Content-Type: application/json
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">How 402 enables it:</strong> Your free tier allows 100 calls per hour. Call 101 returns a 402 instead of a 429. Legitimate users pay the small fee and continue working. Scrapers and abusers hit a cost wall that scales with their abuse. A bot making 10,000 requests doesn&apos;t get blocked &mdash; it gets a $20 bill. That&apos;s a more effective deterrent than any IP blocklist.
+            <strong className="text-white">How 402 enables it:</strong> Your free tier allows 100 calls per hour. Call 101 returns a 402 instead of a 429. Legitimate users pay the small fee and continue working. Scrapers and abusers hit a cost wall that scales with their abuse. A bot making 10,000 requests pays for each batch of requests your route sells, so abuse costs real money. That&apos;s a more effective deterrent than any IP blocklist.
           </p>
 
           <div className="bg-gray-900/70 border border-gray-800 rounded-lg p-6 my-6">
@@ -315,7 +315,7 @@ Content-Type: application/json
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">How 402 enables it:</strong> The parent agent pre-pays for a macaroon with a $50 budget. It narrows that macaroon into sub-tokens: $20 for the research agent, $15 for the writing agent, $10 for the review agent, $5 reserve. Each sub-agent uses its token to pay for 402-gated APIs. When a sub-agent&apos;s budget runs out, it gets 402 responses with no valid payment path &mdash; a hard stop enforced by cryptography.
+            <strong className="text-white">How 402 enables it:</strong> The parent agent pre-pays for a macaroon with a $50 budget. It narrows that macaroon into sub-tokens: $20 for the research agent, $15 for the writing agent, $10 for the review agent, $5 reserve. Each sub-agent uses its token to pay for 402-gated APIs. When a sub-agent&apos;s budget runs out, the gateway refuses its next paid call.
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
@@ -330,8 +330,7 @@ Parent Agent ($50 macaroon)
     └── Pays for fact-check API calls via 402
 
 # Total spend can never exceed $50
-# Each agent can never exceed its allocation
-# No centralized budget tracking needed`}</code>
+# Each agent can never exceed its allocation`}</code>
           </pre>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">5. Instant API Marketplace Discovery</h3>
@@ -415,6 +414,12 @@ Parent Agent ($50 macaroon)
 └──────────┘                    └──────────────┘`}</code>
           </pre>
 
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">x402: paying a 402 in stablecoins</h2>
+
+          <p className="text-gray-300 leading-relaxed">
+            x402 is the other common way to answer a 402: the server asks for a stablecoin payment (SatGate takes USDC on Base). On SatGate, the owner picks Lightning, USDC or both on each paid route.
+          </p>
+
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Implementation Considerations</h2>
 
           <p className="text-gray-300 leading-relaxed">
@@ -430,7 +435,7 @@ Parent Agent ($50 macaroon)
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Client Compatibility</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            Existing HTTP clients handle 402 as an error by default. AI agent frameworks are adding native L402 support, but you&apos;ll need to support both 402-aware and traditional clients during the transition. The simplest approach: accept both API keys (traditional) and L402 tokens (agent-native) on the same endpoints. Return 402 only to clients that signal L402 support via an <code className="text-green-300 bg-black/50 px-1 rounded">Accept-Payment</code> header or lack traditional credentials.
+            Existing HTTP clients handle 402 as an error by default. AI agent frameworks are adding native L402 support, but you&apos;ll need to support both 402-aware and traditional clients during the transition. The simplest approach: accept both API keys (traditional) and L402 tokens (agent-native) on the same endpoints. Return 402 to clients that lack traditional credentials.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Lightning Integration</h3>
@@ -444,20 +449,6 @@ Parent Agent ($50 macaroon)
           <p className="text-gray-300 leading-relaxed">
             Deploy 402 logic at the gateway layer, not in your application. The gateway handles invoice generation, payment verification, macaroon minting, and budget tracking. Your API backend never touches payment logic &mdash; it just serves requests that the gateway has already authorized.
           </p>
-
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">402 in the Wild: Early Adopters</h2>
-
-          <p className="text-gray-300 leading-relaxed">
-            L402-based 402 implementations are appearing across the API ecosystem:
-          </p>
-
-          <ul className="text-gray-300 space-y-2 ml-6 list-disc">
-            <li><strong className="text-white">AI inference APIs</strong> charging per-token with instant settlement instead of monthly billing cycles</li>
-            <li><strong className="text-white">Data providers</strong> selling real-time market data to trading agents at per-query prices</li>
-            <li><strong className="text-white">Developer tools</strong> offering premium features (code analysis, security scanning) on a pay-per-use basis</li>
-            <li><strong className="text-white">Content platforms</strong> monetizing API access to articles, research, and datasets without subscription walls</li>
-            <li><strong className="text-white">IoT networks</strong> where devices pay for cloud processing at the request level</li>
-          </ul>
 
           <p className="text-gray-300 leading-relaxed">
             The pattern is consistent: wherever monthly subscriptions create friction for machine consumers, 402 with L402 provides a smoother alternative. Agents don&apos;t want to manage subscriptions. They want to pay for what they use, when they use it.

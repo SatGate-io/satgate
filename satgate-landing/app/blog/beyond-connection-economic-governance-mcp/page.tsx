@@ -399,6 +399,7 @@ X-SatGate-Budget-Remaining-Credits: 0
   "error": "budget_exhausted",
   "message": "Insufficient credits for this request",
   "payable": false,
+  "hint": "This 402 cannot be paid. Ask the token owner for more budget.",
   "cost_credits": 25,
   "remaining_credits": 0,
   "receipt": { ... }

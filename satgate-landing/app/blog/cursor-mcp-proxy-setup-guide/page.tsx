@@ -206,7 +206,7 @@ satgate-mcp --config ./satgate-mcp.yaml`}</code>
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
             <code>{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
 Send Cursor's calls through the gateway with that token.
-There is no satgate token create command, and no daily limit.`}</code>
+There is no satgate token create command; mint the token in the dashboard, where you can also set daily and weekly dollar limits for MCP tools.`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -216,16 +216,18 @@ There is no satgate token create command, and no daily limit.`}</code>
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 4: Point Cursor at the proxy</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            In Cursor, configure the MCP connection to use the SatGate endpoint and the constrained token you just created. Depending on your local or team setup, that may look like a local URL during development or a hosted gateway URL for shared use.
+            In Cursor, add SatGate as an MCP server with the token you just created. Copy yours from MCP Setup in the dashboard; for Cursor it runs the SatGate bridge:
           </p>
 
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
             <code>{`{
   "mcpServers": {
     "satgate": {
-      "url": "https://gateway.satgate.internal/mcp",
-      "headers": {
-        "Authorization": "Bearer sg_cursor_dev_token"
+      "command": "npx",
+      "args": ["-y", "satgate-mcp-bridge"],
+      "env": {
+        "SATGATE_URL": "https://satgate-mcp-saas.fly.dev",
+        "SATGATE_TOKEN": "paste-the-token-from-cloud.satgate.io"
       }
     }
   }
@@ -260,7 +262,7 @@ There is no satgate token create command, and no daily limit.`}</code>
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 6: Turn on auditability</h2>
 
           <p className="text-gray-300 leading-relaxed">
-            If Wayne asks, “what exactly did Cursor do with that token yesterday,” you should be able to answer without archaeology.
+            If your manager asks, “what exactly did Cursor do with that token yesterday,” you should be able to answer without archaeology.
           </p>
 
           <p className="text-gray-300 leading-relaxed">
@@ -280,7 +282,7 @@ There is no satgate token create command, and no daily limit.`}</code>
             <code>{`{
   "time": "2026-04-09T18:00:00Z",
   "subject": "cursor-dev",
-  "project": "satgate-landing",
+  "project": "web-app",
   "tool": "web-fetch",
   "cost": 2,
   "decision": "allow"
@@ -295,7 +297,7 @@ There is no satgate token create command, and no daily limit.`}</code>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Runaway tool loops</h3>
           <p className="text-gray-300 leading-relaxed">
-            Cursor keeps retrying a flaky tool. Without a proxy, it burns time and money until someone notices. With SatGate, the hourly or daily budget stops the loop automatically.
+            Cursor keeps retrying a flaky tool. Without a proxy, it burns time and money until someone notices. With SatGate, the token&apos;s budget or daily limit stops the loop.
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Overpowered editor access</h3>

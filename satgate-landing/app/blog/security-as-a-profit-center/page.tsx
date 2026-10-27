@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Clock, ExternalLink } from 'lucide-react';
 
 export const metadata = {
   title: 'Security as a Profit Center: Economic Firewall ROI',
-  description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why spending controls can become a profit center.',
+  description: 'SatGate shows what each agent spends and refuses calls over its budget, so you can see what runaway spend was stopped. Learn why spending controls can become a profit center.',
   openGraph: {
     title: 'Security as a Profit Center: Economic Firewall ROI',
     description: 'Your security stack is a cost center. Your economic firewall is a profit center. Here\'s the CFO math.',
@@ -27,7 +27,7 @@ export default function SecurityAsAProfitCenterPage() {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'Security as a Profit Center: Economic Firewall ROI',
-    description: 'SatGate shows how many dollars security saved, not just attacks blocked. Learn why spending controls can become a profit center.',
+    description: 'SatGate shows what each agent spends and refuses calls over its budget, so you can see what runaway spend was stopped. Learn why spending controls can become a profit center.',
     url: 'https://satgate.io/blog/security-as-a-profit-center',
     datePublished: '2026-02-14',
     dateModified: '2026-05-02',
@@ -58,7 +58,7 @@ export default function SecurityAsAProfitCenterPage() {
         name: 'What ROI should teams measure for AI agent governance?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Teams should measure avoided loop spend, reduced retries, optimized tool/model routing, reclaimed engineering time, chargeback accuracy, and new revenue from governed API monetization.',
+          text: 'Teams should measure loop spend stopped by budgets, reclaimed engineering time, chargeback accuracy, and new revenue from charging external agents.',
         },
       },
       {
@@ -66,7 +66,7 @@ export default function SecurityAsAProfitCenterPage() {
         name: 'Why start with Observe mode before enforcing budgets?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Observe mode shows real agent usage, waste, loop patterns, and cost attribution without blocking production workloads, giving finance and engineering evidence before switching to Control.',
+          text: 'Observe mode shows what each agent calls and spends, by route and tool, without blocking anything, giving finance and engineering evidence before switching to Control.',
         },
       },
     ],
@@ -161,7 +161,7 @@ export default function SecurityAsAProfitCenterPage() {
                 <tr className="border-b border-gray-800">
                   <td className="py-3 px-4 font-medium text-white">Success Metric</td>
                   <td className="py-3 px-4 text-red-400">Attacks blocked</td>
-                  <td className="py-3 px-4 text-green-400">Dollars saved + revenue enabled</td>
+                  <td className="py-3 px-4 text-green-400">Runaway spend stopped + revenue enabled</td>
                 </tr>
               </tbody>
             </table>
@@ -176,14 +176,14 @@ export default function SecurityAsAProfitCenterPage() {
             The most immediate ROI is the spend that never happens. AI agents operating without budget constraints exhibit a pattern we call <strong className="text-white">fiscal hallucination</strong> — the economic equivalent of a language model confidently generating wrong answers. The agent isn&apos;t malicious. It&apos;s just expensive.
           </p>
           <ul className="text-gray-300 space-y-2">
-            <li><strong className="text-white">Hard-capping</strong> — A $500 hallucination loop gets stopped at $2. The proxy enforces the budget ceiling at the protocol level, not after the invoice arrives. (<Link href="/blog/hard-capping-mcp-tool-spend" className="text-purple-400 hover:text-purple-300 underline">See how hard-capping works →</Link>)</li>
-            <li><strong className="text-white">Zombie prevention</strong> — Agents that go idle or enter inefficient loops get their tokens auto-revoked. No human needs to notice at 3 AM.</li>
-            <li><strong className="text-white">Blast radius containment</strong> — Cryptographic budget constraints (L402 macaroons) mean a compromised agent can only spend what its token allows. Not a penny more.</li>
+            <li><strong className="text-white">Hard-capping</strong>: a loop stops at the budget you set, say $2. The proxy enforces the budget ceiling before the call, not after the invoice arrives. (<Link href="/blog/hard-capping-mcp-tool-spend" className="text-purple-400 hover:text-purple-300 underline">See how hard-capping works →</Link>)</li>
+            <li><strong className="text-white">Zombie prevention</strong>: runaway loops stop when the token&apos;s budget runs out, and the token expires on the date you set.</li>
+            <li><strong className="text-white">Blast radius containment</strong>: budgets built into each agent&apos;s token mean a compromised agent can only spend what its token allows.</li>
           </ul>
 
           <div className="bg-purple-900/20 border border-purple-800/40 rounded-lg p-6 my-8">
             <p className="text-purple-300 font-mono text-sm mb-0">
-              💰 The average enterprise running 50+ AI agents reports 2-5% of agent compute is wasted on loops, retries, and zombie processes. At scale, that&apos;s six figures annually — invisible on aggregate bills, obvious with per-agent telemetry.
+              💰 Loops, retries and zombie processes hide in aggregate bills and show up in per-agent numbers. Run your own numbers in the ROI calculator.
             </p>
           </div>
 
@@ -204,7 +204,7 @@ export default function SecurityAsAProfitCenterPage() {
             This is the bucket most security tools never reach. SatGate doesn&apos;t just prevent downside — it creates upside.
           </p>
           <ul className="text-gray-300 space-y-2">
-            <li><strong className="text-white">Micropayment monetization</strong> — L402 enables pay-per-tool-call pricing. Expose your internal APIs to partner agents and charge per request, settled instantly via Lightning Network. Your tools become revenue-generating products.</li>
+            <li><strong className="text-white">Micropayment monetization</strong>: charge external agents per use on the API routes you choose (Lightning or USDC).</li>
             <li><strong className="text-white">Trust-as-a-Service</strong> — Enterprise buyers won&apos;t deploy third-party agents without governance guarantees. Governed agents — with provable budget constraints and signed receipts — close deals that ungoverned agents can&apos;t.</li>
             <li><strong className="text-white">Faster deployment velocity</strong> — Lower blast radius means lower risk. Lower risk means faster approval. Faster approval means faster time-to-revenue. The governance layer becomes an accelerator, not a gate.</li>
           </ul>
@@ -234,7 +234,7 @@ Example:
             That&apos;s the conservative case — 50 agents, modest call volume, low loop rate. Enterprises running hundreds of agents with expensive tool calls (database queries, code execution, search APIs) see multiples of this.
           </p>
           <p className="text-gray-300 leading-relaxed">
-            And this is <em>just</em> Bucket 1 — cost avoidance. Add the engineering hours reclaimed (Bucket 2) and the revenue enabled (Bucket 3), and the economic firewall pays for itself in weeks, not quarters.
+            And this is <em>just</em> Bucket 1: cost avoidance. Add the engineering hours reclaimed (Bucket 2) and the revenue enabled (Bucket 3). Run your own numbers in the ROI calculator.
           </p>
 
           <div className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/40 rounded-lg p-6 my-8">
@@ -309,8 +309,8 @@ Example:
             <div className="space-y-5">
               {[
                 ['How can an economic firewall turn security into a profit center?', 'It prevents runaway agent spend, reduces wasted tool calls, attributes costs, and enables controlled paid access for paid agents.'],
-                ['What ROI should teams measure for AI agent governance?', 'Measure avoided loop spend, reduced retries, optimized tool/model routing, reclaimed engineering time, chargeback accuracy, and new revenue from governed API monetization.'],
-                ['Why start with Observe mode before enforcing budgets?', 'Observe mode shows real agent usage, waste, loop patterns, and cost attribution without blocking production workloads, giving finance and engineering evidence before switching to Control.'],
+                ['What ROI should teams measure for AI agent governance?', 'Measure loop spend stopped by budgets, reclaimed engineering time, chargeback accuracy, and new revenue from charging external agents.'],
+                ['Why start with Observe mode before enforcing budgets?', 'Observe mode shows what each agent calls and spends, by route and tool, without blocking anything, giving finance and engineering evidence before switching to Control.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

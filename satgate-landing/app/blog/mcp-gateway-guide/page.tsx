@@ -65,7 +65,7 @@ export default function McpGatewayGuideBlogPage() {
         name: 'How is an economic MCP gateway different from a routing gateway?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent, per-tool, per-workflow budgets, revocation, delegation, and audit controls before the request goes through.',
+          text: 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent and per-tool budgets, revocation, delegation, and audit controls before the request goes through.',
         },
       },
     ],
@@ -320,9 +320,9 @@ tools:
   github.get_file:
     cost: 1 credit
   analysis.review_code:
-    cost: 50 credits     # ~$0.50 (invokes LLM)
+    cost: 50 credits     # ~$0.05 (invokes LLM)
   analysis.generate_report:
-    cost: 200 credits    # ~$2.00 (long-form generation)
+    cost: 200 credits    # ~$0.20 (long-form generation)
   database.query:
     cost: 2 credits
   slack.send_message:
@@ -359,7 +359,6 @@ tools:
 #   expires  24h
 
 # The resulting macaroon encodes all constraints
-# No server-side session needed — it's self-contained
 # The gateway validates the token on every tool call`}</code>
           </pre>
 
@@ -382,20 +381,16 @@ tools:
 5. Gateway checks remaining budget: 30 credits
 6. 30 < 50 → DENY
 
-# Response to agent:
-{
-  "error": "budget_exhausted",
-  "required": 50,
-  "remaining": 30,
-  "alternatives": [
-    {"tool": "github.search_code", "cost": 1}
-  ],
-  "topup_url": "https://gateway.corp/budget/request"
-}`}</code>
+# Response to agent (JSON-RPC error):
+{"jsonrpc": "2.0", "id": 42, "error": {
+  "code": -32000,
+  "message": "Budget exhausted",
+  "data": {"error": "budget_exhausted", "remaining_credits": 30, "cost_credits": 50}
+}}`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            The denial is <em>structured</em>. The agent gets machine-readable context: how much it has, how much it needs, and what cheaper alternatives exist. A well-designed agent can adapt — switch to a cheaper tool, request more budget from its parent, or gracefully inform the user. Compare this to a rate-limit 429, which just says "try again later" and triggers a retry loop.
+            The denial is <em>structured</em>. The agent gets how much it has and what the call costs. A well-designed agent can adapt: switch to a cheaper tool, ask its owner for more budget, or tell the user. Compare this to a rate-limit 429, which just says "try again later" and triggers a retry loop.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">Setting Up an MCP Gateway with Spending Controls</h2>
@@ -462,14 +457,15 @@ satgate-mcp --config satgate-mcp.yaml
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Step 4: Point Agents at the Gateway</h3>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# In your agent's MCP client config
+            <code className="text-green-300">{`# Cursor or Claude Desktop (copy yours from MCP Setup in the dashboard)
 {
   "mcpServers": {
-    "gateway": {
-      "url": "https://gateway.corp:8080/mcp",
-      "transport": "streamable-http",
-      "headers": {
-        "Authorization": "Bearer <macaroon_token>"
+    "satgate": {
+      "command": "npx",
+      "args": ["-y", "satgate-mcp-bridge"],
+      "env": {
+        "SATGATE_URL": "https://satgate-mcp-saas.fly.dev",
+        "SATGATE_TOKEN": "paste-the-token-from-cloud.satgate.io"
       }
     }
   }
@@ -534,7 +530,7 @@ satgate-mcp --config satgate-mcp.yaml
                 <span className="text-green-400">✓</span>
               </div>
               <div className="grid grid-cols-3 gap-4 text-gray-300">
-                <span>Structured denial (402)</span>
+                <span>Structured budget refusal</span>
                 <span className="text-red-400">✗</span>
                 <span className="text-green-400">✓</span>
               </div>
@@ -565,8 +561,7 @@ Orchestrator (10,000 credits)
 
 # Total delegated: 9,000 ≤ 10,000 ✓
 # Each sub-token is cryptographically derived
-# Gateway enforces each agent's ceiling independently
-# Full receipt chain traces back to orchestrator`}</code>
+# Gateway enforces each agent's ceiling independently`}</code>
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
@@ -580,8 +575,8 @@ Orchestrator (10,000 credits)
           </p>
 
           <ul className="text-gray-300 space-y-3">
-            <li><strong className="text-white">Latency budget.</strong> The gateway adds a hop. For stdio-backed servers, the gateway process also manages server lifecycles. Measure per-call overhead and set latency budgets for each tool. Economic checks (macaroon validation, budget lookup) add sub-millisecond overhead — they're cryptographic operations, not database queries.</li>
-            <li><strong className="text-white">High availability.</strong> The gateway is a single point of failure. Run at least two instances behind a load balancer. For budget state, use a shared store (Redis) or a consensus-based approach. SatGate's macaroon approach minimizes shared state requirements since the token itself carries the constraints.</li>
+            <li><strong className="text-white">Latency budget.</strong> The gateway adds a hop. For stdio-backed servers, the gateway process also manages server lifecycles. Measure per-call overhead and set latency budgets for each tool. Token checks are cryptographic; the budget check is a fast lookup in SatGate's budget store.</li>
+            <li><strong className="text-white">High availability.</strong> The gateway is a single point of failure. Run at least two instances behind a load balancer. For budget state, use a shared store (Redis) or a consensus-based approach. SatGate Cloud keeps budget state in Redis.</li>
             <li><strong className="text-white">Server lifecycle management.</strong> Stdio-based MCP servers are processes that the gateway spawns and manages. Monitor for server crashes, implement restart policies, and set resource limits (memory, CPU) per server process.</li>
             <li><strong className="text-white">Graceful degradation.</strong> If an upstream MCP server is down, the gateway should remove its tools from the catalog rather than returning errors for every call. Agents adapt to available tools; they don't handle transient server failures well.</li>
           </ul>
@@ -624,7 +619,7 @@ Orchestrator (10,000 credits)
               {[
                 ['What is an MCP gateway?', 'An MCP gateway sits between AI agents and MCP servers to centralize routing, authentication, tool discovery, policy enforcement, observability, and spending controls for tool calls.'],
                 ['Why does an MCP gateway need budget enforcement?', 'MCP tools can trigger paid APIs, model calls, database queries, or external services. Budget enforcement stops runaway loops and tool fanout before expensive calls execute, instead of reporting the spend after the fact.'],
-                ['How is an economic MCP gateway different from a routing gateway?', 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent, per-tool, per-workflow budgets, revocation, delegation, and audit controls before the request goes through.'],
+                ['How is an economic MCP gateway different from a routing gateway?', 'A routing gateway connects agents to tools. An economic MCP gateway also applies per-agent and per-tool budgets, revocation, delegation, and audit controls before the request goes through.'],
               ].map(([question, answer]) => (
                 <div key={question} className="border-t border-gray-800 pt-5 first:border-t-0 first:pt-0">
                   <h3 className="mb-2 text-lg font-bold text-white">{question}</h3>

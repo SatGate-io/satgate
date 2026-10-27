@@ -123,8 +123,9 @@ export default function WhyRoutingIsntGovernancePage() {
           <div className="space-y-6 text-gray-300 leading-relaxed">
             
             <p className="text-lg">
-              The AI gateway market is booming. Bifrost, LiteLLM, Portkey, and others are racing to 
-              solve the same problem: <em>how do you efficiently route LLM calls across multiple providers?</em>
+              AI gateways like Bifrost, LiteLLM and Portkey route LLM calls and now cap spend per key or team. What they
+              don&apos;t do is give each agent a token with its own budget and tools that it can hand on, smaller, to a helper,
+              or cover the paid APIs and MCP tools agents call beyond the LLM.
             </p>
 
             <p>
@@ -285,8 +286,8 @@ export default function WhyRoutingIsntGovernancePage() {
             </p>
 
             <p>
-              If the answer is "when it finishes the task" or "when the API rate limits kick in," 
-              you have a routing gateway.
+              If the answer is "when it finishes the task" or "when the API rate limits kick in,"
+              you have routing without agent budgets.
             </p>
 
             <p>
@@ -294,8 +295,7 @@ export default function WhyRoutingIsntGovernancePage() {
             </p>
 
             <p>
-              The agent economy needs both. But right now, almost everyone has routing. 
-              Almost no one has governance.
+              The agent economy needs both.
             </p>
 
             <div className="my-8 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-6">
@@ -337,10 +337,10 @@ export default function WhyRoutingIsntGovernancePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/design-partners" 
+              href="/pricing" 
               className="inline-flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition"
             >
-              Apply for Design Partner Program
+              Start free trial
             </Link>
             <Link 
               href="/compare" 

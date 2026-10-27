@@ -197,7 +197,7 @@ export default function McpProxyBlogPage() {
 └── 500 credits remaining
 
 Result:
-  research-agent: 60 calls → 402 EXHAUSTED
+  research-agent: 60 calls → budget_exhausted
   content-agent:  still operational ✓
   orchestrator:   500 credits remaining ✓`}</code>
           </pre>

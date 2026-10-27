@@ -197,7 +197,8 @@ export default function MacaroonTokensVsApiKeysBlogPage() {
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Root macaroon: access to translation API
+            <code className="text-green-300">{`# Generic macaroon example (not SatGate syntax)
+# Root macaroon: access to translation API
 root_secret = "ultra-secure-shared-key"
 location = "https://api.example.com/translate"
 identifier = "user-12345-translate-access"
@@ -229,7 +230,8 @@ macaroon.add_first_party_caveat("rate_limit = 100/hour")
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Agent A has a macaroon with $50 budget
+            <code className="text-green-300">{`# Generic macaroon example (not SatGate syntax)
+# Agent A has a macaroon with $50 budget
 agent_a_macaroon = <root macaroon with budget_max = 50.00>
 
 # Agent A delegates to Agent B, but with stricter limits
@@ -310,7 +312,7 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
           <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-6 my-6">
             <h4 className="text-white font-bold mb-2">✅ Macaroon Approach</h4>
             <p className="text-gray-300 text-sm">
-              Mint macaroon with <code className="text-green-300 bg-black/50 px-1 rounded">budget_max = 25.00</code> caveat. Gateway enforces budget on every request. When $25 is spent, further requests return <code className="text-green-300 bg-black/50 px-1 rounded">402 Payment Required</code>. No proxy needed. No dashboard monitoring. Hard enforcement at the protocol level.
+              Mint a token with a $25 budget and send its calls through the gateway. When $25 is spent, the gateway refuses the next request with <code className="text-green-300 bg-black/50 px-1 rounded">402 Payment Required</code>.
             </p>
           </div>
 
@@ -379,13 +381,13 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
           <h3 className="text-xl font-bold text-white mt-8 mb-3">3. Context-Aware Authorization</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            Macaroons can embed context into the authorization decision. A caveat like <code className="text-green-300 bg-black/50 px-1 rounded">time_of_day = business_hours</code> or <code className="text-green-300 bg-black/50 px-1 rounded">request_rate &lt; 10/min</code> lets you enforce policies that API keys can't express.
+            Macaroons can embed context into the authorization decision. A generic caveat like <code className="text-green-300 bg-black/50 px-1 rounded">time_of_day = business_hours</code> (not SatGate syntax) lets you enforce policies that API keys can&apos;t express. With SatGate, a helper&apos;s token can narrow the routes, tools, budget and end date.
           </p>
 
-          <h3 className="text-xl font-bold text-white mt-8 mb-3">4. Cryptographic Signed Receipt</h3>
+          <h3 className="text-xl font-bold text-white mt-8 mb-3">4. Built-in delegation limits</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            Every macaroon embeds its delegation history. You can cryptographically verify not just that a request is authorized, but how many delegation steps led to that authorization and what constraints were added at each step.
+            Each token records how many hand-offs it is from the original, and every hand-off can only narrow it.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">When to Use Each Approach</h2>
@@ -447,7 +449,8 @@ agent_c_macaroon = attenuate(agent_b_macaroon, [
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Example capability mapping
+            <code className="text-green-300">{`# Generic example (not SatGate syntax)
+# Example capability mapping
 capabilities:
   translate-api:
     endpoints: 
@@ -476,7 +479,8 @@ capabilities:
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`import { Macaroon } from 'macaroons.js';
+            <code className="text-green-300">{`// Generic macaroon example (not SatGate syntax)
+import { Macaroon } from 'macaroons.js';
 
 // Mint a macaroon for agent demo access
 const demo_macaroon = new Macaroon({
@@ -500,7 +504,8 @@ const token = demo_macaroon.serialize();`}</code>
           </p>
 
           <pre className="bg-gray-900/70 border border-gray-800 rounded-lg p-4 overflow-x-auto text-sm my-6">
-            <code className="text-green-300">{`# Agent A has demo macaroon, delegates to Agent B
+            <code className="text-green-300">{`# Generic macaroon example (not SatGate syntax)
+# Agent A has demo macaroon, delegates to Agent B
 attenuated_token = agent_a_token.add_caveats([
   "budget_max = 2.00",           # Subset of parent budget
   "endpoints = /translate/en-es", # Subset of parent endpoints  
@@ -511,7 +516,7 @@ attenuated_token = agent_a_token.add_caveats([
 # even if Agent A's original token allowed more`}</code>
           </pre>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-4">Real-World Impact: The Numbers</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-4">What changes</h2>
 
           <p className="text-gray-300 leading-relaxed">
             Moving from API keys to macaroons isn't just a security improvement — it's an economic enabler. Consider the operational impact:
@@ -520,7 +525,7 @@ attenuated_token = agent_a_token.add_caveats([
           <h3 className="text-xl font-bold text-white mt-8 mb-3">Before: API Key Management Overhead</h3>
 
           <ul className="text-gray-300 space-y-2 ml-6 list-disc">
-            <li><strong className="text-white">Manual provisioning:</strong> 30 minutes per new agent integration</li>
+            <li><strong className="text-white">Manual provisioning:</strong> a key per new agent integration</li>
             <li><strong className="text-white">Budget monitoring:</strong> Daily dashboard checks, quarterly budget reconciliation</li>
             <li><strong className="text-white">Access revocation:</strong> Manual cleanup when projects end</li>
             <li><strong className="text-white">Incident response:</strong> Hours to identify which agent caused usage spikes</li>
@@ -532,11 +537,11 @@ attenuated_token = agent_a_token.add_caveats([
             <li><strong className="text-white">Self-service provisioning:</strong> Agents mint restricted tokens instantly</li>
             <li><strong className="text-white">Automatic budget enforcement:</strong> Hard limits prevent overages</li>
             <li><strong className="text-white">Cryptographic expiration:</strong> No manual cleanup needed</li>
-            <li><strong className="text-white">Built-in attribution:</strong> Every macaroon carries delegation history</li>
+            <li><strong className="text-white">Built-in delegation limits:</strong> Each token records how many hand-offs it is from the original</li>
           </ul>
 
           <p className="text-gray-300 leading-relaxed">
-            The productivity gain is significant, but the risk reduction is transformative. With API keys, a runaway agent can blow through a monthly budget in hours. With macaroons, an agent can spend exactly what it's authorized to spend, no more.
+            With API keys, a runaway agent can blow through a monthly budget in hours. With a budget on each agent&apos;s token, the gateway refuses the call that would go past it.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Strategic Advantage</h2>
@@ -548,7 +553,7 @@ attenuated_token = agent_a_token.add_caveats([
           <h3 className="text-xl font-bold text-white mt-8 mb-3">1. Safe Agent Integration</h3>
 
           <p className="text-gray-300 leading-relaxed">
-            Enterprises hesitate to integrate AI agents with critical APIs because of cost and security risks. Macaroons eliminate both concerns. Agents can't exceed their budgets or access unauthorized endpoints by design.
+            Enterprises hesitate to integrate AI agents with critical APIs because of cost and security risks. Agents can't widen their own budget or reach routes outside their token.
           </p>
 
           <h3 className="text-xl font-bold text-white mt-8 mb-3">2. Zero-Friction Micropayments</h3>
@@ -578,7 +583,7 @@ attenuated_token = agent_a_token.add_caveats([
           </p>
 
           <p className="text-gray-300 leading-relaxed">
-            <strong className="text-white">3. Enable agent self-service:</strong> Publish a tool manifest that lets agents request macaroons with specific constraints. Watch how agents interact with budget-aware APIs differently than unlimited-access APIs.
+            <strong className="text-white">3. Let agents hand on smaller tokens:</strong> With SatGate, a helper&apos;s token can narrow the routes, tools, budget and end date.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-4">The Bottom Line</h2>
@@ -604,7 +609,7 @@ attenuated_token = agent_a_token.add_caveats([
             <p className="mb-4 text-gray-300">Static API keys become dangerous when autonomous agents can spend, delegate, and retry. Start with a risk assessment, then move to revocable capabilities.</p>
             <div className="flex flex-wrap gap-3 text-sm font-semibold">
               <Link href="/agent-api-key-risk-assessment" className="text-cyan-300 hover:text-cyan-200">API key risk assessment →</Link>
-              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Mint a capability token →</Link>
+              <Link href="/build" className="text-cyan-300 hover:text-cyan-200">Build with SatGate →</Link>
               <Link href="/revocable-agent-credentials" className="text-cyan-300 hover:text-cyan-200">Revocable credentials →</Link>
               <Link href="/agent-capability-tokens" className="text-cyan-300 hover:text-cyan-200">Capability tokens →</Link>
               <Link href="/agent-control-plane" className="text-cyan-300 hover:text-cyan-200">Agent control plane →</Link>
@@ -633,7 +638,7 @@ attenuated_token = agent_a_token.add_caveats([
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/build" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition text-sm">
-                Generate Token Policy
+                Build with SatGate
               </Link>
               <a href="https://github.com/SatGate-io/satgate" className="inline-flex items-center gap-2 border border-blue-500 text-blue-300 px-6 py-3 rounded-lg font-bold hover:bg-blue-900/30 transition text-sm">
                 View on GitHub

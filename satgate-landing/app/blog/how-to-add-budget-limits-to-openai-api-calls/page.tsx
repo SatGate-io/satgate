@@ -54,7 +54,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
         name: 'Does OpenAI have built-in spending limits?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'OpenAI has account-level usage limits, but they are not the same as budget enforcement before the request goes through. They are coarse, can lag behind real usage, and usually cannot isolate spend by agent, user, session, workflow, or tool before a request executes.',
+          text: 'OpenAI lets you set hard spend limits per organization and per project. A project is not an agent: if several agents share a project, one runaway loop uses up the limit for all of them. SatGate gives each agent its own budget before the call reaches OpenAI.',
         },
       },
       {
@@ -118,7 +118,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <h1 className="text-4xl font-bold mb-4">How to Add OpenAI API Budget Limits Before Calls Run</h1>
           <div className="mb-6 rounded-2xl border border-green-900/60 bg-green-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-green-300">Direct answer</p>
-            <p className="text-gray-300">OpenAI usage limits are account-level. Controls that run before the request goes through enforce per-agent, per-team, and per-workflow budgets before a GPT call reaches OpenAI. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
+            <p className="text-gray-300">OpenAI lets you set hard spend limits per organization and per project. SatGate gives each agent its own budget before the call reaches OpenAI. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.</p>
           </div>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/build" className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-bold text-black transition hover:bg-gray-200">Add a budget with SatGate</Link>
@@ -137,10 +137,10 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
 
         <article className="prose prose-invert prose-lg max-w-none">
           
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">The $72,000 Lesson</h2>
+          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">The overnight bill</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            Last month, a developer shared their nightmare: a misconfigured retry loop burned $72,000 in OpenAI credits overnight. The dashboard showed the damage hours later. The bill? Non-negotiable.
+            Retry loops have burned thousands of dollars overnight. The dashboard shows the damage hours later.
           </p>
           
           <p className="text-gray-300 leading-relaxed">
@@ -155,7 +155,7 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           </ul>
           
           <p className="text-gray-300 leading-relaxed">
-            OpenAI&apos;s built-in limits? They&apos;re monthly caps that email you after overspending. That&apos;s like a smoke detector that texts you after your house burns down.
+            OpenAI lets you set hard spend limits per organization and per project. A project is not an agent: if several agents share a project, one runaway loop uses up the limit for all of them. SatGate gives each agent its own budget before the call reaches OpenAI.
           </p>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Why Traditional Solutions Fail</h2>
@@ -167,15 +167,8 @@ export default function HowToAddBudgetLimitsToOpenAIAPICallsPage() {
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">1. OpenAI&apos;s Usage Limits</h3>
           
           <p className="text-gray-300 leading-relaxed">
-            OpenAI offers monthly spending limits, but they have critical flaws:
+            OpenAI lets you set hard spend limits per organization and per project. A project is not an agent: if several agents share a project, one runaway loop uses up the limit for all of them.
           </p>
-          
-          <ul className="list-disc list-inside space-y-2 text-gray-300 my-4">
-            <li><strong>Delayed enforcement:</strong> Limits check against cached usage data</li>
-            <li><strong>All-or-nothing:</strong> Hit the limit? Your entire account stops</li>
-            <li><strong>No granularity:</strong> Can&apos;t set limits per team, project, or user</li>
-            <li><strong>Soft enforcement:</strong> &ldquo;Hard limits&rdquo; can still overshoot by 10-20%</li>
-          </ul>
           
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">2. Monitoring Dashboards</h3>
           
@@ -254,7 +247,7 @@ class OpenAIBudgetWrapper:
             <code>{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
 Send the agent's calls through the gateway with that token.
 The gateway holds the upstream key. The agent only holds the SatGate token.
-There is no daily limit yet. A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
+A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 2: Create Budget-Limited Tokens</h2>
@@ -266,7 +259,7 @@ There is no daily limit yet. A spent budget returns HTTP 402 with code budget_ex
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
             <code>{`Mint a token with a budget in the SatGate dashboard: Cloud, then Tokens or MCP setup.
 Use that token on calls you send through the gateway.
-Do not set a daily limit. That control does not exist yet.`}</code>
+Mint tokens and set budgets in the dashboard; there is no CLI for this.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Step 3: Update Your Code</h2>
@@ -288,14 +281,13 @@ A spent budget returns HTTP 402 with code budget_exhausted, not 429.`}</code>
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# Create tokens within a budget in the dashboard (Cloud, then Tokens or MCP setup).
-# There is no satgate budget create command, and no daily limit.`}</code>
+            <code>{`# Create tokens within a budget in the dashboard (Cloud, then Tokens or MCP setup).`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Real-World Example: Preventing Retry Storms</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            Here&apos;s how SatGate prevents the $72,000 nightmare scenario:
+            Here&apos;s how SatGate stops a retry storm:
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
@@ -324,24 +316,30 @@ async function processDocument(doc) {
           </p>
           
           <p className="text-gray-300 leading-relaxed">
-            With SatGate: The token&apos;s hourly limit triggers after ~$50, blocking further requests:
+            With SatGate: the token&apos;s budget runs out after about $50 of calls, and the next request gets HTTP 402 budget_exhausted:
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
-            <code>{`# Request 1: $12.50 (huge input) - Allowed (total: $12.50)
-# Request 2: $12.50 retry - Allowed (total: $25.00)
-# Request 3: $12.50 retry - Allowed (total: $37.50)
-# Request 4: $12.50 retry - Allowed (total: $50.00)
-# Request 5: BLOCKED - Hourly limit exceeded
+            <code>{`# Token budget: 5,000 credits (about $50 at the price you set)
+# Route price: 1,250 credits a call
+# Request 1: Allowed (remaining: 3,750)
+# Request 2: retry - Allowed (remaining: 2,500)
+# Request 3: retry - Allowed (remaining: 1,250)
+# Request 4: retry - Allowed (remaining: 0)
+# Request 5: refused
+
+HTTP/1.1 402 Payment Required
+X-SatGate-Budget-Cost-Credits: 1250
+X-SatGate-Budget-Remaining-Credits: 0
 
 {
-  "error": {
-    "type": "budget_exceeded",
-    "message": "Hourly budget limit exceeded",
-    "limit": 50,
-    "spent": 50,
-    "resets_at": "2024-04-07T19:00:00Z"
-  }
+  "error": "budget_exhausted",
+  "message": "Insufficient credits for this request",
+  "payable": false,
+  "hint": "This 402 cannot be paid. Ask the token owner for more budget.",
+  "cost_credits": 1250,
+  "remaining_credits": 0,
+  "receipt": { ... }
 }`}</code>
           </pre>
           
@@ -354,41 +352,32 @@ async function processDocument(doc) {
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
             <code>{`Mint one token per user, with a budget, in the SatGate dashboard (Cloud, then Tokens or MCP setup).
 Send that user's calls through the gateway with their token.
-There is no daily limit, and no satgate.tokens.create API.
 A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Monitoring and Alerts</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            A spent budget is enforced on the token, not by a CLI. There is no satgate alerts command.
+            A spent budget is enforced on the token. Watch spend and refusals in the dashboard.
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
             <code>{`Mint the token in the SatGate dashboard (Cloud, then Tokens or MCP setup).
-There is no satgate alerts add command, and no daily period.
 A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           </pre>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">The Results</h2>
           
           <p className="text-gray-300 leading-relaxed">
-            Teams using request-level budget enforcement report:
+            Runaway loops stop at the budget you set, for traffic that goes through SatGate in Control.
           </p>
-          
-          <ul className="list-disc list-inside space-y-2 text-gray-300 my-4">
-            <li>Runaway loops stop at the budget you set, for traffic that goes through SatGate in Control</li>
-            <li><strong>73% reduction</strong> in overall OpenAI costs (better visibility)</li>
-            <li><strong>Zero production outages</strong> from hitting OpenAI account limits</li>
-            <li><strong>Granular insights</strong> into cost per feature/team/user</li>
-          </ul>
           
           <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Common Questions</h2>
           
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Does this add latency?</h3>
           
           <p className="text-gray-300 leading-relaxed">
-            SatGate adds &lt;1ms to check budgets. Compare that to the 2-3 seconds for a typical GPT-4 call. The overhead is negligible.
+            The budget check is a fast lookup in SatGate&apos;s budget store, small next to the seconds a typical GPT-4 call takes.
           </p>
           
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">What happens when limits are hit?</h3>
@@ -400,7 +389,7 @@ A spent budget returns HTTP 402 with code budget_exhausted.`}</code>
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Can I override limits in emergencies?</h3>
           
           <p className="text-gray-300 leading-relaxed">
-            Mint another token with a larger budget in the dashboard if you need more room. There is no satgate token update command, and no daily limit to raise.
+            Mint another token with a larger budget in the dashboard if you need more room.
           </p>
           
           <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 my-4">
@@ -417,7 +406,7 @@ Do not treat that as HTTP 429.`}</code>
           <ol className="list-decimal list-inside space-y-2 text-gray-300 my-4">
             <li>Install SatGate alongside your existing setup</li>
             <li>Route development traffic through budget-limited tokens</li>
-            <li>Monitor savings and prevented overages</li>
+            <li>Watch spend and refusals</li>
             <li>Gradually migrate production workloads</li>
           </ol>
           
@@ -428,12 +417,12 @@ Do not treat that as HTTP 429.`}</code>
           <div className="my-10 rounded-2xl border border-green-900/60 bg-green-950/20 p-6">
             <h2 className="text-2xl font-bold text-white mb-4">OpenAI API Budget Limit: The Click-Intent Answer</h2>
             <p className="text-gray-300 leading-relaxed">
-              If you searched for an OpenAI API budget, the distinction is simple: account-level usage limits protect the vendor account; budget limits checked before the request goes through protect each agent, team, session, customer, and workflow before the next GPT call runs.
+              If you searched for an OpenAI API budget, the distinction is simple: OpenAI&apos;s limits stop at the organization or project; budget limits checked before the request goes through protect each agent before the next GPT call runs.
             </p>
             <ol className="list-decimal list-inside space-y-2 text-gray-300 my-4">
               <li>Tag every OpenAI request with agent, team, customer, session, and workflow.</li>
               <li>Price the request using model, token, and tool policy before forwarding it.</li>
-              <li>Block or require approval when the remaining budget is not enough.</li>
+              <li>Block the request when the remaining budget is not enough.</li>
             </ol>
           </div>
           
@@ -456,7 +445,7 @@ Do not treat that as HTTP 429.`}</code>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">Does OpenAI have built-in spending limits?</h3>
           <p className="text-gray-300 leading-relaxed">
-            OpenAI has account-level usage limits, but they are not the same as budget enforcement before the request goes through. They are coarse, can lag behind real usage, and usually cannot isolate spend by agent, user, session, workflow, or tool before a request executes.
+            OpenAI lets you set hard spend limits per organization and per project. A project is not an agent: if several agents share a project, one runaway loop uses up the limit for all of them. SatGate gives each agent its own budget before the call reaches OpenAI.
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3 text-white">What is the difference between a rate limit and a budget limit for OpenAI?</h3>

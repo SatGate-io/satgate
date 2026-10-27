@@ -183,8 +183,7 @@ tools:
           </pre>
 
           <p className="text-gray-300 leading-relaxed">
-            The ceiling travels in the token, and SatGate checks what&apos;s left before each call. Spend tracking uses a lightweight ledger (Redis-backed 
-            by default).
+            The ceiling travels in the token, and SatGate checks what&apos;s left before each call. Spend is tracked in memory on the open-source proxy and in Redis on SatGate Cloud.
           </p>
 
           <h2 className="text-2xl font-bold mt-12 mb-4 text-white">Step 3: Agent Sees Its Own Budget</h2>
@@ -202,8 +201,8 @@ tools:
       "description": "Search the web [SatGate: 2 credits per call]",
       "x-satgate": {
         "cost_credits": 2,
-        "budget_remaining": 487,
-        "calls_affordable": 243
+        "budget_remaining_credits": 487,
+        "budget_total_credits": 500
       }
     }
   ]
@@ -269,11 +268,11 @@ tools:
             <li><strong className="text-white">Cost:</strong> credits charged</li>
             <li><strong className="text-white">Budget remaining:</strong> after this call</li>
             <li><strong className="text-white">Cost center:</strong> department/team tag</li>
-            <li><strong className="text-white">Delegation chain:</strong> full path from root to leaf agent</li>
+            <li><strong className="text-white">Delegation depth:</strong> how many hand-offs the token is from the original</li>
           </ul>
           <p className="text-gray-300 leading-relaxed mt-4">
-            The SatGate dashboard aggregates this into a Shadow Report — showing spend by agent, by tool, 
-            by team, with trends over time. Start in Observe mode to see the data, then switch to Control 
+            The dashboard&apos;s Usage page shows spend by agent token, tool and cost center over time.
+            Start in Observe mode to see the data, then switch to Control 
             when you&apos;re ready to enforce.
           </p>
 
