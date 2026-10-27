@@ -215,7 +215,8 @@ func TestStdioEnvList(t *testing.T) {
 		EnvPassthrough: []string{"API_KEY", "OVERRIDE", "MISSING", "", "BAD=NAME"},
 	}
 	got := stdioEnv(cfg, lookup)
-	want := []string{"API_KEY=passed", "HOME=/srv/tool", "OVERRIDE=from-config", "PATH=/bin", "TZ=UTC"}
+	// The proxy's variables first, sorted, then the env map, sorted.
+	want := []string{"API_KEY=passed", "PATH=/bin", "TZ=UTC", "HOME=/srv/tool", "OVERRIDE=from-config"}
 	if strings.Join(got, "\n") != strings.Join(want, "\n") {
 		t.Fatalf("stdioEnv = %q, want %q", got, want)
 	}
@@ -224,8 +225,8 @@ func TestStdioEnvList(t *testing.T) {
 	if env := stdioEnv(UpstreamConfig{}, func(string) (string, bool) { return "", false }); env == nil || len(env) != 0 {
 		t.Fatalf("empty stdioEnv = %#v, want an empty non-nil list", env)
 	}
-	if !sort.StringsAreSorted(got) {
-		t.Fatalf("stdioEnv not sorted: %q", got)
+	if !sort.StringsAreSorted(got[:3]) || !sort.StringsAreSorted(got[3:]) {
+		t.Fatalf("stdioEnv groups not sorted: %q", got)
 	}
 }
 

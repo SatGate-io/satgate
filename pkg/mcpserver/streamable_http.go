@@ -220,6 +220,11 @@ func (s *SSEServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *SSEServer) handleStreamable(w http.ResponseWriter, r *http.Request) {
+	// A token in the URL is refused unless server.allowQueryToken is on,
+	// before anything else, for every HTTP method.
+	if s.refuseQueryToken(w, r) {
+		return
+	}
 	if s.operationTracker != nil {
 		lease, ok := s.beginOperation()
 		if !ok {
@@ -232,11 +237,6 @@ func (s *SSEServer) handleStreamable(w http.ResponseWriter, r *http.Request) {
 
 	if !originAllowed(r.Header.Get("Origin"), s.allowedOrigins) {
 		http.Error(w, "origin not allowed", http.StatusForbidden)
-		return
-	}
-
-	// A token in the URL is refused unless server.allowQueryToken is on.
-	if s.refuseQueryToken(w, r) {
 		return
 	}
 
@@ -400,9 +400,9 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 	}
 
 	authToken := s.authToken(r)
-	// With sign-every-action on, the connection's credential also travels on
-	// the context, apart from params, and params that are not an object are
-	// left as they came (see authenticate).
+	// The connection's credential also travels on the context, apart from
+	// params (see withTransportToken). With sign-every-action on, params that
+	// are not an object are left as they came (see authenticate).
 	keepParams := s.proxy.signEveryAction && len(req.Params) > 0 && !paramsAreObject(req.Params)
 	if keepParams {
 		// nothing to inject into
@@ -416,9 +416,7 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 
 	// r.Context() carries the enterprise spend session. Do not replace it.
 	reqCtx := sess.contextOnto(r.Context())
-	if s.proxy.signEveryAction {
-		reqCtx = withTransportToken(reqCtx, authToken)
-	}
+	reqCtx = withTransportToken(reqCtx, authToken)
 	rpcResp, handleErr := s.proxy.handleRequest(reqCtx, req)
 	if handleErr != nil {
 		rpcResp = NewErrorResponse(req.ID, CodeInternalError, handleErr.Error())
