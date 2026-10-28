@@ -49,10 +49,11 @@ export class ValidationError extends SatGateError {
 }
 
 /**
- * A request that carries a credential was answered with a redirect. The SDK
- * never follows a redirect on such a request, so the credential is sent only
- * to the configured host, once. The message names only the status and that
- * host.
+ * An SDK request was answered with a redirect. The SDK never follows a
+ * redirect, so a request (and any credential it carries) is sent only to the
+ * configured URL, once. `host` and the message name only the status and the
+ * host and port of the request URL; the SDK passes that URL's host with user
+ * information, path and query removed.
  */
 export class RedirectRefusedError extends SatGateError {
   public readonly host: string;
@@ -60,7 +61,7 @@ export class RedirectRefusedError extends SatGateError {
   constructor(status: number, host: string, label: string = 'host') {
     super(
       `${label} ${host} answered HTTP ${status || 'redirect'}; the SDK does not follow ` +
-      'redirects on requests that carry a credential, and the credential was not sent again',
+      'redirects, and the request was not sent again',
       status || undefined,
     );
     this.name = 'RedirectRefusedError';

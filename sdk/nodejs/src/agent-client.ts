@@ -88,10 +88,10 @@ export class LNDWallet implements LightningWallet {
    * Send one request carrying the macaroon header to the LND host. Redirects
    * are never followed (fetchWithoutRedirects): the macaroon is sent only to
    * the configured host, once. A 3xx answer throws RedirectRefusedError
-   * naming the status and the host.
+   * naming the status and the host and port of the request URL.
    */
   private async request(url: string, init: RequestInit): Promise<Response> {
-    return fetchWithoutRedirects(url, init, { label: 'LND host', host: this.host });
+    return fetchWithoutRedirects(url, init, { label: 'LND host' });
   }
   
   async payInvoice(invoice: string): Promise<string> {

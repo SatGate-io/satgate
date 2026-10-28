@@ -1,20 +1,33 @@
 /**
- * The one transport for SDK requests that carry a credential.
+ * The one transport for every HTTP request the SDK sends.
  *
- * Every request the SDK sends with a credential (an Authorization header,
+ * Every request (including those with a credential: an Authorization header,
  * X-Admin-Token, an LND macaroon header, or a token in the JSON body) goes
  * through fetchWithoutRedirects. It never follows a redirect: the request is
  * sent once, with redirect: 'manual', to the URL the caller configured, and
  * any 3xx answer throws RedirectRefusedError naming only the status and the
- * host that answered.
+ * host and port of the request URL (never its user information, path or
+ * query).
  */
 
 import { RedirectRefusedError } from './errors';
 
-/** host[:port] of url, without user info, path or query. */
+/**
+ * host[:port] of url, without user info, path or query. A port written in
+ * the URL is kept even when it is the scheme's default (URL drops it).
+ */
 export function requestHost(url: string): string {
   try {
-    return new URL(url).host || 'an unreadable host';
+    const parsed = new URL(url);
+    if (!parsed.hostname) return 'an unreadable host';
+    let port = parsed.port;
+    if (!port) {
+      const authority = /^[a-z][a-z0-9+.-]*:\/\/([^/?#]*)/i.exec(url)?.[1] ?? '';
+      const hostPart = authority.slice(authority.lastIndexOf('@') + 1);
+      const written = /:(\d+)$/.exec(hostPart);
+      if (written) port = String(Number(written[1]));
+    }
+    return port ? `${parsed.hostname}:${port}` : parsed.hostname;
   } catch {
     return 'an unreadable host';
   }
@@ -30,8 +43,6 @@ interface MinimalResponse {
 export interface NoRedirectOptions<R> {
   /** Names the kind of host in the error, e.g. "SatGate gateway". */
   label?: string;
-  /** The host named in the error; by default the host of the URL. */
-  host?: string;
   /** The fetch to use; by default the global fetch. */
   fetchImpl?: (url: string, init: RequestInit) => Promise<R>;
 }
@@ -49,9 +60,10 @@ async function discard(body: unknown): Promise<void> {
 /**
  * Send one request and never follow a redirect. Any redirect mode the caller
  * passed is replaced by 'manual'. A 3xx answer (or an opaque redirect)
- * throws RedirectRefusedError naming the status and the host, so the
- * credential is never sent to the redirect's target. Network errors are
- * thrown unchanged.
+ * throws RedirectRefusedError naming the status and requestHost(url) (the
+ * host and port of the request URL, without user information, path or
+ * query), so the request is never sent to the redirect's target. Network
+ * errors are thrown unchanged.
  */
 export async function fetchWithoutRedirects<R extends MinimalResponse = Response>(
   url: string,
@@ -62,7 +74,7 @@ export async function fetchWithoutRedirects<R extends MinimalResponse = Response
   const response = await send(url, { ...init, redirect: 'manual' });
   if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
     await discard(response.body);
-    throw new RedirectRefusedError(response.status, options.host ?? requestHost(url), options.label);
+    throw new RedirectRefusedError(response.status, requestHost(url), options.label);
   }
   return response;
 }

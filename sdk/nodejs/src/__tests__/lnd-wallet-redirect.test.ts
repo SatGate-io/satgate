@@ -155,6 +155,29 @@ maybe('LNDWallet never follows a redirect with the macaroon header', () => {
     }
   }
 
+  for (const operation of OPERATIONS) {
+    it(`${operation}: a configured host with a path and query gives an error naming only host and port`, async () => {
+      const origin = await serve({ secure: true, status: 302, location: '/sink' });
+      const host = `127.0.0.1:${origin.port}`;
+      const wallet = new LNDWallet({ host: `${host}/cfgpath?cfgquery=hidden-value`, macaroonHex: MACAROON_HEX });
+      let caught: unknown;
+      try {
+        await call(wallet, operation);
+      } catch (e) {
+        caught = e;
+      }
+      expect(caught).toBeInstanceOf(SatGateError);
+      const err = caught as SatGateError & { host?: string };
+      expect(err.host).toBe(host);
+      expect(err.message.startsWith(`LND host ${host} answered HTTP 302;`)).toBe(true);
+      for (const part of ['cfgpath', 'cfgquery', 'hidden-value', '?']) {
+        expect(err.message).not.toContain(part);
+      }
+      expect(origin.seen).toHaveLength(1);
+      expect(origin.seen[0].path.startsWith('/cfgpath?cfgquery=hidden-value')).toBe(true);
+    });
+  }
+
   it('the error names only the status and the LND host', async () => {
     const origin = await serve({ secure: true, status: 302, location: 'http://user:pw@127.0.0.1:9/path?q=hidden' });
     const host = `127.0.0.1:${origin.port}`;

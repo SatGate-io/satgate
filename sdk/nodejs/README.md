@@ -69,19 +69,25 @@ console.log(valid.valid, response.status);
 
 ## Redirects
 
-No SDK request that carries a credential follows an HTTP redirect. That
-covers every request that sends an `Authorization` header, `X-Admin-Token`,
-an LND macaroon or a token in the JSON body: `SatGateClient` (all requests,
-including `health()`), `SatGateAgentClient` (minting, every request with the
-capability token including the 401 refresh and the L402 retry,
-`validateToken` and `delegate`), `SatGate` (`issue`, `pay`, `verify`),
-`LNDWallet` and `AlbyWallet`.
+No HTTP request the SDK sends follows a redirect: `SatGateClient` (all
+requests, including `health()` and `governance.getGraph()`),
+`SatGateAgentClient` (minting, every request with the capability token
+including the 401 refresh and the L402 retry, `validateToken` and
+`delegate`), `SatGate` (`issue`, `pay`, `verify`), `LNDWallet` and
+`AlbyWallet`.
 
-Such a request is sent once, with `redirect: 'manual'` (a `redirect` option
+Each request is sent once, with `redirect: 'manual'` (a `redirect` option
 you pass is overridden), to the configured URL. A 3xx answer rejects with
 `RedirectRefusedError` (a `SatGateError`, with `statusCode` and `host`)
-naming only the status and the host that answered; the credential is not
-sent again. `SatGateClient.health()` resolves `false` in that case.
+naming only the status and the host and port of the request URL (no user
+information, path or query, also when they are part of the `host` given to
+`LNDWallet`); the request is not sent again. `SatGateClient.health()`
+resolves `false` in that case.
+
+The SDK keeps no session or cookie jar: a request carries no cookie or
+credential beyond the headers and body the SDK (or your options) set. In a
+browser, `fetch` still applies its default cookie rule
+(`credentials: 'same-origin'`).
 
 Compatibility: earlier releases followed these redirects. A gateway, LND,
 Alby or SatGate API URL that answers with a redirect (for example `http://`
