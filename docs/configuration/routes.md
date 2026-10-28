@@ -16,8 +16,8 @@ routes:
         X-Version: "2"         # Exact value
         X-Custom: "~^prod-"   # Go regexp (prefix with ~)
     upstream: my-backend       # Target upstream name
-    rewrite: /v2               # Optional: rewrite path before proxying
-    stripPrefix: true          # Optional: strip matched prefix
+    rewrite: /v2               # Optional: replace the path sent upstream (takes precedence over stripPrefix)
+    stripPrefix: true          # Optional: strip matched prefix (no effect when rewrite is set)
     policy:
       kind: capability         # Policy type (see below)
       scope: read              # Optional: required macaroon scope
@@ -87,14 +87,18 @@ route sets; a request that fails one is tested against the next route.
 - `pathPrefix` — the request path starts with this value (a trailing `*` is ignored)
 - `pathExact` — the request path equals this value
 - `pathRegex` — the Go regular expression matches the request path (anywhere in it, unless anchored with `^`/`$`)
-- `methods` — the request method equals one entry exactly (entries must be upper case)
-- `headers` — each named header is sent exactly once with exactly this value, or, for a value starting with `~`, a value the Go regular expression after the `~` matches
+- `methods` — the request method equals one entry exactly (entries must be non-empty method tokens with no lower-case letter)
+- `headers` — each named header is sent exactly once with exactly this value, or, for a value starting with `~`, a value the Go regular expression after the `~` matches. `Host` and the framing and hop-by-hop headers (`Content-Length`, `Transfer-Encoding`, `Connection`, `Keep-Alive`, `Proxy-Connection`, `TE`, `Trailer`, `Upgrade`) cannot be matched and are refused at startup
 
 A route that sets `rateLimit` is refused at startup: the gateway does not
 enforce per-route rate limits.
 
-Request paths are checked before any route is matched: a path with a `.`
-or `..` segment, an encoded slash or backslash, a backslash, a NUL or a
-malformed percent sequence (as sent, or after one percent-decoding) is
-refused with `400`. See [Route matching and request paths](../reference/configuration.md#route-matching)
+Request paths are checked before any route is matched, and before an
+`OPTIONS` request is answered: a path with a `.` or `..` segment, an
+encoded slash or backslash, a backslash, a NUL or a malformed percent
+sequence (as sent, or after one percent-decoding) is refused with `400`.
+The path sent upstream, after `rewrite` or `stripPrefix` and the upstream
+URL's own path, is checked the same way before the route's policy runs,
+and a `rewrite` or upstream URL path that fails on its own is refused at
+startup. See [Route matching and request paths](../reference/configuration.md#route-matching)
 for the exact rules.

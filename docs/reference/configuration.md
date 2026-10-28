@@ -122,33 +122,63 @@ least one of `pathPrefix`, `pathExact` and `pathRegex`.
 The path a matcher sees is the request path after the check below,
 percent-decoded once (`/a%20b` is matched as `/a b`).
 
-These are checked when the configuration is loaded, and the gateway does
-not start if one fails; the error names the route:
+These are checked when the configuration is loaded (`ParseYAML`, `Load`,
+`Validate`) and when a gateway is built from a configuration in code
+(`proxy.New`). If one fails, the gateway does not start, and the error
+names the route:
 
 - `pathRegex` and every `~` header value must be valid Go regular
   expressions. Each is compiled once, at load.
-- every `methods` entry must be an HTTP method token written in upper case
-  (`GET`, not `get`), since a request's method is compared exactly.
-- every `headers` name must be a valid HTTP header name other than `Host`
-  (the request host is not matched as a header).
-- a route must not set `rateLimit`. The gateway does not enforce per-route
-  rate limits, so a route that sets one is refused rather than run
-  without it.
+- every `methods` entry must be a non-empty HTTP method token (RFC 9110)
+  with no lower-case letter (`GET`, not `get` or `Get`), since a request's
+  method is compared exactly.
+- every `headers` name must be a valid HTTP header name (an RFC 9110
+  token), and must not be `Host` or one of the framing and hop-by-hop
+  headers `Content-Length`, `Transfer-Encoding`, `Connection`,
+  `Keep-Alive`, `Proxy-Connection`, `TE`, `Trailer` and `Upgrade` (names
+  compared case-insensitively). The HTTP server handles these before the
+  request is routed: the request host is not in the request's headers, and
+  repeated identical `Content-Length` fields, for example, reach the
+  gateway as one, so whether such a header was sent exactly once cannot be
+  judged.
+- a route must not set `rateLimit` (any `rateLimit` block, including
+  `{}`). The gateway does not enforce per-route rate limits, so a route
+  that sets one is refused rather than run without it.
+
+A route's `rewrite` and an upstream's URL path are also checked at load;
+see [Request paths](#request-paths).
 
 **Compatibility.** Earlier versions matched routes on `pathExact` or
 `pathPrefix` alone: `methods`, `headers` and `pathRegex` were accepted but
 had no effect, a route with only `pathRegex` never matched, and a route
 with both `pathExact` and `pathPrefix` was matched on `pathExact` only.
 A route that sets these matchers now matches fewer requests, and requests
-it no longer matches go to the next route. `rateLimit` was also accepted
-without effect and is now refused at load; remove it from the route.
+it no longer matches go to the next route. Because these matchers and
+`rateLimit` had no effect before, this version refuses at load a route
+that sets:
+
+- a `methods` entry that is empty, is not an HTTP method token, or has a
+  lower-case letter;
+- a `headers` name that is not a valid header name, is `Host`, or is
+  `Content-Length`, `Transfer-Encoding`, `Connection`, `Keep-Alive`,
+  `Proxy-Connection`, `TE`, `Trailer` or `Upgrade`;
+- a `~` header value that is not a valid Go regular expression;
+- `rateLimit`.
+
+An invalid `pathRegex` was already refused when a configuration was
+loaded; a gateway built from a configuration in code now refuses it too.
+The forwarding-path refusals under [Request paths](#request-paths) are the
+other configurations this version refuses. Remove or correct the entry to
+load the configuration.
 
 ### Request paths
 
-Before a request is routed, and before the built-in endpoints (`/health`,
-`/api/...`, `/check-payment/...`) are served, its path is checked in two
-forms: as sent, and percent-decoded once. The request is refused with
-`400 Bad request path`, and nothing is forwarded, when either form
+Before a request is answered or routed, including the `OPTIONS` preflight
+answer and the built-in endpoints (`/health`, `/api/...`,
+`/check-payment/...`), its path is checked in two forms: the escaped form
+(the path as it is sent on), and that form percent-decoded once. The
+request is refused with `400 Bad request path`, and nothing is forwarded,
+when either form
 
 - does not begin with `/`;
 - has a segment that is `.` or `..`;
@@ -158,17 +188,48 @@ forms: as sent, and percent-decoded once. The request is refused with
 
 The check applies to the path only, not the query string. Only one
 decoding is considered: `/a/%252e%252e/b` decodes once to `/a/%2e%2e/b`,
-which has no dot segment, and is allowed. Nothing in the path is
-rewritten: a path that passes is matched, checked by the route's policy,
-and forwarded exactly as sent. `OPTIONS` requests are answered by the
-gateway (`204`) and are not routed.
+which has no dot segment, and is allowed. Nothing is repaired.
 
-With `stripPrefix: true`, the route's `pathPrefix` is removed from the
-checked path and the upstream receives the rest of the path encoded as the
-client sent it (`/svc/a%20b` with prefix `/svc/` arrives as `/a%20b`). A
-result that does not begin with `/` gets one. If the result would fail the
-check above (for example prefix `/bare` and path `/bare./x`), the request
-is refused with `400` when the route is matched, before its policy runs.
+The escaped form is the path as the client sent it when that is a valid
+escaped path, as in `/a%20b` or `/caf%C3%A9`. When the client sent a
+character that Go's URL escaping requires to be escaped in a path (for
+example a raw non-ASCII byte, or one of ``#|^`{}``), the escaped form is
+Go's standard escaping of the decoded path: `/café` is sent on as
+`/caf%C3%A9`, `/a#b` as `/a%23b`, `/a|b` as `/a%7Cb`, and
+`/a|%41` as `/a%7CA`.
+
+`OPTIONS` requests whose path passes the check are answered by the gateway
+with `204` and are not routed; those whose path fails it get `400`.
+(`OPTIONS *` is answered by Go's HTTP server and never reaches the
+gateway.)
+
+**The path sent upstream.** Without the settings below, the upstream
+receives the checked path in its escaped form. Three configured settings
+change it, and nothing else does:
+
+1. `rewrite`: the path is replaced by the rewrite value. The value is
+   taken as the decoded path, so a `%` in it is sent as `%25` and a
+   character that must be escaped is escaped (`/a b` is sent as `/a%20b`).
+   When `rewrite` is set, `stripPrefix` has no effect.
+2. `stripPrefix: true` (without `rewrite`): the route's `pathPrefix` is
+   removed from the checked path, and the upstream receives the rest of
+   the escaped form as it was (`/svc/a%20b` with prefix `/svc/` arrives as
+   `/a%20b`). A result that does not begin with `/` gets one.
+3. The upstream URL's path, when it is not empty, is joined in front of
+   the result with one `/` between them (upstream
+   `https://api.example.com/base` or `.../base/` and path `/x` give
+   `/base/x`; path `/` gives `/base/`). A query string in the upstream URL
+   is put before the request's query string; it does not change the path.
+
+The final outgoing path, after all three, must pass the same check. If it
+does not (for example prefix `/bare` and path `/bare./x`), the request is
+refused with `400` when the route is matched, before its policy runs, and
+nothing is forwarded. This also applies to routes promoted at run time
+(`/api/agent/promote`). A route whose `rewrite`, or an upstream whose URL
+path (when not empty), fails the check on its own is refused when the
+configuration is loaded and when a gateway is built from a configuration
+in code; the error names the route or the upstream. These settings were
+applied before this version too, without the check.
 
 ### What an upstream receives
 
@@ -312,8 +373,9 @@ had no effect before, this version refuses at load an upstream `headers`
 entry that is owned by SatGate, malformed, contains a control character,
 duplicates another name by case, or cannot be delivered as configured (the
 names and values refused above); the error names the upstream and the
-entry. Remove or correct the entry to load the configuration. No other
-configuration that loaded before is refused.
+entry. Remove or correct the entry to load the configuration. The route
+matching and forwarding-path refusals are listed under
+[Route matching](#route-matching) and [Request paths](#request-paths).
 
 ## Optional Sections
 

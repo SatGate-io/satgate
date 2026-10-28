@@ -24,8 +24,10 @@ type headerMatcher struct {
 //   - pathRegex is not a valid Go regular expression;
 //   - a methods entry is not an upper-case HTTP method token (methods are
 //     compared exactly, so "get" would never match a GET request);
-//   - a headers name is not a valid HTTP header name or is Host, or a "~"
-//     value is not a valid Go regular expression;
+//   - a headers name is not a valid HTTP header name, is Host, or is a
+//     framing or hop-by-hop header (Content-Length, Transfer-Encoding,
+//     Connection, Keep-Alive, Proxy-Connection, TE, Trailer, Upgrade), or a
+//     "~" value is not a valid Go regular expression;
 //   - it sets rateLimit, which this gateway does not enforce.
 func CheckRouteMatchers(routes []Route) error {
 	for i := range routes {
@@ -82,6 +84,12 @@ func compileRouteMatch(m *RouteMatch) (*regexp.Regexp, []headerMatcher, error) {
 			// net/http carries the request host in Request.Host, not in
 			// the header map, so a Host entry could never match.
 			return nil, nil, fmt.Errorf("headers name %q cannot be matched: the request host is not a header here", name)
+		}
+		if isFramingHeader(name) {
+			// The HTTP server consumes or normalises these before routing
+			// (identical repeated Content-Length fields become one, for
+			// example), so how many times one was sent cannot be judged.
+			return nil, nil, fmt.Errorf("headers name %q cannot be matched: it is a framing or hop-by-hop header the HTTP server handles before routing", name)
 		}
 		value := m.Headers[name]
 		hm := headerMatcher{name: name, value: value}
@@ -220,6 +228,23 @@ func (r *Route) MatchesWithHeaders(path string, method string, headers map[strin
 		h[k] = append(h[k], v)
 	}
 	return r.MatchRequest(path, method, h)
+}
+
+// framingHeaders are the header names a route cannot match on: message
+// framing and hop-by-hop headers, which the HTTP server handles before the
+// request is routed.
+var framingHeaders = []string{
+	"Content-Length", "Transfer-Encoding", "Connection", "Keep-Alive",
+	"Proxy-Connection", "TE", "Trailer", "Upgrade",
+}
+
+func isFramingHeader(name string) bool {
+	for _, h := range framingHeaders {
+		if strings.EqualFold(name, h) {
+			return true
+		}
+	}
+	return false
 }
 
 // isToken reports whether s is a non-empty HTTP token (RFC 9110 5.6.2), the

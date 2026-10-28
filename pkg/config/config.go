@@ -817,6 +817,11 @@ func (c *Config) Validate() error {
 	if err := CheckUpstreamHeaders(c.Upstreams); err != nil {
 		return err
 	}
+	// A route's static rewrite and an upstream URL's base path are part of
+	// the outgoing path; each must pass the request path rule on its own.
+	if err := CheckForwardPaths(c.Routes, c.Upstreams); err != nil {
+		return err
+	}
 
 	return nil
 }

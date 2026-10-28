@@ -1,85 +1,25 @@
 package proxy
 
 import (
-	"errors"
+	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/satgate-io/satgate/pkg/config"
 )
 
-// errRequestPath is returned by checkRequestPath for a path the gateway
-// refuses with 400.
-var errRequestPath = errors.New("request path refused")
-
-// checkRequestPath enforces the one form of request path the gateway
-// matches, checks and forwards. u.EscapedPath() is the path as it will be
-// sent upstream; u.Path is that path percent-decoded once, the form routes
-// are matched against. Each of the two forms is refused when it
-//   - does not begin with "/",
-//   - has a segment that is "." or "..",
-//   - contains "%2F" or "%5C" (an encoded slash or backslash, any case),
-//   - contains a backslash or a NUL byte, or
-//   - contains a "%" that is not followed by two hex digits.
-//
-// Nothing is repaired: a path that passes is used unchanged.
+// checkRequestPath applies the request path rule (config.CheckRequestPath)
+// to a request or outgoing URL. The gateway matches, checks and forwards
+// only paths that pass it.
 func checkRequestPath(u *url.URL) error {
-	if u.Opaque != "" {
-		return errRequestPath
-	}
-	raw := u.EscapedPath()
-	if err := checkPathForm(raw); err != nil {
-		return err
-	}
-	decoded, err := url.PathUnescape(raw)
-	if err != nil || decoded != u.Path {
-		return errRequestPath
-	}
-	return checkPathForm(decoded)
+	return config.CheckRequestPath(u)
 }
 
-func checkPathForm(p string) error {
-	if !strings.HasPrefix(p, "/") {
-		return errRequestPath
-	}
-	for i := 0; i < len(p); i++ {
-		switch p[i] {
-		case 0, '\\':
-			return errRequestPath
-		case '%':
-			if i+2 >= len(p) || !isHex(p[i+1]) || !isHex(p[i+2]) {
-				return errRequestPath
-			}
-			pair := strings.ToUpper(p[i+1 : i+3])
-			if pair == "2F" || pair == "5C" {
-				return errRequestPath
-			}
-		}
-	}
-	for _, seg := range strings.Split(p, "/") {
-		if seg == "." || seg == ".." {
-			return errRequestPath
-		}
-	}
-	return nil
-}
-
-// stripPathPrefix removes prefix from a path that passed checkRequestPath
-// and starts with prefix (decoded form), removing the same characters from
-// the encoded form, so the upstream receives the checked path minus the
-// prefix, encoded as the client sent it. A result that does not begin with
-// "/" gets one. It reports false, leaving u unchanged, when the result would
-// not pass checkRequestPath.
-func stripPathPrefix(u *url.URL, prefix string) bool {
-	path, rawPath, ok := strippedPath(u, prefix)
-	if !ok {
-		return false
-	}
-	u.Path, u.RawPath = path, rawPath
-	return true
-}
-
-// strippedPath returns the Path and RawPath stripPathPrefix would set.
+// strippedPath returns the Path and RawPath of u with prefix removed from
+// a path that passed checkRequestPath and starts with prefix (decoded
+// form), removing the same characters from the escaped form, so the rest
+// keeps the escaping it had. A result that does not begin with "/" gets
+// one. It reports false when the result would not pass checkRequestPath.
 func strippedPath(u *url.URL, prefix string) (path, rawPath string, ok bool) {
 	if !strings.HasPrefix(u.Path, prefix) {
 		return "", "", false
@@ -113,14 +53,40 @@ func strippedPath(u *url.URL, prefix string) (path, rawPath string, ok bool) {
 	return out.Path, out.RawPath, true
 }
 
-// forwardPathOK reports whether the path route would forward for u passes
-// the path rule. It is checked when the route is matched, before the
-// route's policy runs, so a request whose stripped path would be refused
-// is refused before any credential or payment proof is checked.
-func forwardPathOK(route *config.Route, u *url.URL) bool {
-	if route.Rewrite != "" || !route.StripPrefix || route.Match.PathPrefix == "" {
-		return true
+// forwardPath returns the Path and RawPath the gateway forwards for a
+// request to route: the request path, or the route's static rewrite, or
+// the request path with the route's prefix stripped (a rewrite takes
+// precedence over stripPrefix). It reports false when that path, or the
+// final outgoing path after the reverse proxy for the route's upstream
+// joins it with the upstream URL's base path, does not pass
+// checkRequestPath. It is called when the route is matched, before the
+// route's policy runs, and again when the request is forwarded.
+func (g *Gateway) forwardPath(route *config.Route, u *url.URL) (path, rawPath string, ok bool) {
+	path, rawPath = u.Path, u.RawPath
+	switch {
+	case route.Rewrite != "":
+		rw := config.RewritePath(route.Rewrite)
+		path, rawPath = rw.Path, rw.RawPath
+	case route.StripPrefix && route.Match.PathPrefix != "":
+		if path, rawPath, ok = strippedPath(u, route.Match.Prefix()); !ok {
+			return "", "", false
+		}
 	}
-	_, _, ok := strippedPath(u, route.Match.Prefix())
-	return ok
+	fwd := &url.URL{Path: path, RawPath: rawPath}
+	if checkRequestPath(fwd) != nil {
+		return "", "", false
+	}
+	g.proxyMu.RLock()
+	proxy := g.proxies[route.Upstream]
+	g.proxyMu.RUnlock()
+	if proxy != nil {
+		// Run the upstream's own Director on a copy, so the path checked
+		// is the one it will send.
+		out := &http.Request{URL: fwd, Header: make(http.Header)}
+		proxy.Director(out)
+		if checkRequestPath(out.URL) != nil {
+			return "", "", false
+		}
+	}
+	return path, rawPath, true
 }

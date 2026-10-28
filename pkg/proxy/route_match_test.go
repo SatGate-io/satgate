@@ -228,8 +228,12 @@ func TestRouteMatch_GatewayRefusesInvalidMatchersAndRateLimit(t *testing.T) {
 		"bad header pattern": {Match: config.RouteMatch{PathPrefix: "/", Headers: map[string]string{"X-A": "~("}}},
 		"bad header name":    {Match: config.RouteMatch{PathPrefix: "/", Headers: map[string]string{"X A": "v"}}},
 		"lower-case method":  {Match: config.RouteMatch{PathPrefix: "/", Methods: []string{"get"}}},
+		"mixed-case method":  {Match: config.RouteMatch{PathPrefix: "/", Methods: []string{"Post"}}},
+		"non-token method":   {Match: config.RouteMatch{PathPrefix: "/", Methods: []string{"GET POST"}}},
+		"Host header":        {Match: config.RouteMatch{PathPrefix: "/", Headers: map[string]string{"Host": "example.com"}}},
 		"empty method":       {Match: config.RouteMatch{PathPrefix: "/", Methods: []string{""}}},
 		"rateLimit":          {Match: config.RouteMatch{PathPrefix: "/"}, RateLimit: &config.RateLimit{RequestsPerMinute: 10}},
+		"empty rateLimit":    {Match: config.RouteMatch{PathPrefix: "/"}, RateLimit: &config.RateLimit{}},
 	} {
 		route.Name = "route-under-test"
 		route.Policy = config.RoutePolicy{Kind: "public"}
