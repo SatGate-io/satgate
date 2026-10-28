@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -531,7 +532,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		h.Write(nonceBuf)
 		childBudgetID = fmt.Sprintf("del-%s", hex.EncodeToString(h.Sum(nil))[:24])
 		serverCaveats = append(serverCaveats, fmt.Sprintf("budget_id = %s", childBudgetID))
-		serverCaveats = append(serverCaveats, fmt.Sprintf("budget_limit = %.2f", float64(params.Budget)))
+		serverCaveats = append(serverCaveats, budgetLimitCaveat(params.Budget))
 	}
 
 	// Nothing has been taken from the parent yet, so a failure up to the carve
@@ -950,6 +951,21 @@ func (d *Delegator) giveBack(ctx context.Context, parent *TokenInfo, requestID s
 	}
 }
 
+// errBudgetParamRange is the refusal for a budget param that is not a whole
+// number an int64 holds (a fraction, or a value above math.MaxInt64). The
+// child's budget_limit is written from that int64, so every budget the
+// delegator accepts is one the verifier reads back exactly.
+const errBudgetParamRange = "budget must be a whole number of credits from 0 to 9223372036854775807"
+
+// budgetLimitCaveat writes a child's budget_limit caveat as the exact decimal
+// integer, with no float conversion, so the verifier
+// (toolcontrols.ParseWholeAmount) reads back the same number for every
+// budget the delegator accepts, up to math.MaxInt64. Earlier releases wrote
+// "budget_limit = N.00"; those still verify.
+func budgetLimitCaveat(budget int64) string {
+	return "budget_limit = " + strconv.FormatInt(budget, 10)
+}
+
 // HandleDelegate processes a satgate/delegate JSON-RPC request.
 func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo *TokenInfo) (*Response, error) {
 	if d == nil {
@@ -961,7 +977,12 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 	}
 	var params DelegateParams
 	if err := json.Unmarshal(req.Params, &params); err != nil {
-		unreadable := NewErrorResponse(req.ID, CodeInvalidParams, fmt.Sprintf("invalid delegate params: %v", err))
+		msg := fmt.Sprintf("invalid delegate params: %v", err)
+		var typeErr *json.UnmarshalTypeError
+		if errors.As(err, &typeErr) && typeErr.Field == "budget" {
+			msg = "invalid delegate params: " + errBudgetParamRange
+		}
+		unreadable := NewErrorResponse(req.ID, CodeInvalidParams, msg)
 		return d.signRefusal(ctx, req, tokenInfo, "INVALID_PARAMS", unreadable), nil
 	}
 
