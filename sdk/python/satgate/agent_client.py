@@ -186,7 +186,7 @@ class LNDWallet(LightningWallet):
                 "(insecure=True); the macaroon is sent to an unverified server",
                 self.host,
             )
-    
+
     def _request(self, method: str, url: str, **kwargs) -> requests.Response:
         """Send one request carrying the macaroon header to the LND host.
 
