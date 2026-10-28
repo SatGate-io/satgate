@@ -127,14 +127,18 @@ def test_lnd_wallet_untrusted_https_host_fails_loudly(lnd):
 
 
 def test_lnd_wallet_tls_cert_path_verifies_against_that_file(lnd, tmp_path):
-    wallet = LNDWallet(host=lnd.host, macaroon_hex=MACAROON_HEX, tls_cert_path=str(lnd.cert))
+    wallet = LNDWallet(
+        host=lnd.host, macaroon_hex=MACAROON_HEX, tls_cert_path=str(lnd.cert)
+    )
     assert wallet.get_balance() == 42
     assert wallet.pay_invoice("lnbc1") == "ab" * 32
     assert lnd.seen_macaroons == [MACAROON_HEX, MACAROON_HEX]
 
 
 def test_lnd_wallet_cert_path_alias_still_accepted(lnd):
-    wallet = LNDWallet(host=lnd.host, macaroon_hex=MACAROON_HEX, cert_path=str(lnd.cert))
+    wallet = LNDWallet(
+        host=lnd.host, macaroon_hex=MACAROON_HEX, cert_path=str(lnd.cert)
+    )
     assert wallet.get_balance() == 42
     same = LNDWallet(
         host=lnd.host, macaroon_hex=MACAROON_HEX,
@@ -145,7 +149,9 @@ def test_lnd_wallet_cert_path_alias_still_accepted(lnd):
 
 def test_lnd_wallet_other_certificate_file_fails_loudly(lnd, tmp_path):
     other, _ = _make_cert(tmp_path, "other")
-    wallet = LNDWallet(host=lnd.host, macaroon_hex=MACAROON_HEX, tls_cert_path=str(other))
+    wallet = LNDWallet(
+        host=lnd.host, macaroon_hex=MACAROON_HEX, tls_cert_path=str(other)
+    )
     with pytest.raises(SatGateError) as exc:
         wallet.get_balance()
     assert lnd.host in str(exc.value)
@@ -165,7 +171,9 @@ def test_lnd_wallet_insecure_is_the_only_way_to_skip(record_verify, tmp_path):
     with pytest.raises(SatGateError):
         LNDWallet(macaroon_hex=MACAROON_HEX, cert_path="")
     with pytest.raises(SatGateError):
-        LNDWallet(macaroon_hex=MACAROON_HEX, tls_cert_path=str(tmp_path / "missing.cert"))
+        LNDWallet(
+            macaroon_hex=MACAROON_HEX, tls_cert_path=str(tmp_path / "missing.cert")
+        )
     for value in ("true", 1, None):
         with pytest.raises(SatGateError):
             LNDWallet(macaroon_hex=MACAROON_HEX, insecure=value)
@@ -176,6 +184,8 @@ def test_lnd_wallet_insecure_is_the_only_way_to_skip(record_verify, tmp_path):
     other = tmp_path / "b.cert"
     other.write_text("x")
     with pytest.raises(SatGateError):
-        LNDWallet(macaroon_hex=MACAROON_HEX, tls_cert_path=str(cert), cert_path=str(other))
+        LNDWallet(
+            macaroon_hex=MACAROON_HEX, tls_cert_path=str(cert), cert_path=str(other)
+        )
     LNDWallet(macaroon_hex=MACAROON_HEX, insecure=False).get_balance()
     assert record_verify == [True]
