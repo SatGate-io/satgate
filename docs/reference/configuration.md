@@ -95,6 +95,17 @@ routes:
       maxBodySize: 1048576
 ```
 
+### Route names
+
+Every route needs a `name`, and route names must be unique (compared
+exactly, so `orders` and `Orders` are different names). The name is the
+route's identity: an L402 payment challenge is issued for one route name. A
+configuration in which two routes share a name is refused at startup with
+`route name "<name>" is used by routes <i> and <j>: route names must be
+unique`. An agent policy promoted at run time (`/api/agent/promote`) whose
+name is already used by a route is refused with `409 route_name_in_use`, and
+a saved agent route whose name is in use is not restored at startup.
+
 ## Optional Sections
 
 ### Redis (HA)
@@ -105,6 +116,11 @@ redis:
   password: ""
   db: 0
 ```
+
+In the open-source gateway, an enabled Redis holds the L402 consumed-proof
+store, shared by every instance that uses it. Without Redis that store is in
+process memory and correct for a single instance only. See
+[L402 Consumed-Proof Store](../configuration/lightning-providers.md#l402-consumed-proof-store).
 
 ### PostgreSQL
 ```yaml

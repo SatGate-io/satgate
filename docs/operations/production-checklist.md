@@ -25,6 +25,8 @@ Before deploying SatGate to production, verify each item.
 - [ ] Real Lightning provider configured (not `mock`)
 - [ ] `lightning.requireInvoiceRecord: true` (fail-closed)
 - [ ] L402 root key is separate from capability root key
+- [ ] `redis` configured if more than one gateway instance serves L402 routes (the in-memory consumed-proof store is single-instance only)
+- [ ] Clients re-request a `402` challenge after an L402 route's `priceSats` changes (older proofs are refused)
 - [ ] Test payment flow end-to-end
 
 ## Monitoring

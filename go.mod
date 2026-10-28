@@ -3,6 +3,7 @@ module github.com/satgate-io/satgate
 go 1.26.10
 
 require (
+	github.com/alicebob/miniredis/v2 v2.36.1
 	github.com/gorilla/websocket v1.5.3
 	github.com/nbd-wtf/go-nostr v0.52.3
 	github.com/redis/go-redis/v9 v9.18.0
@@ -42,6 +43,7 @@ require (
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
+	github.com/yuin/gopher-lua v1.1.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/arch v0.25.0 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
