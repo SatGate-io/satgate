@@ -170,6 +170,10 @@ func (s *SSEServer) rejectStreamSessionToken(w http.ResponseWriter, r *http.Requ
 			return true
 		}
 		if _, err := s.proxy.auth.Verify(r.Context(), tok); err != nil {
+			if isRevocationUnavailable(err) {
+				writeRevocationUnavailable(w)
+				return true
+			}
 			s.writeAuthChallenge(w, "authentication failed")
 			return true
 		}
@@ -441,7 +445,13 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set(headerMCPSessionID, sess.id)
 	w.Header().Set(headerMCPProtocolVersion, sess.protocol)
-	w.WriteHeader(http.StatusOK)
+	status := http.StatusOK
+	if isRevocationUnavailableResponse(rpcResp) {
+		// The token's ban state could not be read: 503, as the HTTP
+		// gateway answers, with the JSON-RPC refusal as the body.
+		status = http.StatusServiceUnavailable
+	}
+	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(rpcResp)
 }
 
@@ -450,6 +460,10 @@ func (s *SSEServer) rejectHardAuthFailure(w http.ResponseWriter, r *http.Request
 		return false
 	}
 	if _, err := s.proxy.auth.Verify(r.Context(), authToken); err != nil {
+		if isRevocationUnavailable(err) {
+			writeRevocationUnavailable(w)
+			return true
+		}
 		errMsg := err.Error()
 		if strings.Contains(errMsg, "enterprise deployment") || strings.Contains(errMsg, "token revoked") {
 			s.writePreConnectDenial(w, r, errMsg)

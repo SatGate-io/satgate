@@ -32,12 +32,22 @@ type RedisConfig struct {
 	DB       int    `yaml:"db"`       // database number
 }
 
-// NewRedisStore creates a new Redis-backed store
+// NewRedisStore creates a new Redis-backed store.
+//
+// Every command honours its context's deadline on the socket
+// (ContextTimeoutEnabled), so a read made with BanStoreReadTimeout returns by
+// then even when Redis stops answering; a socket read or write never waits
+// longer than BanStoreReadTimeout, and a failed command is retried once.
 func NewRedisStore(cfg *RedisConfig) (*RedisStore, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     cfg.Addr,
-		Password: cfg.Password,
-		DB:       cfg.DB,
+		Addr:                  cfg.Addr,
+		Password:              cfg.Password,
+		DB:                    cfg.DB,
+		ContextTimeoutEnabled: true,
+		DialTimeout:           BanStoreReadTimeout,
+		ReadTimeout:           BanStoreReadTimeout,
+		WriteTimeout:          BanStoreReadTimeout,
+		MaxRetries:            1,
 	})
 
 	// Test connection
@@ -83,6 +93,31 @@ func (r *RedisStore) Unban(ctx context.Context, signature string) error {
 // IsBanned checks if a token is banned
 func (r *RedisStore) IsBanned(ctx context.Context, signature string) (bool, error) {
 	return r.client.SIsMember(ctx, keyBanList, signature).Result()
+}
+
+// BannedAmong reports, for each signature, whether it is in the ban set. It
+// uses one pipeline of SISMEMBER, which every Redis version answers.
+func (r *RedisStore) BannedAmong(ctx context.Context, signatures []string) ([]bool, error) {
+	if len(signatures) == 0 {
+		return nil, nil
+	}
+	pipe := r.client.Pipeline()
+	cmds := make([]*redis.BoolCmd, len(signatures))
+	for i, sig := range signatures {
+		cmds[i] = pipe.SIsMember(ctx, keyBanList, sig)
+	}
+	if _, err := pipe.Exec(ctx); err != nil {
+		return nil, err
+	}
+	out := make([]bool, len(signatures))
+	for i, cmd := range cmds {
+		banned, err := cmd.Result()
+		if err != nil {
+			return nil, err
+		}
+		out[i] = banned
+	}
+	return out, nil
 }
 
 // GetBanList returns all banned tokens

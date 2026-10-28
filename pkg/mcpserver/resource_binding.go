@@ -45,6 +45,10 @@ func CheckResourceCaveats(caveats []string, resource string) error {
 type ResourceBoundAuthenticator struct {
 	Inner    Authenticator
 	Resource string
+
+	// lineage, when the proxy has a LineageRevocationChecker, refuses a
+	// token a ban covers (see Proxy.SetLineageRevocationChecker).
+	lineage *lineageGate
 }
 
 // Verify implements Authenticator.
@@ -61,6 +65,9 @@ func (a *ResourceBoundAuthenticator) Verify(ctx context.Context, token string) (
 			return nil, err
 		}
 	}
+	if err := a.lineage.check(ctx, info, macaroonServiceOf(a.Inner)); err != nil {
+		return nil, err
+	}
 	return info, nil
 }
 
@@ -70,10 +77,12 @@ func BindResource(inner Authenticator, resource string) Authenticator {
 	if inner == nil {
 		return nil
 	}
+	var gate *lineageGate
 	if b, ok := inner.(*ResourceBoundAuthenticator); ok {
 		inner = b.Inner
+		gate = b.lineage
 	}
-	return &ResourceBoundAuthenticator{Inner: inner, Resource: resource}
+	return &ResourceBoundAuthenticator{Inner: inner, Resource: resource, lineage: gate}
 }
 
 // SetResource tells the proxy which MCP resource URL it serves. Every
@@ -82,7 +91,7 @@ func BindResource(inner Authenticator, resource string) Authenticator {
 // names any resource is refused.
 func (p *Proxy) SetResource(resource string) {
 	p.resource = resource
-	p.auth = BindResource(p.auth, resource)
+	p.auth = p.bindAuth(p.auth)
 }
 
 // WithResourceBinding is the server option that carries the resource to the

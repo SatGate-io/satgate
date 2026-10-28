@@ -114,6 +114,10 @@ type Delegator struct {
 	// proxy sets it; a delegator used on its own gets a default one.
 	ea     *everyAction
 	eaOnce sync.Once
+
+	// lineage is the proxy's lineage ban check, run again on the parent
+	// before a child is minted (see Proxy.SetLineageRevocationChecker).
+	lineage *lineageGate
 }
 
 // state returns the switch's shared state.
@@ -442,6 +446,12 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 
 	if parent.RawToken == "" {
 		return nil, &clientError{msg: "delegation requires macaroon auth (mode=header)"}
+	}
+
+	// A ban that covers the parent stops the delegation before anything is
+	// minted, carved or recorded.
+	if err := d.lineage.check(ctx, parent, d.macaroonSvc); err != nil {
+		return nil, err
 	}
 
 	// A token whose chain carries a depth /v1/mint/delegate would refuse (zero,
@@ -973,6 +983,12 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 		}
 		if errors.Is(err, errDelegationProofUnavailable) {
 			return proofUnavailableResponse(req.ID, MethodSatGateDelegate), nil
+		}
+		if errors.Is(err, ErrRevocationUnavailable) {
+			return revocationUnavailableResponse(req.ID), nil
+		}
+		if errors.Is(err, errTokenRevoked) {
+			return d.signRefusal(ctx, req, tokenInfo, DenialCodeTokenRevoked, NewErrorResponse(req.ID, CodePolicyDenied, "token revoked")), nil
 		}
 		return d.signRefusal(ctx, req, tokenInfo, delegationDenialCode(err), d.refusalResponse(req, tokenInfo, &params, err)), nil
 	}

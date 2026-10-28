@@ -373,8 +373,13 @@ func (g *Gateway) handleCapability(w http.ResponseWriter, r *http.Request, route
 		return
 	}
 
-	// Check governance ban list
-	if g.governance != nil && g.governance.IsBanned(mac.Signature) {
+	// A ban of this token or of any token it was delegated from refuses it.
+	if err := g.checkRevoked(r.Context(), mac); err != nil {
+		if errors.Is(err, errRevocationUnavailable) {
+			http.Error(w, "Revocation status unavailable", http.StatusServiceUnavailable)
+			return
+		}
+		g.governance.RecordBannedHit()
 		http.Error(w, "Token revoked", http.StatusUnauthorized)
 		return
 	}
@@ -411,6 +416,17 @@ func (g *Gateway) handleL402(w http.ResponseWriter, r *http.Request, route *conf
 			http.Error(w, "Payment verification unavailable", http.StatusServiceUnavailable)
 			return
 		}
+		if errors.Is(err, errRevocationUnavailable) {
+			http.Error(w, "Revocation status unavailable", http.StatusServiceUnavailable)
+			return
+		}
+		if errors.Is(err, errTokenRevoked) {
+			if g.governance != nil {
+				g.governance.RecordBannedHit()
+			}
+			http.Error(w, "Token revoked", http.StatusUnauthorized)
+			return
+		}
 		log.Debug().Err(err).Str("route", route.Name).Msg("L402: payment proof refused")
 	}
 
@@ -424,9 +440,10 @@ func (g *Gateway) handleL402(w http.ResponseWriter, r *http.Request, route *conf
 // an L402 challenge, the served route's name is unique among the configured
 // routes, its single-valued route and price caveats match the route and its
 // current price, every restriction a holder added (scope, routes, methods,
-// expiry) covers the request, the preimage hashes to its payment_hash, and
-// the payment hash has not been consumed before. The payment hash is consumed
-// only after every other check passes.
+// expiry) covers the request, the preimage hashes to its payment_hash, no
+// ban covers the macaroon or a macaroon it was delegated from, and the
+// payment hash has not been consumed before. The payment hash is consumed
+// only after every other check passes, so a refused proof is not consumed.
 func (g *Gateway) verifyL402Token(r *http.Request, token string, route *config.Route) error {
 	ctx := r.Context()
 	// L402 format: macaroon:preimage
@@ -501,6 +518,12 @@ func (g *Gateway) verifyL402Token(r *http.Request, token string, route *config.R
 	computedHash := hex.EncodeToString(hash[:])
 	if subtle.ConstantTimeCompare([]byte(computedHash), []byte(paymentHash)) != 1 {
 		return fmt.Errorf("preimage does not match payment_hash")
+	}
+
+	// Revocation: a ban of this proof's macaroon, or of one it was
+	// attenuated from, refuses it before it is consumed.
+	if err := g.checkRevoked(ctx, mac); err != nil {
+		return err
 	}
 
 	// Replay guard: each payment proof can only be used once. The record
@@ -705,6 +728,14 @@ func (g *Gateway) handleL402MockPay(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": "macaroon does not match payment_hash"})
+		return
+	}
+	if err := g.checkRevoked(r.Context(), mac); err != nil {
+		if errors.Is(err, errRevocationUnavailable) {
+			writeRevocationUnavailableJSON(w)
+			return
+		}
+		writeTokenBannedJSON(w, http.StatusForbidden)
 		return
 	}
 
@@ -1168,6 +1199,20 @@ func (g *Gateway) handleCapabilityValidate(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// A token covered by a ban is not valid.
+	if err := g.checkRevoked(r.Context(), mac); err != nil {
+		if errors.Is(err, errRevocationUnavailable) {
+			writeRevocationUnavailableJSON(w)
+			return
+		}
+		writeJSON(w, http.StatusUnauthorized, map[string]interface{}{
+			"valid": false,
+			"error": "token revoked",
+			"code":  "TOKEN_BANNED",
+		})
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -1191,12 +1236,25 @@ func (g *Gateway) handleCapabilityDelegate(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// Get parent signature for lineage tracking
-	parentMac, _ := g.macaroonSvc.Verify(req.ParentToken)
-	parentSig := ""
-	if parentMac != nil {
-		parentSig = parentMac.Signature
+	// The parent must verify, and no ban may cover it (a ban of the parent
+	// or of any token it was delegated from). Nothing is minted otherwise.
+	parentMac, err := g.macaroonSvc.Verify(req.ParentToken)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("invalid parent token: %v", err)})
+		return
 	}
+	if err := g.checkRevoked(r.Context(), parentMac); err != nil {
+		if errors.Is(err, errRevocationUnavailable) {
+			writeRevocationUnavailableJSON(w)
+			return
+		}
+		if g.governance != nil {
+			g.governance.RecordBannedHit()
+		}
+		writeTokenBannedJSON(w, http.StatusForbidden)
+		return
+	}
+	parentSig := parentMac.Signature
 
 	// Delegate the token
 	child, err := g.macaroonSvc.Delegate(req.ParentToken, req.Caveats)
@@ -1273,16 +1331,14 @@ func (g *Gateway) handleCapabilityPing(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if token is banned
-	if g.governance != nil && g.governance.IsBanned(mac.Signature) {
+	// Check if a ban covers the token or a token it was delegated from
+	if err := g.checkRevoked(r.Context(), mac); err != nil {
+		if errors.Is(err, errRevocationUnavailable) {
+			writeRevocationUnavailableJSON(w)
+			return
+		}
 		g.governance.RecordBannedHit() // Increment banned hits counter
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusForbidden)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error":  "Token Revoked",
-			"reason": "This token has been banned by an administrator",
-			"code":   "TOKEN_BANNED",
-		})
+		writeTokenBannedJSON(w, http.StatusForbidden)
 		return
 	}
 
@@ -1337,16 +1393,14 @@ func (g *Gateway) handleCapabilityAdmin(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Check if token is banned
-	if g.governance != nil && g.governance.IsBanned(mac.Signature) {
-		g.governance.RecordBannedHit()
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusForbidden)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error":  "Token Revoked",
-			"reason": "This token has been banned by an administrator",
-			"code":   "TOKEN_BANNED",
-		})
+	// Check if a ban covers the token or a token it was delegated from
+	if err := g.checkRevoked(r.Context(), mac); err != nil {
+		if errors.Is(err, errRevocationUnavailable) {
+			writeRevocationUnavailableJSON(w)
+			return
+		}
+		g.governance.RecordBannedHit() // Increment banned hits counter
+		writeTokenBannedJSON(w, http.StatusForbidden)
 		return
 	}
 
@@ -1447,9 +1501,19 @@ func (g *Gateway) handleGovernanceBan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Add to revocation list via governance service
+	req.TokenSignature = strings.ToLower(strings.TrimSpace(req.TokenSignature))
+
+	// Add to revocation list via governance service. The ban covers this
+	// token and every token delegated from it.
 	if g.governance != nil {
-		g.governance.Ban(req.TokenSignature, req.Reason, "admin")
+		if err := g.governance.BanContext(r.Context(), req.TokenSignature, req.Reason, "admin"); err != nil {
+			log.Error().Err(err).Msg("Ban not written to the shared revocation store")
+			writeJSON(w, http.StatusServiceUnavailable, map[string]string{
+				"error": "Ban recorded on this gateway only: the shared revocation store is unavailable. Retry the ban.",
+				"code":  "REVOCATION_UNAVAILABLE",
+			})
+			return
+		}
 		g.governance.RecordBannedHit() // Increment kill switch counter
 	}
 
@@ -1513,7 +1577,13 @@ func (g *Gateway) handleGovernanceGraph(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	graph := g.governance.GetGraph()
+	// Node statuses read the shared ban state; if it cannot be read the
+	// graph is not answered (see governance.Service.GetGraphContext).
+	graph, err := g.governance.GetGraphContext(r.Context())
+	if err != nil {
+		writeRevocationUnavailableJSON(w)
+		return
+	}
 	json.NewEncoder(w).Encode(graph)
 }
 
