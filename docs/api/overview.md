@@ -70,8 +70,18 @@ anything is served or created:
 | `/api/capability/validate` | `401`, `valid: false`, `code: TOKEN_BANNED` |
 | `/api/agent/simulate` | decision `denied`, upstream not contacted |
 
-Token info and the lineage graph (`/api/governance/graph`) show a token as
-banned when it, or a token it was recorded as delegated from, is banned.
+The standalone MCP runtime (`satgate-mcp`) checks the same bans on every
+transport; see [Revoking Tokens](../guides/mcp-gateway.md#revoking-tokens) and
+"The MCP runtime" below.
+
+**Views.** Token info, the token list, the stats and the lineage graph
+(`/api/governance/graph`) show a token as banned when it, or a token it was
+recorded as delegated from, is banned. With Redis they read the ban list from
+Redis on each call (bounded to 2 seconds, like an access check), so a ban or
+unban made on any gateway shows at once; they list the tokens this gateway
+recorded. If Redis cannot be read, `/api/governance/graph` answers `503` with
+`code: REVOCATION_UNAVAILABLE`, and the Go views without a context show no
+token as active (status `unknown`).
 
 **Propagation.**
 
@@ -80,19 +90,35 @@ banned when it, or a token it was recorded as delegated from, is banned.
   This is correct for a single gateway instance only.
 - With `redis.enabled: true`, bans are written to Redis (`satgate:banlist`) and
   every gateway on the same Redis reads them on the request path through a
-  short cache. The cache keeps each answer for **2 seconds**
-  (`governance.BanCacheTTL`). A ban takes effect at once on the gateway that
-  wrote it and on every other gateway within **2 seconds** at most; an unban
-  is honoured everywhere within the same 2 seconds.
+  short cache. An answer from Redis is reused for at most **2 seconds**
+  (`governance.BanCacheTTL`), counted from when the lookup that produced it
+  **started**; an answer that arrives when its lookup started 2 seconds ago or
+  more is not used to allow a request (the request is refused with `503` and
+  the next one reads Redis again). So a ban takes effect at once on the gateway
+  that wrote it and on every other gateway within **2 seconds** of the moment
+  it was written to Redis, however slowly Redis answers; an unban is honoured
+  everywhere within the same 2 seconds. A ban made on a gateway while one of
+  its lookups is in flight wins over that lookup's answer.
 
-**Failure behaviour (Redis).** If Redis cannot be read for a token whose
-answer is not cached, the request is refused with `503 Service Unavailable`
-(`Revocation status unavailable`, or `code: REVOCATION_UNAVAILABLE` on the API
-endpoints) and nothing is served, minted or consumed. A read is bounded to 2
-seconds. If a ban cannot be written to Redis, `/api/governance/ban` answers
-`503` with `code: REVOCATION_UNAVAILABLE`: the gateway that received it keeps
-honouring the ban, the others may not, and the ban should be retried. A gateway
-whose configured Redis is unreachable at startup does not start.
+**The MCP runtime.** `satgate-mcp` with `revocation.redis.addr` set to the
+gateways' Redis reads the same ban list, with the same 2-second bound, read
+deadline and failure behaviour; it does not start if that Redis cannot be
+reached. Without it, `satgate-mcp` keeps bans in its own memory: they apply to
+that process only, and a ban made on a gateway does not reach it.
+
+**Failure behaviour (Redis).** Every read of the ban state is bounded to **2
+seconds** (`governance.BanStoreReadTimeout`): the Redis client applies the
+deadline to the socket, a failed command is retried at most once within it,
+and the check returns at the deadline even if Redis has not answered. If Redis
+cannot be read in that time for a token whose answer is not cached, the
+request is refused with `503 Service Unavailable` (`Revocation status
+unavailable`, or `code: REVOCATION_UNAVAILABLE` on the API endpoints, including
+`/api/agent/simulate`, which then records nothing) and nothing is served,
+minted or consumed. If a ban cannot be written to Redis,
+`/api/governance/ban` answers `503` with `code: REVOCATION_UNAVAILABLE`: the
+gateway that received it keeps honouring the ban, the others may not, and the
+ban should be retried. A gateway whose configured Redis is unreachable at
+startup does not start.
 
 ## Authentication
 

@@ -358,6 +358,50 @@ Agents can also check their remaining budget:
 }
 ```
 
+### Revoking Tokens
+
+`satgate-mcp` honours the bans written through a SatGate gateway's
+`POST /api/governance/ban` (see [Revocation](../api/overview.md#revocation)).
+A ban covers the banned macaroon and every token delegated from it, at any
+depth, before or after the ban, through `satgate/delegate`, the gateway, or a
+holder adding caveats offline. It never covers the token's parent or siblings.
+
+Point the proxy at the Redis the gateways use (`redis.enabled: true` on the
+gateway):
+
+```yaml
+revocation:
+  redis:
+    addr: "redis.internal:6379"
+    password: "${SATGATE_REDIS_PASSWORD}"
+    db: 0
+```
+
+- **With `revocation.redis.addr`**, a ban written by any gateway on that Redis
+  is honoured here within **2 seconds**, and an unban likewise. If the address
+  cannot be reached at startup, `satgate-mcp` does not start.
+- **Without it**, bans are kept in the proxy's own memory and apply to that
+  process only. `satgate-mcp` has no ban endpoint, so a ban made on a gateway
+  does not reach it; only a program that embeds the proxy and bans through its
+  own governance service sees its bans applied.
+
+The check runs wherever the proxy accepts a token, before anything is admitted,
+spent, forwarded or minted: SSE connect and every message, Streamable HTTP
+`initialize`, every request and every resumed session, stdio, the credential
+passed to an upstream with `forwardCallerToken` (not passed on for a banned
+token), and `satgate/delegate` (checked again before the helper is minted).
+A banned token gets `403` with `code: TOKEN_REVOKED` where the refusal is an
+HTTP answer (SSE connect, Streamable `initialize` and resume; `401` with the
+sign-in challenge when the OAuth challenge is on), and otherwise the JSON-RPC
+error `-32001` "token revoked". It applies to macaroons (`mode: header`); a
+static token (`mode: config`) is not a ban subject.
+
+If Redis cannot be read within **2 seconds** for a token whose answer is not
+cached, the request is refused, never served: HTTP `503` with `code:
+REVOCATION_UNAVAILABLE` (SSE connect, Streamable HTTP requests, `initialize` and
+resume), or the JSON-RPC error `-32603` with `data.error:
+"revocation_unavailable"` (SSE messages, stdio).
+
 ### Budget Fail Modes
 
 Control what happens when the budget backend (Redis) is unreachable:

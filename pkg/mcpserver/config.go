@@ -34,6 +34,9 @@ type Config struct {
 	// Enforcement controls the enforcement mode.
 	Enforcement EnforcementConfig `yaml:"enforcement"`
 
+	// Revocation says where satgate-mcp reads token bans from.
+	Revocation RevocationConfig `yaml:"revocation,omitempty"`
+
 	// Logging controls log output.
 	Logging LoggingConfig `yaml:"logging"`
 

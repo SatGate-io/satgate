@@ -21,8 +21,12 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
+	"github.com/satgate-io/satgate/pkg/governance"
 	"github.com/satgate-io/satgate/pkg/mcpserver"
 )
+
+// The gateway's governance service is the MCP runtime's lineage ban check.
+var _ mcpserver.LineageRevocationChecker = (*governance.Service)(nil)
 
 var (
 	Version   = "dev"
@@ -65,6 +69,15 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to create MCP proxy")
 	}
 
+	// Token bans: every macaroon a ban covers (the banned token and every
+	// token delegated from it) is refused on every transport.
+	bans, err := newRevocationService(cfg)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to open the shared ban store")
+	}
+	defer bans.Close()
+	proxy.SetLineageRevocationChecker(bans)
+
 	// Context with signal handling
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -99,6 +112,27 @@ func main() {
 	}
 
 	log.Info().Msg("MCP proxy stopped")
+}
+
+// newRevocationService returns the ban list the proxy checks: the shared
+// store (the Redis a SatGate gateway writes its bans to) when
+// revocation.redis.addr is set, so a ban written through any gateway on that
+// Redis is honoured here within governance.BanCacheTTL; otherwise this
+// process's memory, so bans apply to this process only. A configured store
+// that cannot be reached is an error, never a silent fallback to memory.
+func newRevocationService(cfg *mcpserver.Config) (*governance.Service, error) {
+	rc := cfg.Revocation.Redis
+	if rc.Addr == "" {
+		log.Info().Msg("Token bans kept in memory: they apply to this process only")
+		return governance.NewService(governance.NewMemoryStore()), nil
+	}
+	store, err := governance.NewRedisStore(&governance.RedisConfig{Addr: rc.Addr, Password: rc.Password, DB: rc.DB})
+	if err != nil {
+		return nil, err
+	}
+	log.Info().Dur("ban_cache_ttl", governance.BanCacheTTL).Dur("read_timeout", governance.BanStoreReadTimeout).
+		Msg("Token bans read from the shared store")
+	return governance.NewService(store), nil
 }
 
 func setupLogging(level string, jsonFormat bool) {

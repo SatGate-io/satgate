@@ -281,6 +281,12 @@ func (s *SSEServer) handleSSE(w http.ResponseWriter, r *http.Request) {
 	// Soft failures (unknown key, fallback extraction) are deferred to post-connect.
 	if authToken != "" && s.proxy.auth != nil {
 		if _, err := s.proxy.auth.Verify(ctx, authToken); err != nil {
+			// The token's ban state could not be read: no stream.
+			if isRevocationUnavailable(err) {
+				writeRevocationUnavailable(w)
+				cancel()
+				return
+			}
 			errMsg := err.Error()
 			// Only reject on definitive errors (enterprise misrouting, revocation)
 			// NOT on key-mismatch (multi-tenant SaaS where key lookup is deferred)

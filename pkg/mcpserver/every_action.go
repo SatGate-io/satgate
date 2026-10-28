@@ -613,21 +613,30 @@ func markExpired(err error) error {
 // missing key or a key that does not verify: nothing says whose they are. It
 // returns proof_unavailable when the window record cannot be made, and nil
 // when the ordinary refusal should go out.
+//
+// A key that verified and that a lineage ban covers (see
+// SetLineageRevocationChecker) is signed the same way, as token_revoked.
 func (p *Proxy) recordAuthRefusal(ctx context.Context, req *Request, authErr error) *Response {
-	var exp ExpiredCredential
-	if !errors.As(authErr, &exp) || !exp.CredentialExpired() {
-		return nil
-	}
-	if TenantFromContext(ctx) == "" {
-		log.Warn().Str("method", req.Method).Msg("expired key refused; no tenant on the request, so no receipt")
-		return nil
-	}
-	if err := p.recordWindowedRefusal(ctx, req, nil, MCPDecision{
+	decision := MCPDecision{
 		DecisionReason:       "capability_expired",
 		DenialCode:           DenialCodeCredentialExpired,
 		NoVerifiedCapability: true,
-	}, 0); err != nil {
-		log.Error().Err(err).Str("method", req.Method).Str("code", DenialCodeCredentialExpired).Msg("MCP refused-call receipt unavailable")
+	}
+	var exp ExpiredCredential
+	switch {
+	case errors.As(authErr, &exp) && exp.CredentialExpired():
+	case errors.Is(authErr, errTokenRevoked):
+		decision.DecisionReason = "token_revoked"
+		decision.DenialCode = DenialCodeTokenRevoked
+	default:
+		return nil
+	}
+	if TenantFromContext(ctx) == "" {
+		log.Warn().Str("method", req.Method).Str("code", decision.DenialCode).Msg("key refused; no tenant on the request, so no receipt")
+		return nil
+	}
+	if err := p.recordWindowedRefusal(ctx, req, nil, decision, 0); err != nil {
+		log.Error().Err(err).Str("method", req.Method).Str("code", decision.DenialCode).Msg("MCP refused-call receipt unavailable")
 		return proofUnavailableResponse(req.ID, refusalTool(req))
 	}
 	return nil
@@ -653,6 +662,10 @@ func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Respo
 			if unavailable := p.recordAuthRefusal(ctx, req, authErr); unavailable != nil {
 				return unavailable, nil
 			}
+		}
+		// The token's ban state could not be read: refused, never served.
+		if errors.Is(authErr, ErrRevocationUnavailable) {
+			return revocationUnavailableResponse(req.ID), nil
 		}
 		return NewErrorResponse(req.ID, CodePolicyDenied, authErr.Error()), nil
 	}

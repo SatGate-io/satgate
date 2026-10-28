@@ -65,6 +65,7 @@ type Proxy struct {
 	events            EventPublisher
 	evidence          EvidenceRecorder
 	revocation        RevocationChecker // optional, checks if token is revoked
+	lineage           *lineageGate      // lineage ban check (SetLineageRevocationChecker)
 	limiter           RequestLimiter    // optional, per-token request rate limit
 	toolsListEnricher ToolsListEnricher // optional, enriches tools/list with cost metadata
 	taskTracker       *TaskTracker      // MCP task-level cost aggregation (SEP-1686)
@@ -153,14 +154,16 @@ func New(cfg *Config) (*Proxy, error) {
 		router:      &defaultRouter{mgr: upstream},
 		budget:      budget,
 		costs:       costs,
-		auth:        BindResource(auth, ""),
 		events:      &NoOpPublisher{},
 		taskTracker: NewTaskTracker(),
+		lineage:     &lineageGate{svc: macaroonServiceOf(auth)},
 	}
+	p.auth = p.bindAuth(auth)
 
 	// If macaroon auth, create delegator
 	if macAuth, ok := auth.(*MacaroonAuthenticator); ok {
 		p.delegator = NewDelegator(macAuth.Service, budget)
+		p.delegator.lineage = p.lineage
 	}
 
 	// Initialize budget if configured
@@ -266,7 +269,7 @@ func (p *Proxy) RootToken() string {
 
 // SetAuthenticator replaces the authenticator.
 func (p *Proxy) SetAuthenticator(a Authenticator) {
-	p.auth = BindResource(a, p.resource)
+	p.auth = p.bindAuth(a)
 }
 
 // SetEventPublisher replaces the event publisher (e.g., with enterprise Redis pub/sub).
