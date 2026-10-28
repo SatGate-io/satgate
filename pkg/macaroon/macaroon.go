@@ -315,6 +315,34 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 	return mac, nil
 }
 
+// SignedByThisKey reports whether token is a macaroon, in either format
+// Verify accepts, whose signature chain verifies under this service's root
+// key. Caveats are not checked: an expired or narrowed token signed here is
+// still one this service issued. It answers what a token is, never whether it
+// grants anything; use Verify for that.
+func (s *Service) SignedByThisKey(token string) bool {
+	token = strings.TrimSpace(token)
+	if token == "" {
+		return false
+	}
+	data, err := base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		data, err = base64.RawStdEncoding.DecodeString(token)
+	}
+	if err == nil {
+		var v2mac macaroonv2.Macaroon
+		if v2mac.UnmarshalBinary(data) == nil &&
+			v2mac.Verify(s.rootKey, func(string) error { return nil }, nil) == nil {
+			return true
+		}
+	}
+	mac, err := s.Decode(token)
+	if err != nil || mac.Signature == "" {
+		return false
+	}
+	return hmac.Equal([]byte(mac.Signature), []byte(s.chainedSignature(mac)))
+}
+
 func (s *Service) verifyBinary(token string) (*Macaroon, error) {
 	data, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {

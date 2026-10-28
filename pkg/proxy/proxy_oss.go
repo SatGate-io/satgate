@@ -104,6 +104,11 @@ func New(opts Options) (*Gateway, error) {
 	if err := config.CheckUniqueRouteNames(opts.Config.Routes); err != nil {
 		return nil, fmt.Errorf("invalid routes: %w", err)
 	}
+	// Configured upstream headers are set on every forwarded request; a
+	// header SatGate owns cannot be one of them.
+	if err := config.CheckUpstreamHeaders(opts.Config.Upstreams); err != nil {
+		return nil, fmt.Errorf("invalid upstreams: %w", err)
+	}
 
 	// Initialize admin rate limiter (default: 60 req/min if not configured)
 	adminRPM := opts.Config.Admin.RateLimitPerMinute
@@ -139,7 +144,7 @@ func New(opts Options) (*Gateway, error) {
 
 	// Initialize proxies for configured upstreams
 	for name, upstream := range opts.Config.Upstreams {
-		proxy, err := g.createProxy(upstream.URL)
+		proxy, err := g.createProxy(upstream.URL, upstream.Headers)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create proxy for upstream %s: %w", name, err)
 		}
@@ -873,8 +878,14 @@ func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *co
 		r.URL.RawPath = newPath
 	}
 
+	// The upstream gets a copy of the request without the credentials the
+	// gateway consumed or owns (upstream_credentials.go); the proxy's
+	// Director then sets the upstream's configured headers.
+	out := r.Clone(r.Context())
+	g.removeGatewayCredentials(out.Header, authorizationConsumed(route))
+
 	// Forward request
-	proxy.ServeHTTP(w, r)
+	proxy.ServeHTTP(w, out)
 }
 
 // getDemoResponse returns mock demo data for L402 demo routes
@@ -954,12 +965,16 @@ func (g *Gateway) getDemoResponse(route *config.Route) map[string]interface{} {
 	}
 }
 
-// createProxy creates a reverse proxy for an upstream URL.
-func (g *Gateway) createProxy(upstreamURL string) (*httputil.ReverseProxy, error) {
+// createProxy creates a reverse proxy for an upstream URL. headers are the
+// upstream's configured headers (config.Upstream.Headers), set on every
+// request it forwards; a configured header replaces a client header of the
+// same name.
+func (g *Gateway) createProxy(upstreamURL string, headers map[string]string) (*httputil.ReverseProxy, error) {
 	target, err := url.Parse(upstreamURL)
 	if err != nil {
 		return nil, err
 	}
+	configured := upstreamHeaders(headers)
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	// Wrap Director to set req.Host = target.Host for CDN compatibility
@@ -969,6 +984,9 @@ func (g *Gateway) createProxy(upstreamURL string) (*httputil.ReverseProxy, error
 	proxy.Director = func(r *http.Request) {
 		defaultDirector(r)
 		r.Host = targetHost
+		for name, values := range configured {
+			r.Header[name] = append([]string(nil), values...)
+		}
 	}
 
 	// Configure transport with SSRF-safe dialer that blocks private IPs at connect time.
@@ -1053,7 +1071,8 @@ func extractBearerToken(r *http.Request) string {
 // Supports both "L402 macaroon:preimage" and "LSAT macaroon:preimage" formats.
 func extractL402Token(r *http.Request) string {
 	auth := r.Header.Get("Authorization")
-	log.Debug().Str("auth_header", auth).Msg("extractL402Token: checking Authorization header")
+	// The header's value is a credential: only whether one was sent is logged.
+	log.Debug().Bool("auth_header_present", auth != "").Msg("extractL402Token: checking Authorization header")
 
 	if strings.HasPrefix(auth, "L402 ") {
 		token := strings.TrimPrefix(auth, "L402 ")

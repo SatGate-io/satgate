@@ -377,7 +377,7 @@ func (g *Gateway) installPromotedPolicy(policy *agentPolicy) error {
 		}
 	}
 	if policy.UpstreamURL != "" {
-		proxy, err := g.createProxy(policy.UpstreamURL)
+		proxy, err := g.createProxy(policy.UpstreamURL, nil)
 		if err != nil {
 			return err
 		}
@@ -415,7 +415,7 @@ func (g *Gateway) getAgentPack(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Gateway) callUpstream(upstream, method, path, body string) (int, bool) {
-	proxy, err := g.createProxy(upstream)
+	proxy, err := g.createProxy(upstream, nil)
 	if err != nil {
 		return 0, false
 	}
