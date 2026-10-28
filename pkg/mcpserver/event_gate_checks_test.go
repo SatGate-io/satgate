@@ -175,6 +175,30 @@ func TestEventStakeStaleGiveBackAfterResetThroughUpstream(t *testing.T) {
 	}
 }
 
+// noIdentityStore reserves but returns no reservation identity.
+type noIdentityStore struct{ *toolcontrols.MemoryStore }
+
+func (s noIdentityStore) ReserveEvent(ctx context.Context, r toolcontrols.EventReservation) (toolcontrols.EventReserveResult, error) {
+	out, err := s.MemoryStore.ReserveEvent(ctx, r)
+	out.Reservation = ""
+	return out, err
+}
+
+// A reservation that cannot be named cannot be given back alone, so the call
+// is refused and nothing is forwarded.
+func TestEventStakeStoreWithoutReservationIdentityRefuses(t *testing.T) {
+	h := newEvHarness(t, fmt.Sprintf(stakeDoc, "50"), "", &evOpts{gate: func(s *toolcontrols.MemoryStore, _ *toolcontrols.MemoryApprovalStore, schema string) CallGate {
+		return NewEventGate(noIdentityStore{s}, map[string]string{schema: "venue"})
+	}})
+	r := h.call(t, evBuy("MKT-A1", "1", "0.5"))
+	if got := code(t, r); got != "tool_controls_unavailable" {
+		t.Fatalf("code %q, want tool_controls_unavailable (%+v)", got, r.Error)
+	}
+	if h.rr.forwarded() != 0 {
+		t.Fatalf("forwarded %d", h.rr.forwarded())
+	}
+}
+
 // ---- A lookup that answers after its deadline ---------------------------------
 
 // lateMarket answers with an open market only after the lookup's deadline.
