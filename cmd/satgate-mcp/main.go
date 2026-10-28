@@ -93,10 +93,8 @@ func main() {
 	// Run based on transport mode
 	switch cfg.Server.Transport {
 	case "sse", "http":
-		addr := fmt.Sprintf(":%d", cfg.Server.Port)
-		if cfg.Server.Port == 0 {
-			addr = ":9100"
-		}
+		// server.host (default 127.0.0.1) and server.port (default 9100).
+		addr := cfg.ListenAddr()
 		sseServer := mcpserver.NewSSEServer(proxy, addr)
 		if err := sseServer.ListenAndServe(ctx); err != nil {
 			log.Error().Err(err).Msg("SSE server error")

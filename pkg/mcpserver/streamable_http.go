@@ -211,9 +211,15 @@ type streamSession struct {
 }
 
 // ServeHTTP dispatches legacy SSE routes and the Streamable HTTP endpoint.
+// It refuses every request when auth.mode is not set (see Handler).
 func (s *SSEServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if s == nil || s.mux == nil {
 		http.Error(w, "mcp server unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	// No auth.mode: refuse before any route, session or upstream is reached.
+	if err := s.authModeCheck(); err != nil {
+		writeAuthModeRefusal(w, err)
 		return
 	}
 	if IsStreamableHTTPPath(r.URL.Path, s.basePath) {
@@ -478,10 +484,11 @@ func isStreamableNotification(req *Request) bool {
 }
 
 // requiresVerifiedStreamToken reports whether initialize must carry a token
-// that verifies before a session is created (header auth mode).
+// that verifies before a session is created (auth modes "header" and
+// "config").
 func (s *SSEServer) requiresVerifiedStreamToken() bool {
 	return s.proxy != nil && s.proxy.config != nil && s.proxy.auth != nil &&
-		s.proxy.config.Auth.Mode == "header"
+		authModeRequiresToken(s.proxy.config.Auth.Mode)
 }
 
 func (s *SSEServer) streamMaxSessions() int {

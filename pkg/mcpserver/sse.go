@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -52,6 +53,11 @@ type SSEServer struct {
 	// Empty (the default) keeps the historical bare 401 byte for byte.
 	oauthMetadataURL string
 	operationTracker OperationTracker
+
+	// authRefusalLogged and noneWarned keep the auth.mode refusal and the
+	// auth.mode none warning to one log line per server (see authModeCheck).
+	authRefusalLogged atomic.Bool
+	noneWarned        atomic.Bool
 }
 
 // sseSession represents one connected MCP client over SSE.
@@ -167,7 +173,44 @@ func NewSSEServer(proxy *Proxy, addr string, opts ...SSEOption) *SSEServer {
 		IdleTimeout:  0,
 	}
 
+	// Log the auth.mode refusal (or the auth.mode none warning) now, once,
+	// whether the caller embeds the handler or calls ListenAndServe.
+	_ = s.authModeCheck()
 	return s
+}
+
+// authModeCheck applies the network auth rule to this server: it returns
+// a non-nil error when the proxy's configuration does not set auth.mode
+// (empty, or a loaded file without auth.mode), or sets auth.mode "config"
+// with no auth.token (empty or only whitespace), in which case every request
+// is refused. The refusal, or the warning for auth.mode none, is logged the
+// first time it is seen on this server.
+func (s *SSEServer) authModeCheck() error {
+	var cfg *Config
+	if s.proxy != nil {
+		cfg = s.proxy.config
+	}
+	addr := ""
+	if s.server != nil {
+		addr = s.server.Addr
+	}
+	if err := cfg.networkAuthError(); err != nil {
+		if s.authRefusalLogged.CompareAndSwap(false, true) {
+			log.Error().Err(err).Str("addr", addr).
+				Msg("MCP network handler refuses every request until its auth settings are complete")
+		}
+		return err
+	}
+	if cfg.Auth.Mode == "none" && s.noneWarned.CompareAndSwap(false, true) {
+		log.Warn().Str("addr", addr).Msg(noneModeWarning)
+	}
+	return nil
+}
+
+// writeAuthModeRefusal answers a request on a server without auth.mode:
+// 503 with the same message the listener check returns.
+func writeAuthModeRefusal(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), http.StatusServiceUnavailable)
 }
 
 // Handle registers an additional handler on the SSE server's mux.
@@ -178,6 +221,11 @@ func (s *SSEServer) Handle(pattern string, handler http.Handler) {
 // Handler returns the HTTP handler for embedding in another server.
 // It serves legacy SSE at /sse and /message and Streamable HTTP at the
 // mount root (public .../mcp). See IsStreamableHTTPPath.
+//
+// The handler follows the same rule as ListenAndServe: when the proxy's
+// configuration does not set auth.mode, every request (every route,
+// including /health and routes added with Handle or HandleFunc) gets 503
+// with the auth.mode error, logged once when the server is created.
 func (s *SSEServer) Handler() http.Handler {
 	return s
 }
@@ -188,7 +236,12 @@ func (s *SSEServer) HandleFunc(pattern string, handler http.HandlerFunc) {
 }
 
 // ListenAndServe starts the SSE server. Blocks until context cancelled.
+// It refuses to start when auth.mode is not set (see AuthConfig.Mode); for
+// "none" the server logs a warning once.
 func (s *SSEServer) ListenAndServe(ctx context.Context) error {
+	if err := s.authModeCheck(); err != nil {
+		return err
+	}
 	// Start upstreams first
 	if err := s.proxy.upstream.Start(ctx); err != nil {
 		return fmt.Errorf("start upstreams: %w", err)
@@ -651,13 +704,27 @@ func (s *SSEServer) handleHealth(w http.ResponseWriter, _ *http.Request) {
 }
 
 // extractAuthToken pulls the Bearer token from the Authorization header. It
-// never reads the URL: see SSEServer.authToken for the ?token= fallback.
+// never reads the URL: see SSEServer.authToken for the ?token= fallback. A
+// value that is empty after trimming whitespace, with or without the Bearer
+// scheme, is no token: it returns "".
 func extractAuthToken(r *http.Request) string {
 	auth := r.Header.Get("Authorization")
-	if auth != "" {
-		return strings.TrimPrefix(auth, "Bearer ")
+	if auth == "" || strings.TrimSpace(auth) == "Bearer" {
+		// No header, or the Bearer scheme with no credential.
+		return ""
 	}
-	return ""
+	return presentedToken(strings.TrimPrefix(auth, "Bearer "))
+}
+
+// presentedToken is a token as a client presented it, or "" when it is
+// empty after trimming Unicode whitespace: such a request carries no token
+// and gets the missing-token refusal. A token that is not blank is returned
+// unchanged.
+func presentedToken(token string) string {
+	if blankToken(token) {
+		return ""
+	}
+	return token
 }
 
 // queryTokenParam is the URL query parameter some clients put the token in.
@@ -675,7 +742,7 @@ func (s *SSEServer) authToken(r *http.Request) string {
 		return tok
 	}
 	if s.allowQueryToken() {
-		return r.URL.Query().Get(queryTokenParam)
+		return presentedToken(r.URL.Query().Get(queryTokenParam))
 	}
 	return ""
 }
@@ -736,8 +803,14 @@ func injectMetaToken(params json.RawMessage, token string) json.RawMessage {
 				// "_meta": null decodes to a nil map. Treat it as absent.
 				meta = map[string]json.RawMessage{}
 			}
-			if _, hasToken := meta["token"]; hasToken {
-				return params // already has token, don't override
+			if existing, hasToken := meta["token"]; hasToken {
+				// A blank string is no token (see presentedToken), so the
+				// connection's token takes its place; any other value is
+				// kept.
+				var s string
+				if err := json.Unmarshal(existing, &s); err != nil || !blankToken(s) {
+					return params // already has token, don't override
+				}
 			}
 			tokenJSON, _ := json.Marshal(token)
 			meta["token"] = tokenJSON

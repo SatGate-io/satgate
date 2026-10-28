@@ -2,9 +2,13 @@ package mcpserver
 
 import (
 	"fmt"
+	"net"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
 
@@ -43,14 +47,125 @@ type Config struct {
 	// AllowPrivateUpstreams bypasses SSRF protection on upstream connections.
 	// Only enable for local development or when upstreams are on private networks.
 	AllowPrivateUpstreams bool `yaml:"allowPrivateUpstreams,omitempty"`
+
+	// authModeUnset records that the loaded file did not set auth.mode
+	// (LoadConfig). A network transport then refuses to start, and an
+	// SSEServer handler refuses every request (see networkAuthError).
+	authModeUnset bool
+}
+
+// Listener defaults for the SSE / Streamable HTTP transport.
+const (
+	// DefaultListenHost is the interface a network transport listens on when
+	// server.host is not set: loopback only.
+	DefaultListenHost = "127.0.0.1"
+	// DefaultListenPort is the port used when server.port is not set.
+	DefaultListenPort = 9100
+)
+
+// IsNetworkTransport reports whether a server.transport value serves clients
+// over the network (SSE and Streamable HTTP) rather than over stdio.
+func IsNetworkTransport(transport string) bool {
+	return transport == "sse" || transport == "http"
+}
+
+// ListenAddr is the address a network transport listens on: server.host
+// (default 127.0.0.1) and server.port (default 9100).
+func (c *Config) ListenAddr() string {
+	host := strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(c.Server.Host), "["), "]")
+	if host == "" {
+		host = DefaultListenHost
+	}
+	port := c.Server.Port
+	if port == 0 {
+		port = DefaultListenPort
+	}
+	return net.JoinHostPort(host, strconv.Itoa(port))
+}
+
+// errAuthModeRequired is the refusal for a network transport (the listener
+// or an embedded handler) whose configuration does not say how clients
+// authenticate.
+func errAuthModeRequired(transport string) error {
+	where := ""
+	if IsNetworkTransport(transport) {
+		where = fmt.Sprintf(" (server.transport %q)", transport)
+	}
+	return fmt.Errorf("auth.mode is required to serve over SSE / Streamable HTTP%s: set auth.mode to \"header\" (macaroon tokens) or \"config\" (one static token in auth.token); to serve without authentication, write auth.mode: none", where)
+}
+
+// errAuthTokenRequired is the refusal of auth.mode "config" whose auth.token
+// is empty, or only whitespace. Such a value is no token: it is never
+// compared with what a client presents.
+func errAuthTokenRequired() error {
+	return fmt.Errorf("auth.token is required for auth.mode \"config\" and must not be empty or only whitespace: set auth.token to the static token clients send (Authorization: Bearer <token>), or set auth.mode to \"header\" (macaroon tokens)")
+}
+
+// authTokenMissing reports that auth.mode is "config" and auth.token is
+// empty after trimming Unicode whitespace. Other modes do not read auth.token.
+func (c *Config) authTokenMissing() bool {
+	return c.Auth.Mode == "config" && blankToken(c.Auth.Token)
+}
+
+// blankToken reports whether a token, configured or presented, is empty
+// after trimming Unicode whitespace: it counts as no token.
+func blankToken(token string) bool {
+	return strings.TrimSpace(token) == ""
+}
+
+// noneModeWarning is logged once per network server when auth.mode is none.
+const noneModeWarning = "auth.mode is none: any client that can reach this address can list and call tools without a token"
+
+// authModeMissing reports that no auth mode was written: Auth.Mode is empty,
+// or the configuration came from a file without auth.mode (LoadConfig fills
+// in "none" for stdio) and code has not set another mode since.
+func (c *Config) authModeMissing() bool {
+	return c.Auth.Mode == "" || (c.authModeUnset && c.Auth.Mode == "none")
+}
+
+// networkAuthError is the refusal shared by SSEServer.ListenAndServe and the
+// handler (SSEServer.ServeHTTP): non-nil when the configuration does not set
+// auth.mode, or sets auth.mode "config" with no auth.token (empty or only
+// whitespace). It logs nothing.
+func (c *Config) networkAuthError() error {
+	if c == nil {
+		return fmt.Errorf("no configuration: %w", errAuthModeRequired(""))
+	}
+	if c.authModeMissing() {
+		return errAuthModeRequired(c.Server.Transport)
+	}
+	if c.authTokenMissing() {
+		return errAuthTokenRequired()
+	}
+	return nil
+}
+
+// checkNetworkAuth is the startup check of a network transport: it refuses a
+// configuration that does not set auth.mode, and logs a warning for an
+// explicit auth.mode none.
+func (c *Config) checkNetworkAuth(addr string) error {
+	if err := c.networkAuthError(); err != nil {
+		return err
+	}
+	if c.Auth.Mode == "none" {
+		log.Warn().Str("addr", addr).Msg(noneModeWarning)
+	}
+	return nil
 }
 
 // ServerConfig configures the client-facing MCP server.
 type ServerConfig struct {
-	// Transport: "stdio" (default) or "sse"
+	// Transport: "stdio" (default), "sse" or "http" (SSE and Streamable HTTP
+	// on one listener).
 	Transport string `yaml:"transport"`
 
-	// Port for SSE/HTTP transport (ignored for stdio).
+	// Host is the interface the SSE / Streamable HTTP listener binds to (an
+	// IP address or host name, without a port). Empty means 127.0.0.1, so a
+	// listener is reachable from this machine only until a host is set
+	// (0.0.0.0 or :: for every interface). Ignored for stdio.
+	Host string `yaml:"host,omitempty"`
+
+	// Port for SSE/HTTP transport (ignored for stdio). Empty means 9100.
 	Port int `yaml:"port,omitempty"`
 
 	// Name reported in initialize response.
@@ -71,7 +186,11 @@ type ServerConfig struct {
 
 // AuthConfig configures token verification for incoming requests.
 type AuthConfig struct {
-	// Mode: "none" (default for local), "config" (token in config), "header" (per-request)
+	// Mode: "none" (no authentication), "config" (one static bearer token,
+	// Token) or "header" (per-request macaroon, RootKey). A file loaded with
+	// LoadConfig that leaves it out gets "none" for stdio, and is refused
+	// for the SSE / Streamable HTTP transports: write "none" to serve them
+	// without authentication.
 	Mode string `yaml:"mode"`
 
 	// Token is the static bearer token (for mode=config).
@@ -196,7 +315,9 @@ type ToolsConfig struct {
 
 // EnforcementConfig controls the enforcement mode.
 type EnforcementConfig struct {
-	// Mode: "observe" (deduct, never block — default), "control" (deduct and enforce limits)
+	// Mode: "observe" (deduct, never block) or "control" (deduct and enforce
+	// limits). Left out of a file loaded with LoadConfig, it is "control"
+	// when budget.limit is greater than 0 and "observe" otherwise.
 	Mode string `yaml:"mode"`
 }
 
@@ -246,6 +367,8 @@ func (c *Config) applyDefaults() {
 		c.Server.Version = "0.1.0"
 	}
 	if c.Auth.Mode == "" {
+		// Kept for stdio; a network transport is refused in validate.
+		c.authModeUnset = true
 		c.Auth.Mode = "none"
 	}
 	if c.Budget.Backend == "" {
@@ -255,7 +378,12 @@ func (c *Config) applyDefaults() {
 		c.Budget.FailMode = "closed"
 	}
 	if c.Enforcement.Mode == "" {
-		c.Enforcement.Mode = "observe"
+		// A configured budget is enforced unless the file says otherwise.
+		if c.Budget.Limit > 0 {
+			c.Enforcement.Mode = "control"
+		} else {
+			c.Enforcement.Mode = "observe"
+		}
 	}
 	if c.Logging.Level == "" {
 		c.Logging.Level = "info"
@@ -281,6 +409,18 @@ func (c *Config) applyDefaults() {
 }
 
 func (c *Config) validate() error {
+	if IsNetworkTransport(c.Server.Transport) && c.authModeUnset {
+		return errAuthModeRequired(c.Server.Transport)
+	}
+	if c.authTokenMissing() {
+		return errAuthTokenRequired()
+	}
+	if h := strings.TrimSpace(c.Server.Host); h != "" {
+		if _, _, err := net.SplitHostPort(h); err == nil {
+			return fmt.Errorf("server.host %q must not include a port: set the port in server.port", h)
+		}
+	}
+
 	if len(c.Upstreams) == 0 {
 		return fmt.Errorf("at least one upstream is required")
 	}

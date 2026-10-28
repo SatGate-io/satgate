@@ -144,9 +144,10 @@ func TestForwardedCredentialResumedStream(t *testing.T) {
 	}
 }
 
-// A request whose connection credential does not verify, or that has none,
-// forwards no credential, even when params carry one that would verify:
-// params are never where the forwarded credential comes from.
+// A request whose connection credential does not verify is refused before
+// any upstream is reached (auth mode header). One that has none forwards no
+// credential, even when params carry one that would verify: params are never
+// where the forwarded credential comes from.
 func TestNoCredentialForwardedWithoutVerification(t *testing.T) {
 	p := newTokenProbe(t, true)
 	conn := eaOpenSSE(t, p.srv.URL, hygieneToken)
@@ -157,12 +158,20 @@ func TestNoCredentialForwardedWithoutVerification(t *testing.T) {
 		if status := conn.post([]byte(raw)); status != http.StatusAccepted {
 			t.Fatalf("POST /message status %d", status)
 		}
-		wantForwarded(t, fmt.Sprintf("sse bearer=%v", bearer != ""), receivedParams(t, "resources/list", conn.next()), "")
+		resp := conn.next()
+		if bearer != "" {
+			if resp == nil || resp.Error == nil || resp.Error.Code != CodePolicyDenied || !strings.HasPrefix(resp.Error.Message, "authentication failed:") {
+				t.Fatalf("sse resources/list with a connection credential that does not verify: %+v", resp)
+			}
+			continue
+		}
+		wantForwarded(t, "sse bearer=false", receivedParams(t, "resources/list", resp), "")
 	}
 
-	// Direct dispatch (stdio transport): no connection credential, so a
-	// method passed on unauthenticated forwards none; tools/call forwards
-	// the credential authenticate verified.
+	// Direct dispatch, no connection credential: the request verifies with
+	// the token in params (header mode requires one), and a method passed
+	// on outside tools/call forwards none; tools/call forwards the
+	// credential authenticate verified.
 	req := &Request{JSONRPC: "2.0", ID: json.RawMessage(`504`), Method: "resources/list",
 		Params: json.RawMessage(`{"_meta":{"token":"` + hygieneToken + `"}}`)}
 	resp, err := p.proxy.handleRequest(context.Background(), req)
@@ -189,13 +198,17 @@ type revokeEveryKey struct{}
 
 func (revokeEveryKey) IsRevoked(context.Context, string) bool { return true }
 
-// A connection credential that verifies but is revoked is not forwarded.
+// A connection credential that verifies but is revoked is not forwarded: in
+// auth mode header the request is refused before any upstream is reached.
 func TestNoCredentialForwardedWhenRevoked(t *testing.T) {
 	p := newTokenProbe(t, true)
 	sid := mustInitSession(t, p.srv.URL, hygieneToken)
 	p.proxy.SetRevocationChecker(revokeEveryKey{})
 	raw := `{"jsonrpc":"2.0","id":507,"method":"resources/list","params":{}}`
-	wantForwarded(t, "revoked", receivedParams(t, "resources/list", streamableCall(t, p.srv.URL, sid, hygieneToken, raw)), "")
+	resp := streamableCall(t, p.srv.URL, sid, hygieneToken, raw)
+	if resp.Error == nil || resp.Error.Code != CodePolicyDenied || resp.Error.Message != "token revoked" {
+		t.Fatalf("revoked connection credential: %+v", resp)
+	}
 }
 
 // Network upstreams (SSE and Streamable HTTP) get the verified credential

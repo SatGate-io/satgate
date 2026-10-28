@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/subtle"
 	"fmt"
 	"github.com/satgate-io/satgate/pkg/toolcontrols"
@@ -109,10 +110,16 @@ type StaticTokenAuthenticator struct {
 }
 
 func (a *StaticTokenAuthenticator) Verify(_ context.Context, token string) (*TokenInfo, error) {
-	if token == "" {
+	// A token that is empty after trimming whitespace is no token. It is
+	// refused before any compare, and so is a blank configured token.
+	if blankToken(token) || blankToken(a.Token) {
 		return nil, fmt.Errorf("token required")
 	}
-	if subtle.ConstantTimeCompare([]byte(token), []byte(a.Token)) != 1 {
+	// Compare fixed-length digests, so the time taken does not depend on
+	// where the two values differ or on how long the presented one is.
+	got := sha256.Sum256([]byte(token))
+	want := sha256.Sum256([]byte(a.Token))
+	if subtle.ConstantTimeCompare(got[:], want[:]) != 1 {
 		return nil, fmt.Errorf("invalid token")
 	}
 	return &TokenInfo{
@@ -130,12 +137,15 @@ type MacaroonAuthenticator struct {
 }
 
 func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenInfo, error) {
-	if token == "" {
+	if blankToken(token) {
 		return nil, fmt.Errorf("token required")
 	}
 
 	// Strip "Bearer " prefix if present
 	token = strings.TrimPrefix(token, "Bearer ")
+	if blankToken(token) {
+		return nil, fmt.Errorf("token required")
+	}
 
 	// The proxy enforces argument rules (FillTokenInfo, handleToolsCall), so
 	// it is the one verifier that may accept a token that carries them.
@@ -158,8 +168,8 @@ func NewAuthenticator(cfg AuthConfig) (Authenticator, error) {
 		return &NoAuthAuthenticator{}, nil
 
 	case "config":
-		if cfg.Token == "" {
-			return nil, fmt.Errorf("auth.token required for mode=config")
+		if blankToken(cfg.Token) {
+			return nil, errAuthTokenRequired()
 		}
 		return &StaticTokenAuthenticator{
 			Token:   cfg.Token,
