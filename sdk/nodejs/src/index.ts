@@ -90,4 +90,6 @@ export {
   TokenExpiredError,
   DelegationError,
   SatGateAuthError,
+  RedirectRefusedError,
+  RequestUrlRefusedError,
 } from './errors';

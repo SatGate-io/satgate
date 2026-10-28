@@ -32,6 +32,7 @@ Example usage (OSS Gateway):
 
 import base64
 import json
+import logging
 import os
 import sys
 import time
@@ -41,6 +42,7 @@ from urllib.parse import urljoin
 
 import requests
 
+from ._http import request_host, send_without_credentials, send_without_redirects
 from .exceptions import (
     SatGateError,
     AuthenticationError,
@@ -48,6 +50,8 @@ from .exceptions import (
     PaymentRequiredError,
     PaymentFailedError,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -90,6 +94,36 @@ class CachedToken:
         return max(0, self.budget_limit - self.budget_used)
 
 
+def _resolve_cert_path(
+    tls_cert_path: Optional[str], cert_path: Optional[str]
+) -> Optional[str]:
+    """Return the one certificate path given, or None. cert_path is an alias."""
+    if (
+        tls_cert_path is not None
+        and cert_path is not None
+        and os.path.expanduser(tls_cert_path) != os.path.expanduser(cert_path)
+    ):
+        raise SatGateError("tls_cert_path and cert_path name different files; pass one")
+    path = tls_cert_path if tls_cert_path is not None else cert_path
+    if path is None:
+        return None
+    if not isinstance(path, str) or path == "":
+        raise SatGateError("tls_cert_path must be a non-empty path")
+    path = os.path.expanduser(path)
+    if not os.path.isfile(path):
+        raise SatGateError(f"tls_cert_path {path} is not a file")
+    return path
+
+
+def _tls_verify_setting(cert_path: Optional[str], insecure: bool) -> Union[bool, str]:
+    """The value passed to requests as verify=. Only insecure=True gives False."""
+    if insecure:
+        return False
+    if cert_path is not None:
+        return cert_path
+    return True
+
+
 class LightningWallet:
     """Base class for Lightning wallets"""
     
@@ -103,7 +137,17 @@ class LightningWallet:
 
 
 class LNDWallet(LightningWallet):
-    """LND Lightning wallet"""
+    """LND Lightning wallet (REST).
+
+    TLS is always verified unless ``insecure=True`` is passed:
+
+    * with no certificate path, the LND REST host must present a certificate
+      the system trusts; one it does not trust fails with ``SatGateError``;
+    * with ``tls_cert_path`` (or its alias ``cert_path``), the host is verified
+      against that file, for example LND's own ``tls.cert``;
+    * ``insecure=True`` turns verification off and logs a warning naming the
+      host. It cannot be combined with a certificate path.
+    """
     
     def __init__(
         self,
@@ -111,7 +155,10 @@ class LNDWallet(LightningWallet):
         macaroon_path: Optional[str] = None,
         macaroon_hex: Optional[str] = None,
         cert_path: Optional[str] = None,
-        use_rest: bool = True
+        use_rest: bool = True,
+        *,
+        tls_cert_path: Optional[str] = None,
+        insecure: bool = False,
     ):
         self.host = host
         self.use_rest = use_rest
@@ -125,8 +172,50 @@ class LNDWallet(LightningWallet):
         else:
             raise SatGateError("LND macaroon required")
         
-        # Load cert
-        self.cert_path = cert_path
+        self.cert_path = _resolve_cert_path(tls_cert_path, cert_path)
+        self.tls_cert_path = self.cert_path
+        if insecure is not True and insecure is not False:
+            raise SatGateError("insecure must be True or False")
+        if insecure and self.cert_path is not None:
+            raise SatGateError("insecure=True cannot be combined with tls_cert_path")
+        self.insecure = insecure
+        self._verify = _tls_verify_setting(self.cert_path, insecure)
+        if insecure:
+            logger.warning(
+                "LNDWallet: TLS certificate verification is disabled for %s "
+                "(insecure=True); the macaroon is sent to an unverified server",
+                self._display_host,
+            )
+
+    @property
+    def _display_host(self) -> str:
+        """host[:port] of the LND REST URL, for messages: the configured host
+        with any user information, path and query removed."""
+        return request_host(f"https://{self.host}/")
+
+    def _request(self, method: str, url: str, **kwargs) -> requests.Response:
+        """Send one request carrying the macaroon header to the LND host.
+
+        Redirects are never followed (send_without_redirects): the macaroon
+        is sent only to the configured host, once. A 3xx answer raises
+        RedirectRefusedError naming the status and the host and port of the
+        request URL.
+        """
+        try:
+            return send_without_redirects(
+                method, url, label="LND host", verify=self._verify, **kwargs
+            )
+        except requests.exceptions.SSLError as e:
+            if self.cert_path is not None:
+                hint = f"the certificate in {self.cert_path} does not verify it"
+            else:
+                hint = (
+                    "its certificate is not trusted by the system; pass "
+                    "tls_cert_path= (for example LND's tls.cert)"
+                )
+            raise SatGateError(
+                f"TLS verification failed for LND host {self._display_host}: {hint}"
+            ) from e
     
     def pay_invoice(self, invoice: str) -> str:
         if self.use_rest:
@@ -139,11 +228,11 @@ class LNDWallet(LightningWallet):
         headers = {"Grpc-Metadata-macaroon": self.macaroon}
         data = {"payment_request": invoice}
         
-        resp = requests.post(
+        resp = self._request(
+            "POST",
             url,
             json=data,
             headers=headers,
-            verify=self.cert_path or False,
             timeout=60
         )
         
@@ -163,10 +252,10 @@ class LNDWallet(LightningWallet):
         url = f"https://{self.host}/v1/balance/channels"
         headers = {"Grpc-Metadata-macaroon": self.macaroon}
         
-        resp = requests.get(
+        resp = self._request(
+            "GET",
             url,
             headers=headers,
-            verify=self.cert_path or False,
             timeout=10
         )
         
@@ -178,6 +267,10 @@ class LNDWallet(LightningWallet):
 
 class AlbyWallet(LightningWallet):
     """Alby wallet using NWC or API"""
+
+    # The Alby API the access token is sent to. Requests to it never follow
+    # a redirect.
+    _api_base = "https://api.getalby.com"
     
     def __init__(self, access_token: Optional[str] = None, nwc_url: Optional[str] = None):
         self.access_token = access_token or os.environ.get('ALBY_ACCESS_TOKEN')
@@ -193,11 +286,13 @@ class AlbyWallet(LightningWallet):
             return self._pay_api(invoice)
     
     def _pay_api(self, invoice: str) -> str:
-        url = "https://api.getalby.com/payments/bolt11"
+        url = f"{self._api_base}/payments/bolt11"
         headers = {"Authorization": f"Bearer {self.access_token}"}
         data = {"invoice": invoice}
         
-        resp = requests.post(url, json=data, headers=headers, timeout=60)
+        resp = send_without_redirects(
+            "POST", url, label="Alby API host", json=data, headers=headers, timeout=60
+        )
         
         if resp.status_code != 200:
             raise PaymentFailedError(f"Alby payment failed: {resp.text}")
@@ -209,10 +304,12 @@ class AlbyWallet(LightningWallet):
         raise NotImplementedError("NWC support requires nostr package")
     
     def get_balance(self) -> int:
-        url = "https://api.getalby.com/balance"
+        url = f"{self._api_base}/balance"
         headers = {"Authorization": f"Bearer {self.access_token}"}
         
-        resp = requests.get(url, headers=headers, timeout=10)
+        resp = send_without_redirects(
+            "GET", url, label="Alby API host", headers=headers, timeout=10
+        )
         
         if resp.status_code != 200:
             raise SatGateError(f"Failed to get balance: {resp.text}")
@@ -294,6 +391,17 @@ class SatGateAgentClient:
         # Total cost tracking
         self._total_cost: float = 0.0
     
+    def _send(self, method: str, url: str, **kwargs) -> requests.Response:
+        """Send one gateway request through the session, never following a
+        redirect. Every request this client makes with a credential (the
+        capability token in a header or body, an L402 token, the admin token)
+        goes through here; a 3xx answer raises RedirectRefusedError naming the
+        status and the gateway host.
+        """
+        return send_without_redirects(
+            method, url, session=self.session, label="SatGate gateway", **kwargs
+        )
+
     def _get_token(self) -> Optional[str]:
         """Get a valid token, minting if necessary"""
         # Check cache
@@ -306,7 +414,8 @@ class SatGateAgentClient:
         
         # Mint new token via OSS endpoint
         try:
-            resp = self.session.post(
+            resp = self._send(
+                "POST",
                 f"{self.gateway_url}/api/capability/mint",
                 json={
                     "scope": self.default_scope,
@@ -397,7 +506,7 @@ class SatGateAgentClient:
         headers['Authorization'] = l402_token
         kwargs['headers'] = headers
         
-        retry_resp = self.session.request(method, url, timeout=self.timeout, **kwargs)
+        retry_resp = self._send(method, url, timeout=self.timeout, **kwargs)
         
         cost_sats = challenge.get('amount_sats', challenge.get('amount', 0))
         
@@ -437,7 +546,7 @@ class SatGateAgentClient:
         
         # Make request
         for attempt in range(self.max_retries):
-            resp = self.session.request(method, url, timeout=self.timeout, **kwargs)
+            resp = self._send(method, url, timeout=self.timeout, **kwargs)
             
             # Success
             if resp.status_code < 400:
@@ -510,7 +619,8 @@ class SatGateAgentClient:
         if not t:
             raise SatGateError("No token available to validate")
         
-        resp = self.session.post(
+        resp = self._send(
+            "POST",
             f"{self.gateway_url}/api/capability/validate",
             json={"token": t},
             timeout=self.timeout
@@ -542,7 +652,8 @@ class SatGateAgentClient:
         if not self._token_cache:
             raise SatGateError("No token available for delegation")
         
-        resp = self.session.post(
+        resp = self._send(
+            "POST",
             f"{self.gateway_url}/api/capability/delegate",
             json={
                 "parentToken": self._token_cache.token,
@@ -605,7 +716,7 @@ class SatGateAgentClient:
         headers = {}
         if token:
             headers["Authorization"] = "Bearer " + token
-        resp = self.session.request(
+        resp = self._send(
             method,
             self.gateway_url.rstrip("/") + path,
             json=body,
@@ -633,10 +744,19 @@ class SatGateAgentClient:
         return token
 
     def fetch_jwks(self) -> dict:
-        """Fetch the gateway's published signing key."""
-        resp = self.session.get(
+        """Fetch the gateway's published signing key.
+
+        The request does not use ``self.session``: it is sent once on a new
+        connection with no cookies, no session headers and no
+        authentication (send_without_credentials). Only the session's
+        ``verify`` setting is used. A 3xx answer raises RedirectRefusedError.
+        """
+        resp = send_without_credentials(
+            "GET",
             self.gateway_url.rstrip("/") + "/.well-known/satgate-agent-jwks.json",
+            verify=self.session.verify,
             timeout=self.timeout,
+            label="SatGate gateway",
         )
         if resp.status_code >= 400:
             raise SatGateError(f"jwks failed: {resp.status_code} {resp.text}")
@@ -667,7 +787,7 @@ class SatGateAgentClient:
     def _admin_json(self, method: str, path: str, body: Optional[dict] = None) -> dict:
         if not self.admin_token:
             raise AuthenticationError("admin token required")
-        resp = self.session.request(
+        resp = self._send(
             method,
             self.gateway_url.rstrip("/") + path,
             json=body,

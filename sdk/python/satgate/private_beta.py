@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 
 import requests
 
+from ._http import send_without_redirects
 from .exceptions import SatGateAuthError, SatGateError
 
 BETA_ACCESS_MESSAGE = (
@@ -89,8 +90,12 @@ class SatGate:
             raise SatGateAuthError(BETA_ACCESS_MESSAGE, status_code=401)
 
         try:
-            response = self.session.post(
+            # The session carries the API key; never follow a redirect.
+            response = send_without_redirects(
+                "POST",
                 f"{self.base_url}{path}",
+                session=self.session,
+                label="SatGate API host",
                 json=payload,
                 timeout=self.timeout,
             )

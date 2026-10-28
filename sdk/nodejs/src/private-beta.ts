@@ -1,5 +1,6 @@
 import fetch, { Response } from 'node-fetch';
 import { SatGateAuthError, SatGateError } from './errors';
+import { fetchWithoutRedirects, withoutUrlInErrors } from './transport';
 
 const BETA_ACCESS_MESSAGE =
   'This API namespace requires private beta access. Visit cloud.satgate.io/docs to request access.';
@@ -87,16 +88,24 @@ export class SatGate {
       headers['X-SatGate-Tenant'] = this.tenant;
     }
 
+    const url = `${this.baseUrl}${path}`;
     let response: Response;
     try {
-      response = await fetch(`${this.baseUrl}${path}`, {
+      // The request carries the API key: it never follows a redirect.
+      response = await fetchWithoutRedirects<Response>(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
         signal: controller.signal,
+      }, {
+        label: 'SatGate API host',
+        fetchImpl: fetch as unknown as (url: string, init: RequestInit) => Promise<Response>,
       });
     } catch (err: unknown) {
       clearTimeout(timeoutId);
+      if (err instanceof SatGateError) {
+        throw err;
+      }
       throw new SatGateError(`Request failed: ${err}`);
     }
     clearTimeout(timeoutId);
@@ -116,7 +125,8 @@ export class SatGate {
     if (response.status === 204) {
       return {} as T;
     }
-    return response.json() as Promise<T>;
+    // node-fetch writes the request URL into body-read errors.
+    return withoutUrlInErrors(url, () => response.json() as Promise<T>);
   }
 
   private toApiPayload(value: unknown): JsonValue {

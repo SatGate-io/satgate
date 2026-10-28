@@ -356,7 +356,10 @@ func TestDelegate_AppendedDepthCapNarrowsUnlimited(t *testing.T) {
 }
 
 func TestDelegate_BudgetCapIgnoresLaterWiden(t *testing.T) {
-	for _, extra := range []string{"delegation_budget = 90", "delegation_budget = nope", "delegation_budget = 0"} {
+	// A delegation_budget that does not read as a whole number above zero
+	// ("nope", "0") is no longer skipped with the cap kept: the token is
+	// refused (TestFillTokenInfo_InvalidDelegationBudgetRefusesToken).
+	for _, extra := range []string{"delegation_budget = 90"} {
 		t.Run(extra, func(t *testing.T) {
 			assertBudgetCap(t, "10", extra, 10)
 		})

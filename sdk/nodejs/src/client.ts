@@ -20,6 +20,7 @@ import {
   NotFoundError,
   ValidationError,
 } from './errors';
+import { fetchWithoutRedirects } from './transport';
 
 export interface SatGateClientOptions {
   /** Gateway URL (e.g., "http://localhost:8080") */
@@ -65,12 +66,12 @@ export class SatGateClient {
         headers['X-Admin-Token'] = this.token;
       }
 
-      const response = await fetch(`${this.baseUrl}${path}`, {
+      const response = await fetchWithoutRedirects(`${this.baseUrl}${path}`, {
         method,
         headers,
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal,
-      });
+      }, { label: 'SatGate gateway' });
 
       clearTimeout(timeoutId);
 
@@ -127,15 +128,18 @@ export class SatGateClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
     
     try {
-      const response = await fetch(`${this.baseUrl}/api/capability/ping`, {
+      const response = await fetchWithoutRedirects(`${this.baseUrl}/api/capability/ping`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${bearerToken}` },
         signal: controller.signal,
-      });
+      }, { label: 'SatGate gateway' });
       clearTimeout(timeoutId);
       return response.json() as Promise<Record<string, unknown>>;
     } catch (err: unknown) {
       clearTimeout(timeoutId);
+      if (err instanceof SatGateError) {
+        throw err;
+      }
       throw new SatGateError(`Ping failed: ${err}`);
     }
   }

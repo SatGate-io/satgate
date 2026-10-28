@@ -48,6 +48,48 @@ export class ValidationError extends SatGateError {
   }
 }
 
+/**
+ * An SDK request was answered with a redirect. The SDK never follows a
+ * redirect, so a request (and any credential it carries) is sent only to the
+ * configured URL, once. `host` and the message name only the status and the
+ * host and port of the request URL; the SDK passes that URL's host with user
+ * information, path and query removed.
+ */
+export class RedirectRefusedError extends SatGateError {
+  public readonly host: string;
+
+  constructor(status: number, host: string, label: string = 'host') {
+    super(
+      `${label} ${host} answered HTTP ${status || 'redirect'}; the SDK does not follow ` +
+      'redirects, and the request was not sent again',
+      status || undefined,
+    );
+    this.name = 'RedirectRefusedError';
+    this.host = host;
+  }
+}
+
+/**
+ * The SDK refused a request URL before sending anything: the URL has user
+ * information (a user name or password), or it cannot be parsed. `host` and
+ * the message name only the host and port of the URL, never its user
+ * information, path or query.
+ */
+export class RequestUrlRefusedError extends SatGateError {
+  public readonly host: string;
+
+  constructor(host: string, label: string = 'host', reason: 'user-info' | 'unparseable' = 'user-info') {
+    super(
+      reason === 'user-info'
+        ? `${label} URL for ${host} has a user name or password in it; the SDK does not ` +
+          'send a request to a URL with user information, and no request was sent'
+        : `${label} URL could not be parsed; no request was sent`,
+    );
+    this.name = 'RequestUrlRefusedError';
+    this.host = host;
+  }
+}
+
 export class RateLimitError extends SatGateError {
   constructor(
     message: string = 'Rate limit exceeded',

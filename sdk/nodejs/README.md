@@ -67,6 +67,55 @@ const response = await agent.get("/api/data");
 console.log(valid.valid, response.status);
 ```
 
+## Redirects
+
+No HTTP request the SDK sends follows a redirect: `SatGateClient` (all
+requests, including `health()` and `governance.getGraph()`),
+`SatGateAgentClient` (minting, every request with the capability token
+including the 401 refresh and the L402 retry, `validateToken` and
+`delegate`), `SatGate` (`issue`, `pay`, `verify`), `LNDWallet` and
+`AlbyWallet`.
+
+Each request is sent once, with `redirect: 'manual'` (a `redirect` option
+you pass is overridden), to the configured URL. A 3xx answer rejects with
+`RedirectRefusedError` (a `SatGateError`, with `statusCode` and `host`)
+naming only the status and the host and port of the request URL (no user
+information, path or query, also when they are part of the `host` given to
+`LNDWallet`); the request is not sent again. `SatGateClient.health()`
+resolves `false` in that case.
+
+The request URL is checked before anything is sent. A URL with a user name
+or password (for example a gateway URL or an LND `host` with `user:pass@`),
+or one that cannot be parsed, rejects with `RequestUrlRefusedError` (a
+`SatGateError`, with `host`) naming only the host and port, and no request
+is sent; put credentials in the SDK options, not in the URL (before, such a
+URL failed with a `TypeError` from `fetch`).
+
+The SDK keeps no session or cookie jar: a request carries no cookie or
+credential beyond the headers and body the SDK (or your options) set. In a
+browser, `fetch` still applies its default cookie rule
+(`credentials: 'same-origin'`).
+
+Compatibility: earlier releases followed these redirects. A gateway, LND,
+Alby or SatGate API URL that answers with a redirect (for example `http://`
+redirecting to `https://`) now fails; configure the final URL.
+
+## Error messages
+
+- `RedirectRefusedError` and `RequestUrlRefusedError` name the host by its
+  host and port only, with no user information, path or query from the
+  request URL.
+- When `fetch` rejects (for example a refused connection), and when
+  `node-fetch` fails to read or parse a response body in the `SatGate`
+  client, the full request URL in the error's message, stack and causes is
+  replaced by the URL's host and port. The error keeps its type, and SDK
+  errors that quote it (such as `Request failed: ...`) quote the changed
+  text.
+- Other error messages are unchanged in this release: status, JSON parse
+  and header-validation errors can still quote the request path or query,
+  response text, or a header value. Redaction of these messages is planned
+  as a separate change.
+
 ## Docs
 
 - Developer docs: https://cloud.satgate.io/docs
