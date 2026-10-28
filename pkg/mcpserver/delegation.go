@@ -489,6 +489,16 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		return nil, &clientError{msg: fmt.Sprintf("delegation budget exceeds cap: requested %d, max %d per delegation", params.Budget, parent.DelegationBudget)}
 	}
 
+	// A child carries every caveat of its parent, so its verified budget is
+	// the narrowest of the parent's budget_limit caveats and its own. An
+	// allocation above the parent's effective cap (that narrowest
+	// budget_limit, and the parent's remaining balance when the store holds
+	// one) is refused here, before any mint or carve, so the allocation the
+	// caller is told is always the budget the child verifies with.
+	if err := d.refuseAboveParentCap(ctx, parent, params.Budget); err != nil {
+		return nil, err
+	}
+
 	// Create child macaroon with additional caveats. The caveats this server
 	// writes (the parent link, the child's own credit budget) come first; what
 	// the holder sent in this call (label, scope) comes last. When the child
@@ -964,6 +974,55 @@ const errBudgetParamRange = "budget must be a whole number of credits from 0 to 
 // "budget_limit = N.00"; those still verify.
 func budgetLimitCaveat(budget int64) string {
 	return "budget_limit = " + strconv.FormatInt(budget, 10)
+}
+
+// refuseAboveParentCap returns a refusal when budget credits are more than the
+// parent's effective cap allows, and nil otherwise. The cap is the narrowest
+// of every budget_limit caveat the parent carries (read from its own caveats,
+// the same way the child's are read at verify, and from parent.BudgetLimit)
+// and the parent's remaining balance when the budget store reports one. A
+// refusal is errInsufficientParentBudget, the sentence a carve the balance
+// refuses already gives. A zero-credit child takes nothing from the parent
+// and is not checked here.
+//
+// Only reads: nothing is minted, initialised or carved. The carve that
+// follows stays the authority on the balance, since a balance read here can
+// change before it.
+func (d *Delegator) refuseAboveParentCap(ctx context.Context, parent *TokenInfo, budget int64) error {
+	if budget <= 0 {
+		return nil
+	}
+	limit := parent.BudgetLimit
+	if caveats := parentCaveats(d.macaroonSvc, parent); caveats != nil {
+		v, found, err := narrowestBudgetLimit(&macaroon.Macaroon{Caveats: caveats})
+		if err != nil {
+			return d.refuseMint(parent, err, "parent token cannot be read")
+		}
+		if found && (limit <= 0 || v < limit) {
+			limit = v
+		}
+	}
+	if limit > 0 && budget > limit {
+		// The same fixed sentence as a carve the balance refuses: to the
+		// caller both are "the parent cannot fund this allocation".
+		log.Warn().Str("parent", parent.TokenID).Int64("budget", budget).Int64("parentCap", limit).Msg("delegation refused: allocation above the parent's budget cap")
+		return errInsufficientParentBudget
+	}
+	if d.budget == nil || parent.BudgetID == "" {
+		return nil
+	}
+	remaining, err := d.budget.Remaining(ctx, parent.BudgetID)
+	if err != nil || remaining < 0 {
+		// No balance to read (a store error, or no budget stored yet, which
+		// the carve initialises from the cap checked above): the carve
+		// decides.
+		return nil
+	}
+	if budget > remaining {
+		log.Warn().Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Int64("budget", budget).Msg("delegation refused: allocation above the parent's remaining balance")
+		return errInsufficientParentBudget
+	}
+	return nil
 }
 
 // HandleDelegate processes a satgate/delegate JSON-RPC request.
