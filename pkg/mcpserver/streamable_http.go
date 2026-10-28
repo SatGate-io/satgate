@@ -207,9 +207,15 @@ type streamSession struct {
 }
 
 // ServeHTTP dispatches legacy SSE routes and the Streamable HTTP endpoint.
+// It refuses every request when auth.mode is not set (see Handler).
 func (s *SSEServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if s == nil || s.mux == nil {
 		http.Error(w, "mcp server unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	// No auth.mode: refuse before any route, session or upstream is reached.
+	if err := s.authModeCheck(); err != nil {
+		writeAuthModeRefusal(w, err)
 		return
 	}
 	if IsStreamableHTTPPath(r.URL.Path, s.basePath) {

@@ -281,7 +281,7 @@ Three auth modes:
 
 **`none`** — No authentication. All calls use a default budget identity. For stdio, or a listener only you can reach. Over SSE / Streamable HTTP it must be written out (`auth.mode: none`), and the proxy logs a warning at startup.
 
-**`config`** — One static bearer token in the config file. Agents send it as `Authorization: Bearer <token>` (SSE and Streamable HTTP) or in `params._meta.token`. The comparison takes the same time whatever the value sent.
+**`config`** — One static bearer token in the config file. Agents send it as `Authorization: Bearer <token>` (SSE and Streamable HTTP) or in `params._meta.token`. The proxy hashes the sent and configured values with SHA-256 and compares the fixed-length digests in constant time, so the comparison does not depend on how much of the value matches (hashing time still depends on the length sent).
 
 ```yaml
 auth:
@@ -330,6 +330,7 @@ Over stdio the caller is the local process that started the proxy: in `config` m
 #### Listener and startup checks
 
 - `server.transport: sse` or `http` with no `auth.mode` refuses to start: `auth.mode is required to serve over SSE / Streamable HTTP ...`. Set `auth.mode` to `header` or `config`, or write `auth.mode: none` to serve without authentication (the proxy then logs a warning at startup).
+- The same rule applies to the handler of an embedded server (`NewSSEServer(...).Handler()`, or the `SSEServer` itself as an `http.Handler`). If the configuration does not set `auth.mode` (`Auth.Mode` empty, or a file loaded without `auth.mode`, including a stdio-only file), every request to that handler gets `503` with the same `auth.mode is required ...` message. This covers every route: `/mcp`, `/sse`, `/message`, `/health` and routes added with `Handle` / `HandleFunc`. The request is refused before any MCP method runs or an upstream is contacted. The error is logged once, when `NewSSEServer` is called. With an explicit `none`, the warning is also logged once, at that point.
 - The listener binds `server.host`, default `127.0.0.1` (this machine only), on `server.port`, default `9100`. Set `host: 0.0.0.0` (or `::`) to accept connections from other machines, for example in a container. `host` takes no port.
 - A stdio-only configuration starts as before, with or without an `auth` block.
 
@@ -583,7 +584,9 @@ This release changes three defaults of the MCP proxy:
    - The listener binds `127.0.0.1` instead of every interface. To accept other machines (containers, a LAN), set `server.host: 0.0.0.0`.
    - With `budget.limit` greater than 0 and no `enforcement.mode`, enforcement is `control` instead of `observe`, so an exhausted budget denies calls. To keep the old behaviour, write `enforcement.mode: observe`.
 
-A stdio-only configuration starts as before, with or without an `auth` block; only the enforcement default applies to it. Code that builds a `Config` itself (without `LoadConfig`) keeps the enforcement mode it sets, and must set `Auth.Mode` before it calls `SSEServer.ListenAndServe`; `NewSSEServer` listens on the address it is given, and `Config.ListenAddr` returns the default one.
+A stdio-only configuration starts as before, with or without an `auth` block; only the enforcement default applies to it. Code that builds a `Config` itself (without `LoadConfig`) keeps the enforcement mode it sets. `NewSSEServer` listens on the address it is given, and `Config.ListenAddr` returns the default one.
+
+**Embedded handlers follow the same rule as the listener.** Code that serves `NewSSEServer(...).Handler()` (or the `SSEServer` itself) from its own `http.Server` must set `Auth.Mode`, the same as code that calls `SSEServer.ListenAndServe`. Without it, every request to the handler, on every route including `/health`, gets `503` with the `auth.mode is required ...` message. A file loaded with `LoadConfig` that has no `auth.mode` counts as unset even for stdio, unless the code sets `Auth.Mode` to `header` or `config` before `New`. To keep serving without authentication, set `auth.mode: none` in the file, or `Auth.Mode: "none"` in a `Config` built in code. The warning is then logged once when the server is created.
 
 ## Further Reading
 

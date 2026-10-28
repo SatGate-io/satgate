@@ -46,7 +46,8 @@ type Config struct {
 	AllowPrivateUpstreams bool `yaml:"allowPrivateUpstreams,omitempty"`
 
 	// authModeUnset records that the loaded file did not set auth.mode
-	// (LoadConfig). A network transport then refuses to start.
+	// (LoadConfig). A network transport then refuses to start, and an
+	// SSEServer handler refuses every request (see networkAuthError).
 	authModeUnset bool
 }
 
@@ -79,26 +80,49 @@ func (c *Config) ListenAddr() string {
 	return net.JoinHostPort(host, strconv.Itoa(port))
 }
 
-// errAuthModeRequired is the startup refusal for a network transport whose
-// configuration does not say how clients authenticate.
+// errAuthModeRequired is the refusal for a network transport (the listener
+// or an embedded handler) whose configuration does not say how clients
+// authenticate.
 func errAuthModeRequired(transport string) error {
-	return fmt.Errorf("auth.mode is required to serve over SSE / Streamable HTTP (server.transport %q): set auth.mode to \"header\" (macaroon tokens) or \"config\" (one static token in auth.token); to serve without authentication, write auth.mode: none", transport)
+	where := ""
+	if IsNetworkTransport(transport) {
+		where = fmt.Sprintf(" (server.transport %q)", transport)
+	}
+	return fmt.Errorf("auth.mode is required to serve over SSE / Streamable HTTP%s: set auth.mode to \"header\" (macaroon tokens) or \"config\" (one static token in auth.token); to serve without authentication, write auth.mode: none", where)
+}
+
+// noneModeWarning is logged once per network server when auth.mode is none.
+const noneModeWarning = "auth.mode is none: any client that can reach this address can list and call tools without a token"
+
+// authModeMissing reports that no auth mode was written: Auth.Mode is empty,
+// or the configuration came from a file without auth.mode (LoadConfig fills
+// in "none" for stdio) and code has not set another mode since.
+func (c *Config) authModeMissing() bool {
+	return c.Auth.Mode == "" || (c.authModeUnset && c.Auth.Mode == "none")
+}
+
+// networkAuthError is the refusal shared by SSEServer.ListenAndServe and the
+// handler (SSEServer.ServeHTTP): non-nil when the configuration does not set
+// auth.mode. It logs nothing.
+func (c *Config) networkAuthError() error {
+	if c == nil {
+		return fmt.Errorf("no configuration: %w", errAuthModeRequired(""))
+	}
+	if c.authModeMissing() {
+		return errAuthModeRequired(c.Server.Transport)
+	}
+	return nil
 }
 
 // checkNetworkAuth is the startup check of a network transport: it refuses a
 // configuration that does not set auth.mode, and logs a warning for an
 // explicit auth.mode none.
 func (c *Config) checkNetworkAuth(addr string) error {
-	if c == nil {
-		return fmt.Errorf("no configuration")
-	}
-	if c.Auth.Mode == "" || c.authModeUnset {
-		return errAuthModeRequired(c.Server.Transport)
+	if err := c.networkAuthError(); err != nil {
+		return err
 	}
 	if c.Auth.Mode == "none" {
-		log.Warn().
-			Str("addr", addr).
-			Msg("auth.mode is none: any client that can reach this address can list and call tools without a token")
+		log.Warn().Str("addr", addr).Msg(noneModeWarning)
 	}
 	return nil
 }

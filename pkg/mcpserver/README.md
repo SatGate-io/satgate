@@ -154,6 +154,8 @@ restores the URL fallback for a client that cannot send a header.
 - `server.transport` `sse` / `http` without `auth.mode` does not start; write
   `auth.mode: none` to serve without authentication (a warning is logged at
   startup).
+  An embedded handler (`SSEServer.Handler`) with no `auth.mode` refuses every
+  request with `503` and the same message.
 - The listener binds `server.host`, default `127.0.0.1`, on `server.port`,
   default `9100` (`Config.ListenAddr`). Set `host: 0.0.0.0` for every
   interface.
@@ -163,15 +165,24 @@ restores the URL fallback for a client that cannot send a header.
 
 ## Upgrading
 
-- `auth.mode: config` clients must send the token (`Authorization: Bearer`)
+- `auth.mode: config` clients must send the token (`Authorization: Bearer <token>`)
   over SSE and Streamable HTTP; requests without it are now refused.
 - `tools/list` and passed-on methods need a token in `config` and `header`
   modes over SSE and Streamable HTTP.
 - Add `auth.mode` to every `sse` / `http` configuration, `server.host: 0.0.0.0`
   where other machines (or a container's port mapping) must connect, and
   `enforcement.mode: observe` where a budget should only be watched.
-- Code that builds a `Config` and calls `SSEServer.ListenAndServe` must set
-  `Auth.Mode`. `NewSSEServer` still listens on the address it is given.
+- Code that calls `SSEServer.ListenAndServe` must set `Auth.Mode`.
+  `NewSSEServer` still listens on the address it is given.
+- Embedded handlers follow the same rule. When `Auth.Mode` is not set, a
+  handler from `NewSSEServer(...).Handler()`, or the `SSEServer` used as an
+  `http.Handler`, answers every request with `503` and the
+  `auth.mode is required ...` message. That covers every route, including
+  `/health` and routes added with `Handle` / `HandleFunc`. "Not set" means
+  `Auth.Mode` is empty, or the configuration came from a file loaded without
+  `auth.mode`, stdio-only files included. The error is logged once, by
+  `NewSSEServer`. Set `Auth.Mode` to `header` or `config`, or to `none` to
+  serve without authentication (logged once as a warning).
 
 See [docs/guides/mcp-gateway.md](../../docs/guides/mcp-gateway.md#upgrading).
 
