@@ -315,13 +315,87 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 	return mac, nil
 }
 
-func (s *Service) verifyBinary(token string) (*Macaroon, error) {
+// SignedByThisKey reports whether token is a macaroon, in either format
+// Verify accepts (libmacaroon binary or SatGate JSON), whose signature chain
+// verifies under this service's root key. Caveats are not checked: an expired
+// or narrowed token signed here is still one this service issued. It answers
+// what a token is, never whether it grants anything; use Verify for that.
+//
+// token is read with TokenBytes, so every spelling Verify accepts is
+// recognised, and more: either format in the standard or the URL-safe
+// base64 alphabet, padded or not. Recognising a token is never a reason to
+// accept it.
+func (s *Service) SignedByThisKey(token string) bool {
+	data, ok := TokenBytes(strings.TrimSpace(token))
+	return ok && s.SignedByThisKeyBytes(data)
+}
+
+// TokenBytes decodes token the way Verify reads a token, and failing that
+// in either base64 alphabet, padded or not. It first tries the decoding
+// Verify uses for a binary macaroon (binaryTokenBytes: standard base64,
+// padded or not), then the one it uses for a JSON macaroon (jsonTokenBytes:
+// URL-safe unpadded or standard padded base64). Both skip CR and LF
+// anywhere in token, as Go's base64 decoders do. When either succeeds the
+// other gives the same bytes or fails, so one result covers both formats.
+// ok is false when nothing decodes or the result is empty.
+//
+// It is for recognising a token (SignedByThisKey); Verify, DecodeBinary and
+// Decode accept only their own decodings.
+func TokenBytes(token string) (data []byte, ok bool) {
+	var err error
+	if data, err = binaryTokenBytes(token); err != nil {
+		if data, err = jsonTokenBytes(token); err != nil {
+			t := strings.TrimRight(token, "=\r\n")
+			enc := base64.RawStdEncoding
+			if strings.ContainsAny(t, "-_") {
+				enc = base64.RawURLEncoding
+			}
+			data, err = enc.DecodeString(t)
+		}
+	}
+	return data, err == nil && len(data) > 0
+}
+
+// SignedByThisKeyBytes reports whether data, a decoded token (TokenBytes),
+// is a binary or JSON macaroon whose signature chain verifies under this
+// service's root key. Caveats are not checked (see SignedByThisKey).
+func (s *Service) SignedByThisKeyBytes(data []byte) bool {
+	var v2mac macaroonv2.Macaroon
+	if v2mac.UnmarshalBinary(data) == nil &&
+		v2mac.Verify(s.rootKey, func(string) error { return nil }, nil) == nil {
+		return true
+	}
+	var mac Macaroon
+	if json.Unmarshal(data, &mac) != nil || mac.Signature == "" {
+		return false
+	}
+	return hmac.Equal([]byte(mac.Signature), []byte(s.chainedSignature(&mac)))
+}
+
+// binaryTokenBytes is how Verify (verifyBinary) and DecodeBinary read a
+// binary macaroon: standard base64, padded or not.
+func binaryTokenBytes(token string) ([]byte, error) {
 	data, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		data, err = base64.RawStdEncoding.DecodeString(token)
-		if err != nil {
-			return nil, fmt.Errorf("invalid base64: %w", err)
-		}
+	}
+	return data, err
+}
+
+// jsonTokenBytes is how Verify and Decode read a JSON macaroon: URL-safe
+// base64 without padding, or standard base64 with padding.
+func jsonTokenBytes(token string) ([]byte, error) {
+	data, err := base64.RawURLEncoding.DecodeString(token)
+	if err != nil {
+		data, err = base64.StdEncoding.DecodeString(token)
+	}
+	return data, err
+}
+
+func (s *Service) verifyBinary(token string) (*Macaroon, error) {
+	data, err := binaryTokenBytes(token)
+	if err != nil {
+		return nil, fmt.Errorf("invalid base64: %w", err)
 	}
 
 	var v2mac macaroonv2.Macaroon
@@ -452,13 +526,9 @@ func (s *Service) EncodeBinary(mac *Macaroon) (string, error) {
 
 // DecodeBinary deserializes a base64 standard-format binary macaroon into our Macaroon struct.
 func (s *Service) DecodeBinary(token string) (*Macaroon, error) {
-	data, err := base64.StdEncoding.DecodeString(token)
+	data, err := binaryTokenBytes(token)
 	if err != nil {
-		// Try raw standard base64
-		data, err = base64.RawStdEncoding.DecodeString(token)
-		if err != nil {
-			return nil, fmt.Errorf("invalid base64: %w", err)
-		}
+		return nil, fmt.Errorf("invalid base64: %w", err)
 	}
 
 	var v2mac macaroonv2.Macaroon
@@ -493,13 +563,9 @@ func (s *Service) Encode(mac *Macaroon) string {
 
 // Decode deserializes a macaroon from a string
 func (s *Service) Decode(token string) (*Macaroon, error) {
-	data, err := base64.RawURLEncoding.DecodeString(token)
+	data, err := jsonTokenBytes(token)
 	if err != nil {
-		// Try standard base64
-		data, err = base64.StdEncoding.DecodeString(token)
-		if err != nil {
-			return nil, fmt.Errorf("invalid base64: %w", err)
-		}
+		return nil, fmt.Errorf("invalid base64: %w", err)
 	}
 
 	var mac Macaroon

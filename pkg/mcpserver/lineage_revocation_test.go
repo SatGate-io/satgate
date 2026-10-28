@@ -317,11 +317,11 @@ func TestMCPLineage_StdioDispatchRefusesBannedToken(t *testing.T) {
 	}
 }
 
-// forwardCallerToken: the connection credential of a banned lineage is not
-// passed on to the upstream; the method is refused before it is passed on.
-func TestMCPLineage_ForwardedCredentialWithheldForBannedToken(t *testing.T) {
+// A method passed on for a banned lineage is refused before it reaches the
+// upstream; before the ban it reaches the upstream without the credential.
+func TestMCPLineage_BannedTokenRefusedBeforePassedOn(t *testing.T) {
 	gov := governance.NewService(nil)
-	p := newTokenProbe(t, true)
+	p := newTokenProbe(t)
 	svc, err := macaroon.NewService("hygiene-test-root")
 	if err != nil {
 		t.Fatal(err)
@@ -339,16 +339,14 @@ func TestMCPLineage_ForwardedCredentialWithheldForBannedToken(t *testing.T) {
 	child := svc.Encode(childMac)
 	sid := mustInitSession(t, p.srv.URL, child)
 	raw := `{"jsonrpc":"2.0","id":510,"method":"resources/list","params":{}}`
-	wantForwarded(t, "before the ban", receivedParams(t, "resources/list", streamableCall(t, p.srv.URL, sid, child, raw)), child)
+	before := receivedParams(t, "resources/list", streamableCall(t, p.srv.URL, sid, child, raw))
+	if _, has := metaTokenOf(t, before); has || strings.Contains(string(before), child) {
+		t.Fatal("before the ban: upstream received the caller's credential")
+	}
 	gov.Ban(root.Signature, "test", "admin")
 	resp := streamableCall(t, p.srv.URL, sid, child, raw)
 	if resp.Error == nil || !strings.Contains(resp.Error.Message, "token revoked") || len(resp.Result) != 0 {
 		t.Fatalf("resources/list with a banned lineage was passed on: %+v", resp.Error)
-	}
-	// The verification that decides what is forwarded refuses it too.
-	ctx := p.proxy.verifyConnectionCredential(withTransportToken(context.Background(), child))
-	if verifiedCredentialFrom(ctx) != "" {
-		t.Fatal("a banned lineage's credential was marked for forwarding")
 	}
 }
 

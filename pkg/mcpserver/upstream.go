@@ -361,6 +361,10 @@ func (m *UpstreamManager) logConnected(name string, client *UpstreamClient) {
 }
 
 func (m *UpstreamManager) connect(ctx context.Context, name string, cfg UpstreamConfig) (*UpstreamClient, error) {
+	// Refused here too, for an upstream added without LoadConfig.
+	if cfg.ForwardCallerToken {
+		return nil, errForwardCallerToken
+	}
 	var c *UpstreamClient
 	var err error
 	switch cfg.Transport {
@@ -642,8 +646,8 @@ func (m *UpstreamManager) sendRequest(ctx context.Context, client *UpstreamClien
 	id := m.idCounter.Add(1)
 	idJSON, _ := json.Marshal(id)
 
-	// The caller's token stays with the proxy unless this upstream opted in.
-	params = m.outboundParams(ctx, client.name, params)
+	// The caller's token stays with the proxy: no upstream receives it.
+	params = outboundParams(params)
 
 	req := Request{
 		JSONRPC: "2.0",

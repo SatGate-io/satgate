@@ -202,13 +202,13 @@ See [docs/guides/mcp-gateway.md](../../docs/guides/mcp-gateway.md#upgrading).
   variables named in the upstream's `envPassthrough` list, plus its `env` map,
   which wins (also where names compare without regard to case, as on Windows).
   Nothing else from the proxy's environment.
-- **Caller token:** never, by default. `_meta.token` is removed from every
-  forwarded request. `forwardCallerToken: true` on an upstream passes that
-  upstream the credential the proxy verified for the request (the token
-  authentication accepted, or for a method passed on outside the `tools/call` path
-  the connection's own credential once it verifies and is not revoked), never a value from params that it did not verify; with none
-  verified, none is passed.
-  That upstream can then act as the caller.
+- **Caller token:** never. `_meta.token` is removed from every forwarded
+  request, on every method, transport and per-tenant router, and the caller's
+  `Authorization` header is not sent on; a network upstream receives only its
+  configured `headers`. `forwardCallerToken` is no longer supported: a
+  configuration or `UpstreamConfig` that sets it is refused. Give an upstream
+  its own credential in `env` (stdio) or `Headers` (SSE and Streamable HTTP
+  upstreams added in code).
 
 ```yaml
 upstreams:
@@ -218,7 +218,6 @@ upstreams:
     env:
       API_KEY: "${TOOLS_API_KEY}"
     envPassthrough: [HTTPS_PROXY]
-    # forwardCallerToken: true   # only if this upstream verifies SatGate tokens itself
 ```
 
 ## Per-Tool Routing

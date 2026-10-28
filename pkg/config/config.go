@@ -468,8 +468,18 @@ type LightningConfig struct {
 
 // Upstream represents a backend API
 type Upstream struct {
-	URL            string            `yaml:"url"`
-	Timeout        time.Duration     `yaml:"timeout"`
+	URL     string        `yaml:"url"`
+	Timeout time.Duration `yaml:"timeout"`
+	// Headers are set on every request the gateway forwards to this
+	// upstream, as the request leaves the gateway and after every other
+	// change, so each arrives with exactly its configured value and replaces
+	// a client header of the same name. They are how an upstream gets its own
+	// credential (for example Authorization). Host sets the request's Host.
+	// Names SatGate owns, hop-by-hop names, names the proxy manages
+	// (X-Forwarded-For, X-Forwarded-Host, X-Forwarded-Proto, Forwarded),
+	// Content-Length, Expect, an empty User-Agent or Accept-Encoding, and
+	// any entry that cannot be delivered as written are refused at load
+	// (see CheckUpstreamHeaders).
 	Headers        map[string]string `yaml:"headers"`
 	HealthCheck    *HealthCheck      `yaml:"healthCheck"`
 	CircuitBreaker *CircuitBreaker   `yaml:"circuitBreaker"`
@@ -797,6 +807,11 @@ func (c *Config) Validate() error {
 		if err := validateUpstreamURL(name, upstream.URL); err != nil {
 			return err
 		}
+	}
+	// Configured headers are set on every request to the upstream; a header
+	// SatGate owns cannot be one of them (see CheckUpstreamHeaders).
+	if err := CheckUpstreamHeaders(c.Upstreams); err != nil {
+		return err
 	}
 
 	return nil

@@ -137,9 +137,8 @@ func macaroonServiceOf(a Authenticator) *macaroon.Service {
 // after the signature and resource checks, so every place the runtime
 // accepts a token runs it before anything is admitted, spent, forwarded or
 // minted: SSE connect and each message, Streamable HTTP initialize, each
-// request and resume, stdio, the credential passed to an upstream with
-// forwardCallerToken, and satgate/delegate (checked again before the child is
-// minted). Over stdio every token a request supplies (params._meta.token and
+// request and resume, stdio, and satgate/delegate (checked again before the
+// child is minted). Over stdio every token a request supplies (params._meta.token and
 // the connection's) is verified and checked before anything is signed or
 // passed on, on every method that is, with sign-every-action on or off;
 // tools/list and the methods passed on to the default upstream answer a

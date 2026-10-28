@@ -50,7 +50,7 @@ func newStdioRig(t *testing.T, checker LineageRevocationChecker, wrap func(conte
 		Budget:          BudgetConfig{Limit: 100, FailMode: "closed"},
 		Enforcement:     EnforcementConfig{Mode: "control"},
 		Logging:         LoggingConfig{Level: "error"},
-		Upstreams:       map[string]UpstreamConfig{"fixture": helperUpstream(nil, nil, false)},
+		Upstreams:       map[string]UpstreamConfig{"fixture": helperUpstream(nil, nil)},
 		DefaultUpstream: "fixture",
 	}
 	proxy, err := New(cfg)

@@ -679,9 +679,6 @@ func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Respo
 		ctx = context.WithValue(ctx, CtxTenantID, tokenInfo.TenantID)
 	}
 	ctx = context.WithValue(ctx, CtxTokenInfo, tokenInfo)
-	// The credential just verified is the only one an upstream configured
-	// with ForwardCallerToken may receive (see upstream_hygiene.go).
-	ctx = withVerifiedCredential(ctx, verified)
 	// Check revocation (after tenant is in context)
 	if p.revocation != nil && tokenInfo.BudgetID != "" {
 		if p.revocation.IsRevoked(ctx, tokenInfo.BudgetID) {
@@ -844,10 +841,9 @@ type transportTokenKey struct{}
 // withTransportToken keeps the bearer credential of a connection on the
 // request's context, apart from the request's params. The transports always
 // set it; with the switch on, authenticate reads it when params carry no
-// token, and verifyConnectionCredential reads it for an upstream configured
-// with ForwardCallerToken. It is the credential the connection presented,
-// verified like any other before it is used: nothing a caller wrote into
-// params can name a different identity through it.
+// token. It is the credential the connection presented, verified like any
+// other before it is used: nothing a caller wrote into params can name a
+// different identity through it. It is never passed to an upstream.
 func withTransportToken(ctx context.Context, token string) context.Context {
 	token = presentedToken(token)
 	if token == "" {
