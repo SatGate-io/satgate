@@ -197,7 +197,7 @@ func NewTestEnv(t *testing.T, opts ...TestEnvOption) *TestEnv {
 	}
 
 	// Mint root token
-	rootMac, err := macService.Mint("api:*", time.Now().Add(time.Hour))
+	rootMac, err := macService.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		cancel()
 		t.Fatalf("mint root: %v", err)
@@ -342,7 +342,7 @@ func (e *TestEnv) MintToken(t *testing.T, scope string, expiry time.Duration) st
 // MintExpiredToken creates a macaroon that has already expired.
 func (e *TestEnv) MintExpiredToken(t *testing.T) string {
 	t.Helper()
-	mac, err := e.MacService.Mint("api:*", time.Now().Add(-time.Hour))
+	mac, err := e.MacService.Mint("mcp:*", time.Now().Add(-time.Hour))
 	if err != nil {
 		t.Fatalf("mint expired: %v", err)
 	}
