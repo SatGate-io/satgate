@@ -31,6 +31,7 @@ import {
   PaymentRequiredError,
   PaymentFailedError,
 } from './errors';
+import { fetchWithoutRedirects } from './transport';
 
 export interface AgentResponse<T = unknown> {
   statusCode: number;
@@ -64,19 +65,6 @@ export interface LNDWalletOptions {
   certPath?: string;
 }
 
-/** scheme://host[:port] of a redirect's Location, for an error message. */
-function redirectTarget(base: string, location: string | null): string {
-  if (!location) {
-    return 'no Location';
-  }
-  try {
-    const target = new URL(location, base);
-    return `${target.protocol}//${target.host}`;
-  } catch {
-    return 'an unreadable Location';
-  }
-}
-
 export class LNDWallet implements LightningWallet {
   private host: string;
   private macaroon: string;
@@ -98,21 +86,12 @@ export class LNDWallet implements LightningWallet {
 
   /**
    * Send one request carrying the macaroon header to the LND host. Redirects
-   * are never followed: the macaroon is sent only to the configured host,
-   * once. A 3xx answer throws SatGateError naming the status and the host.
+   * are never followed (fetchWithoutRedirects): the macaroon is sent only to
+   * the configured host, once. A 3xx answer throws RedirectRefusedError
+   * naming the status and the host.
    */
   private async request(url: string, init: RequestInit): Promise<Response> {
-    const response = await fetch(url, { ...init, redirect: 'manual' });
-    if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-      const target = redirectTarget(url, response.headers.get('location'));
-      await response.body?.cancel().catch(() => undefined);
-      const status = response.status || 'redirect';
-      throw new SatGateError(
-        `LND host ${this.host} answered HTTP ${status} (redirect to ${target}); ` +
-        'LNDWallet does not follow redirects and the macaroon was not sent again',
-      );
-    }
-    return response;
+    return fetchWithoutRedirects(url, init, { label: 'LND host', host: this.host });
   }
   
   async payInvoice(invoice: string): Promise<string> {
@@ -164,6 +143,8 @@ export interface AlbyWalletOptions {
 export class AlbyWallet implements LightningWallet {
   private accessToken?: string;
   private nwcUrl?: string;
+  /** The Alby API the access token is sent to; never through a redirect. */
+  private apiBase = 'https://api.getalby.com';
   
   constructor(options: AlbyWalletOptions = {}) {
     this.accessToken = options.accessToken || process.env.ALBY_ACCESS_TOKEN;
@@ -179,14 +160,14 @@ export class AlbyWallet implements LightningWallet {
       throw new SatGateError('Alby access token required for API payments');
     }
     
-    const response = await fetch('https://api.getalby.com/payments/bolt11', {
+    const response = await fetchWithoutRedirects(`${this.apiBase}/payments/bolt11`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ invoice }),
-    });
+    }, { label: 'Alby API host' });
     
     if (!response.ok) {
       throw new PaymentFailedError(`Alby payment failed: ${await response.text()}`);
@@ -201,9 +182,9 @@ export class AlbyWallet implements LightningWallet {
       throw new SatGateError('Alby access token required');
     }
     
-    const response = await fetch('https://api.getalby.com/balance', {
+    const response = await fetchWithoutRedirects(`${this.apiBase}/balance`, {
       headers: { 'Authorization': `Bearer ${this.accessToken}` },
-    });
+    }, { label: 'Alby API host' });
     
     if (!response.ok) {
       throw new SatGateError(`Failed to get balance: ${await response.text()}`);
@@ -284,6 +265,16 @@ export class SatGateAgentClient {
     }
   }
   
+  /**
+   * Send one gateway request, never following a redirect. Every request this
+   * client makes with a credential (the capability token in a header or
+   * body, an L402 token, the admin token) goes through here; a 3xx answer
+   * throws RedirectRefusedError naming the status and the gateway host.
+   */
+  private send(url: string, init: RequestInit): Promise<Response> {
+    return fetchWithoutRedirects(url, init, { label: 'SatGate gateway' });
+  }
+
   private async getToken(): Promise<string | undefined> {
     // Check cache
     if (this.tokenCache && Date.now() < this.tokenCache.expiresAt) {
@@ -296,11 +287,10 @@ export class SatGateAgentClient {
     }
     
     // Mint new token via OSS endpoint
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-      
-      const response = await fetch(`${this.gatewayUrl}/api/capability/mint`, {
+      const response = await this.send(`${this.gatewayUrl}/api/capability/mint`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -348,6 +338,8 @@ export class SatGateAgentClient {
     } catch (e) {
       if (e instanceof SatGateError) throw e;
       throw new AuthenticationError(`Failed to mint token: ${e}`);
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
   
@@ -405,7 +397,7 @@ export class SatGateAgentClient {
     const headers = new Headers(options.headers);
     headers.set('Authorization', l402Token);
     
-    const retryResponse = await fetch(url, { ...options, headers });
+    const retryResponse = await this.send(url, { ...options, headers });
     const costSats = (challenge.amount_sats as number) || (challenge.amount as number) || 0;
     
     return {
@@ -442,7 +434,7 @@ export class SatGateAgentClient {
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
       
       try {
-        const response = await fetch(url, {
+        const response = await this.send(url, {
           ...requestOptions,
           signal: controller.signal,
         });
@@ -566,7 +558,7 @@ export class SatGateAgentClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
     
     try {
-      const response = await fetch(`${this.gatewayUrl}/api/capability/delegate`, {
+      const response = await this.send(`${this.gatewayUrl}/api/capability/delegate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

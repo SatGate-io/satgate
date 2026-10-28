@@ -48,6 +48,26 @@ export class ValidationError extends SatGateError {
   }
 }
 
+/**
+ * A request that carries a credential was answered with a redirect. The SDK
+ * never follows a redirect on such a request, so the credential is sent only
+ * to the configured host, once. The message names only the status and that
+ * host.
+ */
+export class RedirectRefusedError extends SatGateError {
+  public readonly host: string;
+
+  constructor(status: number, host: string, label: string = 'host') {
+    super(
+      `${label} ${host} answered HTTP ${status || 'redirect'}; the SDK does not follow ` +
+      'redirects on requests that carry a credential, and the credential was not sent again',
+      status || undefined,
+    );
+    this.name = 'RedirectRefusedError';
+    this.host = host;
+  }
+}
+
 export class RateLimitError extends SatGateError {
   constructor(
     message: string = 'Rate limit exceeded',

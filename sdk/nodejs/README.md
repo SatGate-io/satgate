@@ -67,6 +67,26 @@ const response = await agent.get("/api/data");
 console.log(valid.valid, response.status);
 ```
 
+## Redirects
+
+No SDK request that carries a credential follows an HTTP redirect. That
+covers every request that sends an `Authorization` header, `X-Admin-Token`,
+an LND macaroon or a token in the JSON body: `SatGateClient` (all requests,
+including `health()`), `SatGateAgentClient` (minting, every request with the
+capability token including the 401 refresh and the L402 retry,
+`validateToken` and `delegate`), `SatGate` (`issue`, `pay`, `verify`),
+`LNDWallet` and `AlbyWallet`.
+
+Such a request is sent once, with `redirect: 'manual'` (a `redirect` option
+you pass is overridden), to the configured URL. A 3xx answer rejects with
+`RedirectRefusedError` (a `SatGateError`, with `statusCode` and `host`)
+naming only the status and the host that answered; the credential is not
+sent again. `SatGateClient.health()` resolves `false` in that case.
+
+Compatibility: earlier releases followed these redirects. A gateway, LND,
+Alby or SatGate API URL that answers with a redirect (for example `http://`
+redirecting to `https://`) now fails; configure the final URL.
+
 ## Docs
 
 - Developer docs: https://cloud.satgate.io/docs

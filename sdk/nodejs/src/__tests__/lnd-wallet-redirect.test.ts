@@ -143,25 +143,27 @@ maybe('LNDWallet never follows a redirect with the macaroon header', () => {
       it(`${operation}: ${status} to a plain-HTTP URL is refused`, async () => {
         const sink = await serve({ secure: false });
         const message = await expectRefused(operation, status, sink.url(), sink);
-        expect(message).toContain(`http://127.0.0.1:${sink.port}`);
+        expect(message).not.toContain(String(sink.port));
       });
 
       it(`${operation}: ${status} to another host is refused`, async () => {
         const sink = await serve({ secure: true });
         const message = await expectRefused(operation, status, sink.url('localhost'), sink);
-        expect(message).toContain(`https://localhost:${sink.port}`);
+        expect(message).not.toContain('localhost');
+        expect(message).not.toContain(String(sink.port));
       });
     }
   }
 
-  it('the error names only the scheme, host and port of the Location', async () => {
+  it('the error names only the status and the LND host', async () => {
     const origin = await serve({ secure: true, status: 302, location: 'http://user:pw@127.0.0.1:9/path?q=hidden' });
-    const wallet = new LNDWallet({ host: `127.0.0.1:${origin.port}`, macaroonHex: MACAROON_HEX });
-    await expect(wallet.getBalance()).rejects.toThrow('http://127.0.0.1:9');
+    const host = `127.0.0.1:${origin.port}`;
+    const wallet = new LNDWallet({ host, macaroonHex: MACAROON_HEX });
+    await expect(wallet.getBalance()).rejects.toThrow(`LND host ${host} answered HTTP 302;`);
     try {
       await wallet.getBalance();
     } catch (e) {
-      for (const part of ['user', 'pw', '/path', 'hidden']) {
+      for (const part of ['127.0.0.1:9', 'user', 'pw', '/path', 'hidden']) {
         expect((e as Error).message).not.toContain(part);
       }
     }
