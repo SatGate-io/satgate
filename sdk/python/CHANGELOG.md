@@ -21,18 +21,32 @@ All notable changes to the `satgate` Python SDK are listed here.
 - `LNDWallet` requests (`get_balance`, `pay_invoice`) no longer follow HTTP
   redirects. The macaroon header is sent only to the configured host, once.
   A 3xx answer raises `RedirectRefusedError` naming the status and the host.
-- No SDK request that carries a credential follows an HTTP redirect any
-  more. Every such request (`SatGateClient`, whose session sends
-  `X-Admin-Token` on every request; `SatGateAgentClient` minting, gateway
-  requests with the capability token including the 401 refresh and the L402
-  retry, `validate_token` and `delegate` with the token in the body, `call`,
-  and the admin helpers; `SatGate` `issue`/`pay`/`verify`; `AlbyWallet`;
+- No HTTP request the SDK sends follows a redirect any more. Every request
+  (`SatGateClient`, whose session sends `X-Admin-Token` on every request;
+  `SatGateAgentClient` minting, gateway requests with the capability token
+  including the 401 refresh and the L402 retry, `validate_token` and
+  `delegate` with the token in the body, `call`, the admin helpers and
+  `fetch_jwks`; `SatGate` `issue`/`pay`/`verify`; `AlbyWallet`;
   `LNDWallet`) is sent once with `allow_redirects=False`, whatever the
   caller passes. A 3xx answer raises the new `satgate.RedirectRefusedError`
-  (a subclass of `SatGateError`, with `status_code` and `host`) naming only
-  the status and the host that answered. Before, these requests followed
-  redirects and, depending on the status, resent `X-Admin-Token`, the API key
-  or a token in the body to the redirect target.
+  (a subclass of `SatGateError`, with `status_code` and `host`). Before,
+  these requests followed redirects and, depending on the status, resent
+  `X-Admin-Token`, the API key or a token in the body to the redirect
+  target, and the session's cookies to a target on the same host.
+- Requests sent through a client's `requests.Session` (all of
+  `SatGateClient` and `SatGate`, and every `SatGateAgentClient` request
+  except `fetch_jwks`) still carry what that session holds: its headers,
+  its authentication and the cookies the gateway set. They are sent only to
+  the configured URL.
+- `SatGateAgentClient.fetch_jwks()` no longer uses the client's session. It
+  is sent on a new session used for that request alone, with no cookies, no
+  session headers, no authentication (none from `~/.netrc` either) and no
+  client certificate. Only the session's `verify` setting is used.
+- `RedirectRefusedError.host` and its message name only the host and port
+  of the URL the request was sent to: user information, path and query are
+  removed, also when they are part of the `host` given to `LNDWallet`. The
+  `LNDWallet` TLS error and the `insecure=True` warning name the host the
+  same way.
 
 ### Compatibility
 
@@ -42,8 +56,11 @@ All notable changes to the `satgate` Python SDK are listed here.
   example `http://` redirecting to `https://`, or a trailing-slash redirect)
   now raises `RedirectRefusedError` instead of being followed; configure the
   final URL. `SatGateClient.health()` returns `False` for such a gateway.
-  `SatGateAgentClient.fetch_jwks()` sends no credential and still follows
-  redirects.
+  `SatGateAgentClient.fetch_jwks()` raises `RedirectRefusedError` for such a
+  gateway too.
+- `fetch_jwks()` against a gateway that requires a cookie, a session header
+  or a client certificate on the JWKS path now fails; publish the JWKS
+  without them. A CA set with `agent.session.verify` still applies.
 - Code that passed `cert_path=` keeps working unchanged.
 - Code that created `LNDWallet` without a certificate path against LND's
   default self-signed certificate now fails with `SatGateError`; pass

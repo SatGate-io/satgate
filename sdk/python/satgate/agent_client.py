@@ -42,7 +42,7 @@ from urllib.parse import urljoin
 
 import requests
 
-from ._http import send_without_redirects
+from ._http import request_host, send_without_credentials, send_without_redirects
 from .exceptions import (
     SatGateError,
     AuthenticationError,
@@ -184,20 +184,26 @@ class LNDWallet(LightningWallet):
             logger.warning(
                 "LNDWallet: TLS certificate verification is disabled for %s "
                 "(insecure=True); the macaroon is sent to an unverified server",
-                self.host,
+                self._display_host,
             )
+
+    @property
+    def _display_host(self) -> str:
+        """host[:port] of the LND REST URL, for messages: the configured host
+        with any user information, path and query removed."""
+        return request_host(f"https://{self.host}/")
 
     def _request(self, method: str, url: str, **kwargs) -> requests.Response:
         """Send one request carrying the macaroon header to the LND host.
 
         Redirects are never followed (send_without_redirects): the macaroon
         is sent only to the configured host, once. A 3xx answer raises
-        RedirectRefusedError naming the status and the host.
+        RedirectRefusedError naming the status and the host and port of the
+        request URL.
         """
         try:
             return send_without_redirects(
-                method, url, host=self.host, label="LND host",
-                verify=self._verify, **kwargs
+                method, url, label="LND host", verify=self._verify, **kwargs
             )
         except requests.exceptions.SSLError as e:
             if self.cert_path is not None:
@@ -208,7 +214,7 @@ class LNDWallet(LightningWallet):
                     "tls_cert_path= (for example LND's tls.cert)"
                 )
             raise SatGateError(
-                f"TLS verification failed for LND host {self.host}: {hint}"
+                f"TLS verification failed for LND host {self._display_host}: {hint}"
             ) from e
     
     def pay_invoice(self, invoice: str) -> str:
@@ -738,10 +744,19 @@ class SatGateAgentClient:
         return token
 
     def fetch_jwks(self) -> dict:
-        """Fetch the gateway's published signing key."""
-        resp = self.session.get(
+        """Fetch the gateway's published signing key.
+
+        The request does not use ``self.session``: it is sent once on a new
+        connection with no cookies, no session headers and no
+        authentication (send_without_credentials). Only the session's
+        ``verify`` setting is used. A 3xx answer raises RedirectRefusedError.
+        """
+        resp = send_without_credentials(
+            "GET",
             self.gateway_url.rstrip("/") + "/.well-known/satgate-agent-jwks.json",
+            verify=self.session.verify,
             timeout=self.timeout,
+            label="SatGate gateway",
         )
         if resp.status_code >= 400:
             raise SatGateError(f"jwks failed: {resp.status_code} {resp.text}")
