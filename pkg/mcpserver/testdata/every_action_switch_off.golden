@@ -108,7 +108,7 @@ E06 tools/list with a key (signer down)
   window_total: 0
 E07 tools/list with no key (signer up)
   responses:
-    {"jsonrpc":"2.0","id":1,"result":{"tools":[]}}
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication required: no token provided"}}
   signed: []
   asked: 0
   preflights: 0
@@ -117,7 +117,7 @@ E07 tools/list with no key (signer up)
   window_total: 0
 E07 tools/list with no key (signer down)
   responses:
-    {"jsonrpc":"2.0","id":1,"result":{"tools":[]}}
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication required: no token provided"}}
   signed: []
   asked: 0
   preflights: 0
@@ -126,7 +126,7 @@ E07 tools/list with no key (signer down)
   window_total: 0
 E08 resources/read with no key (signer up)
   responses:
-    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication required: no token provided"}}
   signed: []
   asked: 0
   preflights: 0
@@ -135,7 +135,7 @@ E08 resources/read with no key (signer up)
   window_total: 0
 E08 resources/read with no key (signer down)
   responses:
-    {"jsonrpc":"2.0","id":1,"error":{"code":-32002,"message":"upstream: no default upstream configured"}}
+    {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"authentication required: no token provided"}}
   signed: []
   asked: 0
   preflights: 0
