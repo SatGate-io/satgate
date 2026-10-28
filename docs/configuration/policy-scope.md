@@ -75,13 +75,24 @@ Every `expires` caveat must hold an absolute time, in one of two forms:
 
 - Unix time in milliseconds, digits only, e.g. `expires = 1793491200000`.
   This is the form the gateway writes when it mints a token.
-- An RFC 3339 time with a zone, e.g. `expires = 2026-11-01T00:00:00Z`.
+- An RFC 3339 date-time with a zone, e.g. `expires = 2026-11-01T00:00:00Z` or
+  `expires = 2026-11-01T02:30:00.5+02:30`, spelled exactly as RFC 3339
+  section 5.6 allows: a four-digit year; month, day, hour, minute and second
+  as two digits each and in range; an upper-case `T` between date and time; an
+  optional fraction of one or more digits after a `.`; and `Z` (upper-case) or
+  an offset `+hh:mm` / `-hh:mm` with hour 00-23 and minute 00-59. A one-digit
+  field (`T1:00:00Z`), a `,` before the fraction, an offset such as `+24:00`,
+  `+00:60`, `+0100` or `+01`, a lower-case `t` or `z`, a space instead of `T`,
+  a missing zone and a leap second (`:60`) are refused.
 
 The token is refused once any of its `expires` caveats is in the past. Any
 other value refuses the token, including a duration such as `24h` or `5m`, a
-date without a time, a signed or fractional number, and an empty value. The
-delegation endpoint refuses to add such a caveat. A legacy `time < N` caveat
-is also accepted, where `N` is Unix time in seconds, digits only.
+date without a time, a signed or fractional number, and an empty value.
+Surrounding spaces are ignored. Every check reads the value the same way: the
+HTTP gateway, `/api/capability/validate`, the delegation endpoint (which
+refuses to add such a caveat), L402 proofs and the MCP server. A legacy
+`time < N` caveat is also accepted, where `N` is Unix time in seconds, digits
+only.
 
 ## Cost Credits
 

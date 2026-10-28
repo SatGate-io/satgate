@@ -341,9 +341,14 @@ Over stdio the caller is the local process that started the proxy: in `config` m
 ### Tool scopes
 
 Calling tool `T` needs the scope `mcp:T`. Each word of a token's scope caveat
-(words are separated by commas; a `<tenant uuid>:` prefix on a word is
-ignored) is matched with the same rule the HTTP gateway uses (see
-[How a scope is matched](../configuration/policy-scope.md#how-a-scope-is-matched)):
+is matched with the same rule the HTTP gateway uses (see
+[How a scope is matched](../configuration/policy-scope.md#how-a-scope-is-matched)).
+Words are separated by commas and are read as written, with no trimming, so
+write a list as `search,fetch`: in `search, fetch` the second word starts with
+a space and allows nothing. A word that starts with a tenant UUID and `:`
+(`0f2b7c4e-1d3a-4b5c-8e9f-0a1b2c3d4e5f:mcp:*`, 8-4-4-4-12 hexadecimal digits)
+is read without that prefix; any other prefix is a namespace and stays part of
+the word.
 
 | Scope word | Allows |
 |------------|--------|
@@ -352,15 +357,22 @@ ignored) is matched with the same rule the HTTP gateway uses (see
 | `db:*` or `mcp:db:*` | tools whose names start with `db:` (`db:query`), not `db_query` |
 | any word in the `api:` namespace, such as `api:*` | no tool |
 
-A word that is empty, contains whitespace or has `*` anywhere other than as
-the whole last segment allows nothing, and a tool whose name is not a
-well-formed scope segment (it contains whitespace, a comma or `*`, or an
-empty `:` segment) is allowed by no word. Every scope caveat on the token
-must allow the tool. A token with no scope caveat allows every tool.
+A word that is empty, contains whitespace anywhere (including before or after
+it), contains a control character, has an empty `:` segment or has `*`
+anywhere other than as the whole last segment allows nothing, and a tool whose
+name is not a well-formed scope segment (it contains whitespace, a comma or
+`*`, or an empty `:` segment) is allowed by no word. Every scope caveat on the
+token must allow the tool. A caveat is a scope caveat when its key, with
+surrounding spaces removed, is `scope`, the same reading token verification
+uses (so `" scope = api:*"` narrows the token like `"scope = api:*"`).
+Argument rules and tool controls are read only from a caveat written exactly
+`scope = <value>`; a rule written under another spelling of the key allows no
+tool. A token with no scope caveat allows every tool.
 
-Every `expires` caveat must be an absolute time, RFC 3339 or Unix
-milliseconds (see [Token expiry](../configuration/policy-scope.md#token-expiry));
-a token with any other value, such as `24h`, is refused.
+Every `expires` caveat must be an absolute time, Unix milliseconds or an RFC
+3339 date-time spelled exactly as RFC 3339 allows (see
+[Token expiry](../configuration/policy-scope.md#token-expiry)); a token with
+any other value, such as `24h` or `2026-11-01T1:00:00Z`, is refused.
 
 ### Tokens and Upstreams
 
