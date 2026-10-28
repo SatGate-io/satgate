@@ -2,6 +2,7 @@ package mcpserver
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/subtle"
 	"fmt"
 	"github.com/satgate-io/satgate/pkg/toolcontrols"
@@ -112,7 +113,11 @@ func (a *StaticTokenAuthenticator) Verify(_ context.Context, token string) (*Tok
 	if token == "" {
 		return nil, fmt.Errorf("token required")
 	}
-	if subtle.ConstantTimeCompare([]byte(token), []byte(a.Token)) != 1 {
+	// Compare fixed-length digests, so the time taken does not depend on
+	// where the two values differ or on how long the presented one is.
+	got := sha256.Sum256([]byte(token))
+	want := sha256.Sum256([]byte(a.Token))
+	if subtle.ConstantTimeCompare(got[:], want[:]) != 1 {
 		return nil, fmt.Errorf("invalid token")
 	}
 	return &TokenInfo{

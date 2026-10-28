@@ -188,7 +188,12 @@ func (s *SSEServer) HandleFunc(pattern string, handler http.HandlerFunc) {
 }
 
 // ListenAndServe starts the SSE server. Blocks until context cancelled.
+// It refuses to start when auth.mode is not set (see AuthConfig.Mode), and
+// logs a warning when it is "none".
 func (s *SSEServer) ListenAndServe(ctx context.Context) error {
+	if err := s.proxy.config.checkNetworkAuth(s.server.Addr); err != nil {
+		return err
+	}
 	// Start upstreams first
 	if err := s.proxy.upstream.Start(ctx); err != nil {
 		return fmt.Errorf("start upstreams: %w", err)

@@ -426,8 +426,9 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 			continue
 		}
 
-		// Handle the request
-		resp, err := p.handleRequest(ctx, req)
+		// Handle the request. withClientLoop marks it as read here (stdio),
+		// not over SSE or Streamable HTTP (see authenticate).
+		resp, err := p.handleRequest(withClientLoop(ctx), req)
 		if err != nil {
 			log.Error().Err(err).Str("method", req.Method).Msg("handler error")
 			resp = NewErrorResponse(req.ID, CodeInternalError, err.Error())
@@ -475,6 +476,11 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 		return p.handlePing(req), nil
 
 	case MethodToolsList:
+		// With auth mode header or config, the tool list is answered only
+		// for a token that verifies (stdio excepted).
+		if refused := p.refuseUnauthenticated(ctx, req); refused != nil {
+			return refused, nil
+		}
 		return p.handleToolsListWithCtx(ctx, req)
 
 	case MethodToolsCall, MethodSatGateDelegate, MethodSatGateBudget, "budget/check":
@@ -494,6 +500,11 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 			// action of a key like any other: it is authenticated, limited
 			// and signed before it is passed on.
 			return p.dispatchAuthenticated(ctx, req)
+		}
+		// Passed on to an upstream: with auth mode header or config, only
+		// for a token that verifies (stdio excepted).
+		if refused := p.refuseUnauthenticated(ctx, req); refused != nil {
+			return refused, nil
 		}
 		return p.forwardToDefault(ctx, req)
 	}
@@ -525,17 +536,98 @@ func (p *Proxy) authenticate(ctx context.Context, req *Request) (info *TokenInfo
 	}
 
 	// No token provided.
-	// In header mode, a missing token is an auth bypass — deny it.
-	if p.config.Auth.Mode == "header" {
-		return nil, "", fmt.Errorf("authentication required: no token provided")
+	// In header mode, a missing token is an auth bypass — deny it. Config
+	// mode (one static token) denies it too, except for a request read by
+	// Run (stdio), whose caller is the local process that started the proxy.
+	if p.config.Auth.Mode == "header" || (p.config.Auth.Mode == "config" && !fromClientLoop(ctx)) {
+		return nil, "", errNoToken
 	}
 
-	// For auth modes "none" and "config", fall back to default identity.
+	// Auth mode "none", and config mode over stdio: the default identity.
 	return &TokenInfo{
 		TokenID:  p.tokenID,
 		BudgetID: p.tokenID,
 		Scope:    "*",
 	}, "", nil
+}
+
+// errNoToken is the refusal of a request that carries no token where one is
+// required. Its text is the JSON-RPC error message the caller receives.
+var errNoToken = errors.New("authentication required: no token provided")
+
+// authModeRequiresToken reports whether an auth mode verifies a token on
+// every request: "header" (macaroons) and "config" (one static token).
+func authModeRequiresToken(mode string) bool {
+	return mode == "header" || mode == "config"
+}
+
+type clientLoopKey struct{}
+
+// withClientLoop marks a request read by Run from its client transport (the
+// stdio loop), as opposed to one that arrived over SSE or Streamable HTTP.
+func withClientLoop(ctx context.Context) context.Context {
+	return context.WithValue(ctx, clientLoopKey{}, true)
+}
+
+func fromClientLoop(ctx context.Context) bool {
+	v, _ := ctx.Value(clientLoopKey{}).(bool)
+	return v
+}
+
+// refuseUnauthenticated answers a request that reveals the tool list or
+// reaches an upstream without the authenticated path (tools/list, and the
+// methods forwardToDefault passes on) when the auth mode requires a token
+// ("header" or "config") and the request did not come from Run (stdio). The
+// credential checked is the connection's (the Authorization header, see
+// withTransportToken), which is also the one forwardToDefault may pass on,
+// else params._meta.token. A request with none, or one that does not verify
+// or is revoked, gets the refusal dispatchAuthenticated gives; nil means it
+// may go on. Its context is left as it was: what tools/list and
+// forwardToDefault read from it is unchanged.
+func (p *Proxy) refuseUnauthenticated(ctx context.Context, req *Request) *Response {
+	if p.config == nil || !authModeRequiresToken(p.config.Auth.Mode) || fromClientLoop(ctx) {
+		return nil
+	}
+	token := transportTokenFrom(ctx)
+	if token == "" {
+		token = extractMetaToken(req.Params)
+	}
+	var err error
+	var info *TokenInfo
+	if token == "" {
+		err = errNoToken
+	} else if info, err = p.auth.Verify(ctx, token); err != nil {
+		err = fmt.Errorf("authentication failed: %w", err)
+	} else if info == nil {
+		err = fmt.Errorf("authentication failed: no identity")
+	}
+	if err != nil {
+		p.publishAuthFailure(req, err)
+		return NewErrorResponse(req.ID, CodePolicyDenied, err.Error())
+	}
+	if p.revocation != nil && info.BudgetID != "" {
+		rctx := ctx
+		if info.TenantID != "" {
+			rctx = context.WithValue(ctx, CtxTenantID, info.TenantID)
+		}
+		if p.revocation.IsRevoked(rctx, info.BudgetID) {
+			return NewErrorResponse(req.ID, CodePolicyDenied, "token revoked")
+		}
+	}
+	return nil
+}
+
+// publishAuthFailure logs and publishes a refused authentication.
+func (p *Proxy) publishAuthFailure(req *Request, authErr error) {
+	log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
+	p.events.Publish(Event{
+		Type:      EventAuthFailure,
+		Timestamp: time.Now(),
+		Data: map[string]interface{}{
+			"method": req.Method,
+			"error":  authErr.Error(),
+		},
+	})
 }
 
 // extractMetaToken pulls the token from params._meta.token if present.

@@ -464,10 +464,11 @@ func isStreamableNotification(req *Request) bool {
 }
 
 // requiresVerifiedStreamToken reports whether initialize must carry a token
-// that verifies before a session is created (header auth mode).
+// that verifies before a session is created (auth modes "header" and
+// "config").
 func (s *SSEServer) requiresVerifiedStreamToken() bool {
 	return s.proxy != nil && s.proxy.config != nil && s.proxy.auth != nil &&
-		s.proxy.config.Auth.Mode == "header"
+		authModeRequiresToken(s.proxy.config.Auth.Mode)
 }
 
 func (s *SSEServer) streamMaxSessions() int {

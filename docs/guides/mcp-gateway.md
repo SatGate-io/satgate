@@ -45,6 +45,11 @@ server:
   transport: stdio
   name: my-mcp-proxy
 
+# Over stdio the caller is the local process that starts the proxy.
+# For SSE / Streamable HTTP pick "header" or "config" (see Authentication).
+auth:
+  mode: none
+
 upstreams:
   filesystem:
     transport: stdio
@@ -58,7 +63,7 @@ tools:
   defaultCost: 1
 
 enforcement:
-  mode: shadow    # observe only — no blocking
+  mode: shadow    # observe only — no blocking (without this line a budget is enforced)
 ```
 
 ### 2. Run the Proxy
@@ -93,15 +98,16 @@ The config file maps directly to the Go `Config` struct. Every field shown here 
 
 # --- Client-facing transport ---
 server:
-  transport: stdio          # "stdio" (default). "sse"/"http" defined but not yet implemented.
+  transport: stdio          # "stdio" (default), or "sse" / "http" (SSE and Streamable HTTP on one listener)
   name: satgate-mcp-proxy   # Reported in MCP initialize response
   version: 0.1.0            # Reported in MCP initialize response
-  # port: 9100              # For future SSE/HTTP transport
+  # host: 127.0.0.1         # Listen address for sse/http (default 127.0.0.1; 0.0.0.0 or :: for every interface). No port here.
+  # port: 9100              # Listen port for sse/http (default 9100)
   # allowQueryToken: false   # Accept the token from a ?token= URL parameter (SSE / Streamable HTTP). Off by default: any ?token= gets 401.
 
 # --- Authentication ---
 auth:
-  mode: none                # "none" (default), "config", or "header"
+  mode: none                # "none", "config" or "header". Required for sse/http; stdio without it means "none".
   # token: "my-secret"      # Static bearer token (mode: config)
   # rootKey: "hex-key"      # Macaroon root key (mode: header)
   # autoMintRoot: true       # Auto-mint a root macaroon on startup (mode: header)
@@ -152,9 +158,10 @@ tools:
 
 # --- Enforcement mode ---
 enforcement:
-  mode: shadow               # "hard" (deny on exhaustion, default)
+  mode: shadow               # "hard" / "control" (deny on exhaustion)
                               # "soft" (warn but allow)
-                              # "shadow" (observe only, log what would happen)
+                              # "shadow" / "observe" (observe only, log what would happen)
+                              # Not set: "control" when budget.limit > 0, else "observe"
 
 # --- Logging ---
 logging:
@@ -260,21 +267,29 @@ Progress from observation to enforcement without config overhaul:
 3. Switch to `mode: soft` — watch for warnings
 4. Switch to `mode: hard` — enforce
 
+**Default.** When `enforcement.mode` is not set, it is `control` (calls are denied when the budget is exhausted) if `budget.limit` is greater than 0, and `observe` otherwise. Write `enforcement.mode: observe` (or `shadow`) to watch a budget without enforcing it.
+
 ### Authentication
 
 Three auth modes:
 
-**`none`** (default) — No authentication. All calls use a default budget identity. Fine for local development.
+| Mode | Token | SSE / Streamable HTTP without a token |
+|------|-------|----------------------------------------|
+| `none` | none | answered under the default identity |
+| `config` | one static bearer token, `auth.token` | refused |
+| `header` | a macaroon signed with `auth.rootKey` | refused |
 
-**`config`** — Static bearer token in the config file. Agents pass it in `params._meta.token` on `tools/call` requests.
+**`none`** — No authentication. All calls use a default budget identity. For stdio, or a listener only you can reach. Over SSE / Streamable HTTP it must be written out (`auth.mode: none`), and the proxy logs a warning at startup.
+
+**`config`** — One static bearer token in the config file. Agents send it as `Authorization: Bearer <token>` (SSE and Streamable HTTP) or in `params._meta.token`. The comparison takes the same time whatever the value sent.
 
 ```yaml
 auth:
   mode: config
-  token: "my-secret-token"
+  token: "${SATGATE_MCP_TOKEN}"
 ```
 
-**`header`** — Macaroon-based auth. Agents pass a macaroon token in `params._meta.token`. Supports delegation (sub-agent tokens with carved budgets).
+**`header`** — Macaroon-based auth. Agents send a macaroon the same way. Supports delegation (sub-agent tokens with carved budgets).
 
 ```yaml
 auth:
@@ -300,13 +315,31 @@ auth:
   rootToken: "eyJpZCI6Ii..."   # Reuse this token instead of minting new ones
 ```
 
+#### What needs a token
+
+With `mode: config` or `mode: header`, a request over SSE (`POST /message`) or Streamable HTTP must carry a token that verifies before the proxy reveals the tool list or reaches an upstream:
+
+- `tools/call`, `satgate/delegate`, `satgate/budget`, `budget/check`, `tools/list`, and every method the proxy passes on to an upstream (`resources/list`, `prompts/get` and the like).
+- A request with no token, or an empty one, gets the JSON-RPC error `-32001` with the message `authentication required: no token provided`; a token that does not verify gets `-32001` `authentication failed: ...`; a revoked one `-32001` `token revoked`. The answer is the same in both modes.
+- Streamable HTTP refuses `initialize` with `401` (`authentication required` / `authentication failed`) and creates no session.
+- `GET /sse` without a token still opens the stream (some clients send the token only on `POST /message`), as in header mode; with the authorization challenge on (`WithOAuthChallenge`) it gets `401`.
+- `initialize`, `ping` and notifications need no token.
+
+Over stdio the caller is the local process that started the proxy: in `config` mode a request without a token runs under the configured token's identity, as before, and `tools/list` and passed-on methods need no token in either mode. In `header` mode `tools/call` over stdio still needs a token, as before.
+
+#### Listener and startup checks
+
+- `server.transport: sse` or `http` with no `auth.mode` refuses to start: `auth.mode is required to serve over SSE / Streamable HTTP ...`. Set `auth.mode` to `header` or `config`, or write `auth.mode: none` to serve without authentication (the proxy then logs a warning at startup).
+- The listener binds `server.host`, default `127.0.0.1` (this machine only), on `server.port`, default `9100`. Set `host: 0.0.0.0` (or `::`) to accept connections from other machines, for example in a container. `host` takes no port.
+- A stdio-only configuration starts as before, with or without an `auth` block.
+
 ### Tokens and Upstreams
 
 Agents authenticate to the proxy with the `Authorization` header, `Bearer` scheme (SSE and Streamable HTTP), or `params._meta.token` (stdio). The token is for the proxy:
 
 - **Not forwarded by default.** The proxy removes `_meta.token` from every request before it reaches an upstream, including a `_meta.token` the agent put there itself. Other `_meta` members (such as `progressToken`) are passed on.
 - **Opt-in per upstream.** An upstream that must check the caller's SatGate token itself can be given it with `forwardCallerToken: true`. That upstream then holds the caller's token and can act as the caller with it until it expires or is revoked; enable it only for an upstream you run and trust.
-- **Only the verified credential.** What an opted-in upstream receives in `_meta.token` is the credential the proxy verified for that request, never a value from the request's params that it did not verify: for `tools/call` (and every method, with sign-every-action on) the token authentication accepted; for a method the proxy passes on without authenticating it (`resources/list`, `prompts/get` and the like), the connection's credential (the `Authorization` header, or the URL token with `allowQueryToken`), which the proxy verifies and checks for revocation first. A request with no credential that verifies (none sent, one that fails verification or is revoked, or, with sign-every-action off, a stdio request other than `tools/call`) forwards none.
+- **Only the verified credential.** What an opted-in upstream receives in `_meta.token` is the credential the proxy verified for that request, never a value from the request's params that it did not verify: for `tools/call` (and every method, with sign-every-action on) the token authentication accepted; for a method the proxy passes on outside the `tools/call` path (`resources/list`, `prompts/get` and the like), the connection's credential (the `Authorization` header, or the URL token with `allowQueryToken`), which the proxy verifies and checks for revocation first. A request with no credential that verifies (none sent, one that fails verification or is revoked, or, with sign-every-action off, a stdio request other than `tools/call`) forwards none.
 
 ```yaml
 upstreams:
@@ -387,7 +420,7 @@ allowPrivateUpstreams: true
 | Transport | Status |
 |-----------|--------|
 | `stdio` | ✅ Fully implemented. Default. |
-| `sse` / `http` | ⚠️ Defined in code but upstream validation rejects `http`/`sse`. Use `stdio`. |
+| `sse` / `http` | ✅ SSE (`GET /sse`, `POST /message`) and Streamable HTTP (`/mcp`) on one listener, `server.host` (default `127.0.0.1`) : `server.port` (default `9100`). Requires `auth.mode`. |
 
 ### Upstream Connections (upstreams.*.transport)
 
@@ -438,6 +471,9 @@ upstreams:
 ```yaml
 server:
   transport: stdio
+
+auth:
+  mode: none
 
 upstreams:
   tools:
@@ -501,6 +537,9 @@ logging:
 server:
   transport: stdio
 
+auth:
+  mode: none
+
 upstreams:
   dev:
     transport: stdio
@@ -531,7 +570,20 @@ The proxy adds two custom JSON-RPC methods (namespaced under `satgate/` to avoid
 | `satgate/delegate` | Yes (macaroon) | Create a scoped child token with carved budget |
 | `satgate/budget` | Yes | Check remaining budget for the authenticated token |
 
-Standard MCP methods (`tools/list`, `tools/call`, `initialize`, `ping`, etc.) are fully supported and proxied transparently.
+Standard MCP methods (`tools/list`, `tools/call`, `initialize`, `ping`, etc.) are fully supported and proxied transparently. With `auth.mode` `config` or `header`, every method except `initialize`, `ping` and notifications needs a token over SSE and Streamable HTTP (see [What needs a token](#what-needs-a-token)).
+
+## Upgrading
+
+This release changes three defaults of the MCP proxy:
+
+1. **Static-token mode refuses requests without a token.** With `auth.mode: config`, a request over SSE or Streamable HTTP with no token, or an empty one, is refused like in `header` mode; before, it ran under the configured token's identity. Streamable HTTP `initialize` without the token now gets `401`. Clients must send `Authorization: Bearer <token>`. stdio is unchanged.
+2. **`tools/list` and passed-on methods need a token in `config` and `header` modes** over SSE and Streamable HTTP. In `none` mode, and over stdio, they stay open.
+3. **Safer startup defaults for `satgate-mcp`:**
+   - `server.transport: sse` / `http` without `auth.mode` no longer starts. Add an `auth` block; to keep serving without authentication, write `auth.mode: none`.
+   - The listener binds `127.0.0.1` instead of every interface. To accept other machines (containers, a LAN), set `server.host: 0.0.0.0`.
+   - With `budget.limit` greater than 0 and no `enforcement.mode`, enforcement is `control` instead of `observe`, so an exhausted budget denies calls. To keep the old behaviour, write `enforcement.mode: observe`.
+
+A stdio-only configuration starts as before, with or without an `auth` block; only the enforcement default applies to it. Code that builds a `Config` itself (without `LoadConfig`) keeps the enforcement mode it sets, and must set `Auth.Mode` before it calls `SSEServer.ListenAndServe`; `NewSSEServer` listens on the address it is given, and `Config.ListenAddr` returns the default one.
 
 ## Further Reading
 
