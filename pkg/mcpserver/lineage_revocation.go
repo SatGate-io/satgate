@@ -139,7 +139,10 @@ func macaroonServiceOf(a Authenticator) *macaroon.Service {
 // minted: SSE connect and each message, Streamable HTTP initialize, each
 // request and resume, stdio, the credential passed to an upstream with
 // forwardCallerToken, and satgate/delegate (checked again before the child is
-// minted).
+// minted). Over stdio, tools/list and the methods passed on to the default
+// upstream answer a request that supplies no token as before; one that
+// supplies a token (params._meta.token, or the connection's) is verified and
+// checked first.
 //
 // A covered token is refused like a revoked one ("token revoked"). If the
 // ban state cannot be read the request is refused with the
@@ -155,6 +158,17 @@ func macaroonServiceOf(a Authenticator) *macaroon.Service {
 // is refused. Call it before the proxy serves requests.
 func (p *Proxy) SetLineageRevocationChecker(rc LineageRevocationChecker) {
 	p.lineageGate().set(rc)
+}
+
+// lineageCheckerInstalled reports whether a LineageRevocationChecker is set.
+func (p *Proxy) lineageCheckerInstalled() bool {
+	g := p.lineage
+	if g == nil {
+		return false
+	}
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	return g.checker != nil
 }
 
 // lineageGate returns the proxy's gate, creating it for a Proxy not built by

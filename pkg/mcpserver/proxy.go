@@ -480,7 +480,8 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 
 	case MethodToolsList:
 		// With auth mode header or config, the tool list is answered only
-		// for a token that verifies (stdio excepted).
+		// for a token that verifies. Over stdio a supplied token is checked
+		// when a lineage checker is installed (refuseUnauthenticated).
 		if refused := p.refuseUnauthenticated(ctx, req); refused != nil {
 			return refused, nil
 		}
@@ -505,7 +506,8 @@ func (p *Proxy) dispatchRequest(ctx context.Context, req *Request) (*Response, e
 			return p.dispatchAuthenticated(ctx, req)
 		}
 		// Passed on to an upstream: with auth mode header or config, only
-		// for a token that verifies (stdio excepted).
+		// for a token that verifies. Over stdio a supplied token is checked
+		// when a lineage checker is installed (refuseUnauthenticated).
 		if refused := p.refuseUnauthenticated(ctx, req); refused != nil {
 			return refused, nil
 		}
@@ -579,22 +581,67 @@ func fromClientLoop(ctx context.Context) bool {
 
 // refuseUnauthenticated answers a request that reveals the tool list or
 // reaches an upstream without the authenticated path (tools/list, and the
-// methods forwardToDefault passes on) when the auth mode requires a token
-// ("header" or "config") and the request did not come from Run (stdio). The
-// credential checked is the connection's (the Authorization header, see
-// withTransportToken), which is also the one forwardToDefault may pass on,
-// else params._meta.token. A request with none, or one that does not verify
-// or is revoked, gets the refusal dispatchAuthenticated gives; nil means it
-// may go on. Its context is left as it was: what tools/list and
-// forwardToDefault read from it is unchanged.
+// methods forwardToDefault passes on); nil means it may go on. Its context is
+// left as it was: what tools/list and forwardToDefault read from it is
+// unchanged.
+//
+// Over SSE and Streamable HTTP, when the auth mode requires a token
+// ("header" or "config"), the credential checked is the connection's (the
+// Authorization header, see withTransportToken), which is also the one
+// forwardToDefault may pass on, else params._meta.token. A request with none,
+// or one that does not verify or is revoked, gets the refusal
+// dispatchAuthenticated gives.
+//
+// Over stdio (a request read by Run) see refuseSuppliedStdioToken.
 func (p *Proxy) refuseUnauthenticated(ctx context.Context, req *Request) *Response {
-	if p.config == nil || !authModeRequiresToken(p.config.Auth.Mode) || fromClientLoop(ctx) {
+	if fromClientLoop(ctx) {
+		return p.refuseSuppliedStdioToken(ctx, req)
+	}
+	if p.config == nil || !authModeRequiresToken(p.config.Auth.Mode) {
 		return nil
 	}
 	token := transportTokenFrom(ctx)
 	if token == "" {
 		token = extractMetaToken(req.Params)
 	}
+	return p.refuseToken(ctx, req, token)
+}
+
+// refuseSuppliedStdioToken is refuseUnauthenticated for a request read by Run
+// (stdio). A request that supplies no token keeps the stdio behaviour: it is
+// answered (its caller is the local process that started the proxy). With a
+// lineage revocation checker installed (SetLineageRevocationChecker), every
+// token the request supplies, the connection's (withTransportToken) and
+// params._meta.token, is verified, and its lineage checked, before the tool
+// list is answered or the method passed on: a token that does not verify or
+// that a ban covers is refused, and one whose ban state cannot be read gets
+// the revocation-unavailable answer. With no checker installed nothing is
+// checked here, as before.
+func (p *Proxy) refuseSuppliedStdioToken(ctx context.Context, req *Request) *Response {
+	if p.auth == nil || !p.lineageCheckerInstalled() {
+		return nil
+	}
+	tokens := []string{transportTokenFrom(ctx)}
+	if meta := extractMetaToken(req.Params); meta != tokens[0] {
+		tokens = append(tokens, meta)
+	}
+	for _, token := range tokens {
+		if token == "" {
+			continue
+		}
+		if refused := p.refuseToken(ctx, req, token); refused != nil {
+			return refused
+		}
+	}
+	return nil
+}
+
+// refuseToken verifies token (which includes the lineage check when a
+// checker is installed) and checks it for revocation. It returns the refusal
+// dispatchAuthenticated gives for a missing, invalid or revoked token, the
+// revocation-unavailable answer when its ban state cannot be read, and nil
+// when it may go on.
+func (p *Proxy) refuseToken(ctx context.Context, req *Request, token string) *Response {
 	var err error
 	var info *TokenInfo
 	if token == "" {
