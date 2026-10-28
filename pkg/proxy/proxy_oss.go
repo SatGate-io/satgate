@@ -104,10 +104,21 @@ func New(opts Options) (*Gateway, error) {
 	if err := config.CheckUniqueRouteNames(opts.Config.Routes); err != nil {
 		return nil, fmt.Errorf("invalid routes: %w", err)
 	}
+	// A route matches only requests that meet every matcher it sets; the
+	// matchers are checked and compiled here, and a route that sets
+	// rateLimit (not enforced per route) is refused.
+	if err := config.CheckRouteMatchers(opts.Config.Routes); err != nil {
+		return nil, fmt.Errorf("invalid routes: %w", err)
+	}
 	// Configured upstream headers are set on every forwarded request; a
 	// header SatGate owns cannot be one of them.
 	if err := config.CheckUpstreamHeaders(opts.Config.Upstreams); err != nil {
 		return nil, fmt.Errorf("invalid upstreams: %w", err)
+	}
+	// A route's static rewrite and an upstream URL's base path are part of
+	// the outgoing path; each must pass the request path rule on its own.
+	if err := config.CheckForwardPaths(opts.Config.Routes, opts.Config.Upstreams); err != nil {
+		return nil, fmt.Errorf("invalid forwarding path: %w", err)
 	}
 
 	// Initialize admin rate limiter (default: 60 req/min if not configured)
@@ -186,6 +197,15 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
 			}
 		}
+	}
+
+	// Every request is served on one checked path: the preflight answer,
+	// built-in endpoints, route matching, policy checks and the forwarded
+	// path all start from the path that passed checkRequestPath.
+	if err := checkRequestPath(r.URL); err != nil {
+		http.Error(w, "Bad request path", http.StatusBadRequest)
+		g.metrics.TotalErrors.Add(1)
+		return
 	}
 
 	// Handle CORS preflight
@@ -302,6 +322,14 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if route == nil {
 		log.Warn().Str("path", r.URL.Path).Msg("No matching route")
 		http.Error(w, "No matching route", http.StatusNotFound)
+		g.metrics.TotalErrors.Add(1)
+		return
+	}
+	// The path the route would forward, and the final outgoing path after
+	// the join with the upstream URL's base path, must pass the same rule;
+	// refuse it here, before the route's policy runs.
+	if _, _, ok := g.forwardPath(route, r.URL); !ok {
+		http.Error(w, "Bad request path", http.StatusBadRequest)
 		g.metrics.TotalErrors.Add(1)
 		return
 	}
@@ -783,33 +811,16 @@ func (g *Gateway) validAdminToken(adminToken string) bool {
 	return false
 }
 
-// matchRoute finds the route matching the request.
+// matchRoute returns the first route, in configuration order, whose every
+// configured matcher the request meets (config.Route.MatchRequest), or nil.
+// r.URL.Path has passed checkRequestPath.
 func (g *Gateway) matchRoute(r *http.Request) *config.Route {
-	path := r.URL.Path
-
 	for i := range g.config.Routes {
 		route := &g.config.Routes[i]
-
-		// Check exact path match
-		if route.Match.PathExact != "" {
-			if route.Match.PathExact == path {
-				return route
-			}
-			continue
-		}
-
-		// Check path prefix match (supports trailing * for wildcard)
-		if route.Match.PathPrefix != "" {
-			prefix := route.Match.PathPrefix
-			if strings.HasSuffix(prefix, "*") {
-				prefix = strings.TrimSuffix(prefix, "*")
-			}
-			if strings.HasPrefix(path, prefix) {
-				return route
-			}
+		if route.MatchRequest(r.URL.Path, r.Method, r.Header) {
+			return route
 		}
 	}
-
 	return nil
 }
 
@@ -860,23 +871,15 @@ func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *co
 		return
 	}
 
-	// Apply path rewrite if configured (static rewrite takes precedence)
-	if route.Rewrite != "" {
-		r.URL.Path = route.Rewrite
-		r.URL.RawPath = route.Rewrite
-	} else if route.StripPrefix && route.Match.PathPrefix != "" {
-		// Strip the matched prefix from the path before proxying
-		prefix := route.Match.PathPrefix
-		if strings.HasSuffix(prefix, "*") {
-			prefix = strings.TrimSuffix(prefix, "*")
-		}
-		newPath := strings.TrimPrefix(r.URL.Path, prefix)
-		if !strings.HasPrefix(newPath, "/") {
-			newPath = "/" + newPath
-		}
-		r.URL.Path = newPath
-		r.URL.RawPath = newPath
+	// Apply the static rewrite (it takes precedence) or the prefix strip.
+	// A path that would not pass the path rule, before or after the join
+	// with the upstream URL's base path, is refused (see forwardPath).
+	path, rawPath, ok := g.forwardPath(route, r.URL)
+	if !ok {
+		http.Error(w, "Bad request path", http.StatusBadRequest)
+		return
 	}
+	r.URL.Path, r.URL.RawPath = path, rawPath
 
 	// The upstream gets a copy of the request without the credentials the
 	// gateway consumed or owns (upstream_credentials.go). upstreamTransport

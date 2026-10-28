@@ -87,7 +87,7 @@ func TestDocsListRefusedUpstreamHeadersAsCodeRefusesThem(t *testing.T) {
 		"bytes 0x00 to 0x08, 0x0A to 0x1F",
 		"an empty value for `User-Agent` or `Accept-Encoding`",
 		"For every other accepted\n  name an empty value is accepted",
-		"No other\nconfiguration that loaded before is refused.",
+		"Remove or correct the entry to load the configuration. The route\nmatching and forwarding-path refusals are listed under",
 	} {
 		if !strings.Contains(text, sentence) {
 			t.Errorf("configuration.md does not say %q", sentence)
