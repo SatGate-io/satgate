@@ -357,7 +357,10 @@ func (s *Service) Unban(signature string) bool {
 
 	wasShared := false
 	if s.shared {
-		wasShared, _ = s.store.IsBanned(ctx, signature)
+		var err error
+		if wasShared, err = s.store.IsBanned(ctx, signature); err != nil {
+			wasShared = true // cannot tell; still try to remove it
+		}
 		s.cacheMu.Lock()
 		_, wasPending := s.pendingBans[signature]
 		delete(s.pendingBans, signature)
