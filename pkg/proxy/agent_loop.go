@@ -235,6 +235,12 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 			decision = "denied"
 			break
 		}
+		// A revoked token, or one whose revocation state cannot be read,
+		// does not reach the upstream.
+		if err := g.checkRevoked(r.Context(), mac); err != nil {
+			decision = "denied"
+			break
+		}
 		identity = "sha256:" + hex.EncodeToString(mustSHA256(mac.Signature))
 		status, contacted = g.callUpstream(policy.UpstreamURL, req.Method, req.Path, req.Body)
 		if !contacted {

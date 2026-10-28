@@ -115,8 +115,10 @@ func main() {
 	log.Info().Msg("Macaroon service initialized")
 
 	// Initialize governance service
-	governanceSvc := governance.NewService(governance.NewMemoryStore())
-	log.Info().Msg("Governance service initialized (in-memory)")
+	governanceSvc, err := newGovernanceService(cfg)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to initialize governance service")
+	}
 
 	// Initialize lightning provider (optional)
 	var lightningSvc lightning.Provider
@@ -192,6 +194,31 @@ func main() {
 
 	<-done
 	log.Info().Msg("Gateway stopped")
+}
+
+// newGovernanceService returns the governance service: backed by Redis when
+// redis is configured and enabled, so that every gateway on the same Redis
+// honours a ban written by any of them, and in process memory otherwise
+// (correct for a single gateway instance only). A configured Redis that
+// cannot be reached is an error, never a silent fallback to memory.
+func newGovernanceService(cfg *config.Config) (*governance.Service, error) {
+	if cfg.Redis == nil || !cfg.Redis.Enabled {
+		log.Info().Msg("Governance service initialized (in-memory, single instance)")
+		return governance.NewService(governance.NewMemoryStore()), nil
+	}
+	if cfg.Redis.Addr == "" {
+		return nil, fmt.Errorf("redis is enabled but redis.addr is empty")
+	}
+	svc, err := governance.NewServiceWithRedis(&governance.RedisConfig{
+		Addr:     cfg.Redis.Addr,
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.DB,
+	})
+	if err != nil {
+		return nil, err
+	}
+	log.Info().Dur("ban_cache_ttl", governance.BanCacheTTL).Msg("Governance service initialized (Redis, shared ban list)")
+	return svc, nil
 }
 
 func setupLogging(level string, jsonFormat bool) {

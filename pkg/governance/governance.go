@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -73,6 +74,45 @@ type Service struct {
 	// PolicyToProof Keys
 	privateKey ed25519.PrivateKey
 	publicKey  ed25519.PublicKey
+
+	// Revocation on a shared store (any store but *MemoryStore). The store
+	// is the source of truth and is read on the request path through
+	// banCache, so a ban written by another gateway is honoured here within
+	// banCacheTTL. pendingBans holds bans made here that could not be
+	// written to the store; this gateway keeps honouring them.
+	shared      bool
+	banCacheTTL time.Duration
+	now         func() time.Time
+	cacheMu     sync.Mutex
+	banCache    map[string]banCacheEntry
+	pendingBans map[string]BanRecord
+}
+
+// BanCacheTTL is how long a gateway backed by a shared store (Redis) reuses
+// one answer from the store for a signature. A ban written by one gateway is
+// honoured by every other gateway on the same store within this delay.
+const BanCacheTTL = 2 * time.Second
+
+// banStoreTimeout bounds one read of the shared ban store on the request path.
+const banStoreTimeout = 2 * time.Second
+
+// maxBanCacheEntries bounds the ban cache. When it is full, expired entries
+// are dropped, and if that is not enough the cache is cleared.
+const maxBanCacheEntries = 100000
+
+// ErrRevocationUnavailable is returned when the shared ban store cannot be
+// read or written. A request whose revocation state cannot be read is refused.
+var ErrRevocationUnavailable = errors.New("revocation state unavailable")
+
+type banCacheEntry struct {
+	banned bool
+	at     time.Time
+}
+
+// banLister is implemented by stores that check several signatures in one
+// round trip (RedisStore). Other stores are asked one signature at a time.
+type banLister interface {
+	BannedAmong(ctx context.Context, signatures []string) ([]bool, error)
 }
 
 // MintedToken tracks a minted token
@@ -124,14 +164,20 @@ func NewService(store Store) *Service {
 	}
 
 	pub, priv, _ := ed25519.GenerateKey(rand.Reader)
+	_, inMemory := store.(*MemoryStore)
 
 	return &Service{
-		store:      store,
-		banned:     make(map[string]BanRecord),
-		usage:      make(map[string]*UsageStats),
-		minted:     make(map[string]*MintedToken),
-		privateKey: priv,
-		publicKey:  pub,
+		store:       store,
+		banned:      make(map[string]BanRecord),
+		usage:       make(map[string]*UsageStats),
+		minted:      make(map[string]*MintedToken),
+		privateKey:  priv,
+		publicKey:   pub,
+		shared:      !inMemory,
+		banCacheTTL: BanCacheTTL,
+		now:         time.Now,
+		banCache:    make(map[string]banCacheEntry),
+		pendingBans: make(map[string]BanRecord),
 	}
 }
 
@@ -250,53 +296,221 @@ func (s *Service) RecordBannedHit() {
 	s.counterMu.Unlock()
 }
 
-// Ban adds a token to the ban list
+// Ban adds a token to the ban list. See BanContext.
 func (s *Service) Ban(signature, reason, bannedBy string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_ = s.BanContext(ctx, signature, reason, bannedBy)
+}
 
+// BanContext bans signature. The ban covers the token with that signature and
+// every token delegated from it, before or after the ban, at any depth, when
+// the caller checks the token's lineage with IsAnyBanned.
+//
+// The ban takes effect on this gateway at once. With a shared store it is
+// written to the store, and other gateways on the store honour it within
+// BanCacheTTL. If the write fails, this gateway keeps honouring the ban and
+// the error (wrapping ErrRevocationUnavailable) says that other gateways may
+// not; the caller should retry.
+func (s *Service) BanContext(ctx context.Context, signature, reason, bannedBy string) error {
 	record := BanRecord{
 		Signature: signature,
 		Reason:    reason,
 		BannedAt:  time.Now(),
 		BannedBy:  bannedBy,
 	}
+	s.mu.Lock()
 	s.banned[signature] = record
+	s.mu.Unlock()
 
 	// Persist to store (sync for ban operations - critical path)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := s.store.Ban(ctx, record); err != nil {
-		log.Error().Err(err).Str("signature", signature).Msg("Failed to persist ban record")
+	err := s.store.Ban(ctx, record)
+	if !s.shared {
+		if err != nil {
+			log.Error().Err(err).Str("signature", shortSig(signature)).Msg("Failed to persist ban record")
+		}
+		return nil
 	}
+
+	s.cacheMu.Lock()
+	defer s.cacheMu.Unlock()
+	s.putCacheLocked(signature, true)
+	if err != nil {
+		s.pendingBans[signature] = record
+		log.Error().Err(err).Str("signature", shortSig(signature)).Msg("Ban not written to the shared store; only this gateway honours it")
+		return fmt.Errorf("%w: %v", ErrRevocationUnavailable, err)
+	}
+	delete(s.pendingBans, signature)
+	return nil
 }
 
-// Unban removes a token from the ban list
+// Unban removes a token from the ban list. With a shared store, other
+// gateways stop honouring the ban within BanCacheTTL.
 func (s *Service) Unban(signature string) bool {
 	s.mu.Lock()
-	defer s.mu.Unlock()
+	_, wasLocal := s.banned[signature]
+	delete(s.banned, signature)
+	s.mu.Unlock()
 
-	if _, ok := s.banned[signature]; ok {
-		delete(s.banned, signature)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-		// Persist to store
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		if err := s.store.Unban(ctx, signature); err != nil {
-			log.Error().Err(err).Str("signature", signature).Msg("Failed to persist unban")
-		}
-		return true
+	wasShared := false
+	if s.shared {
+		wasShared, _ = s.store.IsBanned(ctx, signature)
+		s.cacheMu.Lock()
+		_, wasPending := s.pendingBans[signature]
+		delete(s.pendingBans, signature)
+		delete(s.banCache, signature)
+		s.cacheMu.Unlock()
+		wasShared = wasShared || wasPending
 	}
-	return false
+	if !wasLocal && !wasShared {
+		return false
+	}
+
+	// Persist to store
+	if err := s.store.Unban(ctx, signature); err != nil {
+		log.Error().Err(err).Str("signature", shortSig(signature)).Msg("Failed to persist unban")
+	}
+	return true
 }
 
-// IsBanned checks if a token is banned
+// IsBanned reports whether the token with exactly this signature is banned.
+// It does not look at the tokens this one was delegated from; use
+// IsAnyBanned with the token's lineage for an access decision. With a shared
+// store, a store that cannot be read counts as banned (fail closed).
 func (s *Service) IsBanned(signature string) bool {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	banned, err := s.IsAnyBanned(context.Background(), []string{signature})
+	return banned || err != nil
+}
 
-	_, banned := s.banned[signature]
-	return banned
+// IsAnyBanned reports whether any of signatures is banned. Pass the lineage
+// of a verified token (macaroon.Service.Lineage: its own signature and the
+// signature of every token it was delegated from) to decide whether a ban
+// covers it.
+//
+// With the in-memory store it reads this process's ban list and never fails.
+// With a shared store it reads the store, reusing each answer for
+// BanCacheTTL; if the store cannot be read it returns an error wrapping
+// ErrRevocationUnavailable, and the caller must refuse the request.
+func (s *Service) IsAnyBanned(ctx context.Context, signatures []string) (bool, error) {
+	if !s.shared {
+		s.mu.RLock()
+		defer s.mu.RUnlock()
+		for _, sig := range signatures {
+			if _, banned := s.banned[sig]; banned {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+
+	now := s.now()
+	misses := make([]string, 0, len(signatures))
+	s.cacheMu.Lock()
+	for _, sig := range signatures {
+		if _, pending := s.pendingBans[sig]; pending {
+			s.cacheMu.Unlock()
+			return true, nil
+		}
+		if e, ok := s.banCache[sig]; ok && now.Sub(e.at) < s.banCacheTTL {
+			if e.banned {
+				s.cacheMu.Unlock()
+				return true, nil
+			}
+			continue
+		}
+		misses = append(misses, sig)
+	}
+	s.cacheMu.Unlock()
+	if len(misses) == 0 {
+		return false, nil
+	}
+
+	storeCtx, cancel := context.WithTimeout(ctx, banStoreTimeout)
+	defer cancel()
+	found, err := s.lookupBans(storeCtx, misses)
+	if err != nil {
+		log.Error().Err(err).Msg("Ban store unavailable; refusing request")
+		return false, fmt.Errorf("%w: %v", ErrRevocationUnavailable, err)
+	}
+
+	s.cacheMu.Lock()
+	defer s.cacheMu.Unlock()
+	hit := false
+	for i, sig := range misses {
+		// A ban made here while the store was being read stays in force.
+		if e, ok := s.banCache[sig]; ok && e.banned && !e.at.Before(now) {
+			hit = true
+			continue
+		}
+		s.putCacheLocked(sig, found[i])
+		hit = hit || found[i]
+	}
+	return hit, nil
+}
+
+func (s *Service) lookupBans(ctx context.Context, signatures []string) ([]bool, error) {
+	if l, ok := s.store.(banLister); ok {
+		found, err := l.BannedAmong(ctx, signatures)
+		if err == nil && len(found) != len(signatures) {
+			err = fmt.Errorf("ban store answered %d of %d lookups", len(found), len(signatures))
+		}
+		return found, err
+	}
+	found := make([]bool, len(signatures))
+	for i, sig := range signatures {
+		banned, err := s.store.IsBanned(ctx, sig)
+		if err != nil {
+			return nil, err
+		}
+		found[i] = banned
+	}
+	return found, nil
+}
+
+// putCacheLocked records one answer from the shared store. cacheMu is held.
+func (s *Service) putCacheLocked(sig string, banned bool) {
+	now := s.now()
+	if len(s.banCache) >= maxBanCacheEntries {
+		for k, e := range s.banCache {
+			if now.Sub(e.at) >= s.banCacheTTL {
+				delete(s.banCache, k)
+			}
+		}
+		if len(s.banCache) >= maxBanCacheEntries {
+			s.banCache = make(map[string]banCacheEntry)
+		}
+	}
+	s.banCache[sig] = banCacheEntry{banned: banned, at: now}
+}
+
+// coveringBanLocked returns the ban that covers the recorded token sig: a ban
+// of sig itself or of a token it was recorded as delegated from (ParentSig).
+// It is for display (token info, graph, stats); access decisions use
+// IsAnyBanned with the verified lineage. s.mu is held.
+func (s *Service) coveringBanLocked(sig string) (BanRecord, bool) {
+	seen := make(map[string]bool)
+	for cur := sig; cur != "" && !seen[cur]; {
+		seen[cur] = true
+		if ban, ok := s.banned[cur]; ok {
+			return ban, true
+		}
+		minted, ok := s.minted[cur]
+		if !ok {
+			break
+		}
+		cur = minted.ParentSig
+	}
+	return BanRecord{}, false
+}
+
+func shortSig(sig string) string {
+	if len(sig) > 12 {
+		return sig[:8] + "..." + sig[len(sig)-4:]
+	}
+	return sig
 }
 
 // GetBanList returns all banned tokens
@@ -381,7 +595,7 @@ func (s *Service) GetTokenInfoBySignature(signature string) *TokenInfo {
 	// Check if we know about this token from minting
 	minted, hasMinted := s.minted[signature]
 	stats, hasStats := s.usage[signature]
-	ban, isBanned := s.banned[signature]
+	ban, isBanned := s.coveringBanLocked(signature)
 
 	// If we don't have any info about this token, return nil
 	if !hasMinted && !hasStats && !isBanned {
@@ -450,8 +664,8 @@ func (s *Service) GetAllTokenInfo() []TokenInfo {
 			info.Routes = stats.Routes
 		}
 
-		// Check if banned
-		if ban, banned := s.banned[sig]; banned {
+		// Check if banned, directly or through a token it was delegated from
+		if ban, banned := s.coveringBanLocked(sig); banned {
 			info.Status = "banned"
 			info.BannedAt = &ban.BannedAt
 			info.BanReason = ban.Reason
@@ -672,8 +886,8 @@ func (s *Service) GetStats() map[string]interface{} {
 
 	// Count minted tokens by status
 	for sig, minted := range s.minted {
-		if _, banned := s.banned[sig]; banned {
-			continue // counted in bannedCount
+		if _, banned := s.coveringBanLocked(sig); banned {
+			continue // banned directly (counted in bannedCount) or through its lineage
 		}
 		if time.Now().After(minted.ExpiresAt) {
 			expiredCount++
@@ -748,7 +962,7 @@ func (s *Service) GetGraph() GraphResponse {
 	for sig, token := range s.minted {
 		// Determine status
 		status := "ACTIVE"
-		if _, banned := s.banned[sig]; banned {
+		if _, banned := s.coveringBanLocked(sig); banned {
 			status = "BANNED"
 		} else if time.Now().After(token.ExpiresAt) {
 			status = "EXPIRED"
@@ -833,7 +1047,7 @@ func (s *Service) GetGraph() GraphResponse {
 	activeCount := 0
 	bannedCount := 0
 	for sig := range s.minted {
-		if _, banned := s.banned[sig]; banned {
+		if _, banned := s.coveringBanLocked(sig); banned {
 			bannedCount++
 		} else {
 			activeCount++
@@ -860,6 +1074,11 @@ func (s *Service) Reset() {
 	s.banned = make(map[string]BanRecord)
 	s.usage = make(map[string]*UsageStats)
 	s.minted = make(map[string]*MintedToken)
+
+	s.cacheMu.Lock()
+	s.banCache = make(map[string]banCacheEntry)
+	s.pendingBans = make(map[string]BanRecord)
+	s.cacheMu.Unlock()
 
 	// Reset counters
 	s.counterMu.Lock()

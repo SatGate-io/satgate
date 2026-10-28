@@ -85,6 +85,31 @@ func (r *RedisStore) IsBanned(ctx context.Context, signature string) (bool, erro
 	return r.client.SIsMember(ctx, keyBanList, signature).Result()
 }
 
+// BannedAmong reports, for each signature, whether it is in the ban set. It
+// uses one pipeline of SISMEMBER, which every Redis version answers.
+func (r *RedisStore) BannedAmong(ctx context.Context, signatures []string) ([]bool, error) {
+	if len(signatures) == 0 {
+		return nil, nil
+	}
+	pipe := r.client.Pipeline()
+	cmds := make([]*redis.BoolCmd, len(signatures))
+	for i, sig := range signatures {
+		cmds[i] = pipe.SIsMember(ctx, keyBanList, sig)
+	}
+	if _, err := pipe.Exec(ctx); err != nil {
+		return nil, err
+	}
+	out := make([]bool, len(signatures))
+	for i, cmd := range cmds {
+		banned, err := cmd.Result()
+		if err != nil {
+			return nil, err
+		}
+		out[i] = banned
+	}
+	return out, nil
+}
+
 // GetBanList returns all banned tokens
 func (r *RedisStore) GetBanList(ctx context.Context) ([]BanRecord, error) {
 	signatures, err := r.client.SMembers(ctx, keyBanList).Result()

@@ -26,6 +26,7 @@ Before deploying SatGate to production, verify each item.
 - [ ] `lightning.requireInvoiceRecord: true` (fail-closed)
 - [ ] L402 root key is separate from capability root key
 - [ ] `redis` configured if more than one gateway instance serves L402 routes (the in-memory consumed-proof store is single-instance only)
+- [ ] `redis` configured if more than one gateway instance serves tokens that may be banned (in-memory bans are seen by one process only; with Redis a ban reaches every instance within 2 seconds, see [Revocation](../api/overview.md#revocation))
 - [ ] Clients re-request a `402` challenge after an L402 route's `priceSats` changes (older proofs are refused)
 - [ ] Test payment flow end-to-end
 

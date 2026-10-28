@@ -38,6 +38,62 @@ Token lifecycle and observability endpoints.
 | `POST` | `/api/governance/reset` | Reset dashboard/governance data |
 | `GET` | `/api/governance/evidence-pack` | Export a canonical Policy-to-Proof Evidence Pack v1 |
 
+## Revocation
+
+`POST /api/governance/ban` with `{"tokenSignature": "<signature>", "reason": "..."}`
+bans a token by the `signature` that `/api/capability/mint` and
+`/api/capability/delegate` return.
+
+**What a ban covers.** The banned token and every token delegated from it, at
+any depth, whether it was delegated before or after the ban, through
+`/api/capability/delegate` or by a holder adding caveats offline. It also
+covers an L402 challenge macaroon and any proof a holder narrowed from it. A
+ban never covers the token's parent or its siblings. (Two delegations of the
+same token with exactly the same caveats are the same token, with the same
+signature.)
+
+The gateway decides this from the token itself: it recomputes the token's
+signature chain from the root key, and the signature after each caveat is the
+signature of the token that caveat was added to. A token is refused when any of
+those signatures is banned. A holder cannot change the chain without the token
+failing verification.
+
+**Where it is checked.** Every place the gateway verifies a token, before
+anything is served or created:
+
+| Path | Refused with |
+|------|--------------|
+| Capability routes, including MCP-enabled routes | `401 Token revoked` |
+| L402 routes (checked before the payment proof is consumed, so a refused proof is not used up) | `401 Token revoked` |
+| `/api/capability/delegate` (no child is minted or recorded) | `403`, `code: TOKEN_BANNED` |
+| `/api/capability/ping`, `/api/capability/admin`, `/api/l402/mock-pay` | `403`, `code: TOKEN_BANNED` |
+| `/api/capability/validate` | `401`, `valid: false`, `code: TOKEN_BANNED` |
+| `/api/agent/simulate` | decision `denied`, upstream not contacted |
+
+Token info and the lineage graph (`/api/governance/graph`) show a token as
+banned when it, or a token it was recorded as delegated from, is banned.
+
+**Propagation.**
+
+- Without Redis, bans are kept in process memory. They take effect at once on
+  that gateway and are seen by no other process, and they are lost on restart.
+  This is correct for a single gateway instance only.
+- With `redis.enabled: true`, bans are written to Redis (`satgate:banlist`) and
+  every gateway on the same Redis reads them on the request path through a
+  short cache. The cache keeps each answer for **2 seconds**
+  (`governance.BanCacheTTL`). A ban takes effect at once on the gateway that
+  wrote it and on every other gateway within **2 seconds** at most; an unban
+  is honoured everywhere within the same 2 seconds.
+
+**Failure behaviour (Redis).** If Redis cannot be read for a token whose
+answer is not cached, the request is refused with `503 Service Unavailable`
+(`Revocation status unavailable`, or `code: REVOCATION_UNAVAILABLE` on the API
+endpoints) and nothing is served, minted or consumed. A read is bounded to 2
+seconds. If a ban cannot be written to Redis, `/api/governance/ban` answers
+`503` with `code: REVOCATION_UNAVAILABLE`: the gateway that received it keeps
+honouring the ban, the others may not, and the ban should be retried. A gateway
+whose configured Redis is unreachable at startup does not start.
+
 ## Authentication
 
 - **Admin endpoints** (mint, ban, reset): Require `Authorization: Bearer <ADMIN_TOKEN>`
