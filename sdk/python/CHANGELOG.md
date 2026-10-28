@@ -47,6 +47,14 @@ All notable changes to the `satgate` Python SDK are listed here.
   removed, also when they are part of the `host` given to `LNDWallet`. The
   `LNDWallet` TLS error and the `insecure=True` warning name the host the
   same way.
+- An error from `requests` itself (an invalid URL, a refused connection, a
+  timeout) is raised as the same exception, with the request URL removed
+  from its message: the URL is named by its host and port, and the path and
+  query urllib3 writes (`with url: ...`) read `[path and query removed]`.
+  The SDK's own errors that quote such an error (`Request failed: ...`,
+  `Ping failed: ...`, `Failed to mint token: ...`, `Lightning payment
+  failed: ...`) quote the cleaned text, so no SDK error message carries the
+  URL's user information, path or query.
 
 ### Compatibility
 

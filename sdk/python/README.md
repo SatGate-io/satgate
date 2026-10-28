@@ -111,7 +111,9 @@ Each request is sent once, to the configured URL, with
 the host and port of the request URL (no user information, path or query);
 the request is not sent again. Point the client at the final address (for
 example `https://` rather than an `http://` URL that redirects to it).
-`SatGateClient.health()` returns `False` in that case.
+`SatGateClient.health()` returns `False` in that case. An error from
+`requests` itself (an invalid URL, a refused connection) is raised with the
+URL removed from its message, naming only its host and port.
 
 Requests sent through a client's `requests.Session` carry what that session
 holds (its headers, its authentication and the cookies the gateway set), to
