@@ -235,9 +235,15 @@ func (g *Gateway) simulateAgentPolicy(w http.ResponseWriter, r *http.Request) {
 			decision = "denied"
 			break
 		}
-		// A revoked token, or one whose revocation state cannot be read,
-		// does not reach the upstream.
+		// A revoked token is denied and does not reach the upstream. When
+		// its revocation state cannot be read the simulation is not run:
+		// 503 REVOCATION_UNAVAILABLE, nothing recorded, as on every other
+		// API endpoint.
 		if err := g.checkRevoked(r.Context(), mac); err != nil {
+			if errors.Is(err, errRevocationUnavailable) {
+				writeRevocationUnavailableJSON(w)
+				return
+			}
 			decision = "denied"
 			break
 		}

@@ -89,12 +89,21 @@ type Service struct {
 }
 
 // BanCacheTTL is how long a gateway backed by a shared store (Redis) reuses
-// one answer from the store for a signature. A ban written by one gateway is
-// honoured by every other gateway on the same store within this delay.
+// one answer from the store for a signature, counted from the moment the
+// lookup that produced it started. A ban written by one gateway is honoured by
+// every other gateway on the same store within this delay: any lookup that
+// starts after the ban sees it, and an answer from a lookup that started
+// earlier is not used to allow a request once BanCacheTTL has passed since
+// that lookup started.
 const BanCacheTTL = 2 * time.Second
 
-// banStoreTimeout bounds one read of the shared ban store on the request path.
-const banStoreTimeout = 2 * time.Second
+// BanStoreReadTimeout bounds one read of the shared ban store (an access
+// check, or a ban list read for the views). A read that has not answered by
+// then is abandoned and the request is refused with ErrRevocationUnavailable.
+const BanStoreReadTimeout = 2 * time.Second
+
+// banStoreTimeout is BanStoreReadTimeout (kept for the existing name).
+const banStoreTimeout = BanStoreReadTimeout
 
 // maxBanCacheEntries bounds the ban cache. When it is full, expired entries
 // are dropped, and if that is not enough the cache is cleared.
@@ -334,7 +343,7 @@ func (s *Service) BanContext(ctx context.Context, signature, reason, bannedBy st
 
 	s.cacheMu.Lock()
 	defer s.cacheMu.Unlock()
-	s.putCacheLocked(signature, true)
+	s.putCacheLocked(signature, true, s.now())
 	if err != nil {
 		s.pendingBans[signature] = record
 		log.Error().Err(err).Str("signature", shortSig(signature)).Msg("Ban not written to the shared store; only this gateway honours it")
@@ -395,8 +404,10 @@ func (s *Service) IsBanned(signature string) bool {
 //
 // With the in-memory store it reads this process's ban list and never fails.
 // With a shared store it reads the store, reusing each answer for
-// BanCacheTTL; if the store cannot be read it returns an error wrapping
-// ErrRevocationUnavailable, and the caller must refuse the request.
+// BanCacheTTL from when the lookup that produced it started; the read is
+// bounded to BanStoreReadTimeout. If the store cannot be read in time, or its
+// answer arrives when it is already BanCacheTTL old, it returns an error
+// wrapping ErrRevocationUnavailable, and the caller must refuse the request.
 func (s *Service) IsAnyBanned(ctx context.Context, signatures []string) (bool, error) {
 	if !s.shared {
 		s.mu.RLock()
@@ -409,7 +420,7 @@ func (s *Service) IsAnyBanned(ctx context.Context, signatures []string) (bool, e
 		return false, nil
 	}
 
-	now := s.now()
+	start := s.now()
 	misses := make([]string, 0, len(signatures))
 	s.cacheMu.Lock()
 	for _, sig := range signatures {
@@ -417,7 +428,7 @@ func (s *Service) IsAnyBanned(ctx context.Context, signatures []string) (bool, e
 			s.cacheMu.Unlock()
 			return true, nil
 		}
-		if e, ok := s.banCache[sig]; ok && now.Sub(e.at) < s.banCacheTTL {
+		if e, ok := s.banCache[sig]; ok && start.Sub(e.at) < s.banCacheTTL {
 			if e.banned {
 				s.cacheMu.Unlock()
 				return true, nil
@@ -431,27 +442,67 @@ func (s *Service) IsAnyBanned(ctx context.Context, signatures []string) (bool, e
 		return false, nil
 	}
 
-	storeCtx, cancel := context.WithTimeout(ctx, banStoreTimeout)
-	defer cancel()
-	found, err := s.lookupBans(storeCtx, misses)
+	found, err := boundedRead(ctx, func(rctx context.Context) ([]bool, error) {
+		return s.lookupBans(rctx, misses)
+	})
 	if err != nil {
 		log.Error().Err(err).Msg("Ban store unavailable; refusing request")
 		return false, fmt.Errorf("%w: %v", ErrRevocationUnavailable, err)
 	}
+	// The answer describes the store as it was at some moment after start,
+	// so it is fresh for banCacheTTL from start, not from now.
+	fresh := s.now().Sub(start) < s.banCacheTTL
 
 	s.cacheMu.Lock()
 	defer s.cacheMu.Unlock()
 	hit := false
 	for i, sig := range misses {
-		// A ban made here while the store was being read stays in force.
-		if e, ok := s.banCache[sig]; ok && e.banned && !e.at.Before(now) {
-			hit = true
+		// A newer answer, or a ban made here while the store was being
+		// read, is kept; a ban in either answer is honoured.
+		if e, ok := s.banCache[sig]; ok && (e.at.After(start) || (e.at.Equal(start) && e.banned)) {
+			hit = hit || e.banned || found[i]
 			continue
 		}
-		s.putCacheLocked(sig, found[i])
+		if fresh {
+			s.putCacheLocked(sig, found[i], start)
+		}
 		hit = hit || found[i]
 	}
-	return hit, nil
+	if hit {
+		return true, nil
+	}
+	if !fresh {
+		log.Error().Msg("Ban store answered after the cache TTL; refusing request")
+		return false, fmt.Errorf("%w: ban store answer arrived after %s", ErrRevocationUnavailable, s.banCacheTTL)
+	}
+	return false, nil
+}
+
+// boundedRead runs read with a context that ends BanStoreReadTimeout from now
+// (or sooner, with ctx) and returns no later than that deadline, even if read
+// does not return. An answer that arrives after the deadline is discarded.
+func boundedRead[T any](ctx context.Context, read func(context.Context) (T, error)) (T, error) {
+	rctx, cancel := context.WithTimeout(ctx, banStoreTimeout)
+	defer cancel()
+	type result struct {
+		v   T
+		err error
+	}
+	done := make(chan result, 1)
+	go func() {
+		v, err := read(rctx)
+		done <- result{v, err}
+	}()
+	var zero T
+	select {
+	case r := <-done:
+		if r.err == nil && rctx.Err() != nil {
+			return zero, rctx.Err()
+		}
+		return r.v, r.err
+	case <-rctx.Done():
+		return zero, rctx.Err()
+	}
 }
 
 func (s *Service) lookupBans(ctx context.Context, signatures []string) ([]bool, error) {
@@ -473,8 +524,10 @@ func (s *Service) lookupBans(ctx context.Context, signatures []string) ([]bool, 
 	return found, nil
 }
 
-// putCacheLocked records one answer from the shared store. cacheMu is held.
-func (s *Service) putCacheLocked(sig string, banned bool) {
+// putCacheLocked records one answer from the shared store, obtained by a
+// lookup that started at at (or, for a ban made here, made at at). cacheMu is
+// held.
+func (s *Service) putCacheLocked(sig string, banned bool, at time.Time) {
 	now := s.now()
 	if len(s.banCache) >= maxBanCacheEntries {
 		for k, e := range s.banCache {
@@ -486,18 +539,18 @@ func (s *Service) putCacheLocked(sig string, banned bool) {
 			s.banCache = make(map[string]banCacheEntry)
 		}
 	}
-	s.banCache[sig] = banCacheEntry{banned: banned, at: now}
+	s.banCache[sig] = banCacheEntry{banned: banned, at: at}
 }
 
-// coveringBanLocked returns the ban that covers the recorded token sig: a ban
-// of sig itself or of a token it was recorded as delegated from (ParentSig).
-// It is for display (token info, graph, stats); access decisions use
-// IsAnyBanned with the verified lineage. s.mu is held.
-func (s *Service) coveringBanLocked(sig string) (BanRecord, bool) {
+// coveringBanLocked returns the ban in bans that covers the recorded token
+// sig: a ban of sig itself or of a token it was recorded as delegated from
+// (ParentSig). It is for the views (token info, graph, stats); access
+// decisions use IsAnyBanned with the verified lineage. s.mu is held.
+func (s *Service) coveringBanLocked(bans map[string]BanRecord, sig string) (BanRecord, bool) {
 	seen := make(map[string]bool)
 	for cur := sig; cur != "" && !seen[cur]; {
 		seen[cur] = true
-		if ban, ok := s.banned[cur]; ok {
+		if ban, ok := bans[cur]; ok {
 			return ban, true
 		}
 		minted, ok := s.minted[cur]
@@ -509,6 +562,74 @@ func (s *Service) coveringBanLocked(sig string) (BanRecord, bool) {
 	return BanRecord{}, false
 }
 
+// banView is the ban state the views show.
+type banView struct {
+	bans map[string]BanRecord
+	// unknown is set when the shared store could not be read: the views
+	// then show bans known here and no token as active.
+	unknown bool
+}
+
+// currentBans returns the bans the views (token info, graph, stats, ban list)
+// show. With the in-memory store that is this process's ban list. With a
+// shared store it is the store's ban list, read with the same deadline as an
+// access check (BanStoreReadTimeout), plus bans made here that could not be
+// written; a token another gateway banned is therefore shown banned at once,
+// and one unbanned elsewhere is no longer shown banned. If the store cannot
+// be read the error wraps ErrRevocationUnavailable. Call it without s.mu.
+func (s *Service) currentBans(ctx context.Context) (map[string]BanRecord, error) {
+	if !s.shared {
+		s.mu.RLock()
+		defer s.mu.RUnlock()
+		out := make(map[string]BanRecord, len(s.banned))
+		for sig, ban := range s.banned {
+			out[sig] = ban
+		}
+		return out, nil
+	}
+	list, err := boundedRead(ctx, s.store.GetBanList)
+	if err != nil {
+		log.Error().Err(err).Msg("Ban store unavailable; ban state of the views unknown")
+		return nil, fmt.Errorf("%w: %v", ErrRevocationUnavailable, err)
+	}
+	out := make(map[string]BanRecord, len(list))
+	for _, ban := range list {
+		out[ban.Signature] = ban
+	}
+	s.cacheMu.Lock()
+	for sig, ban := range s.pendingBans {
+		out[sig] = ban
+	}
+	s.cacheMu.Unlock()
+	return out, nil
+}
+
+// viewBans is currentBans for the views that cannot return an error: when the
+// shared store cannot be read it falls back to the bans known here and marks
+// the view unknown.
+func (s *Service) viewBans() banView {
+	bans, err := s.currentBans(context.Background())
+	if err == nil {
+		return banView{bans: bans}
+	}
+	bans = make(map[string]BanRecord)
+	s.mu.RLock()
+	for sig, ban := range s.banned {
+		bans[sig] = ban
+	}
+	s.mu.RUnlock()
+	s.cacheMu.Lock()
+	for sig, ban := range s.pendingBans {
+		bans[sig] = ban
+	}
+	s.cacheMu.Unlock()
+	return banView{bans: bans, unknown: true}
+}
+
+// StatusUnknown is the token status the views show, with a shared store that
+// cannot be read, for a token not known here to be banned.
+const StatusUnknown = "unknown"
+
 func shortSig(sig string) string {
 	if len(sig) > 12 {
 		return sig[:8] + "..." + sig[len(sig)-4:]
@@ -516,13 +637,27 @@ func shortSig(sig string) string {
 	return sig
 }
 
-// GetBanList returns all banned tokens
+// GetBanList returns all banned tokens. With a shared store it lists the
+// store's bans (see GetBanListContext); if the store cannot be read it lists
+// the bans known here.
 func (s *Service) GetBanList() []BanRecord {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	return banList(s.viewBans().bans)
+}
 
-	result := make([]BanRecord, 0, len(s.banned))
-	for _, record := range s.banned {
+// GetBanListContext returns all banned tokens: with a shared store, the
+// store's ban list (bans made by every gateway), or an error wrapping
+// ErrRevocationUnavailable if it cannot be read.
+func (s *Service) GetBanListContext(ctx context.Context) ([]BanRecord, error) {
+	bans, err := s.currentBans(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return banList(bans), nil
+}
+
+func banList(bans map[string]BanRecord) []BanRecord {
+	result := make([]BanRecord, 0, len(bans))
+	for _, record := range bans {
 		result = append(result, record)
 	}
 	return result
@@ -590,15 +725,33 @@ func (s *Service) GetUsage(signature string) *UsageStats {
 	return nil
 }
 
-// GetTokenInfoBySignature returns full info about a specific token
+// GetTokenInfoBySignature returns full info about a specific token. Its
+// status reads the shared ban state like GetTokenInfoBySignatureContext; if
+// the shared store cannot be read, a token not known here to be banned has
+// status StatusUnknown.
 func (s *Service) GetTokenInfoBySignature(signature string) *TokenInfo {
+	return s.tokenInfo(s.viewBans(), signature)
+}
+
+// GetTokenInfoBySignatureContext returns full info about a specific token,
+// with its status read from the shared ban state (see currentBans), or an
+// error wrapping ErrRevocationUnavailable if that cannot be read.
+func (s *Service) GetTokenInfoBySignatureContext(ctx context.Context, signature string) (*TokenInfo, error) {
+	bans, err := s.currentBans(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.tokenInfo(banView{bans: bans}, signature), nil
+}
+
+func (s *Service) tokenInfo(view banView, signature string) *TokenInfo {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	// Check if we know about this token from minting
 	minted, hasMinted := s.minted[signature]
 	stats, hasStats := s.usage[signature]
-	ban, isBanned := s.coveringBanLocked(signature)
+	ban, isBanned := s.coveringBanLocked(view.bans, signature)
 
 	// If we don't have any info about this token, return nil
 	if !hasMinted && !hasStats && !isBanned {
@@ -608,6 +761,9 @@ func (s *Service) GetTokenInfoBySignature(signature string) *TokenInfo {
 	info := &TokenInfo{
 		Signature: signature,
 		Status:    "active",
+	}
+	if view.unknown {
+		info.Status = StatusUnknown
 	}
 
 	// Add minted info if available
@@ -637,11 +793,32 @@ func (s *Service) GetTokenInfoBySignature(signature string) *TokenInfo {
 	return info
 }
 
-// GetAllTokenInfo returns info about all tracked tokens
+// GetAllTokenInfo returns info about all tracked tokens. Statuses read the
+// shared ban state like GetAllTokenInfoContext; if the shared store cannot be
+// read, a token not known here to be banned has status StatusUnknown.
 func (s *Service) GetAllTokenInfo() []TokenInfo {
+	return s.allTokenInfo(s.viewBans())
+}
+
+// GetAllTokenInfoContext returns info about all tracked tokens, with statuses
+// read from the shared ban state (see currentBans), or an error wrapping
+// ErrRevocationUnavailable if that cannot be read.
+func (s *Service) GetAllTokenInfoContext(ctx context.Context) ([]TokenInfo, error) {
+	bans, err := s.currentBans(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.allTokenInfo(banView{bans: bans}), nil
+}
+
+func (s *Service) allTokenInfo(view banView) []TokenInfo {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
+	active := "active"
+	if view.unknown {
+		active = StatusUnknown
+	}
 	result := make([]TokenInfo, 0)
 	seen := make(map[string]bool)
 
@@ -649,7 +826,7 @@ func (s *Service) GetAllTokenInfo() []TokenInfo {
 	for sig, minted := range s.minted {
 		info := TokenInfo{
 			Signature: sig,
-			Status:    "active",
+			Status:    active,
 			Scope:     minted.Scope,
 			CreatedAt: &minted.CreatedAt,
 			ExpiresAt: &minted.ExpiresAt,
@@ -668,7 +845,7 @@ func (s *Service) GetAllTokenInfo() []TokenInfo {
 		}
 
 		// Check if banned, directly or through a token it was delegated from
-		if ban, banned := s.coveringBanLocked(sig); banned {
+		if ban, banned := s.coveringBanLocked(view.bans, sig); banned {
 			info.Status = "banned"
 			info.BannedAt = &ban.BannedAt
 			info.BanReason = ban.Reason
@@ -685,13 +862,13 @@ func (s *Service) GetAllTokenInfo() []TokenInfo {
 		}
 		info := TokenInfo{
 			Signature:     sig,
-			Status:        "active",
+			Status:        active,
 			TotalRequests: stats.TotalRequests,
 			LastUsed:      &stats.LastUsed,
 			Routes:        stats.Routes,
 		}
 
-		if ban, banned := s.banned[sig]; banned {
+		if ban, banned := view.bans[sig]; banned {
 			info.Status = "banned"
 			info.BannedAt = &ban.BannedAt
 			info.BanReason = ban.Reason
@@ -702,7 +879,7 @@ func (s *Service) GetAllTokenInfo() []TokenInfo {
 	}
 
 	// Add banned tokens that weren't in usage or minted
-	for sig, ban := range s.banned {
+	for sig, ban := range view.bans {
 		if seen[sig] {
 			continue
 		}
@@ -878,22 +1055,44 @@ func hashReceipts(receipts []PolicyDecision) string {
 	sum := sha256.Sum256(data)
 	return "sha256:" + hex.EncodeToString(sum[:])
 }
+
+// GetStats returns token counts. Ban counts read the shared ban state like
+// GetStatsContext; if the shared store cannot be read, tokens not known here
+// to be banned are counted as "unknown", not "active".
 func (s *Service) GetStats() map[string]interface{} {
+	return s.stats(s.viewBans())
+}
+
+// GetStatsContext returns token counts with ban counts read from the shared
+// ban state (see currentBans), or an error wrapping ErrRevocationUnavailable
+// if that cannot be read.
+func (s *Service) GetStatsContext(ctx context.Context) (map[string]interface{}, error) {
+	bans, err := s.currentBans(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.stats(banView{bans: bans}), nil
+}
+
+func (s *Service) stats(view banView) map[string]interface{} {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	activeCount := 0
-	bannedCount := len(s.banned)
+	unknownCount := 0
+	bannedCount := len(view.bans)
 	expiredCount := 0
 	totalRequests := int64(0)
 
 	// Count minted tokens by status
 	for sig, minted := range s.minted {
-		if _, banned := s.coveringBanLocked(sig); banned {
+		if _, banned := s.coveringBanLocked(view.bans, sig); banned {
 			continue // banned directly (counted in bannedCount) or through its lineage
 		}
 		if time.Now().After(minted.ExpiresAt) {
 			expiredCount++
+		} else if view.unknown {
+			unknownCount++
 		} else {
 			activeCount++
 		}
@@ -904,13 +1103,17 @@ func (s *Service) GetStats() map[string]interface{} {
 		totalRequests += stats.TotalRequests
 	}
 
-	return map[string]interface{}{
+	out := map[string]interface{}{
 		"active":        activeCount,
 		"banned":        bannedCount,
 		"expired":       expiredCount,
 		"total":         len(s.minted),
 		"totalRequests": totalRequests,
 	}
+	if view.unknown {
+		out[StatusUnknown] = unknownCount
+	}
+	return out
 }
 
 // GraphNode represents a node in the token lineage graph
@@ -954,8 +1157,25 @@ type GraphResponse struct {
 	Stats GraphStats  `json:"stats"`
 }
 
-// GetGraph returns the token lineage graph for the dashboard
+// GetGraph returns the token lineage graph for the dashboard. Node statuses
+// read the shared ban state like GetGraphContext; if the shared store cannot
+// be read, a node not known here to be banned has status "UNKNOWN".
 func (s *Service) GetGraph() GraphResponse {
+	return s.graph(s.viewBans())
+}
+
+// GetGraphContext returns the token lineage graph with node statuses read
+// from the shared ban state (see currentBans), or an error wrapping
+// ErrRevocationUnavailable if that cannot be read.
+func (s *Service) GetGraphContext(ctx context.Context) (GraphResponse, error) {
+	bans, err := s.currentBans(ctx)
+	if err != nil {
+		return GraphResponse{}, err
+	}
+	return s.graph(banView{bans: bans}), nil
+}
+
+func (s *Service) graph(view banView) GraphResponse {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -965,10 +1185,12 @@ func (s *Service) GetGraph() GraphResponse {
 	for sig, token := range s.minted {
 		// Determine status
 		status := "ACTIVE"
-		if _, banned := s.coveringBanLocked(sig); banned {
+		if _, banned := s.coveringBanLocked(view.bans, sig); banned {
 			status = "BANNED"
 		} else if time.Now().After(token.ExpiresAt) {
 			status = "EXPIRED"
+		} else if view.unknown {
+			status = "UNKNOWN"
 		}
 
 		// Build constraints list
@@ -1050,9 +1272,9 @@ func (s *Service) GetGraph() GraphResponse {
 	activeCount := 0
 	bannedCount := 0
 	for sig := range s.minted {
-		if _, banned := s.coveringBanLocked(sig); banned {
+		if _, banned := s.coveringBanLocked(view.bans, sig); banned {
 			bannedCount++
-		} else {
+		} else if !view.unknown {
 			activeCount++
 		}
 	}

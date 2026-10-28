@@ -1577,7 +1577,13 @@ func (g *Gateway) handleGovernanceGraph(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	graph := g.governance.GetGraph()
+	// Node statuses read the shared ban state; if it cannot be read the
+	// graph is not answered (see governance.Service.GetGraphContext).
+	graph, err := g.governance.GetGraphContext(r.Context())
+	if err != nil {
+		writeRevocationUnavailableJSON(w)
+		return
+	}
 	json.NewEncoder(w).Encode(graph)
 }
 

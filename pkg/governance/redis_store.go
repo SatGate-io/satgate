@@ -32,12 +32,22 @@ type RedisConfig struct {
 	DB       int    `yaml:"db"`       // database number
 }
 
-// NewRedisStore creates a new Redis-backed store
+// NewRedisStore creates a new Redis-backed store.
+//
+// Every command honours its context's deadline on the socket
+// (ContextTimeoutEnabled), so a read made with BanStoreReadTimeout returns by
+// then even when Redis stops answering; a socket read or write never waits
+// longer than BanStoreReadTimeout, and a failed command is retried once.
 func NewRedisStore(cfg *RedisConfig) (*RedisStore, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     cfg.Addr,
-		Password: cfg.Password,
-		DB:       cfg.DB,
+		Addr:                  cfg.Addr,
+		Password:              cfg.Password,
+		DB:                    cfg.DB,
+		ContextTimeoutEnabled: true,
+		DialTimeout:           BanStoreReadTimeout,
+		ReadTimeout:           BanStoreReadTimeout,
+		WriteTimeout:          BanStoreReadTimeout,
+		MaxRetries:            1,
 	})
 
 	// Test connection
