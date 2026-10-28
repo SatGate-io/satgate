@@ -534,20 +534,22 @@ type Route struct {
 	StripPrefix bool        `yaml:"stripPrefix,omitempty"` // Strip the matched pathPrefix before proxying
 	Policy      RoutePolicy `yaml:"policy"`
 	Transform   *Transform  `yaml:"transform,omitempty"`
-	RateLimit   *RateLimit  `yaml:"rateLimit,omitempty"`
-	MCP         *MCPConfig  `yaml:"mcp,omitempty"` // MCP request parsing for tool-level cost attribution
+	RateLimit   *RateLimit  `yaml:"rateLimit,omitempty"` // refused at load: not enforced per route
+	MCP         *MCPConfig  `yaml:"mcp,omitempty"`       // MCP request parsing for tool-level cost attribution
 }
 
-// RouteMatch defines matching criteria
+// RouteMatch defines matching criteria. A request matches the route only
+// when it meets every matcher that is set (see Route.MatchRequest).
 type RouteMatch struct {
-	PathPrefix string            `yaml:"pathPrefix"`
-	PathExact  string            `yaml:"pathExact"`
-	PathRegex  string            `yaml:"pathRegex"`
-	Methods    []string          `yaml:"methods"`
-	Headers    map[string]string `yaml:"headers"` // header -> value (supports regex with prefix "~")
+	PathPrefix string            `yaml:"pathPrefix"` // path starts with this value (a trailing "*" is ignored)
+	PathExact  string            `yaml:"pathExact"`  // path equals this value
+	PathRegex  string            `yaml:"pathRegex"`  // Go regexp, matched anywhere in the path unless anchored
+	Methods    []string          `yaml:"methods"`    // request method is one of these, compared exactly
+	Headers    map[string]string `yaml:"headers"`    // header name -> exact value, or "~" + Go regexp
 
-	// Compiled regex (populated during validation)
+	// Compiled matchers (populated by CheckRouteMatchers)
 	compiledPathRegex *regexp.Regexp
+	compiledHeaders   []headerMatcher
 }
 
 // RoutePolicy defines access control
@@ -665,7 +667,8 @@ type Transform struct {
 	AddHeaders  map[string]string `yaml:"addHeaders"`
 }
 
-// RateLimit defines rate limiting rules
+// RateLimit is a per-route rate limit. The gateway does not enforce it, so
+// a route that sets rateLimit is refused at load (see CheckRouteMatchers).
 type RateLimit struct {
 	RequestsPerMinute int    `yaml:"requestsPerMinute"`
 	BurstSize         int    `yaml:"burstSize"`
@@ -796,10 +799,11 @@ func (c *Config) Validate() error {
 			}
 		}
 
-		// Compile path regex
-		if err := route.CompileRegex(); err != nil {
-			return err
-		}
+	}
+	// methods, headers and pathRegex are checked and compiled once here;
+	// a route that sets rateLimit is refused (see CheckRouteMatchers).
+	if err := CheckRouteMatchers(c.Routes); err != nil {
+		return err
 	}
 
 	// Validate upstreams
@@ -920,112 +924,4 @@ type urlParsed struct {
 	Scheme string
 	User   *string
 	Host   string
-}
-
-// GetRoute finds the first matching route for a request
-func (c *Config) GetRoute(path string, method string) *Route {
-	return c.GetRouteWithHeaders(path, method, nil)
-}
-
-// GetRouteWithHeaders finds the first matching route including header checks
-func (c *Config) GetRouteWithHeaders(path string, method string, headers map[string]string) *Route {
-	for i := range c.Routes {
-		route := &c.Routes[i]
-		if route.MatchesWithHeaders(path, method, headers) {
-			return route
-		}
-	}
-	return nil
-}
-
-// Matches checks if a request matches this route
-func (r *Route) Matches(path string, method string) bool {
-	return r.MatchesWithHeaders(path, method, nil)
-}
-
-// MatchesWithHeaders checks if a request matches this route including headers
-func (r *Route) MatchesWithHeaders(path string, method string, headers map[string]string) bool {
-	// Check path prefix
-	if r.Match.PathPrefix != "" {
-		if !strings.HasPrefix(path, r.Match.PathPrefix) {
-			return false
-		}
-	}
-
-	// Check exact path
-	if r.Match.PathExact != "" && path != r.Match.PathExact {
-		return false
-	}
-
-	// Check path regex
-	if r.Match.compiledPathRegex != nil {
-		if !r.Match.compiledPathRegex.MatchString(path) {
-			return false
-		}
-	}
-
-	// Check method
-	if len(r.Match.Methods) > 0 {
-		found := false
-		methodUpper := strings.ToUpper(method)
-		for _, m := range r.Match.Methods {
-			if strings.ToUpper(m) == methodUpper {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return false
-		}
-	}
-
-	// Check headers
-	if len(r.Match.Headers) > 0 && headers != nil {
-		for key, pattern := range r.Match.Headers {
-			headerValue, exists := headers[key]
-			if !exists {
-				// Also check case-insensitive
-				for k, v := range headers {
-					if strings.EqualFold(k, key) {
-						headerValue = v
-						exists = true
-						break
-					}
-				}
-			}
-			if !exists {
-				return false
-			}
-
-			// Check if pattern is regex (prefixed with ~)
-			if strings.HasPrefix(pattern, "~") {
-				re, err := regexp.Compile(pattern[1:])
-				if err != nil {
-					return false
-				}
-				if !re.MatchString(headerValue) {
-					return false
-				}
-			} else {
-				// Exact match
-				if headerValue != pattern {
-					return false
-				}
-			}
-		}
-	}
-
-	return true
-}
-
-// CompileRegex compiles the path regex if specified
-func (r *Route) CompileRegex() error {
-	if r.Match.PathRegex != "" {
-		re, err := regexp.Compile(r.Match.PathRegex)
-		if err != nil {
-			return fmt.Errorf("invalid path regex for route %s: %w", r.Name, err)
-		}
-		r.Match.compiledPathRegex = re
-	}
-	return nil
 }

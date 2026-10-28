@@ -104,6 +104,12 @@ func New(opts Options) (*Gateway, error) {
 	if err := config.CheckUniqueRouteNames(opts.Config.Routes); err != nil {
 		return nil, fmt.Errorf("invalid routes: %w", err)
 	}
+	// A route matches only requests that meet every matcher it sets; the
+	// matchers are checked and compiled here, and a route that sets
+	// rateLimit (not enforced per route) is refused.
+	if err := config.CheckRouteMatchers(opts.Config.Routes); err != nil {
+		return nil, fmt.Errorf("invalid routes: %w", err)
+	}
 	// Configured upstream headers are set on every forwarded request; a
 	// header SatGate owns cannot be one of them.
 	if err := config.CheckUpstreamHeaders(opts.Config.Upstreams); err != nil {
@@ -191,6 +197,16 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Handle CORS preflight
 	if r.Method == "OPTIONS" {
 		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	// Every other request is served on one checked path: built-in
+	// endpoints, route matching, policy checks and the prefix strip all
+	// read the path that passed checkRequestPath, and the upstream receives
+	// it (minus a stripped prefix) as sent.
+	if err := checkRequestPath(r.URL); err != nil {
+		http.Error(w, "Bad request path", http.StatusBadRequest)
+		g.metrics.TotalErrors.Add(1)
 		return
 	}
 
@@ -302,6 +318,13 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if route == nil {
 		log.Warn().Str("path", r.URL.Path).Msg("No matching route")
 		http.Error(w, "No matching route", http.StatusNotFound)
+		g.metrics.TotalErrors.Add(1)
+		return
+	}
+	// The path the route would forward must pass the same rule; refuse it
+	// here, before the route's policy runs.
+	if !forwardPathOK(route, r.URL) {
+		http.Error(w, "Bad request path", http.StatusBadRequest)
 		g.metrics.TotalErrors.Add(1)
 		return
 	}
@@ -783,33 +806,16 @@ func (g *Gateway) validAdminToken(adminToken string) bool {
 	return false
 }
 
-// matchRoute finds the route matching the request.
+// matchRoute returns the first route, in configuration order, whose every
+// configured matcher the request meets (config.Route.MatchRequest), or nil.
+// r.URL.Path has passed checkRequestPath.
 func (g *Gateway) matchRoute(r *http.Request) *config.Route {
-	path := r.URL.Path
-
 	for i := range g.config.Routes {
 		route := &g.config.Routes[i]
-
-		// Check exact path match
-		if route.Match.PathExact != "" {
-			if route.Match.PathExact == path {
-				return route
-			}
-			continue
-		}
-
-		// Check path prefix match (supports trailing * for wildcard)
-		if route.Match.PathPrefix != "" {
-			prefix := route.Match.PathPrefix
-			if strings.HasSuffix(prefix, "*") {
-				prefix = strings.TrimSuffix(prefix, "*")
-			}
-			if strings.HasPrefix(path, prefix) {
-				return route
-			}
+		if route.MatchRequest(r.URL.Path, r.Method, r.Header) {
+			return route
 		}
 	}
-
 	return nil
 }
 
@@ -865,17 +871,13 @@ func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *co
 		r.URL.Path = route.Rewrite
 		r.URL.RawPath = route.Rewrite
 	} else if route.StripPrefix && route.Match.PathPrefix != "" {
-		// Strip the matched prefix from the path before proxying
-		prefix := route.Match.PathPrefix
-		if strings.HasSuffix(prefix, "*") {
-			prefix = strings.TrimSuffix(prefix, "*")
+		// Strip the matched prefix from the checked path; the rest goes
+		// upstream encoded as sent. A remainder that would not pass the
+		// path check is refused.
+		if !stripPathPrefix(r.URL, route.Match.Prefix()) {
+			http.Error(w, "Bad request path", http.StatusBadRequest)
+			return
 		}
-		newPath := strings.TrimPrefix(r.URL.Path, prefix)
-		if !strings.HasPrefix(newPath, "/") {
-			newPath = "/" + newPath
-		}
-		r.URL.Path = newPath
-		r.URL.RawPath = newPath
 	}
 
 	// The upstream gets a copy of the request without the credentials the

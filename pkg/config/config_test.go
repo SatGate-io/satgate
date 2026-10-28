@@ -708,8 +708,8 @@ func TestRouteMatches_Methods(t *testing.T) {
 	}{
 		{"GET", true},
 		{"POST", true},
-		{"get", true},  // case insensitive
-		{"post", true}, // case insensitive
+		{"get", false},  // methods are compared exactly (case-sensitive)
+		{"post", false}, // methods are compared exactly (case-sensitive)
 		{"PUT", false},
 		{"DELETE", false},
 	}
@@ -741,7 +741,7 @@ func TestRouteMatchesWithHeaders_ExactMatch(t *testing.T) {
 		{"exact match", map[string]string{"Content-Type": "application/json"}, true},
 		{"wrong value", map[string]string{"Content-Type": "text/html"}, false},
 		{"missing header", map[string]string{}, false},
-		{"nil headers (skips check)", nil, true},
+		{"nil headers (no headers: no match)", nil, false},
 		{"case insensitive key", map[string]string{"content-type": "application/json"}, true},
 	}
 	for _, tt := range tests {
@@ -1092,9 +1092,9 @@ routes:
 	}
 }
 
-// --- Route with transform and rate limit ---
+// --- Route with transform; rateLimit is refused ---
 
-func TestParseYAML_RouteTransformAndRateLimit(t *testing.T) {
+func TestParseYAML_RouteTransform(t *testing.T) {
 	yaml := []byte(`
 upstreams:
   backend:
@@ -1110,10 +1110,6 @@ routes:
       stripPrefix: /api
       addHeaders:
         X-Gateway: satgate
-    rateLimit:
-      requestsPerMinute: 100
-      burstSize: 10
-      key: ip
 `)
 	cfg, err := ParseYAML(yaml)
 	if err != nil {
@@ -1128,11 +1124,5 @@ routes:
 	}
 	if route.Transform.AddHeaders["X-Gateway"] != "satgate" {
 		t.Errorf("expected X-Gateway header 'satgate'")
-	}
-	if route.RateLimit == nil {
-		t.Fatal("expected rate limit config")
-	}
-	if route.RateLimit.RequestsPerMinute != 100 {
-		t.Errorf("expected 100 rpm, got %d", route.RateLimit.RequestsPerMinute)
 	}
 }

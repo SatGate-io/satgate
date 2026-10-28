@@ -86,10 +86,6 @@ routes:
     transform:
       stripPrefix: ""
       addHeaders: {}
-    rateLimit:
-      requestsPerMinute: 0
-      burstSize: 0
-      key: ip
     mcp:
       enabled: false
       maxBodySize: 1048576
@@ -105,6 +101,74 @@ configuration in which two routes share a name is refused at startup with
 unique`. An agent policy promoted at run time (`/api/agent/promote`) whose
 name is already used by a route is refused with `409 route_name_in_use`, and
 a saved agent route whose name is in use is not restored at startup.
+
+### Route matching
+
+Routes are tried in the order they are listed, and a request is served by
+the first route that matches it. A route matches a request only when the
+request meets every matcher the route sets; a request that fails one of
+them does not match that route, and the next route is tried. A request
+that matches no route gets `404 No matching route`. Each route must set at
+least one of `pathPrefix`, `pathExact` and `pathRegex`.
+
+| Matcher | A request meets it when |
+|---|---|
+| `pathPrefix` | its path starts with this value. A trailing `*` is ignored (`/api/*` is `/api/`). |
+| `pathExact` | its path equals this value. |
+| `pathRegex` | the Go regular expression (RE2 syntax) matches its path. The match may be anywhere in the path unless the pattern is anchored with `^` and `$`. |
+| `methods` | its method equals one of the entries. Methods are compared exactly, as HTTP defines them: `HEAD` does not meet `[GET]`. |
+| `headers` | for every entry, it carries a header of that name exactly once (names are compared case-insensitively) and that header's value equals the entry's value exactly (case-sensitive). A value that starts with `~` is instead a Go regular expression, which must match the header's value (anywhere unless anchored). A header sent more than once does not meet the entry. |
+
+The path a matcher sees is the request path after the check below,
+percent-decoded once (`/a%20b` is matched as `/a b`).
+
+These are checked when the configuration is loaded, and the gateway does
+not start if one fails; the error names the route:
+
+- `pathRegex` and every `~` header value must be valid Go regular
+  expressions. Each is compiled once, at load.
+- every `methods` entry must be an HTTP method token written in upper case
+  (`GET`, not `get`), since a request's method is compared exactly.
+- every `headers` name must be a valid HTTP header name other than `Host`
+  (the request host is not matched as a header).
+- a route must not set `rateLimit`. The gateway does not enforce per-route
+  rate limits, so a route that sets one is refused rather than run
+  without it.
+
+**Compatibility.** Earlier versions matched routes on `pathExact` or
+`pathPrefix` alone: `methods`, `headers` and `pathRegex` were accepted but
+had no effect, a route with only `pathRegex` never matched, and a route
+with both `pathExact` and `pathPrefix` was matched on `pathExact` only.
+A route that sets these matchers now matches fewer requests, and requests
+it no longer matches go to the next route. `rateLimit` was also accepted
+without effect and is now refused at load; remove it from the route.
+
+### Request paths
+
+Before a request is routed, and before the built-in endpoints (`/health`,
+`/api/...`, `/check-payment/...`) are served, its path is checked in two
+forms: as sent, and percent-decoded once. The request is refused with
+`400 Bad request path`, and nothing is forwarded, when either form
+
+- does not begin with `/`;
+- has a segment that is `.` or `..`;
+- contains `%2F` or `%5C` (an encoded `/` or `\`, in either case);
+- contains `\` or a NUL byte; or
+- contains a `%` that is not followed by two hexadecimal digits.
+
+The check applies to the path only, not the query string. Only one
+decoding is considered: `/a/%252e%252e/b` decodes once to `/a/%2e%2e/b`,
+which has no dot segment, and is allowed. Nothing in the path is
+rewritten: a path that passes is matched, checked by the route's policy,
+and forwarded exactly as sent. `OPTIONS` requests are answered by the
+gateway (`204`) and are not routed.
+
+With `stripPrefix: true`, the route's `pathPrefix` is removed from the
+checked path and the upstream receives the rest of the path encoded as the
+client sent it (`/svc/a%20b` with prefix `/svc/` arrives as `/a%20b`). A
+result that does not begin with `/` gets one. If the result would fail the
+check above (for example prefix `/bare` and path `/bare./x`), the request
+is refused with `400` when the route is matched, before its policy runs.
 
 ### What an upstream receives
 
