@@ -12,7 +12,7 @@ import requests
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 from datetime import datetime
-from ._http import read_json, redact, send_without_redirects
+from ._http import send_without_redirects
 from .models import Token, TokenInfo, BanRecord, Stats
 from .exceptions import SatGateError, AuthenticationError, NotFoundError
 
@@ -80,7 +80,7 @@ class SatGateClient:
                 timeout=self.timeout
             )
         except requests.RequestException as e:
-            raise SatGateError(f"Request failed: {redact(str(e), e)}")
+            raise SatGateError(f"Request failed: {e}")
         
         if response.status_code == 401:
             raise AuthenticationError("Invalid admin token")
@@ -91,12 +91,10 @@ class SatGateClient:
                 error_msg = response.json().get("error", "Unknown error")
             except Exception:
                 error_msg = response.text
-            raise SatGateError(
-                f"API error {response.status_code}: {redact(str(error_msg), response)}"
-            )
+            raise SatGateError(f"API error {response.status_code}: {error_msg}")
         
         if response.content:
-            return read_json(response)
+            return response.json()
         return {}
     
     def health(self) -> bool:
@@ -127,9 +125,9 @@ class SatGateClient:
             )
             if resp.status_code != 200:
                 return {"status": "error", "code": resp.status_code}
-            return read_json(resp)
+            return resp.json()
         except requests.RequestException as e:
-            raise SatGateError(f"Ping failed: {redact(str(e), e)}")
+            raise SatGateError(f"Ping failed: {e}")
 
 
 class TokensService:

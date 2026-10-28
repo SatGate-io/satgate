@@ -42,13 +42,7 @@ from urllib.parse import urljoin
 
 import requests
 
-from ._http import (
-    read_json,
-    redact,
-    request_host,
-    send_without_credentials,
-    send_without_redirects,
-)
+from ._http import request_host, send_without_credentials, send_without_redirects
 from .exceptions import (
     SatGateError,
     AuthenticationError,
@@ -220,8 +214,7 @@ class LNDWallet(LightningWallet):
                     "tls_cert_path= (for example LND's tls.cert)"
                 )
             raise SatGateError(
-                f"TLS verification failed for LND host {self._display_host}: "
-                f"{redact(hint, e)}"
+                f"TLS verification failed for LND host {self._display_host}: {hint}"
             ) from e
     
     def pay_invoice(self, invoice: str) -> str:
@@ -244,13 +237,11 @@ class LNDWallet(LightningWallet):
         )
         
         if resp.status_code != 200:
-            raise PaymentFailedError(f"LND payment failed: {redact(resp.text, resp)}")
+            raise PaymentFailedError(f"LND payment failed: {resp.text}")
         
-        result = read_json(resp)
+        result = resp.json()
         if result.get('payment_error'):
-            raise PaymentFailedError(
-                f"Payment error: {redact(str(result['payment_error']), resp)}"
-            )
+            raise PaymentFailedError(f"Payment error: {result['payment_error']}")
         
         return result.get('payment_preimage', '')
     
@@ -269,9 +260,9 @@ class LNDWallet(LightningWallet):
         )
         
         if resp.status_code != 200:
-            raise SatGateError(f"Failed to get balance: {redact(resp.text, resp)}")
+            raise SatGateError(f"Failed to get balance: {resp.text}")
         
-        return int(read_json(resp).get('balance', 0))
+        return int(resp.json().get('balance', 0))
 
 
 class AlbyWallet(LightningWallet):
@@ -304,9 +295,9 @@ class AlbyWallet(LightningWallet):
         )
         
         if resp.status_code != 200:
-            raise PaymentFailedError(f"Alby payment failed: {redact(resp.text, resp)}")
+            raise PaymentFailedError(f"Alby payment failed: {resp.text}")
         
-        result = read_json(resp)
+        result = resp.json()
         return result.get('payment_preimage', '')
     
     def _pay_nwc(self, invoice: str) -> str:
@@ -321,9 +312,9 @@ class AlbyWallet(LightningWallet):
         )
         
         if resp.status_code != 200:
-            raise SatGateError(f"Failed to get balance: {redact(resp.text, resp)}")
+            raise SatGateError(f"Failed to get balance: {resp.text}")
         
-        return int(read_json(resp).get('balance', 0))
+        return int(resp.json().get('balance', 0))
 
 
 class SatGateAgentClient:
@@ -422,7 +413,6 @@ class SatGateAgentClient:
             return None
         
         # Mint new token via OSS endpoint
-        resp = None
         try:
             resp = self._send(
                 "POST",
@@ -439,11 +429,9 @@ class SatGateAgentClient:
             )
             
             if resp.status_code != 200:
-                raise AuthenticationError(
-                    f"Mint failed ({resp.status_code}): {redact(resp.text, resp)}"
-                )
+                raise AuthenticationError(f"Mint failed ({resp.status_code}): {resp.text}")
             
-            result = read_json(resp)
+            result = resp.json()
             
             # Parse expiration
             expires_at = time.time() + 3600  # Default 1 hour
@@ -466,7 +454,7 @@ class SatGateAgentClient:
             return self._token_cache.token
             
         except requests.RequestException as e:
-            raise AuthenticationError(f"Failed to mint token: {redact(str(e), e, resp)}")
+            raise AuthenticationError(f"Failed to mint token: {e}")
     
     def _handle_l402(self, response: requests.Response, method: str, url: str, **kwargs) -> AgentResponse:
         """Handle an L402 Payment Required response"""
@@ -476,7 +464,7 @@ class SatGateAgentClient:
         content_type = response.headers.get('Content-Type', '')
         if 'application/json' in content_type:
             try:
-                challenge = read_json(response)
+                challenge = response.json()
             except Exception:
                 pass
         
@@ -510,7 +498,7 @@ class SatGateAgentClient:
         try:
             preimage = self.wallet.pay_invoice(invoice)
         except Exception as e:
-            raise PaymentFailedError(f"Lightning payment failed: {redact(str(e), e, response)}")
+            raise PaymentFailedError(f"Lightning payment failed: {e}")
         
         # Build L402 token and retry
         l402_token = f"L402 {macaroon}:{preimage}"
@@ -585,7 +573,7 @@ class SatGateAgentClient:
                 continue
             
             # Other error
-            raise SatGateError(f"Request failed: {resp.status_code} {redact(resp.text, resp)}")
+            raise SatGateError(f"Request failed: {resp.status_code} {resp.text}")
         
         raise SatGateError("Max retries exceeded")
     
@@ -639,9 +627,9 @@ class SatGateAgentClient:
         )
         
         if resp.status_code != 200:
-            raise SatGateError(f"Validation failed: {redact(resp.text, resp)}")
+            raise SatGateError(f"Validation failed: {resp.text}")
         
-        return read_json(resp)
+        return resp.json()
     
     def delegate(
         self,
@@ -675,9 +663,9 @@ class SatGateAgentClient:
         )
         
         if resp.status_code != 200:
-            raise SatGateError(f"Delegation failed: {redact(resp.text, resp)}")
+            raise SatGateError(f"Delegation failed: {resp.text}")
         
-        return read_json(resp)['token']
+        return resp.json()['token']
     
     @property
     def total_cost(self) -> float:
@@ -707,23 +695,21 @@ class SatGateAgentClient:
 
     def stage_policy(self, policy: dict) -> dict:
         """Stage a policy. It is not live until promote."""
-        return self._admin_json("POST", "/api/agent/policy", policy, operation="stage_policy")
+        return self._admin_json("POST", "/api/agent/policy", policy)
 
     def simulate_policy(self, policy_id: str, **fields) -> dict:
         """Run a staged policy against its upstream and return the signed pack."""
         body = {"policy_id": policy_id}
         body.update({key: value for key, value in fields.items() if value is not None})
-        return self._admin_json("POST", "/api/agent/simulate", body, operation="simulate_policy")
+        return self._admin_json("POST", "/api/agent/simulate", body)
 
     def promote_policy(self, policy_id: str) -> dict:
         """Make a simulated policy live. Does not invent a price."""
-        return self._admin_json(
-            "POST", "/api/agent/promote", {"policy_id": policy_id}, operation="promote_policy"
-        )
+        return self._admin_json("POST", "/api/agent/promote", {"policy_id": policy_id})
 
     def fetch_pack(self, pack_id: str) -> dict:
         """Fetch a pack the gateway already signed."""
-        return self._admin_json("GET", "/api/agent/pack/" + pack_id, operation="fetch_pack")
+        return self._admin_json("GET", "/api/agent/pack/" + pack_id)
 
     def call(self, method: str, path: str, body: Optional[dict] = None, token: Optional[str] = None) -> dict:
         """Call a promoted route. Returns the upstream body and the live pack id."""
@@ -751,12 +737,7 @@ class SatGateAgentClient:
 
     def mint_capability(self, scope: str, duration: str = "1h") -> str:
         """Mint a real capability token. This does not call an identity provider."""
-        minted = self._admin_json(
-            "POST",
-            "/api/capability/mint",
-            {"scope": scope, "duration": duration},
-            operation="mint_capability",
-        )
+        minted = self._admin_json("POST", "/api/capability/mint", {"scope": scope, "duration": duration})
         token = minted.get("token")
         if not token:
             raise SatGateError("mint returned no token")
@@ -778,8 +759,8 @@ class SatGateAgentClient:
             label="SatGate gateway",
         )
         if resp.status_code >= 400:
-            raise SatGateError(f"jwks failed: {resp.status_code} {redact(resp.text, resp)}")
-        return read_json(resp)
+            raise SatGateError(f"jwks failed: {resp.status_code} {resp.text}")
+        return resp.json()
 
     def verify_pack(self, pack: dict, jwks: dict, require_trusted_issuer: bool = True) -> dict:
         """Verify a pack with the public verifier. SATGATE_VERIFIER must point at that script."""
@@ -803,16 +784,7 @@ class SatGateAgentClient:
             raise SatGateError(verified.stdout + verified.stderr)
         return json.loads(verified.stdout)
 
-    def _admin_json(
-        self,
-        method: str,
-        path: str,
-        body: Optional[dict] = None,
-        operation: str = "admin request",
-    ) -> dict:
-        """Send an admin request. An error status raises SatGateError naming
-        the operation and the status, with the response text redacted; the
-        message does not name the request path."""
+    def _admin_json(self, method: str, path: str, body: Optional[dict] = None) -> dict:
         if not self.admin_token:
             raise AuthenticationError("admin token required")
         resp = self._send(
@@ -823,7 +795,5 @@ class SatGateAgentClient:
             timeout=self.timeout,
         )
         if resp.status_code >= 400:
-            raise SatGateError(
-                f"{operation} failed: {resp.status_code} {redact(resp.text, resp)}"
-            )
-        return read_json(resp)
+            raise SatGateError(f"{method} {path} failed: {resp.status_code} {resp.text}")
+        return resp.json()

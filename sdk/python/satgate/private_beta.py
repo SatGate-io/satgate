@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import requests
 
-from ._http import read_json, redact, send_without_redirects
+from ._http import send_without_redirects
 from .exceptions import SatGateAuthError, SatGateError
 
 BETA_ACCESS_MESSAGE = (
@@ -100,7 +100,7 @@ class SatGate:
                 timeout=self.timeout,
             )
         except requests.RequestException as exc:
-            raise SatGateError(f"Request failed: {redact(str(exc), exc)}") from exc
+            raise SatGateError(f"Request failed: {exc}") from exc
 
         if response.status_code in {401, 403, 404, 503}:
             raise SatGateAuthError(BETA_ACCESS_MESSAGE, status_code=response.status_code)
@@ -111,13 +111,11 @@ class SatGate:
                 message = body.get("message") or body.get("error") or response.text
             except Exception:
                 message = response.text
-            raise SatGateError(
-                f"API error {response.status_code}: {redact(str(message), response)}"
-            )
+            raise SatGateError(f"API error {response.status_code}: {message}")
 
         if not response.content:
             return AttrDict()
-        return AttrDict.from_value(read_json(response))
+        return AttrDict.from_value(response.json())
 
     def _serialize(self, value: Any) -> Any:
         if isinstance(value, AttrDict):

@@ -111,7 +111,9 @@ Each request is sent once, to the configured URL, with
 the host and port of the request URL (no user information, path or query);
 the request is not sent again. Point the client at the final address (for
 example `https://` rather than an `http://` URL that redirects to it).
-`SatGateClient.health()` returns `False` in that case.
+`SatGateClient.health()` returns `False` in that case. An error from
+`requests` itself (an invalid URL, a refused connection) is raised with the
+URL removed from its message, naming only its host and port.
 
 Requests sent through a client's `requests.Session` carry what that session
 holds (its headers, its authentication and the cookies the gateway set), to
@@ -119,49 +121,6 @@ the configured URL only. `SatGateAgentClient.fetch_jwks()` does not use the
 session: it is sent on a new session with no cookies, no session headers, no
 authentication (none from `~/.netrc` either) and no client certificate. Only
 `agent.session.verify` is applied to it.
-
-## Error messages
-
-Every message the SDK builds or raises about a request is redacted for that
-request: an error from `requests` (an invalid URL or header value, a refused
-connection, a timeout, a body cut short) or a JSON parse error, raised as
-the same exception; a status error quoting the response (`Request failed:
-...`, `API error ...`, `Mint failed ...`, `Validation failed: ...`,
-`Delegation failed: ...`, `jwks failed: ...`, the wallet errors, the admin
-helpers); and an SDK error quoting another (`Request failed: ...`, `Ping
-failed: ...`, `Failed to mint token: ...`, `Lightning payment failed: ...`).
-
-In those messages, and in the messages of the exceptions they wrap:
-
-- the request URL (with the query parameters of the call and the session
-  merged) is named by its host and port; its path and query read
-  `[path and query removed]`, the path alone (or a tail of it from a `/`)
-  `[path removed]`, and the query string, each `name=value` pair, each
-  query value and each query name `[redacted]`; user information is
-  dropped;
-- every credential the request carried reads `[redacted]` wherever it
-  appears, including text quoted from the response body, also when
-  URL-encoded, JSON-escaped or quoted: the values of request headers whose
-  names contain `auth`, `token`, `key`, `secret`, `macaroon`, `cookie` or
-  `password` (including those the session, its cookies or `~/.netrc` add),
-  the token after the scheme, the parts of Basic and L402 credentials, the
-  string values of JSON body fields whose names contain `token`,
-  `macaroon`, `preimage`, `secret`, `password`, `passwd`, `key`,
-  `credential`, `capability`, `auth`, `signature` or `receipt`, the URL's
-  user name and password, and the query values.
-
-A credential, query name or query value shorter than 3 characters is not
-replaced on its own; it is removed only as part of the URL, the query
-string or a `name=value` pair. Other text the server sent is quoted as
-before.
-
-Not redacted: exception types, status codes and chained causes are
-unchanged, and so are attributes: `exc.request` and `exc.response` of a
-`requests` exception (the prepared URL, headers and body), urllib3's
-`MaxRetryError.url`, a `JSONDecodeError`'s `doc`,
-`PaymentRequiredError.challenge`, and the response data the SDK returns
-(`AgentResponse.content`, the `body` from `call()`). Do not log those as if
-they were redacted.
 
 ## Docs
 
