@@ -610,6 +610,15 @@ func TestEventClosingOrderNotCounted(t *testing.T) {
 	if h.rr.forwarded() != 2 || h0.rr.forwarded() != 1 {
 		t.Fatalf("forwarded %d/%d", h.rr.forwarded(), h0.rr.forwarded())
 	}
+	// A closing order reads and writes no counter, so a store that is down
+	// does not trap the agent in a position; an opening order is refused.
+	h0.store.Err = toolcontrols.ErrStoreUnavailable
+	if r := h0.call(t, evClose("MKT-A1", "3")); r.Error != nil {
+		t.Fatalf("closing refused with the store down: %+v", r.Error)
+	}
+	if r := h0.call(t, evBuy("MKT-A1", "1", "0.01")); code(t, r) != "tool_controls_unavailable" {
+		t.Fatalf("opening order with the store down: %+v", r.Error)
+	}
 }
 
 // Shapes v1 refuses: resting orders, orders by amount, amend or replace,
