@@ -40,7 +40,7 @@ type stdioRig struct {
 
 // newStdioRig runs a header-mode proxy with a real default upstream (the
 // helper process, which answers any passed-on method with {"echo": params})
-// on stdio. checker may be nil. runCtx, if given, is the context Run gets
+// on stdio. checker may be nil. wrap, if set, wraps the context Run gets
 // (to carry a connection credential).
 func newStdioRig(t *testing.T, checker LineageRevocationChecker, wrap func(context.Context) context.Context) *stdioRig {
 	t.Helper()
