@@ -6,7 +6,7 @@ Routes define how SatGate matches incoming requests and which policy to apply.
 
 ```yaml
 routes:
-  - name: my-api              # Unique route name (required)
+  - name: my-api              # Unique route name (required; duplicates refused at startup)
     match:
       pathPrefix: /api/        # Match by path prefix
       # pathExact: /api/health # Or exact path match

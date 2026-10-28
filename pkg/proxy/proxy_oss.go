@@ -100,6 +100,10 @@ func New(opts Options) (*Gateway, error) {
 	if opts.Macaroon == nil {
 		return nil, fmt.Errorf("macaroon service is required")
 	}
+	// A route's name is its identity; an L402 proof is issued for one name.
+	if err := config.CheckUniqueRouteNames(opts.Config.Routes); err != nil {
+		return nil, fmt.Errorf("invalid routes: %w", err)
+	}
 
 	// Initialize admin rate limiter (default: 60 req/min if not configured)
 	adminRPM := opts.Config.Admin.RateLimitPerMinute
@@ -398,7 +402,7 @@ func (g *Gateway) handleL402(w http.ResponseWriter, r *http.Request, route *conf
 	token := extractL402Token(r)
 	if token != "" {
 		// Verify L402 token (macaroon:preimage format)
-		err := g.verifyL402Token(r.Context(), token, route)
+		err := g.verifyL402Token(r, token, route)
 		if err == nil {
 			g.proxyRequest(w, r, route)
 			return
@@ -414,14 +418,17 @@ func (g *Gateway) handleL402(w http.ResponseWriter, r *http.Request, route *conf
 	g.issueL402Challenge(w, r, route)
 }
 
-// verifyL402Token verifies an L402 payment proof for the route being served.
+// verifyL402Token verifies an L402 payment proof for the request being served.
 //
 // The proof is accepted only when the macaroon was issued by this gateway as
-// an L402 challenge, its single-valued route and price caveats match the
-// route and its current price, the preimage hashes to its payment_hash, and
+// an L402 challenge, the served route's name is unique among the configured
+// routes, its single-valued route and price caveats match the route and its
+// current price, every restriction a holder added (scope, routes, methods,
+// expiry) covers the request, the preimage hashes to its payment_hash, and
 // the payment hash has not been consumed before. The payment hash is consumed
 // only after every other check passes.
-func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *config.Route) error {
+func (g *Gateway) verifyL402Token(r *http.Request, token string, route *config.Route) error {
+	ctx := r.Context()
 	// L402 format: macaroon:preimage
 	parts := strings.SplitN(token, ":", 2)
 	if len(parts) != 2 {
@@ -430,7 +437,7 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 	macaroonStr, preimageHex := parts[0], parts[1]
 
 	// Verify macaroon signature and caveats (a repeated single-valued caveat
-	// is refused here).
+	// and every absolute expiry are checked here).
 	mac, err := g.macaroonSvc.Verify(macaroonStr)
 	if err != nil {
 		return fmt.Errorf("macaroon verification failed: %w", err)
@@ -462,6 +469,9 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 		return fmt.Errorf("route %q has no price", route.Name)
 	}
 	currentPrice := strconv.FormatInt(route.Policy.PriceSats, 10)
+	if !g.routeNameIsUnique(route.Name) {
+		return fmt.Errorf("route name %q is not unique among configured routes", route.Name)
+	}
 	if boundRoute != route.Name {
 		return fmt.Errorf("proof was issued for route %q, not %q", boundRoute, route.Name)
 	}
@@ -470,6 +480,15 @@ func (g *Gateway) verifyL402Token(ctx context.Context, token string, route *conf
 	}
 	if hasInvoiceAmount && invoiceAmount != currentPrice {
 		return fmt.Errorf("invoice amount %s sats does not match route price %s sats", invoiceAmount, currentPrice)
+	}
+
+	// Restrictions a holder added to narrow the proof must cover this request.
+	if err := mac.CheckL402Request(macaroon.L402Request{
+		Method: r.Method,
+		Path:   r.URL.Path,
+		Route:  route.Name,
+	}); err != nil {
+		return fmt.Errorf("proof restriction: %w", err)
 	}
 
 	// CRYPTOGRAPHIC PROOF: Verify that SHA256(preimage) == payment_hash
@@ -531,6 +550,20 @@ func hasL402Route(cfg *config.Config) bool {
 	return false
 }
 
+// routeNameIsUnique reports whether exactly one configured route has name.
+// Configuration, gateway construction and agent promotion already refuse
+// duplicate names; this keeps an L402 proof bound to a single route even if
+// the live route table is changed some other way.
+func (g *Gateway) routeNameIsUnique(name string) bool {
+	n := 0
+	for i := range g.config.Routes {
+		if g.config.Routes[i].Name == name {
+			n++
+		}
+	}
+	return n == 1
+}
+
 // issueL402Challenge issues an HTTP 402 payment challenge.
 func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, route *config.Route) {
 	if g.lightning == nil {
@@ -539,6 +572,13 @@ func (g *Gateway) issueL402Challenge(w http.ResponseWriter, r *http.Request, rou
 	}
 	if route.Policy.PriceSats <= 0 {
 		http.Error(w, "price_unknown", http.StatusConflict)
+		return
+	}
+	// A challenge names one route. Do not take a payment that no route could
+	// accept.
+	if !g.routeNameIsUnique(route.Name) {
+		log.Error().Str("route", route.Name).Msg("L402: route name is not unique; refusing to issue a challenge")
+		http.Error(w, "Route configuration error", http.StatusInternalServerError)
 		return
 	}
 	priceSats := route.Policy.PriceSats

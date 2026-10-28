@@ -25,9 +25,16 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/satgate-io/satgate/pkg/config"
 	"github.com/satgate-io/satgate/pkg/lightning"
 )
+
+// errRouteNameInUse refuses to install an agent route whose name another
+// route already has. Route names are unique: an L402 proof is issued for one
+// route name.
+var errRouteNameInUse = errors.New("route_name_in_use")
 
 // Agent loop: stage a policy, run it against a real upstream, sign that
 // decision, then promote only when the agent asks. Staging does not go live.
@@ -315,6 +322,10 @@ func (g *Gateway) promoteAgentPolicy(w http.ResponseWriter, r *http.Request) {
 			status = http.StatusConflict
 			code = err.Error()
 		}
+		if errors.Is(err, errRouteNameInUse) {
+			status = http.StatusConflict
+			code = "route_name_in_use"
+		}
 		writeJSON(w, status, map[string]any{
 			"error":      code,
 			"promoted":   false,
@@ -347,6 +358,12 @@ func (g *Gateway) installPromotedPolicy(policy *agentPolicy) error {
 		kind = "chargeback"
 	}
 	name := "agent-" + policy.ID
+	// Route names are unique (an L402 proof is issued for one route name).
+	for i := range g.config.Routes {
+		if g.config.Routes[i].Name == policy.Name {
+			return errRouteNameInUse
+		}
+	}
 	if policy.UpstreamURL != "" {
 		proxy, err := g.createProxy(policy.UpstreamURL)
 		if err != nil {
@@ -666,6 +683,10 @@ func (g *Gateway) restoreAgentPolicies() {
 			continue
 		}
 		if err := g.installPromotedPolicy(&policy); err != nil {
+			if errors.Is(err, errRouteNameInUse) {
+				log.Error().Str("policy_id", policy.ID).Str("route", policy.Name).
+					Msg("Agent policy not restored: a route with this name already exists; route names must be unique")
+			}
 			policy.Promoted = false
 			continue
 		}

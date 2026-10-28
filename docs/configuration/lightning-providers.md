@@ -109,22 +109,48 @@ issues for one payment, one route and one price. Besides the expiry and
 | `price_sats` | The route's `priceSats` when the challenge was issued |
 | `invoice_amount_sats` | Invoice amount reported by the provider, when it reports one |
 
-A paid retry (`Authorization: L402 <macaroon>:<preimage>`) is accepted only when:
+Route names are unique: the gateway refuses to start with two routes of the
+same name, and refuses to promote an agent route whose name is in use (see
+[Route names](../reference/configuration.md#route-names)). A challenge
+therefore names exactly one route. If the live route table ever holds two
+routes with the served route's name, the gateway issues no challenge for that
+route and accepts no proof on it.
 
-- the macaroon was issued by this gateway as an L402 challenge (its identifier starts with `satgate-l402-v2:`);
-- `route` names the route being served and `price_sats` equals that route's current `priceSats` (and `invoice_amount_sats`, when present, equals it too);
+A paid retry (`Authorization: L402 <macaroon>:<preimage>`) is accepted only
+when all of these hold; the payment hash is consumed only after every other
+check passes:
+
+- the macaroon verifies under this gateway's root key and was issued as an L402 challenge (its identifier starts with `satgate-l402-v2:`);
+- every `expires` caveat is in the future;
+- `payment_hash`, `route`, `price_sats` and `invoice_amount_sats` each appear at most once, and `payment_hash`, `route` and `price_sats` are present;
+- the served route's name is unique, `route` names it, and `price_sats` equals its current `priceSats` (and `invoice_amount_sats`, when present, equals it too);
+- every restriction a holder added covers the request (below);
 - `SHA256(preimage)` equals `payment_hash`;
 - the payment hash has not been used before (see the consumed-proof store below).
 
 So a proof paid on one route does not serve another route, and changing a
 route's `priceSats` refuses proofs issued at the old price; the client pays
-the new challenge. A refused proof is not consumed.
+the new challenge. A refused proof is not consumed, and the client gets a new
+`402` challenge.
 
-`payment_hash`, `route`, `price_sats` and `invoice_amount_sats` are
-single-valued. A token that carries any of them more than once is refused,
-whatever the order. `/api/capability/delegate` refuses to add them. Caveats
-that attenuation may repeat, such as `expires` and `scope`, are still checked
-on every occurrence, so a holder can narrow a proof but not widen or rebind it.
+### Narrowing a proof
+
+A holder can add first-party caveats to a challenge macaroon to narrow it.
+On the L402 path the gateway accepts only these keys, and checks every
+occurrence of each:
+
+| Caveat | Accepted when |
+|--------|---------------|
+| `expires = <unix ms or RFC 3339>` | the time is in the future. A relative value such as `5m` refuses the proof. |
+| `time < <unix seconds>` | the time is in the future. |
+| `scope = <scope>` | the scope grants `l402` (`l402`, `*` or `api:*`). |
+| `routes = <pattern>,...` | one pattern covers the request: a pattern starting with `/` is a path, matched exactly or, when it ends in `*`, as a prefix; `*` matches anything; any other pattern is a route name. |
+| `methods = <METHOD>,...` | the request method is listed (case-insensitive). |
+
+A proof that carries any other caveat key (other than the server-written
+keys above) is refused, because the gateway does not enforce it.
+`/api/capability/delegate` refuses to add the server-written keys. A holder
+can therefore narrow a proof but cannot widen or rebind it.
 
 ## L402 Consumed-Proof Store
 

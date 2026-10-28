@@ -53,6 +53,21 @@ func IsSingleValuedCaveat(key string) bool {
 	return singleValuedCaveats[key]
 }
 
+// L402Scope is the scope written into every L402 challenge macaroon, and the
+// scope a paid L402 request needs: every scope caveat on a proof must grant it
+// (see HasScope).
+const L402Scope = "l402"
+
+// Caveat keys a holder may add to narrow an L402 proof. The L402 path checks
+// each of them before it consumes the proof, and refuses a proof that carries
+// any other key it does not write itself (see CheckL402Request).
+const (
+	CaveatExpires = "expires"
+	CaveatScope   = "scope"
+	CaveatRoutes  = "routes"
+	CaveatMethods = "methods"
+)
+
 // L402IdentifierPrefix starts the identifier of every macaroon the gateway
 // issues in an L402 payment challenge. The identifier is the first input to
 // the signature chain, so only a holder of the root key can produce one.
@@ -241,7 +256,7 @@ func (s *Service) MintL402(b L402Binding, expiresAt time.Time) (*Macaroon, error
 		Identifier: fmt.Sprintf("%s%d:%s", L402IdentifierPrefix, time.Now().UnixMilli(), hex.EncodeToString(nonce)),
 		Caveats: []string{
 			fmt.Sprintf("expires = %d", expiresAt.UnixMilli()),
-			"scope = l402",
+			"scope = " + L402Scope,
 		},
 	}
 	mac.AddCaveat(CaveatPaymentHash, b.PaymentHash)
@@ -605,17 +620,115 @@ func (s *Service) verifyCaveat(caveat string) error {
 //
 // Every scope caveat must grant it. An additional scope caveat can only narrow
 // access. Each caveat is compared as one string. A token with no scope caveat
-// keeps full access.
+// keeps full access. A caveat counts as a scope caveat when its key, parsed as
+// Verify parses it (surrounding spaces trimmed), is "scope".
 func (m *Macaroon) HasScope(requiredScope string) bool {
 	for _, caveat := range m.Caveats {
-		if !strings.HasPrefix(caveat, "scope = ") {
+		key, value, ok := parseCaveat(caveat)
+		if !ok || key != CaveatScope {
 			continue
 		}
-		if !scopeMatches(strings.TrimPrefix(caveat, "scope = "), requiredScope) {
+		if !scopeMatches(value, requiredScope) {
 			return false
 		}
 	}
 	return true
+}
+
+// L402Request is what a paid L402 request asks for: the HTTP method, the
+// request path and the name of the route that serves it.
+type L402Request struct {
+	Method string
+	Path   string
+	Route  string
+}
+
+// CheckL402Request checks every restriction a holder can put on an L402 proof
+// against the request, before the proof is consumed. The macaroon must have
+// passed Verify, which checks every absolute expires caveat.
+//
+//   - A relative expires caveat ("expires = 5m") refuses the proof: it has no
+//     start time, so it cannot be enforced.
+//   - Every scope caveat must grant L402Scope (HasScope).
+//   - Every "routes = <pattern>,..." caveat must list the request. A pattern
+//     that starts with "/" is a path: it matches exactly, or as a prefix when
+//     it ends in "*". "*" matches any request. Any other pattern is a route
+//     name and matches only that route.
+//   - Every "methods = <METHOD>,..." caveat must list the request method
+//     (case-insensitive).
+//   - Any other key refuses the proof unless it is one the gateway writes into
+//     the challenge (payment_hash, route, price_sats, invoice_amount_sats),
+//     which the caller checks. A paid proof is never accepted with a
+//     restriction the gateway does not enforce.
+func (m *Macaroon) CheckL402Request(req L402Request) error {
+	for _, caveat := range m.Caveats {
+		if strings.HasPrefix(caveat, "time < ") {
+			continue // expiry, checked by Verify
+		}
+		key, value, ok := parseCaveat(caveat)
+		if !ok {
+			return fmt.Errorf("invalid caveat format")
+		}
+		switch key {
+		case CaveatExpires:
+			// Absolute expiry is checked on every occurrence by Verify. A
+			// relative one ("5m") has no start time to count from, so Verify
+			// lets it pass; a paid proof does not accept it.
+			if _, err := time.ParseDuration(strings.TrimSpace(value)); err == nil {
+				return fmt.Errorf("relative expires caveat is not enforced on L402 proofs")
+			}
+		case CaveatScope:
+			// Checked on every occurrence by HasScope below.
+		case CaveatPaymentHash, CaveatRoute, CaveatPriceSats, CaveatInvoiceAmountSats:
+			// Server-written, single-valued; the caller checks them.
+		case CaveatRoutes:
+			if !routesCaveatAllows(value, req) {
+				return fmt.Errorf("routes caveat does not cover route %q", req.Route)
+			}
+		case CaveatMethods:
+			if !methodsCaveatAllows(value, req.Method) {
+				return fmt.Errorf("methods caveat does not cover method %s", req.Method)
+			}
+		default:
+			return fmt.Errorf("caveat %q is not enforced on L402 proofs", key)
+		}
+	}
+	if !m.HasScope(L402Scope) {
+		return fmt.Errorf("scope caveat does not grant %q", L402Scope)
+	}
+	return nil
+}
+
+func routesCaveatAllows(value string, req L402Request) bool {
+	for _, pattern := range strings.Split(value, ",") {
+		pattern = strings.TrimSpace(pattern)
+		switch {
+		case pattern == "":
+			continue
+		case pattern == "*":
+			return true
+		case strings.HasPrefix(pattern, "/"):
+			if strings.HasSuffix(pattern, "*") {
+				if strings.HasPrefix(req.Path, strings.TrimSuffix(pattern, "*")) {
+					return true
+				}
+			} else if req.Path == pattern {
+				return true
+			}
+		case pattern == req.Route:
+			return true
+		}
+	}
+	return false
+}
+
+func methodsCaveatAllows(value, method string) bool {
+	for _, allowed := range strings.Split(value, ",") {
+		if allowed = strings.TrimSpace(allowed); allowed != "" && strings.EqualFold(allowed, method) {
+			return true
+		}
+	}
+	return false
 }
 
 // scopeMatches checks if tokenScope grants access to requiredScope

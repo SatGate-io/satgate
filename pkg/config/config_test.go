@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -223,6 +224,39 @@ routes:
 	_, err := ParseYAML(yaml)
 	if err == nil {
 		t.Error("expected error for route with no name")
+	}
+}
+
+func TestValidate_RouteNamesMustBeUnique(t *testing.T) {
+	yaml := []byte(`
+upstreams:
+  backend:
+    url: https://api.example.com
+routes:
+  - name: orders
+    match:
+      pathPrefix: /orders/
+    upstream: backend
+    policy:
+      kind: public
+  - name: orders
+    match:
+      pathPrefix: /orders-v2/
+    upstream: backend
+    policy:
+      kind: l402
+      priceSats: 10
+`)
+	_, err := ParseYAML(yaml)
+	if err == nil {
+		t.Fatal("expected error for two routes with the same name")
+	}
+	if want := `route name "orders" is used by routes 0 and 1`; !strings.Contains(err.Error(), want) {
+		t.Fatalf("error %q does not contain %q", err, want)
+	}
+
+	if err := CheckUniqueRouteNames([]Route{{Name: "a"}, {Name: "b"}, {Name: "A"}}); err != nil {
+		t.Fatalf("distinct names refused: %v", err)
 	}
 }
 

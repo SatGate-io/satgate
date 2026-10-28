@@ -709,6 +709,9 @@ func (c *Config) Validate() error {
 	}
 
 	// Validate each route
+	if err := CheckUniqueRouteNames(c.Routes); err != nil {
+		return err
+	}
 	for i := range c.Routes {
 		route := &c.Routes[i]
 		if route.Name == "" {
@@ -796,6 +799,25 @@ func (c *Config) Validate() error {
 		}
 	}
 
+	return nil
+}
+
+// CheckUniqueRouteNames refuses a route list in which two routes share a
+// name. A route's name is its identity: an L402 payment proof is issued for
+// one route name, so two routes with the same name could not be told apart.
+// Names are compared exactly.
+func CheckUniqueRouteNames(routes []Route) error {
+	seen := make(map[string]int, len(routes))
+	for i := range routes {
+		name := routes[i].Name
+		if name == "" {
+			continue // reported as "route %d has no name" by Validate
+		}
+		if first, dup := seen[name]; dup {
+			return fmt.Errorf("route name %q is used by routes %d and %d: route names must be unique", name, first, i)
+		}
+		seen[name] = i
+	}
 	return nil
 }
 
