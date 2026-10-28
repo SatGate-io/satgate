@@ -19,14 +19,18 @@ export const Caveats = {
   scope: (scope: string): string => `scope = ${scope}`,
 
   /**
-   * Set expiration time
+   * Set expiration time. The caveat holds an absolute time in Unix
+   * milliseconds, the form the gateway mints and verifies.
    * @param seconds Seconds from now, or Date object
    */
   expires: (seconds: number | Date): string => {
     const expiry = typeof seconds === 'number'
-      ? Math.floor(Date.now() / 1000) + seconds
-      : Math.floor(seconds.getTime() / 1000);
-    return `expires = ${expiry}`;
+      ? Date.now() + Math.floor(seconds * 1000)
+      : seconds.getTime();
+    if (!Number.isFinite(expiry)) {
+      throw new Error('expires needs a finite number of seconds or a valid Date');
+    }
+    return `expires = ${Math.floor(expiry)}`;
   },
 
   /**

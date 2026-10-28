@@ -131,18 +131,28 @@ func (t *TokenInfo) AllowsTool(toolName string) bool {
 	if t.Raw != nil {
 		saw := false
 		for _, caveat := range t.Raw.Caveats {
-			if !strings.HasPrefix(caveat, "scope = ") {
+			// Scope caveats are found by the key reading Verify uses, so
+			// every scope caveat Verify accepts is enforced here.
+			value, ok := macaroon.ScopeCaveatValue(caveat)
+			if !ok {
 				continue
 			}
-			if argrules.IsRuleScope(strings.TrimPrefix(caveat, "scope = ")) {
+			if argrules.IsRuleScope(value) {
 				// A rule caveat limits arguments, not tool names. The
 				// tool-name check of an older verifier compares the whole
 				// word to the tool name, which no real tool equals, so it
 				// denies every real tool; that is how it fails closed.
+				// The rule and control readers (argrules.Collect,
+				// pkg/toolcontrols) read only a caveat written exactly
+				// "scope = <value>"; a rule word in any other spelling
+				// would not be enforced, so it allows no tool.
+				if !strings.HasPrefix(caveat, ruleCaveatPrefix) {
+					return false
+				}
 				continue
 			}
 			saw = true
-			if !matchScope(strings.TrimPrefix(caveat, "scope = "), toolName) {
+			if !matchScope(value, toolName) {
 				return false
 			}
 		}
@@ -150,19 +160,24 @@ func (t *TokenInfo) AllowsTool(toolName string) bool {
 			return true
 		}
 	}
-	if t.Scope == "" || t.Scope == "*" || t.Scope == "api:*" || t.Scope == "mcp:*" {
+	if t.Scope == "" {
 		return true
 	}
 	return matchScope(t.Scope, toolName)
 }
 
+// ruleCaveatPrefix is the only spelling in which the argument-rule and
+// tool-control readers (argrules.Collect, pkg/toolcontrols) find a rule or
+// control word.
+const ruleCaveatPrefix = "scope = "
+
 func rejectWideningScope(mac *macaroon.Macaroon) error {
 	sawRestricted := false
 	for _, caveat := range mac.Caveats {
-		if !strings.HasPrefix(caveat, "scope = ") {
+		value, ok := macaroon.ScopeCaveatValue(caveat)
+		if !ok {
 			continue
 		}
-		value := strings.TrimPrefix(caveat, "scope = ")
 		if argrules.IsRuleScope(value) {
 			continue
 		}
@@ -176,12 +191,13 @@ func rejectWideningScope(mac *macaroon.Macaroon) error {
 	return nil
 }
 
+// scopeCaveatUniversal reports whether a scope caveat value allows every
+// tool: one of its words (scopeWords) is "*" or "mcp:*". "api:*" allows no
+// tool (see toolScopeWordGrants), so it is not universal.
 func scopeCaveatUniversal(scope string) bool {
-	for _, part := range strings.Split(scope, ",") {
-		for _, word := range strings.Fields(part) {
-			if word == "*" || word == "api:*" || word == "mcp:*" {
-				return true
-			}
+	for _, word := range scopeWords(scope) {
+		if word == "*" || word == toolScopeNamespace+":*" {
+			return true
 		}
 	}
 	return false
@@ -190,8 +206,8 @@ func scopeCaveatUniversal(scope string) bool {
 func displayScope(mac *macaroon.Macaroon) string {
 	var scopes []string
 	for _, caveat := range mac.Caveats {
-		if strings.HasPrefix(caveat, "scope = ") && !argrules.IsRuleScope(strings.TrimPrefix(caveat, "scope = ")) {
-			scopes = append(scopes, strings.TrimPrefix(caveat, "scope = "))
+		if value, ok := macaroon.ScopeCaveatValue(caveat); ok && !argrules.IsRuleScope(value) {
+			scopes = append(scopes, value)
 		}
 	}
 	if len(scopes) == 0 {

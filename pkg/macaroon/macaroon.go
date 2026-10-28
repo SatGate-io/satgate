@@ -83,14 +83,28 @@ type L402Binding struct {
 	InvoiceAmountSats int64
 }
 
-// parseCaveat splits a "key = value" caveat the way verifyCaveat does. The key
-// is trimmed so that spacing variants of a key count as the same key.
+// parseCaveat splits a "key = value" caveat. It is the one reading of a
+// caveat key: verifyCaveat uses it, so a key counts as whatever Verify reads
+// it as. The key is trimmed so that spacing variants of a key count as the
+// same key. The value is returned as written.
 func parseCaveat(caveat string) (key, value string, ok bool) {
 	parts := strings.SplitN(caveat, " = ", 2)
 	if len(parts) != 2 {
 		return "", "", false
 	}
 	return strings.TrimSpace(parts[0]), parts[1], true
+}
+
+// ScopeCaveatValue reports whether caveat is a scope caveat, reading its key
+// exactly as Verify does, and returns its value as written (not trimmed).
+// Every reader that decides access from scope caveats finds them with this
+// function, so a scope caveat Verify accepts is never skipped.
+func ScopeCaveatValue(caveat string) (value string, ok bool) {
+	key, value, parsed := parseCaveat(caveat)
+	if !parsed || key != CaveatScope {
+		return "", false
+	}
+	return value, true
 }
 
 // checkSingleValued refuses a token in which a single-valued key appears more
@@ -110,11 +124,22 @@ func (m *Macaroon) checkSingleValued() error {
 	return nil
 }
 
-// checkDelegatedCaveats refuses caveats that only the gateway may write.
+// checkDelegatedCaveats refuses caveats that only the gateway may write, and
+// an expires caveat that is not an absolute time (Verify would refuse the
+// child).
 func checkDelegatedCaveats(caveats []string) error {
 	for _, caveat := range caveats {
-		if key, _, ok := parseCaveat(caveat); ok && singleValuedCaveats[key] {
+		key, value, ok := parseCaveat(caveat)
+		if !ok {
+			continue
+		}
+		if singleValuedCaveats[key] {
 			return fmt.Errorf("%w: %s", ErrReservedCaveat, key)
+		}
+		if key == CaveatExpires {
+			if _, err := ParseExpires(value); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -284,14 +309,20 @@ func (m *Macaroon) IsL402Challenge() bool {
 func (s *Service) Verify(token string) (*Macaroon, error) {
 	// Binary L402 macaroons use libmacaroon's canonical signature algorithm;
 	// verify them with the library before converting into SatGate's struct shape.
-	if mac, err := s.verifyBinary(token); err == nil {
+	mac, signedHere, err := s.verifyBinary(token)
+	if err == nil {
 		if err := mac.checkSingleValued(); err != nil {
 			return nil, fmt.Errorf("caveat check failed: %w", err)
 		}
 		return mac, nil
 	}
+	if signedHere {
+		// A binary macaroon signed with this key whose caveats do not hold
+		// is refused with the caveat's own error.
+		return nil, fmt.Errorf("caveat check failed: %w", err)
+	}
 
-	mac, err := s.Decode(token)
+	mac, err = s.Decode(token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode token: %w", err)
 	}
@@ -392,21 +423,27 @@ func jsonTokenBytes(token string) ([]byte, error) {
 	return data, err
 }
 
-func (s *Service) verifyBinary(token string) (*Macaroon, error) {
+// verifyBinary verifies a binary macaroon. signedHere is true when the token
+// is a binary macaroon whose signature chain verifies under this key, so a
+// non-nil err then comes from a caveat check.
+func (s *Service) verifyBinary(token string) (mac *Macaroon, signedHere bool, err error) {
 	data, err := binaryTokenBytes(token)
 	if err != nil {
-		return nil, fmt.Errorf("invalid base64: %w", err)
+		return nil, false, fmt.Errorf("invalid base64: %w", err)
 	}
 
 	var v2mac macaroonv2.Macaroon
 	if err := v2mac.UnmarshalBinary(data); err != nil {
-		return nil, fmt.Errorf("invalid binary macaroon: %w", err)
+		return nil, false, fmt.Errorf("invalid binary macaroon: %w", err)
+	}
+	if err := v2mac.Verify(s.rootKey, func(string) error { return nil }, nil); err != nil {
+		return nil, false, err
 	}
 	if err := v2mac.Verify(s.rootKey, s.verifyCaveat, nil); err != nil {
-		return nil, err
+		return nil, true, err
 	}
 
-	return s.decodeVerifiedBinaryMacaroon(&v2mac), nil
+	return s.decodeVerifiedBinaryMacaroon(&v2mac), true, nil
 }
 
 // Delegate creates a child macaroon with additional caveats using proper
@@ -604,71 +641,40 @@ func (s *Service) RecalculateSignature(mac *Macaroon) string {
 
 // verifyCaveat checks if a caveat is satisfied
 func (s *Service) verifyCaveat(caveat string) error {
-	// Handle "time < N" caveats (legacy format from enterprise Mint)
+	// "time < N" caveats (Unix seconds, legacy format from enterprise Mint)
 	if strings.HasPrefix(caveat, "time < ") {
-		val := strings.TrimPrefix(caveat, "time < ")
-		var ts int64
-		if _, err := fmt.Sscanf(val, "%d", &ts); err == nil {
-			if time.Now().Unix() > ts {
-				return fmt.Errorf("token expired")
-			}
-			return nil
+		ts, err := parseTimeBefore(strings.TrimPrefix(caveat, "time < "))
+		if err != nil {
+			return err
 		}
-		return fmt.Errorf("invalid time caveat: %s", caveat)
+		if time.Now().Unix() > ts.Unix() {
+			return ErrTokenExpired
+		}
+		return nil
 	}
 
-	parts := strings.SplitN(caveat, " = ", 2)
-	if len(parts) != 2 {
+	key, value, ok := parseCaveat(caveat)
+	if !ok {
 		return fmt.Errorf("invalid caveat format: %s", caveat)
 	}
-
-	key := strings.TrimSpace(parts[0])
-	value := strings.TrimSpace(parts[1])
+	value = strings.TrimSpace(value)
 
 	switch key {
-	case "expires":
-		// Check expiration - support both Unix timestamp (ms) and duration strings
-		// IMPORTANT: Check duration first because fmt.Sscanf partially parses "5m" as 5!
-
-		// Try parsing as duration string first (e.g., "5m", "1h")
-		if _, durErr := time.ParseDuration(value); durErr == nil {
-			// Duration caveats are relative to token creation time
-			// We can't verify them without that context, so we allow them
-			// (they're mainly for display purposes in delegated tokens)
-			return nil
+	case CaveatExpires:
+		// Every expires caveat must hold an absolute time (ParseExpires):
+		// Unix milliseconds or RFC 3339. A duration such as "24h" has no
+		// start to count from, so it refuses the token, as does any other
+		// value.
+		ts, err := ParseExpires(value)
+		if err != nil {
+			return err
 		}
-
-		// Try parsing as Unix timestamp in milliseconds (must be all digits)
-		var expiresMs int64
-		if n, err := fmt.Sscanf(value, "%d", &expiresMs); err == nil && n == 1 {
-			// Verify it's actually all digits (not "5m" which would parse as 5)
-			isAllDigits := true
-			for _, c := range value {
-				if c < '0' || c > '9' {
-					isAllDigits = false
-					break
-				}
-			}
-			if isAllDigits {
-				if time.Now().UnixMilli() > expiresMs {
-					return fmt.Errorf("token expired")
-				}
-				return nil
-			}
+		if time.Now().After(ts) {
+			return ErrTokenExpired
 		}
+		return nil
 
-		// Try parsing as RFC3339 timestamp
-		if ts, tsErr := time.Parse(time.RFC3339, value); tsErr == nil {
-			if time.Now().After(ts) {
-				return fmt.Errorf("token expired")
-			}
-			return nil
-		}
-
-		// Unknown format - fail safe by rejecting
-		return fmt.Errorf("invalid expires value: %s", value)
-
-	case "scope":
+	case CaveatScope:
 		// Scope is checked at request time, not here. Argument rules ride in
 		// a scope word, and only an enforcing verifier may accept them.
 		if !s.acceptArgumentRules && IsArgumentRulesScope(value) {
@@ -684,17 +690,18 @@ func (s *Service) verifyCaveat(caveat string) error {
 
 // HasScope reports whether the macaroon grants requiredScope.
 //
-// Every scope caveat must grant it. An additional scope caveat can only narrow
-// access. Each caveat is compared as one string. A token with no scope caveat
-// keeps full access. A caveat counts as a scope caveat when its key, parsed as
-// Verify parses it (surrounding spaces trimmed), is "scope".
+// Every scope caveat must grant it (ScopeGrants). An additional scope caveat
+// can only narrow access. Each caveat value is compared as one scope; a value
+// that is a list does not grant anything. A token with no scope caveat keeps
+// full access. A caveat counts as a scope caveat when its key, parsed as
+// Verify parses it (surrounding spaces trimmed), is "scope" (ScopeCaveatValue).
 func (m *Macaroon) HasScope(requiredScope string) bool {
 	for _, caveat := range m.Caveats {
-		key, value, ok := parseCaveat(caveat)
-		if !ok || key != CaveatScope {
+		value, ok := ScopeCaveatValue(caveat)
+		if !ok {
 			continue
 		}
-		if !scopeMatches(value, requiredScope) {
+		if !ScopeGrants(value, requiredScope) {
 			return false
 		}
 	}
@@ -711,10 +718,10 @@ type L402Request struct {
 
 // CheckL402Request checks every restriction a holder can put on an L402 proof
 // against the request, before the proof is consumed. The macaroon must have
-// passed Verify, which checks every absolute expires caveat.
+// passed Verify, which checks every expires and "time <" caveat.
 //
-//   - A relative expires caveat ("expires = 5m") refuses the proof: it has no
-//     start time, so it cannot be enforced.
+//   - An expires caveat that is not an absolute time in the future
+//     (ParseExpires) refuses the proof. Verify refuses such a token already.
 //   - Every scope caveat must grant L402Scope (HasScope).
 //   - Every "routes = <pattern>,..." caveat must list the request. A pattern
 //     that starts with "/" is a path: it matches exactly, or as a prefix when
@@ -737,11 +744,15 @@ func (m *Macaroon) CheckL402Request(req L402Request) error {
 		}
 		switch key {
 		case CaveatExpires:
-			// Absolute expiry is checked on every occurrence by Verify. A
-			// relative one ("5m") has no start time to count from, so Verify
-			// lets it pass; a paid proof does not accept it.
-			if _, err := time.ParseDuration(strings.TrimSpace(value)); err == nil {
-				return fmt.Errorf("relative expires caveat is not enforced on L402 proofs")
+			// Verify has already checked every occurrence. It is read again
+			// here, so a proof never passes on an expiry this check cannot
+			// read or one that has passed.
+			ts, err := ParseExpires(value)
+			if err != nil {
+				return fmt.Errorf("expires caveat on L402 proof: %w", err)
+			}
+			if time.Now().After(ts) {
+				return ErrTokenExpired
 			}
 		case CaveatScope:
 			// Checked on every occurrence by HasScope below.
@@ -797,41 +808,30 @@ func methodsCaveatAllows(value, method string) bool {
 	return false
 }
 
-// scopeMatches checks if tokenScope grants access to requiredScope
-func scopeMatches(tokenScope, requiredScope string) bool {
-	// Wildcard match
-	if tokenScope == "*" || tokenScope == "api:*" {
-		return true
-	}
-
-	// Exact match
-	if tokenScope == requiredScope {
-		return true
-	}
-
-	// Prefix match (e.g., "api:read" matches "api:read:users")
-	if strings.HasSuffix(tokenScope, ":*") {
-		prefix := strings.TrimSuffix(tokenScope, "*")
-		if strings.HasPrefix(requiredScope, prefix) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// GetExpiry returns the expiration time from caveats
-func (m *Macaroon) GetExpiry() (time.Time, bool) {
+// GetExpiry returns the earliest time at which an expiry caveat ends the
+// token. It reads every "expires" caveat with ParseExpires and every
+// "time < N" caveat as Unix seconds, the same readings Verify enforces. ok is
+// false when the token has no expiry caveat, or when any expiry caveat does
+// not read (Verify refuses such a token).
+func (m *Macaroon) GetExpiry() (expiry time.Time, ok bool) {
 	for _, caveat := range m.Caveats {
-		if strings.HasPrefix(caveat, "expires = ") {
-			value := strings.TrimPrefix(caveat, "expires = ")
-			var expiresMs int64
-			if _, err := fmt.Sscanf(value, "%d", &expiresMs); err == nil {
-				return time.UnixMilli(expiresMs), true
-			}
+		var ts time.Time
+		var err error
+		if v, isTime := strings.CutPrefix(caveat, "time < "); isTime {
+			ts, err = parseTimeBefore(v)
+		} else if key, value, parsed := parseCaveat(caveat); parsed && key == CaveatExpires {
+			ts, err = ParseExpires(value)
+		} else {
+			continue
+		}
+		if err != nil {
+			return time.Time{}, false
+		}
+		if !ok || ts.Before(expiry) {
+			expiry, ok = ts, true
 		}
 	}
-	return time.Time{}, false
+	return expiry, ok
 }
 
 // GetScope returns the last scope caveat, for display. Scope caveats repeat

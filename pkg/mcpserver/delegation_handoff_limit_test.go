@@ -134,13 +134,13 @@ func newHandoffRig(t *testing.T) *handoffRig {
 // root mints a root token with a 1000 credit budget and stores limit for it.
 func (r *handoffRig) root(limit *int) *TokenInfo {
 	r.t.Helper()
-	mac, err := r.svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := r.svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		r.t.Fatal(err)
 	}
 	tok := r.svc.Encode(mac)
 	id := hashToken(mac.Identifier + mac.Signature)
-	info := &TokenInfo{TokenID: id, BudgetID: id, Scope: "api:*", RawToken: tok, BudgetLimit: 1000}
+	info := &TokenInfo{TokenID: id, BudgetID: id, Scope: "mcp:*", RawToken: tok, BudgetLimit: 1000}
 	if err := r.budget.Initialize(context.Background(), id, 1000); err != nil {
 		r.t.Fatal(err)
 	}

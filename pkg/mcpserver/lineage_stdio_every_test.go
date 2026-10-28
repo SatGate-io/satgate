@@ -51,7 +51,7 @@ func newStdioCreds(t *testing.T) stdioCreds {
 	if err != nil {
 		t.Fatal(err)
 	}
-	root, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	root, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +59,7 @@ func newStdioCreds(t *testing.T) stdioCreds {
 	if err != nil {
 		t.Fatal(err)
 	}
-	other, err := svc.Mint("api:*", time.Now().Add(2*time.Hour))
+	other, err := svc.Mint("mcp:*", time.Now().Add(2*time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +117,7 @@ func TestMCPStdio_EverySuppliedCredentialCheckedOnEveryBranch(t *testing.T) {
 						checker = selectivelyUnreadable{sig: c.badRoot.Signature}
 					case "does_not_verify":
 						other, _ := macaroon.NewService("some-other-root")
-						mac, _ := other.Mint("api:*", time.Now().Add(time.Hour))
+						mac, _ := other.Mint("mcp:*", time.Now().Add(time.Hour))
 						c.bad = other.Encode(mac)
 					}
 					conn, meta := c.bad, c.healthy
@@ -159,7 +159,7 @@ func TestMCPStdio_TwoHealthySuppliedCredentialsServed(t *testing.T) {
 			gov := governance.NewService(nil)
 			gov.Ban("unrelated-signature", "test", "admin")
 			svc, _ := macaroon.NewService(stdioLineageRoot)
-			conn, _ := svc.Mint("api:*", time.Now().Add(3*time.Hour))
+			conn, _ := svc.Mint("mcp:*", time.Now().Add(3*time.Hour))
 			r := stdioRigWith(t, gov, svc.Encode(conn), sign)
 			if resp := r.call(MethodToolsList, c.healthy); !listed(resp) {
 				t.Fatalf("tools/list refused: %+v", resp.Error)
@@ -211,7 +211,7 @@ func TestMCPStdio_TokenlessRequestsUnchangedUnderBothSwitchStates(t *testing.T) 
 // both switch states.
 func TestMCPStdio_NoCheckerLeavesSecondCredentialUnchecked(t *testing.T) {
 	other, _ := macaroon.NewService("some-other-root")
-	mac, _ := other.Mint("api:*", time.Now().Add(time.Hour))
+	mac, _ := other.Mint("mcp:*", time.Now().Add(time.Hour))
 	forged := other.Encode(mac)
 	for _, sign := range []bool{false, true} {
 		t.Run(switchName(sign), func(t *testing.T) {
@@ -237,7 +237,7 @@ func TestMCPStdio_NoCheckerLeavesSecondCredentialUnchecked(t *testing.T) {
 func TestMCPStdio_SignEveryAction_BannedConnectionCredentialRefusedDespiteHealthyMetaToken(t *testing.T) {
 	gov := governance.NewService(nil)
 	svc, _ := macaroon.NewService(stdioLineageRoot)
-	root, _ := svc.Mint("api:*", time.Now().Add(time.Hour))
+	root, _ := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	child, _ := svc.Delegate(svc.Encode(root), []string{"label = connection"})
 	gov.Ban(root.Signature, "test", "admin")
 	r := newStdioRig(t, gov, func(ctx context.Context) context.Context { return withTransportToken(ctx, svc.Encode(child)) })
@@ -245,7 +245,7 @@ func TestMCPStdio_SignEveryAction_BannedConnectionCredentialRefusedDespiteHealth
 	if err := r.proxy.SetSignEveryAction(true); err != nil {
 		t.Fatal(err)
 	}
-	other, _ := svc.Mint("api:*", time.Now().Add(2*time.Hour))
+	other, _ := svc.Mint("mcp:*", time.Now().Add(2*time.Hour))
 	resp := r.call("resources/list", svc.Encode(other))
 	if forwarded(resp) {
 		t.Fatal("passed-on method forwarded despite a supplied banned connection credential")
@@ -269,7 +269,7 @@ func TestMCPStdio_BothSuppliedTokensCheckedOnPassedOnMethods(t *testing.T) {
 				gov := governance.NewService(nil)
 				defer gov.Close()
 				svc, _ := macaroon.NewService(stdioLineageRoot)
-				conn, _ := svc.Mint("api:*", time.Now().Add(time.Hour))
+				conn, _ := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 				gov.Ban(conn.Signature, "test", "admin")
 				r := newStdioRig(t, gov, func(ctx context.Context) context.Context {
 					return withTransportToken(context.WithValue(ctx, CtxTenantID, "stdio-test-tenant"), svc.Encode(conn))

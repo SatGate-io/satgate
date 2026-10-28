@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/satgate-io/satgate/pkg/argrules"
+	"github.com/satgate-io/satgate/pkg/macaroon"
 )
 
 // Rule 7: no new unguarded path.
@@ -85,7 +86,7 @@ func scopeNamesTool(token *TokenInfo, tool string) bool {
 	var scopes []string
 	if token.Raw != nil {
 		for _, c := range token.Raw.Caveats {
-			v, ok := strings.CutPrefix(c, "scope = ")
+			v, ok := macaroon.ScopeCaveatValue(c)
 			if !ok || argrules.IsRuleScope(v) {
 				continue
 			}
@@ -96,11 +97,7 @@ func scopeNamesTool(token *TokenInfo, tool string) bool {
 		scopes = append(scopes, token.Scope)
 	}
 	for _, scope := range scopes {
-		for _, s := range strings.Split(scope, ",") {
-			s = strings.TrimSpace(s)
-			if len(s) > 37 && s[36] == ':' && s[8] == '-' && s[13] == '-' {
-				s = s[37:]
-			}
+		for _, s := range scopeWords(scope) {
 			if s == tool {
 				return true
 			}

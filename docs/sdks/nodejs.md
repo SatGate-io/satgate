@@ -89,9 +89,11 @@ const result = await client.tokens.validate('token-string-here');
 ### Delegate a Token
 
 ```typescript
+import { Caveats } from '@satgate/sdk';
+
 const child = await client.tokens.delegate({
   parentToken: 'parent-token-string',
-  caveats: ['scope = api:read', 'expires = 1800'],
+  caveats: ['scope = api:read', Caveats.expires(1800)], // an absolute time, Unix ms
 });
 ```
 

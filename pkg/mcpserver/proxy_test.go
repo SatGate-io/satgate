@@ -85,7 +85,7 @@ func TestProxyReusedRootTokenDoesNotPrintSecretToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("create macaroon service: %v", err)
 	}
-	rootMac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	rootMac, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatalf("mint root macaroon: %v", err)
 	}
@@ -155,7 +155,7 @@ func TestProxy_FullDelegationFlow(t *testing.T) {
 	svc, _ := macaroon.NewService("test-root-key")
 
 	// Mint root token
-	rootMac, _ := svc.Mint("api:*", time.Now().Add(time.Hour))
+	rootMac, _ := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	rootToken := svc.Encode(rootMac)
 	rootTokenID := hashToken(rootMac.Identifier + rootMac.Signature)
 

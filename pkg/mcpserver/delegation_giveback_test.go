@@ -77,7 +77,7 @@ func (e *gbEvents) Publish(Event) { e.mu.Lock(); e.n++; e.mu.Unlock() }
 
 func gbParent(t *testing.T, svc *macaroon.Service) *TokenInfo {
 	t.Helper()
-	m, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	m, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -523,7 +523,7 @@ func TestRefusalMessageRules(t *testing.T) {
 		}},
 		{"caveat check (expired parent)", func(t *testing.T) (*macaroon.Service, *TokenInfo) {
 			svc := gbService(t)
-			m, err := svc.Mint("api:*", time.Now().Add(-time.Hour))
+			m, err := svc.Mint("mcp:*", time.Now().Add(-time.Hour))
 			if err != nil {
 				t.Fatal(err)
 			}

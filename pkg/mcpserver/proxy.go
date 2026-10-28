@@ -188,7 +188,8 @@ func New(cfg *Config) (*Proxy, error) {
 					log.Info().Str("tokenId", tokenID).Msg("root token available programmatically; not printing secret")
 					fmt.Fprintf(os.Stderr, "TOKEN_ID=%s\n", tokenID)
 				} else {
-					rootMac, mintErr := macAuth.Service.Mint("api:*", time.Now().Add(24*time.Hour))
+					// "mcp:*" allows every tool; an "api:*" token allows none.
+					rootMac, mintErr := macAuth.Service.Mint(toolScopeNamespace+":*", time.Now().Add(24*time.Hour))
 					if mintErr != nil {
 						return nil, fmt.Errorf("auto-mint root token: %w", mintErr)
 					}
@@ -1704,11 +1705,9 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 	return resp, nil
 }
 
-// generateRequestID creates an idempotency key from token + tool + request ID.
-// matchScope checks if a tool name matches a comma-separated scope string.
-// Supports exact match and wildcard prefix (e.g., "db:*" matches "db:query").
-// Handles tenant-prefixed scopes (e.g., "tenant-uuid:*" or "tenant-uuid:mcp:*")
-// by stripping the tenant prefix before matching.
+// matchScope reports whether a comma-separated scope caveat value allows a
+// tool. Each word (scopeWords) is compared with macaroon.ScopeGrants against
+// the tool's scope "mcp:<tool>" (see toolScopeWordGrants).
 func matchScope(scope, toolName string) bool {
 	// No scope, wildcard included, allows a tool whose name starts with the
 	// reserved argument-rules prefix. An older runtime allows a tool whose name
@@ -1716,31 +1715,86 @@ func matchScope(scope, toolName string) bool {
 	if macaroon.IsReservedToolName(toolName) {
 		return false
 	}
-	for _, s := range strings.Split(scope, ",") {
-		s = strings.TrimSpace(s)
-
-		// Strip tenant UUID prefix if present (format: "uuid:scope")
-		// UUIDs are 36 chars with hyphens (8-4-4-4-12)
-		if len(s) > 37 && s[36] == ':' && s[8] == '-' && s[13] == '-' {
-			s = s[37:]
-		}
-
-		if s == "*" || s == "api:*" || s == "mcp:*" {
-			return true
-		}
-		if strings.HasSuffix(s, ":*") {
-			prefix := strings.TrimSuffix(s, ":*")
-			if strings.HasPrefix(toolName, prefix+":") || strings.HasPrefix(toolName, prefix+"_") {
-				return true
-			}
-		}
-		if s == toolName {
+	for _, s := range scopeWords(scope) {
+		if toolScopeWordGrants(s, toolName) {
 			return true
 		}
 	}
 	return false
 }
 
+// scopeWords splits a scope caveat value into its words, the one reading
+// every MCP scope check uses. Words are separated by "," and are not trimmed:
+// a word with surrounding or inner whitespace stays malformed, and
+// macaroon.ScopeGrants refuses it, as the HTTP gateway does. A word that
+// starts with a tenant UUID and ":" ("<uuid>:mcp:*") has that prefix removed
+// (stripTenantPrefix); every other namespace stays as written.
+func scopeWords(scope string) []string {
+	words := strings.Split(scope, ",")
+	for i, w := range words {
+		words[i] = stripTenantPrefix(w)
+	}
+	return words
+}
+
+// stripTenantPrefix removes a leading "<tenant uuid>:" from a scope word. The
+// prefix is removed only when the first 36 bytes are a complete UUID in its
+// canonical 8-4-4-4-12 hexadecimal form and byte 37 is ":". Anything else is
+// a scope namespace, not a tenant, and the word is returned unchanged.
+func stripTenantPrefix(word string) string {
+	if len(word) > 37 && word[36] == ':' && isCanonicalUUID(word[:36]) {
+		return word[37:]
+	}
+	return word
+}
+
+// isCanonicalUUID reports whether s is a UUID written as 36 bytes: 32
+// hexadecimal digits (either case) in groups of 8-4-4-4-12 joined by "-".
+func isCanonicalUUID(s string) bool {
+	if len(s) != 36 {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch i {
+		case 8, 13, 18, 23:
+			if c != '-' {
+				return false
+			}
+		default:
+			if !('0' <= c && c <= '9' || 'a' <= c && c <= 'f' || 'A' <= c && c <= 'F') {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// toolScopeNamespace is the scope namespace of MCP tools: calling tool T
+// needs scope "mcp:T".
+const toolScopeNamespace = "mcp"
+
+// toolScopeWordGrants reports whether one scope word allows a tool. The tool
+// needs scope "mcp:<tool>", and the word is compared with macaroon.ScopeGrants:
+//
+//   - "*", "mcp:*" and "mcp:<tool>" are read as written;
+//   - a word in the "api:" namespace is an HTTP API scope and allows no tool;
+//   - any other word is a tool name or tool-name wildcard written without the
+//     namespace, and is read as "mcp:<word>": "search" allows the tool
+//     "search", and "db:*" allows "db:query" (not "db_query").
+func toolScopeWordGrants(word, toolName string) bool {
+	required := toolScopeNamespace + ":" + toolName
+	switch {
+	case word == "*" || strings.HasPrefix(word, toolScopeNamespace+":"):
+		return macaroon.ScopeGrants(word, required)
+	case strings.HasPrefix(word, "api:"):
+		return false
+	default:
+		return macaroon.ScopeGrants(toolScopeNamespace+":"+word, required)
+	}
+}
+
+// generateRequestID creates an idempotency key from token + tool + request ID.
 func generateRequestID(tokenID, toolName string, reqID json.RawMessage) string {
 	h := sha256.New()
 	h.Write([]byte(tokenID))

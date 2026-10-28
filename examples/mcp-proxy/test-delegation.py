@@ -96,7 +96,7 @@ def main():
     # === Delegate to research agent ===
     print("4️⃣  Delegate 300 credits → research-agent")
     send({"jsonrpc": "2.0", "id": 4, "method": "satgate/delegate", "params": {
-        "budget": 300, "label": "research-agent", "scope": "api:read",
+        "budget": 300, "label": "research-agent", "scope": "web_search",
         "_meta": {"token": root_token}
     }})
     resp = recv()
@@ -113,7 +113,7 @@ def main():
     # === Delegate to content agent ===
     print("5️⃣  Delegate 200 credits → content-agent")
     send({"jsonrpc": "2.0", "id": 5, "method": "satgate/delegate", "params": {
-        "budget": 200, "label": "content-agent", "scope": "api:*",
+        "budget": 200, "label": "content-agent", "scope": "mcp:*",
         "_meta": {"token": root_token}
     }})
     resp = recv()

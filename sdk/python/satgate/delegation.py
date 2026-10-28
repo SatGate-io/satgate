@@ -31,16 +31,17 @@ class Caveats:
     @staticmethod
     def expires(seconds: int = None, dt: datetime = None) -> str:
         """
-        Set expiration time
+        Set expiration time. The caveat holds an absolute time in Unix
+        milliseconds, the form the gateway mints and verifies.
         
         Args:
             seconds: Seconds from now
-            dt: Specific datetime
+            dt: Specific datetime (a naive datetime is read as local time)
         """
         if dt:
-            expiry = int(dt.timestamp())
+            expiry = int(dt.timestamp() * 1000)
         elif seconds:
-            expiry = int(datetime.now().timestamp()) + seconds
+            expiry = int(datetime.now().timestamp() * 1000) + int(seconds * 1000)
         else:
             raise ValueError("Either 'seconds' or 'dt' must be provided")
         return f"expires = {expiry}"

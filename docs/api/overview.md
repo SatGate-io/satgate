@@ -154,18 +154,24 @@ startup does not start.
 
 ```bash
 curl -X POST http://localhost:8080/api/capability/mint \
-  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "X-Admin-Token: $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"scope": "read", "budget": 1000}'
+  -d '{"scope": "api:read", "duration": "1h"}'
 ```
+
+The minted token's `expires` caveat is an absolute time (Unix milliseconds);
+`duration` only sets how far ahead it is. See
+[Scope and expiry rules](../configuration/policy-scope.md#how-a-scope-is-matched).
 
 ## Example: Delegate a Token
 
 ```bash
 curl -X POST http://localhost:8080/api/capability/delegate \
-  -H "Authorization: Bearer <parent-token>" \
   -H "Content-Type: application/json" \
-  -d '{"caveats": [{"type": "budget", "limit": 100}, {"type": "expiry", "ttl": "24h"}]}'
+  -d '{"parentToken": "<parent token>", "caveats": ["scope = api:read", "expires = 2026-11-01T00:00:00Z"]}'
 ```
+
+An `expires` caveat must be an absolute time (RFC 3339 or Unix milliseconds);
+a duration such as `24h` is refused.
 
 The delegated token has strictly fewer permissions than its parent — this is enforced cryptographically by the macaroon structure.

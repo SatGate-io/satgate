@@ -96,7 +96,7 @@ Create a child token with reduced permissions — no server roundtrip needed for
 ```python
 child = client.tokens.delegate(
     parent_token="parent-token-string",
-    caveats=["scope = api:read", "expires = 1800"]
+    caveats=["scope = api:read", "expires = 2026-11-01T00:00:00Z"]  # expires: RFC 3339 or Unix ms
 )
 print(f"Child token: {child.token}")
 ```
@@ -208,9 +208,11 @@ response = client.get("/premium/data")  # includes receipt_id / evidence_pack_id
 Create restricted tokens for worker agents:
 
 ```python
+from satgate import Caveats
+
 # Delegate from the current token
 child_token = client.delegate(
-    caveats=["scope = api:read", "expires = 3600"]
+    caveats=["scope = api:read", Caveats.expires(seconds=3600)]  # an absolute time
 )
 
 # Give the child token to a worker agent

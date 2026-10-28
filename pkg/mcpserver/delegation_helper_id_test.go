@@ -30,7 +30,7 @@ func (c *captureEvents) Publish(e Event) {
 // key does (the budget_id seal is the enterprise issuer's and is not needed here).
 func mintWithTokenID(t *testing.T, svc *macaroon.Service, id string) *macaroon.Macaroon {
 	t.Helper()
-	root, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	root, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +204,7 @@ func TestHelperOfParentWithoutTokenIDIsRefusedWhenOnAndMintsWhenOff(t *testing.T
 	if err != nil {
 		t.Fatal(err)
 	}
-	mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -308,7 +308,7 @@ func TestReviewHolderEmptyTokenIDCannotDisableHelperIdentity(t *testing.T) {
 // refused with the fixed sentence, and nothing is published.
 func TestHelperOfParentWhoseFirstTokenIDIsEmptyIsRefused(t *testing.T) {
 	svc, d, ev, _ := helperIDRig(t)
-	root, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	root, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}

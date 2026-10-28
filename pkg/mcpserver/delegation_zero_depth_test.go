@@ -64,7 +64,7 @@ func newZeroDepthRig(t *testing.T, withStore bool) *zeroDepthRig {
 // signature, like a policy mint), then appends the holder's (after it).
 func (r *zeroDepthRig) token(issuer []string, holder []string, storedLimit *int) *TokenInfo {
 	r.t.Helper()
-	mac, err := r.svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := r.svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		r.t.Fatal(err)
 	}
