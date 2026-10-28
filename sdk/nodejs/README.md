@@ -89,8 +89,7 @@ or password (for example a gateway URL or an LND `host` with `user:pass@`),
 or one that cannot be parsed, rejects with `RequestUrlRefusedError` (a
 `SatGateError`, with `host`) naming only the host and port, and no request
 is sent; put credentials in the SDK options, not in the URL (before, such a
-URL failed with a `TypeError` from `fetch`). A network or
-response-body error names no part of the request URL but its host and port.
+URL failed with a `TypeError` from `fetch`).
 
 The SDK keeps no session or cookie jar: a request carries no cookie or
 credential beyond the headers and body the SDK (or your options) set. In a
@@ -100,6 +99,22 @@ browser, `fetch` still applies its default cookie rule
 Compatibility: earlier releases followed these redirects. A gateway, LND,
 Alby or SatGate API URL that answers with a redirect (for example `http://`
 redirecting to `https://`) now fails; configure the final URL.
+
+## Error messages
+
+- `RedirectRefusedError` and `RequestUrlRefusedError` name the host by its
+  host and port only, with no user information, path or query from the
+  request URL.
+- When `fetch` rejects (for example a refused connection), and when
+  `node-fetch` fails to read or parse a response body in the `SatGate`
+  client, the full request URL in the error's message, stack and causes is
+  replaced by the URL's host and port. The error keeps its type, and SDK
+  errors that quote it (such as `Request failed: ...`) quote the changed
+  text.
+- Other error messages are unchanged in this release: status, JSON parse
+  and header-validation errors can still quote the request path or query,
+  response text, or a header value. Redaction of these messages is planned
+  as a separate change.
 
 ## Docs
 

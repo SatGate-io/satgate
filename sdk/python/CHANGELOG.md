@@ -30,9 +30,7 @@ All notable changes to the `satgate` Python SDK are listed here.
   `LNDWallet`) is sent once with `allow_redirects=False`, whatever the
   caller passes. A 3xx answer raises the new `satgate.RedirectRefusedError`
   (a subclass of `SatGateError`, with `status_code` and `host`). Before,
-  these requests followed redirects and, depending on the status, resent
-  `X-Admin-Token`, the API key or a token in the body to the redirect
-  target, and the session's cookies to a target on the same host.
+  these requests followed redirects.
 - Requests sent through a client's `requests.Session` (all of
   `SatGateClient` and `SatGate`, and every `SatGateAgentClient` request
   except `fetch_jwks`) still carry what that session holds: its headers,
@@ -42,19 +40,46 @@ All notable changes to the `satgate` Python SDK are listed here.
   is sent on a new session used for that request alone, with no cookies, no
   session headers, no authentication (none from `~/.netrc` either) and no
   client certificate. Only the session's `verify` setting is used.
+
+### Error messages
+
 - `RedirectRefusedError.host` and its message name only the host and port
   of the URL the request was sent to: user information, path and query are
   removed, also when they are part of the `host` given to `LNDWallet`. The
   `LNDWallet` TLS error and the `insecure=True` warning name the host the
   same way.
-- An error from `requests` itself (an invalid URL, a refused connection, a
-  timeout) is raised as the same exception, with the request URL removed
-  from its message: the URL is named by its host and port, and the path and
-  query urllib3 writes (`with url: ...`) read `[path and query removed]`.
-  The SDK's own errors that quote such an error (`Request failed: ...`,
-  `Ping failed: ...`, `Failed to mint token: ...`, `Lightning payment
-  failed: ...`) quote the cleaned text, so no SDK error message carries the
-  URL's user information, path or query.
+- When `requests` raises while sending (for example for an invalid URL or a
+  refused connection), the URL the SDK passed to it is replaced in the
+  message by that URL's host and port, and the path and query urllib3 writes
+  for it (`with url: ...`) by `[path and query removed]`; the same is done
+  in the exceptions it wraps. The exception keeps its type and is the same
+  object, and SDK errors that quote it (such as `Request failed: ...`) quote
+  the changed text. Query parameters passed separately with `params=` (by
+  the caller or on a session) are not removed.
+- Apart from the errors described above, error messages are unchanged in
+  this release. Status errors, admin-helper errors, JSON parse errors,
+  header-validation errors and conversion errors read as before and can
+  quote the request path or query, response text, or a header value.
+  Redaction of these messages is planned as a separate change.
+
+### Gateway (Go packages in this repository, not part of this package)
+
+- A `budget_limit` or `delegation_budget` caveat is read exactly, without
+  conversion to a floating-point number. It must be a whole number of
+  credits above zero that fits in a 64-bit integer; a whole value written
+  with zeros after the point (`5.00`) reads as 5. A token with one that is
+  zero, negative, fractional, malformed or out of range is refused. When a
+  token has several, the smallest applies.
+- Delegation writes a child's `budget_limit` as the exact integer
+  (`budget_limit = N`) instead of `N.00` formatted from a floating-point
+  number, so every accepted allocation up to 9223372036854775807 verifies
+  as that number. A budget parameter written as a JSON number that is a
+  fraction, uses an exponent or is above 9223372036854775807 is refused
+  with an `invalid delegate params` message that states the allowed range.
+  A zero-credit child still gets no `budget_limit` of its own.
+- A positive delegation allocation above the parent's effective cap (its
+  smallest `budget_limit`, and its remaining balance when the budget store
+  reports one) is refused before anything is minted or carved.
 
 ### Compatibility
 
@@ -73,3 +98,7 @@ All notable changes to the `satgate` Python SDK are listed here.
 - Code that created `LNDWallet` without a certificate path against LND's
   default self-signed certificate now fails with `SatGateError`; pass
   `tls_cert_path=` pointing at LND's `tls.cert`.
+- On the gateway, a token whose `budget_limit` or `delegation_budget` caveat
+  is zero, fractional or unreadable is now refused; before, such a caveat
+  was ignored or truncated. Tokens with no such caveat, or with whole values
+  (including `N.00`), verify as before.

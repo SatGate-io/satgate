@@ -70,8 +70,8 @@ print(valid["valid"], response.status_code)
 
 ## Lightning (LND) wallet and TLS
 
-`LNDWallet` talks to LND's REST port over HTTPS and always verifies the
-server's TLS certificate:
+`LNDWallet` talks to LND's REST port over HTTPS and verifies the server's
+TLS certificate unless you pass `insecure=True`:
 
 ```python
 from satgate import LNDWallet
@@ -111,9 +111,7 @@ Each request is sent once, to the configured URL, with
 the host and port of the request URL (no user information, path or query);
 the request is not sent again. Point the client at the final address (for
 example `https://` rather than an `http://` URL that redirects to it).
-`SatGateClient.health()` returns `False` in that case. An error from
-`requests` itself (an invalid URL, a refused connection) is raised with the
-URL removed from its message, naming only its host and port.
+`SatGateClient.health()` returns `False` in that case.
 
 Requests sent through a client's `requests.Session` carry what that session
 holds (its headers, its authentication and the cookies the gateway set), to
@@ -121,6 +119,21 @@ the configured URL only. `SatGateAgentClient.fetch_jwks()` does not use the
 session: it is sent on a new session with no cookies, no session headers, no
 authentication (none from `~/.netrc` either) and no client certificate. Only
 `agent.session.verify` is applied to it.
+
+## Error messages
+
+- `RedirectRefusedError` and the `LNDWallet` TLS error name the host by its
+  host and port only, with no user information, path or query from the
+  request URL.
+- When `requests` raises while sending (for example for an invalid URL or a
+  refused connection), the URL the SDK passed to it is replaced in the
+  message by its host and port, and the path and query urllib3 writes for
+  it by `[path and query removed]`. Query parameters passed separately with
+  `params=` are not removed.
+- Other error messages are unchanged in this release: status, admin-helper,
+  JSON parse, header-validation and conversion errors can still quote the
+  request path or query, response text, or a header value. Redaction of
+  these messages is planned as a separate change.
 
 ## Docs
 
