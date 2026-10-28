@@ -90,28 +90,40 @@ token as active (status `unknown`).
   This is correct for a single gateway instance only.
 - With `redis.enabled: true`, bans are written to Redis (`satgate:banlist`) and
   every gateway on the same Redis reads them on the request path through a
-  short cache. An answer from Redis is reused for at most **2 seconds**
-  (`governance.BanCacheTTL`), counted from when the lookup that produced it
-  **started**; an answer that arrives when its lookup started 2 seconds ago or
-  more is not used to allow a request (the request is refused with `503` and
-  the next one reads Redis again). So a ban takes effect at once on the gateway
-  that wrote it and on every other gateway within **2 seconds** of the moment
-  it was written to Redis, however slowly Redis answers; an unban is honoured
-  everywhere within the same 2 seconds. A ban made on a gateway while one of
-  its lookups is in flight wins over that lookup's answer.
+  short cache. A request is allowed only if, at the moment it is allowed,
+  every token in its lineage (the token and each token it was delegated from)
+  has a "not banned" answer from a Redis lookup that **started less than 2
+  seconds** (`governance.BanCacheTTL`) before that moment, whether the answer
+  was cached or just read. Cached answers that reach that age while another
+  token of the lineage is being read are read again (the whole lineage in one
+  lookup); an answer that arrives when its lookup started 2 seconds ago or more
+  is not used to allow. If no such answer can be had for every token within
+  the check's read deadline (below), the request is refused with `503`. So a
+  ban takes effect on every other gateway within **2 seconds** of the moment
+  it was written to Redis, however slowly Redis answers, and an unban likewise.
+- A ban takes effect on the gateway that receives it from the moment it is
+  made: before allowing, every check reads that gateway's own bans again, so a
+  request whose check was in progress when the ban was made, or while the ban
+  was being written to Redis, is refused, whatever Redis answered it.
 
 **The MCP runtime.** `satgate-mcp` with `revocation.redis.addr` set to the
 gateways' Redis reads the same ban list, with the same 2-second bound, read
 deadline and failure behaviour; it does not start if that Redis cannot be
 reached. Without it, `satgate-mcp` keeps bans in its own memory: they apply to
-that process only, and a ban made on a gateway does not reach it.
+that process only, and a ban made on a gateway does not reach it. Over stdio,
+`tools/call`, `satgate/delegate` and the budget methods check the token as on
+the other transports; `tools/list` and the methods passed on to an upstream
+check a token when the request supplies one, and a request that supplies none
+is answered as before (see [Revoking
+Tokens](../guides/mcp-gateway.md#revoking-tokens)).
 
 **Failure behaviour (Redis).** Every read of the ban state is bounded to **2
 seconds** (`governance.BanStoreReadTimeout`): the Redis client applies the
 deadline to the socket, a failed command is retried at most once within it,
-and the check returns at the deadline even if Redis has not answered. If Redis
-cannot be read in that time for a token whose answer is not cached, the
-request is refused with `503 Service Unavailable` (`Revocation status
+and the check returns at the deadline even if Redis has not answered. All
+reads of one check share one deadline, 2 seconds from the start of the check.
+If Redis cannot be read in that time for a token that has no fresh cached
+answer, the request is refused with `503 Service Unavailable` (`Revocation status
 unavailable`, or `code: REVOCATION_UNAVAILABLE` on the API endpoints, including
 `/api/agent/simulate`, which then records nothing) and nothing is served,
 minted or consumed. If a ban cannot be written to Redis,

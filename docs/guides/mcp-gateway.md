@@ -327,7 +327,7 @@ With `mode: config` or `mode: header`, a request over SSE (`POST /message`) or S
 - `GET /sse` without a token still opens the stream (some clients send the token only on `POST /message`), as in header mode; with the authorization challenge on (`WithOAuthChallenge`) it gets `401`.
 - `initialize`, `ping` and notifications need no token.
 
-Over stdio the caller is the local process that started the proxy: in `config` mode a request without a token runs under the configured token's identity, as before, and `tools/list` and passed-on methods need no token in either mode. In `header` mode `tools/call` over stdio still needs a token, as before.
+Over stdio the caller is the local process that started the proxy: in `config` mode a request without a token runs under the configured token's identity, as before, and `tools/list` and passed-on methods need no token in either mode. In `header` mode `tools/call` over stdio still needs a token, as before. A token that a stdio request does supply to `tools/list` or a passed-on method is verified and checked for bans first when the revocation check is installed (always in `satgate-mcp`); see [Revoking Tokens](#revoking-tokens).
 
 #### Listener and startup checks
 
@@ -424,20 +424,43 @@ revocation:
 
 The check runs wherever the proxy accepts a token, before anything is admitted,
 spent, forwarded or minted: SSE connect and every message, Streamable HTTP
-`initialize`, every request and every resumed session, stdio, `tools/list` and
-the methods passed on to an upstream, the credential passed to an upstream
-with `forwardCallerToken` (never passed on for a banned token), and
-`satgate/delegate` (checked again before the helper is minted).
+`initialize`, every request and every resumed session, `tools/list` and the
+methods passed on to an upstream, the credential passed to an upstream with
+`forwardCallerToken` (never passed on for a banned token), `satgate/delegate`
+(checked again before the helper is minted), and stdio as below.
 A banned token gets `403` with `code: TOKEN_REVOKED` where the refusal is an
 HTTP answer (SSE connect, Streamable `initialize` and resume; `401` with the
 sign-in challenge when the OAuth challenge is on), and otherwise the JSON-RPC
 error `-32001` "token revoked". It applies to macaroons (`mode: header`); a
 static token (`mode: config`) is not a ban subject.
 
-If Redis cannot be read within **2 seconds** for a token whose answer is not
-cached, the request is refused, never served: HTTP `503` with `code:
-REVOCATION_UNAVAILABLE` (SSE connect, Streamable HTTP requests, `initialize` and
-resume), or the JSON-RPC error `-32603` with `data.error:
+**Over stdio** the caller is the local process that started the proxy, and a
+request may supply no token:
+
+| stdio request | With a token supplied | With no token supplied |
+|---|---|---|
+| `tools/call`, `satgate/delegate`, `satgate/budget`, `budget/check` (and, with sign-every-action on, every method passed on) | verified and its lineage checked; refused if it does not verify, if a ban covers it, or if its ban state cannot be read | `header` mode: refused (a token is required); `config` and `none`: the configured or default identity, as before |
+| `tools/list`, and every method passed on to the default upstream (`resources/list`, `resources/read`, `prompts/list`, `prompts/get`, `completion/complete`, any method the proxy does not answer itself) | verified and its lineage checked before the list is answered or the method passed on; refused the same way | answered or passed on, as before |
+| `initialize`, `ping` (answered by the proxy), notifications (not passed on) | not checked | not checked |
+
+"A token supplied" is `params._meta.token`, or, for a program that embeds the
+proxy and runs it with a connection credential, that credential; when both are
+present both are checked. `satgate-mcp` always installs the check (with the
+shared Redis, or its own memory). A program that embeds the proxy and does not
+call `SetLineageRevocationChecker` sees no change: over stdio `tools/list` and
+passed-on methods then check no token.
+
+**The 2-second bound, as enforced.** With `revocation.redis.addr`, a request
+is allowed only if, at the moment it is allowed, every token in its lineage has
+a "not banned" answer from a Redis lookup that started less than 2 seconds
+before that moment, cached or just read; cached answers that reach that age
+while another token of the lineage is read are read again. A ban made on this
+proxy (by a program that embeds it) refuses every check in progress when it is
+made or while it is written to Redis. All Redis reads of one check share one
+deadline, **2 seconds** from the start of the check; if no such answer can be
+had for every token by then, the request is refused, never served: HTTP `503`
+with `code: REVOCATION_UNAVAILABLE` (SSE connect, Streamable HTTP requests,
+`initialize` and resume), or the JSON-RPC error `-32603` with `data.error:
 "revocation_unavailable"` (SSE messages, stdio).
 
 ### Budget Fail Modes
