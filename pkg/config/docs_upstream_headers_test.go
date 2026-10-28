@@ -38,7 +38,7 @@ func TestDocsListRefusedUpstreamHeadersAsCodeRefusesThem(t *testing.T) {
 		"Connection", "Keep-Alive", "Proxy-Authenticate", "Proxy-Authorization", "Proxy-Connection",
 		"Te", "Trailer", "Transfer-Encoding", "Upgrade",
 		"X-Forwarded-For", "X-Forwarded-Host", "X-Forwarded-Proto", "Forwarded",
-		"Content-Length",
+		"Content-Length", "Expect",
 	}
 	sort.Strings(documented)
 	sorted := append([]string(nil), want...)
@@ -60,9 +60,23 @@ func TestDocsListRefusedUpstreamHeadersAsCodeRefusesThem(t *testing.T) {
 		}
 	}
 	// Names the reference gives as accepted are accepted.
-	for _, name := range []string{"Authorization", "Cookie", "User-Agent", "Accept", "Accept-Encoding", "Expect", "Via", "X-Api-Key", "Host"} {
+	for _, name := range []string{"Authorization", "Cookie", "User-Agent", "Accept", "Accept-Encoding", "Via", "X-Api-Key", "Host"} {
 		if err := check(name, "example.com"); err != nil {
 			t.Errorf("documented as accepted but refused: %s: %v", name, err)
+		}
+	}
+	// An empty value: refused for User-Agent and Accept-Encoding (naming
+	// the upstream and the entry), accepted for the other accepted names.
+	for _, name := range []string{"User-Agent", "user-agent", "Accept-Encoding", "ACCEPT-ENCODING"} {
+		if err := check(name, ""); err == nil {
+			t.Errorf("empty %s documented as refused but accepted", name)
+		} else if !strings.Contains(err.Error(), "upstream u:") || !strings.Contains(err.Error(), `"`+name+`"`) {
+			t.Errorf("refusal does not name the upstream and the entry: %v", err)
+		}
+	}
+	for _, name := range []string{"Authorization", "Cookie", "Accept", "Via", "X-Api-Key"} {
+		if err := check(name, ""); err != nil {
+			t.Errorf("empty %s documented as accepted but refused: %v", name, err)
 		}
 	}
 
@@ -71,7 +85,8 @@ func TestDocsListRefusedUpstreamHeadersAsCodeRefusesThem(t *testing.T) {
 		"A horizontal tab (0x09) is accepted\n  between other characters",
 		"a value that starts or ends with a space or a horizontal tab",
 		"bytes 0x00 to 0x08, 0x0A to 0x1F",
-		"An empty value is\n  accepted",
+		"an empty value for `User-Agent` or `Accept-Encoding`",
+		"For every other accepted\n  name an empty value is accepted",
 		"No other\nconfiguration that loaded before is refused.",
 	} {
 		if !strings.Contains(text, sentence) {

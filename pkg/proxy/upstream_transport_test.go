@@ -126,8 +126,16 @@ func TestCredentialsSplitsJoinedValues(t *testing.T) {
 		{`L402 macaroon="m", preimage="p"`, []string{`L402 macaroon="m", preimage="p"`}},
 	}
 	for _, c := range cases {
-		if got := credentials(c.in); strings.Join(got, "|") != strings.Join(c.want, "|") {
-			t.Errorf("credentials(%q) = %q, want %q", c.in, got, c.want)
+		got, ok := credentials(c.in)
+		if !ok || strings.Join(got, "|") != strings.Join(c.want, "|") {
+			t.Errorf("credentials(%q) = %q, %v, want %q", c.in, got, ok, c.want)
+		}
+	}
+	// A quoted string that is not closed: where the credentials end cannot
+	// be told, so the value is not split.
+	for _, in := range []string{`Digest realm="r, Bearer x`, `Bearer a, b="\`, `"`} {
+		if got, ok := credentials(in); ok {
+			t.Errorf("credentials(%q) = %q, want no split", in, got)
 		}
 	}
 }
@@ -143,7 +151,7 @@ func TestCarriesGatewayTokenIsLinear(t *testing.T) {
 		"percent":        strings.Repeat("%41", 300000),
 	} {
 		start := time.Now()
-		if gw.carriesGatewayToken(v, true) {
+		if gw.carriesGatewayToken(v) {
 			t.Errorf("%s: recognised a gateway token in a value without one", name)
 		}
 		if d := time.Since(start); d > 5*time.Second {

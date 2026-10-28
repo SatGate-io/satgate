@@ -5,9 +5,7 @@ import (
 	"encoding/base64"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/satgate-io/satgate/pkg/config"
 )
@@ -43,8 +41,21 @@ import (
 // Names the proxy or the HTTP transport manage are refused at load
 // (config.CheckUpstreamHeaders).
 //
-// Authorization forms the gateway accepts a token it issued in, and so the
-// forms carriesGatewayToken recognises (it recognises more; see there):
+// The removal boundary on public and chargeback routes. A gateway token is
+// removed from Authorization (headers and trailers) in every form the
+// gateway accepts one (listed below) and inside exactly one wrapper: a
+// quoted string (backslash escapes resolved), an auth-param value, Basic
+// credentials, one layer of percent-encoding, or base64 in either alphabet,
+// padded or not. Each comma-joined credential is judged on its own; a part
+// that does not decode is left as written and stops nothing else. A token a
+// client wraps in two or more encodings (base64 of base64, percent of
+// percent, base64 of percent-encoded text, percent-encoded Basic
+// credentials and the like) is not decoded and is forwarded like any other
+// client data, as is a token in another header, the query or the body: the
+// gateway never accepts a token in those forms. See withoutGatewayTokens
+// and carriesGatewayToken.
+//
+// Authorization forms the gateway accepts a token it issued in:
 //   - "Bearer <token>" (scheme exactly "Bearer" and one space) or the bare
 //     token, the whole value: capability routes, extractBearerToken
 //     (proxy_oss.go), and /api/capability/ping and /api/capability/admin
@@ -142,12 +153,24 @@ func (g *Gateway) removeGatewayTokens(h http.Header) {
 
 // withoutGatewayTokens splits an Authorization value into the credentials it
 // carries (credentials), drops each one that carries a token this gateway
-// issued and joins the others with ", ". removed reports whether any was
-// dropped; when none was, rest is value unchanged.
+// issued (carriesGatewayToken) and joins the others once with ", ". Each
+// credential is judged on its own, so nothing in one credential can stop
+// another from being removed. A value that cannot be split reliably (a
+// quoted string that is not closed) is judged whole: it is dropped if it
+// carries a gateway token anywhere, and kept as written otherwise. removed
+// reports whether anything was dropped; when nothing was, rest is value
+// unchanged.
 func (g *Gateway) withoutGatewayTokens(value string) (rest string, removed bool) {
-	var keep []string
-	for _, c := range credentials(value) {
-		if g.carriesGatewayToken(c, true) {
+	creds, ok := credentials(value)
+	if !ok {
+		if g.carriesGatewayToken(value) {
+			return "", true
+		}
+		return value, false
+	}
+	keep := make([]string, 0, len(creds))
+	for _, c := range creds {
+		if g.carriesGatewayToken(c) {
 			removed = true
 			continue
 		}
@@ -165,10 +188,23 @@ func (g *Gateway) withoutGatewayTokens(value string) (rest string, removed bool)
 // joined into it with commas. A comma inside a quoted string does not
 // split, and an element that is an auth-param (name=value), or empty,
 // belongs to the credential before it, so "Digest a=1, b=2" stays one
-// credential while "Bearer x, Basic y" is two. Each credential is returned
-// with its bytes as written.
-func credentials(value string) []string {
-	var elems []string
+// credential while "Bearer x, Basic y" is two. Each credential is a slice
+// of value (its bytes as written); the split is one pass over value and
+// copies nothing. ok is false when value has a quoted string that is not
+// closed, so where its credentials end cannot be told.
+func credentials(value string) (creds []string, ok bool) {
+	credStart, credEnd := -1, 0 // the credential being built: value[credStart:credEnd]
+	element := func(start, end int) {
+		e := strings.Trim(value[start:end], " \t")
+		if credStart >= 0 && (e == "" || isAuthParam(e)) {
+			credEnd = end
+			return
+		}
+		if credStart >= 0 {
+			creds = append(creds, value[credStart:credEnd])
+		}
+		credStart, credEnd = start, end
+	}
 	start, quoted, escaped := 0, false, false
 	for i := 0; i < len(value); i++ {
 		c := value[i]
@@ -180,22 +216,15 @@ func credentials(value string) []string {
 		case c == '"':
 			quoted = !quoted
 		case c == ',' && !quoted:
-			elems = append(elems, value[start:i])
+			element(start, i)
 			start = i + 1
 		}
 	}
-	elems = append(elems, value[start:])
-
-	var creds []string
-	for _, e := range elems {
-		t := strings.Trim(e, " \t")
-		if len(creds) > 0 && (t == "" || isAuthParam(t)) {
-			creds[len(creds)-1] += "," + e
-			continue
-		}
-		creds = append(creds, e)
+	if quoted {
+		return nil, false
 	}
-	return creds
+	element(start, len(value))
+	return append(creds, value[credStart:credEnd]), true
 }
 
 // isAuthParam reports whether s starts as an RFC 9110 auth-param does: a
@@ -234,44 +263,60 @@ func isTokenChar(c byte) bool {
 // minTokenLen is shorter than any macaroon this gateway issues, encoded.
 const minTokenLen = 16
 
-// carriesGatewayToken reports whether s, one credential, carries a token
-// this gateway issued anywhere in it: under any scheme or none, in any
-// letter case, after any whitespace, as a parameter value, before or after
-// a ":" (L402 and LSAT put the preimage after one), in either macaroon
-// format and either base64 alphabet (macaroon.Service.SignedByThisKey).
-// With decode set it also looks, once, inside each base64 or
-// percent-encoded part of s (for example Basic credentials whose password
-// is the token).
+// carriesGatewayToken reports whether s, one credential (or a whole value
+// that cannot be split), carries a token this gateway issued inside the
+// removal boundary (see the comment at the top of this file):
 //
-// Each candidate is a maximal run of characters a base64 token can contain
-// (letters, digits, "+", "/", "-", "_", "="), cut after a run of "=" that is
-// followed by more characters, since a token has "=" only at its end. The
-// work is linear in the length of s.
-func (g *Gateway) carriesGatewayToken(s string, decode bool) bool {
+//   - as written: anywhere in s, under any scheme or none, after any
+//     separator, as a parameter value, before or after a ":"
+//     (tokenAsWritten);
+//   - the same with each quoted string's backslash escapes resolved
+//     (unquoted);
+//   - after exactly one decoding: one base64 decoding, in either alphabet,
+//     padded or not, of one candidate (this covers Basic credentials
+//     "user:token" and "token:"), or one percent-decoding of s.
+//
+// The result of a decoding is only looked at as written; it is never
+// decoded again, so a token wrapped in two or more encodings is not found.
+// A part that does not decode (a malformed percent sequence, invalid
+// base64, a non-UTF-8 byte) is left as written and affects no other part.
+// The work is linear in the length of s.
+func (g *Gateway) carriesGatewayToken(s string) bool {
 	if g.macaroonSvc == nil {
 		return false
 	}
-	for _, run := range base64Runs(s) {
-		for _, part := range splitAfterPadding(run) {
-			if len(part) < minTokenLen {
-				continue
-			}
-			if g.macaroonSvc.SignedByThisKey(part) {
-				return true
-			}
-			if decode {
-				if text, ok := decodedText(part); ok && g.carriesGatewayToken(text, false) {
-					return true
-				}
-			}
-		}
+	if g.tokenInOneLayer(s) {
+		return true
 	}
-	if decode && strings.Contains(s, "%") {
-		if u, err := url.PathUnescape(s); err == nil && u != s && g.carriesGatewayToken(u, false) {
-			return true
-		}
+	if u := unquoted(s); u != s {
+		return g.tokenInOneLayer(u)
 	}
 	return false
+}
+
+// tokenInOneLayer reports whether s carries a gateway token as written,
+// inside one base64-encoded candidate, or after one percent-decoding of s.
+func (g *Gateway) tokenInOneLayer(s string) bool {
+	if g.tokenAsWritten(s) {
+		return true
+	}
+	if eachCandidate(s, func(part string) bool {
+		data, ok := base64Decoded(part)
+		return ok && g.tokenAsWritten(string(data))
+	}) {
+		return true
+	}
+	if p := percentDecoded(s); p != s && g.tokenAsWritten(p) {
+		return true
+	}
+	return false
+}
+
+// tokenAsWritten reports whether a candidate in s (eachCandidate) is a
+// token signed under this gateway's root key, in either macaroon format and
+// either base64 alphabet (macaroon.Service.SignedByThisKey).
+func (g *Gateway) tokenAsWritten(s string) bool {
+	return eachCandidate(s, g.macaroonSvc.SignedByThisKey)
 }
 
 func isBase64Char(c byte) bool {
@@ -282,60 +327,118 @@ func isBase64Char(c byte) bool {
 	return c == '+' || c == '/' || c == '-' || c == '_' || c == '='
 }
 
-// base64Runs returns the maximal runs of base64 characters in s.
-func base64Runs(s string) []string {
-	var runs []string
-	start := -1
-	for i := 0; i <= len(s); i++ {
-		if i < len(s) && isBase64Char(s[i]) {
-			if start < 0 {
-				start = i
+// eachCandidate calls f with each part of s that could be a base64 token,
+// in order, until f returns true, and reports whether one did. A candidate
+// is a maximal run of characters a base64 token can contain (letters,
+// digits, "+", "/", "-", "_", "="), cut after a run of "=" that more such
+// characters follow (a token has "=" only at its end), and at least
+// minTokenLen long. One pass over s; nothing is copied.
+func eachCandidate(s string, f func(string) bool) bool {
+	i := 0
+	for i < len(s) {
+		if !isBase64Char(s[i]) {
+			i++
+			continue
+		}
+		start := i
+		for i < len(s) && isBase64Char(s[i]) {
+			if s[i] != '=' {
+				i++
+				continue
 			}
-			continue
+			j := i
+			for j < len(s) && s[j] == '=' {
+				j++
+			}
+			if j < len(s) && isBase64Char(s[j]) {
+				if j-start >= minTokenLen && f(s[start:j]) {
+					return true
+				}
+				start = j
+			}
+			i = j
 		}
-		if start >= 0 {
-			runs = append(runs, s[start:i])
-			start = -1
+		if i-start >= minTokenLen && f(s[start:i]) {
+			return true
 		}
 	}
-	return runs
+	return false
 }
 
-// splitAfterPadding cuts run after every run of "=" that more characters
-// follow ("macaroon=abc" gives "macaroon=" and "abc").
-func splitAfterPadding(run string) []string {
-	var parts []string
-	start := 0
-	for i := 0; i < len(run); i++ {
-		if run[i] != '=' {
-			continue
-		}
-		j := i
-		for j < len(run) && run[j] == '=' {
-			j++
-		}
-		if j < len(run) {
-			parts = append(parts, run[start:j])
-			start = j
-		}
-		i = j - 1
-	}
-	return append(parts, run[start:])
-}
-
-// decodedText decodes part as base64 in either alphabet, padded or not, and
-// returns the result when it is UTF-8 text.
-func decodedText(part string) (string, bool) {
+// base64Decoded decodes part as base64 in either alphabet, padded or not.
+// The bytes need not be text: Basic credentials may carry a user name in
+// any character set.
+func base64Decoded(part string) ([]byte, bool) {
 	trimmed := strings.TrimRight(part, "=")
 	enc := base64.RawStdEncoding
 	if strings.ContainsAny(trimmed, "-_") {
 		enc = base64.RawURLEncoding
 	}
 	data, err := enc.DecodeString(trimmed)
-	if err != nil || len(data) == 0 || !utf8.Valid(data) {
-		return "", false
+	return data, err == nil && len(data) > 0
+}
+
+// percentDecoded decodes each "%" followed by two hex digits in s, once,
+// and keeps every other byte, a "%" that does not start such a sequence
+// included, as written. It returns s itself when nothing was decoded.
+func percentDecoded(s string) string {
+	var b []byte
+	for i := 0; i < len(s); i++ {
+		if s[i] == '%' && i+2 < len(s) && isHex(s[i+1]) && isHex(s[i+2]) {
+			if b == nil {
+				b = make([]byte, 0, len(s))
+				b = append(b, s[:i]...)
+			}
+			b = append(b, unhex(s[i+1])<<4|unhex(s[i+2]))
+			i += 2
+			continue
+		}
+		if b != nil {
+			b = append(b, s[i])
+		}
 	}
-	return string(data), true
+	if b == nil {
+		return s
+	}
+	return string(b)
+}
+
+func isHex(c byte) bool {
+	return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
+}
+
+func unhex(c byte) byte {
+	switch {
+	case c >= '0' && c <= '9':
+		return c - '0'
+	case c >= 'a' && c <= 'f':
+		return c - 'a' + 10
+	}
+	return c - 'A' + 10
+}
+
+// unquoted returns s with each backslash escape inside a quoted string
+// resolved ("\x" becomes "x"); the quotes and everything outside quoted
+// strings are kept. It returns s itself when s has no backslash.
+func unquoted(s string) string {
+	if strings.IndexByte(s, '\\') < 0 {
+		return s
+	}
+	b := make([]byte, 0, len(s))
+	quoted := false
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if quoted && c == '\\' && i+1 < len(s) {
+			i++
+			b = append(b, s[i])
+			continue
+		}
+		if c == '"' {
+			quoted = !quoted
+		}
+		b = append(b, c)
+	}
+	return string(b)
 }
 
 // satgateCookieNames are the session cookies SatGate's dashboard and sign-in

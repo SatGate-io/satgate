@@ -477,8 +477,9 @@ type Upstream struct {
 	// credential (for example Authorization). Host sets the request's Host.
 	// Names SatGate owns, hop-by-hop names, names the proxy manages
 	// (X-Forwarded-For, X-Forwarded-Host, X-Forwarded-Proto, Forwarded),
-	// Content-Length, and any entry that cannot be delivered as written are
-	// refused at load (see CheckUpstreamHeaders).
+	// Content-Length, Expect, an empty User-Agent or Accept-Encoding, and
+	// any entry that cannot be delivered as written are refused at load
+	// (see CheckUpstreamHeaders).
 	Headers        map[string]string `yaml:"headers"`
 	HealthCheck    *HealthCheck      `yaml:"healthCheck"`
 	CircuitBreaker *CircuitBreaker   `yaml:"circuitBreaker"`

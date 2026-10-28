@@ -81,6 +81,24 @@ var transportComputedHeaders = []string{
 	"Content-Length",
 }
 
+// transportManagedHeaders are request headers the HTTP client acts on
+// itself. For Expect it waits for an interim 100 Continue response before
+// it sends a body, and a server answers an expectation it does not know
+// with 417 Expectation Failed, so a fixed value changes how the request is
+// sent or whether it is served.
+var transportManagedHeaders = []string{
+	"Expect",
+}
+
+// nonEmptyHeaders are request headers the HTTP client does not send as
+// configured when their value is empty: it leaves out an empty User-Agent
+// and adds its own Accept-Encoding when that header is empty. A non-empty
+// value is sent exactly as configured.
+var nonEmptyHeaders = []string{
+	"User-Agent",
+	"Accept-Encoding",
+}
+
 func inCanonical(list []string, name string) bool {
 	c := http.CanonicalHeaderKey(name)
 	for _, h := range list {
@@ -100,7 +118,10 @@ func inCanonical(list []string, name string) bool {
 //   - a hop-by-hop name (IsHopByHopHeader);
 //   - a name the proxy manages for each request (X-Forwarded-For,
 //     X-Forwarded-Host, X-Forwarded-Proto, Forwarded);
-//   - a name the HTTP transport computes (Content-Length);
+//   - a name the HTTP transport computes (Content-Length) or acts on itself
+//     (Expect);
+//   - an empty value for User-Agent or Accept-Encoding, which the HTTP
+//     transport would leave out or add to;
 //   - a value with a control character other than horizontal tab, or one
 //     that starts or ends with a space or a horizontal tab (HTTP does not
 //     deliver leading or trailing whitespace; a tab between other
@@ -148,8 +169,13 @@ func checkHeaderMap(headers map[string]string) error {
 			return fmt.Errorf("header %q is managed by the proxy for each request and cannot be configured", k)
 		case inCanonical(transportComputedHeaders, k):
 			return fmt.Errorf("header %q is computed by the HTTP transport from the request and cannot be configured", k)
+		case inCanonical(transportManagedHeaders, k):
+			return fmt.Errorf("header %q is managed by the HTTP transport for each request and cannot be configured", k)
 		}
 		v := headers[k]
+		if v == "" && inCanonical(nonEmptyHeaders, k) {
+			return fmt.Errorf("header %q cannot be empty: the HTTP transport leaves out an empty User-Agent and adds its own Accept-Encoding", k)
+		}
 		if !validHeaderValue(v) {
 			return fmt.Errorf("header %q has a value with a line break or control character", k)
 		}

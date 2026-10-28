@@ -510,7 +510,6 @@ func TestUpstreamHeaders_DeliveredExactlyAsConfigured(t *testing.T) {
 		"X-Empty":         "",
 		"X-Utf8":          "caf\u00e9",
 		"Via":             "1.1 configured",
-		"Expect":          "100-continue",
 		"Host":            "configured.example:8443",
 	}
 	up := newRequestRecorder(t)
@@ -519,9 +518,7 @@ func TestUpstreamHeaders_DeliveredExactlyAsConfigured(t *testing.T) {
 	defer front.Close()
 	req, _ := http.NewRequest(http.MethodGet, front.URL+"/data", nil)
 	for k := range configured {
-		// The gateway's own server answers an Expect it does not know with
-		// 417, so the client sends none.
-		if k != "Host" && k != "Expect" {
+		if k != "Host" {
 			req.Header.Set(k, "from-client")
 		}
 	}

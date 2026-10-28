@@ -115,28 +115,58 @@ block and from request trailers alike:
 | Removed | When | Why |
 |---|---|---|
 | `Authorization` (every value) | The route's policy is `capability` (also the default when no policy kind is set), `l402` or `identity` | The gateway checked this credential to let the request through. |
-| Each credential in an `Authorization` value that carries a token this gateway issued | Any other route (`public`, `chargeback`) | A macaroon signed under this gateway's root key is a SatGate credential, not the upstream's, in whatever form it is sent (see below). |
+| Each credential in an `Authorization` value that carries a token this gateway issued | Any other route (`public`, `chargeback`) | A macaroon signed under this gateway's root key is a SatGate credential, not the upstream's, in the forms listed below. |
 | `X-Admin-Token`, `X-Tenant-ID`, every `X-SatGate-*` header | Always | SatGate reads these itself (admin authentication, tenant selection) or reserves the names; a client's value must not reach the upstream as if SatGate had set it. |
 | SatGate's session cookies (`cloud_session`, `__Host-cloud_session`, `__Host-admin_session`, `impersonation`, `__Host-impersonation`, and any cookie whose name starts with `satgate`) | Always | They are SatGate sign-in sessions. Other cookies are passed on exactly as sent. |
 
-**Forms of a gateway token that are removed.** On `public` and `chargeback`
-routes the gateway finds a token it issued anywhere in an `Authorization`
-value: under any scheme or none (`Bearer`, `Basic`, `Digest`, `L402`, `LSAT`
-or another, in any letter case, or the bare token), after any whitespace
-(spaces, tabs, other Unicode spaces), quoted or as a parameter value
-(`token="..."`), as the macaroon of `L402`/`LSAT <macaroon>:<preimage>`, in
-the JSON or the binary macaroon format, in standard or URL-safe base64,
-padded or not, percent-encoded, or inside base64-encoded `Basic`
-credentials. Every `Authorization` line is checked. A value that joins
-several credentials with commas is split into them (a comma inside a quoted
-string, or between one credential's parameters, does not split); each
-credential that carries a gateway token is removed, the others are passed on
-joined with `, `, and a value left with no credential is dropped. A value
-that carries no gateway token is passed on byte for byte. An
-`Authorization` value that is not a token this gateway issued (an upstream
-API key, a JWT, `Basic` credentials, a macaroon from another issuer) is
-passed on unchanged: the gateway did not check it, and on a route the
-gateway does not guard it belongs to the upstream.
+**Which gateway tokens are removed (the removal boundary).** On `public`
+and `chargeback` routes the gateway removes a token it issued from every
+`Authorization` line, in the header block and in trailers, in every form
+the gateway itself accepts one:
+
+- `Bearer <token>` or the bare token (capability routes,
+  `/api/capability/ping`, `/api/capability/admin` and the MCP server, which
+  also accepts `Bearer Bearer <token>`);
+- `L402 <macaroon>:<preimage>` and `LSAT <macaroon>:<preimage>`;
+- the token itself in either macaroon format (JSON or binary), in standard
+  or URL-safe base64, padded or not.
+
+For removal (never for acceptance) it also finds the token under any other
+scheme name or none, in any letter case, after any whitespace or other
+separator, and as the macaroon of an `L402`/`LSAT` value with or without a
+preimage; and inside exactly one of these wrappers:
+
+- a quoted string (its backslash escapes resolved);
+- an auth-param value (`token=...`);
+- `Basic` credentials (`user:<token>` or `<token>:`);
+- one layer of percent-encoding;
+- one layer of base64, in either alphabet, with or without padding.
+
+A quoted string and an auth-param value are HTTP syntax and are always
+opened, so the token in one may also be in one percent or base64 encoding
+(for example `token="<percent-encoded token>"`). The result of a decoding
+is never decoded again.
+
+Not decoded, and forwarded like any other client data: a token the client
+wraps in two or more encodings (base64 of base64, percent-encoding of
+percent-encoding, base64 of percent-encoded text, percent-encoded `Basic`
+credentials and the like), and a token in any header other than
+`Authorization`, in the query string or in the body. The gateway never
+accepts its token in those forms.
+
+Each comma-joined credential in a value is judged on its own, and so is
+each of its parts: a part that does not decode (a malformed percent
+sequence, invalid base64, a broken quote or parameter, an empty or very
+long part) is left as written and does not stop a gateway token elsewhere
+in the value from being removed. A credential that carries a gateway token
+is removed whole, with its parameters; the other credentials are passed on
+joined with `, `, and a value left with none is dropped. A value whose
+credentials cannot be told apart (a quoted string that is not closed) is
+judged whole and dropped if it carries a gateway token in any of the forms
+above. A value that carries none is passed on byte for byte: an upstream
+API key, a JWT, `Basic` credentials or a macaroon from another issuer
+reaches the upstream unchanged, because the gateway did not check it and,
+on a route the gateway does not guard, it belongs to the upstream.
 
 **Request trailers.** Trailers lose what the table above removes, and also
 every hop-by-hop name and every name the upstream has a configured header
@@ -171,7 +201,8 @@ upstreams:
 
 Accepted: any valid header name not refused below, for example
 `Authorization`, `Cookie`, `User-Agent`, `Accept`, `Accept-Encoding`,
-`Expect`, `Via` or a custom `X-...` name. `Host` is accepted and is sent as
+`Via` or a custom `X-...` name (`User-Agent` and `Accept-Encoding` only with
+a value that is not empty). `Host` is accepted and is sent as
 the request's Host (instead of the upstream URL's host), provided its value
 is a plain ASCII host or `host:port`: letters, digits and
 ``-._~!$&'()*+,;=:[]``, not empty. A non-ASCII name or an IPv6 zone (`%`) is
@@ -188,6 +219,7 @@ entry, never the value:
 | `Connection`, `Keep-Alive`, `Proxy-Authenticate`, `Proxy-Authorization`, `Proxy-Connection`, `Te`, `Trailer`, `Transfer-Encoding`, `Upgrade` | Hop-by-hop: they apply to one connection. The reverse proxy removes them and the HTTP client writes its own, so a configured value would not arrive. |
 | `X-Forwarded-For`, `X-Forwarded-Host`, `X-Forwarded-Proto`, `Forwarded` | Managed by the proxy for each request: they describe the client's connection (the proxy adds the client's address to `X-Forwarded-For` on every request), so a fixed value would misstate it. |
 | `Content-Length` | Computed by the HTTP client from the request body; a configured value is ignored. |
+| `Expect` | Managed by the HTTP client: for `100-continue` it waits for an interim response before sending the body, and a server answers any other expectation with 417, so a fixed value changes how the request is sent or whether it is served. |
 <!-- upstream-headers-refused:end -->
 
 Also refused:
@@ -199,8 +231,11 @@ Also refused:
   (including line breaks) and 0x7F. A horizontal tab (0x09) is accepted
   between other characters;
 - a value that starts or ends with a space or a horizontal tab, because HTTP
-  does not deliver leading or trailing whitespace. An empty value is
-  accepted and is sent as an empty header.
+  does not deliver leading or trailing whitespace;
+- an empty value for `User-Agent` or `Accept-Encoding`, because the HTTP
+  client leaves out an empty `User-Agent` and adds its own
+  `Accept-Encoding` when that header is empty. For every other accepted
+  name an empty value is accepted and is sent as one empty header.
 
 **Compatibility.** Earlier versions forwarded the client's `Authorization`,
 `X-Admin-Token`, `X-Tenant-ID`, cookies and trailers as sent, and never
