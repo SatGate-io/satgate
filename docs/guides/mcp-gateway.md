@@ -316,6 +316,8 @@ auth:
   rootToken: "eyJpZCI6Ii..."   # Reuse this token instead of minting new ones
 ```
 
+The auto-minted root token carries `scope = mcp:*`, which allows every tool.
+
 #### What needs a token
 
 With `mode: config` or `mode: header`, a request over SSE (`POST /message`) or Streamable HTTP must carry a token that verifies before the proxy reveals the tool list or reaches an upstream:
@@ -335,6 +337,30 @@ Over stdio the caller is the local process that started the proxy: in `config` m
 - The same rule applies to the handler of an embedded server (`NewSSEServer(...).Handler()`, or the `SSEServer` itself as an `http.Handler`). If the configuration does not set `auth.mode` (`Auth.Mode` empty, or a file loaded without `auth.mode`, including a stdio-only file), every request to that handler gets `503` with the same `auth.mode is required ...` message. This covers every route: `/mcp`, `/sse`, `/message`, `/health` and routes added with `Handle` / `HandleFunc`. The request is refused before any MCP method runs or an upstream is contacted. The error is logged once, when `NewSSEServer` is called. With an explicit `none`, the warning is also logged once, at that point.
 - The listener binds `server.host`, default `127.0.0.1` (this machine only), on `server.port`, default `9100`. Set `host: 0.0.0.0` (or `::`) to accept connections from other machines, for example in a container. `host` takes no port.
 - A stdio-only configuration starts as before, with or without an `auth` block.
+
+### Tool scopes
+
+Calling tool `T` needs the scope `mcp:T`. Each word of a token's scope caveat
+(words are separated by commas; a `<tenant uuid>:` prefix on a word is
+ignored) is matched with the same rule the HTTP gateway uses (see
+[How a scope is matched](../configuration/policy-scope.md#how-a-scope-is-matched)):
+
+| Scope word | Allows |
+|------------|--------|
+| `*` or `mcp:*` | every tool |
+| `search` or `mcp:search` | the tool `search` |
+| `db:*` or `mcp:db:*` | tools whose names start with `db:` (`db:query`), not `db_query` |
+| any word in the `api:` namespace, such as `api:*` | no tool |
+
+A word that is empty, contains whitespace or has `*` anywhere other than as
+the whole last segment allows nothing, and a tool whose name is not a
+well-formed scope segment (it contains whitespace, a comma or `*`, or an
+empty `:` segment) is allowed by no word. Every scope caveat on the token
+must allow the tool. A token with no scope caveat allows every tool.
+
+Every `expires` caveat must be an absolute time, RFC 3339 or Unix
+milliseconds (see [Token expiry](../configuration/policy-scope.md#token-expiry));
+a token with any other value, such as `24h`, is refused.
 
 ### Tokens and Upstreams
 
@@ -364,14 +390,13 @@ With macaroon auth (`mode: header`), agents can create scoped sub-tokens via the
   "params": {
     "_meta": { "token": "parent-macaroon" },
     "budget": 100,
-    "scope": "db_*",
-    "label": "research-agent",
-    "expiresIn": 3600
+    "scope": "db_query,db_schema",
+    "label": "research-agent"
   }
 }
 ```
 
-This carves 100 credits from the parent's budget and creates a child token that can only call `db_*` tools. Delegation depth and per-delegation budget caps are enforced via macaroon caveats.
+This carves 100 credits from the parent's budget and creates a child token that can only call the `db_query` and `db_schema` tools (see [Tool scopes](#tool-scopes)). Delegation depth and per-delegation budget caps are enforced via macaroon caveats. The child keeps every caveat of its parent, including its `expires` caveats; `satgate/delegate` adds no expiry of its own.
 
 Agents can also check their remaining budget:
 

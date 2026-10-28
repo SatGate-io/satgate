@@ -20,7 +20,7 @@ routes:
     stripPrefix: true          # Optional: strip matched prefix
     policy:
       kind: capability         # Policy type (see below)
-      scope: read              # Optional: required macaroon scope
+      scope: api:read          # Optional: required macaroon scope (see policy-scope.md)
       costCredits: 10          # Optional: credits per request (for budget enforcement)
     rateLimit:                 # Optional: per-route rate limiting
       requestsPerMinute: 60
@@ -70,7 +70,7 @@ routes:
     upstream: backend
     policy:
       kind: capability
-      scope: read
+      scope: api:read
 
   - name: paid-api
     match:

@@ -141,9 +141,9 @@ occurrence of each:
 
 | Caveat | Accepted when |
 |--------|---------------|
-| `expires = <unix ms or RFC 3339>` | the time is in the future. A relative value such as `5m` refuses the proof. |
+| `expires = <unix ms or RFC 3339>` | the time is in the future. Any other value, including a duration such as `5m`, refuses the proof. |
 | `time < <unix seconds>` | the time is in the future. |
-| `scope = <scope>` | the scope grants `l402` (`l402`, `*` or `api:*`). |
+| `scope = <scope>` | the scope grants `l402` (`l402` or `*`). |
 | `routes = <pattern>,...` | one pattern covers the request: a pattern starting with `/` is a path, matched exactly or, when it ends in `*`, as a prefix; `*` matches anything; any other pattern is a route name. |
 | `methods = <METHOD>,...` | the request method is listed (case-insensitive). |
 
