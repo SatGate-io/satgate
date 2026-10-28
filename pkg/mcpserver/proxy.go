@@ -616,7 +616,8 @@ func (p *Proxy) refuseUnauthenticated(ctx context.Context, req *Request) *Respon
 // list is answered or the method passed on: a token that does not verify or
 // that a ban covers is refused, and one whose ban state cannot be read gets
 // the revocation-unavailable answer. With no checker installed nothing is
-// checked here, as before.
+// checked here, as before. The authenticated path (dispatchAuthenticated)
+// runs the same check through otherSuppliedStdioTokenError.
 func (p *Proxy) refuseSuppliedStdioToken(ctx context.Context, req *Request) *Response {
 	if p.auth == nil || !p.lineageCheckerInstalled() {
 		return nil
@@ -631,6 +632,44 @@ func (p *Proxy) refuseSuppliedStdioToken(ctx context.Context, req *Request) *Res
 		}
 		if refused := p.refuseToken(ctx, req, token); refused != nil {
 			return refused
+		}
+	}
+	return nil
+}
+
+// otherSuppliedStdioTokenError is the supplied-token check of
+// refuseSuppliedStdioToken for the authenticated path (dispatchAuthenticated):
+// for a request read by Run (stdio) with a lineage checker installed, every
+// token the request supplies (the connection's and params._meta.token) other
+// than verified, the one authenticate already accepted, is verified (which
+// includes the lineage check) and checked for revocation. It returns the
+// first refusal as an authentication error: wrapping errTokenRevoked for a
+// token a ban covers, ErrRevocationUnavailable when its ban state cannot be
+// read. A request with no other token, a network transport, or a proxy with
+// no checker installed gets nil, as before.
+func (p *Proxy) otherSuppliedStdioTokenError(ctx context.Context, req *Request, verified string) error {
+	if !fromClientLoop(ctx) || p.auth == nil || !p.lineageCheckerInstalled() {
+		return nil
+	}
+	for _, token := range []string{transportTokenFrom(ctx), extractMetaToken(req.Params)} {
+		if token == "" || token == verified {
+			continue
+		}
+		info, err := p.auth.Verify(ctx, token)
+		if err != nil {
+			return fmt.Errorf("authentication failed: %w", err)
+		}
+		if info == nil {
+			return fmt.Errorf("authentication failed: no identity")
+		}
+		if p.revocation != nil && info.BudgetID != "" {
+			rctx := ctx
+			if info.TenantID != "" {
+				rctx = context.WithValue(ctx, CtxTenantID, info.TenantID)
+			}
+			if p.revocation.IsRevoked(rctx, info.BudgetID) {
+				return errTokenRevoked
+			}
 		}
 	}
 	return nil

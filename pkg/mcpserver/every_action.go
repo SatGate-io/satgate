@@ -645,9 +645,15 @@ func (p *Proxy) recordAuthRefusal(ctx context.Context, req *Request, authErr err
 // dispatchAuthenticated runs the authenticated methods: tools/call,
 // satgate/delegate, satgate/budget, budget/check and, with the switch on, every
 // other method a key may ask for. The order is authentication, revocation, the
-// request limiter, then the method.
+// request limiter, then the method. Over stdio with a lineage checker
+// installed, every other token the request supplies is checked as part of
+// authentication (otherSuppliedStdioTokenError), so nothing is signed, spent
+// or forwarded for a request that carries a refused credential.
 func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Response, error) {
 	tokenInfo, verified, authErr := p.authenticate(ctx, req)
+	if authErr == nil {
+		authErr = p.otherSuppliedStdioTokenError(ctx, req, verified)
+	}
 	if authErr != nil {
 		p.publishAuthFailure(req, authErr)
 		if p.signEveryAction {

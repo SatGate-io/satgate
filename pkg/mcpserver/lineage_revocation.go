@@ -139,10 +139,11 @@ func macaroonServiceOf(a Authenticator) *macaroon.Service {
 // minted: SSE connect and each message, Streamable HTTP initialize, each
 // request and resume, stdio, the credential passed to an upstream with
 // forwardCallerToken, and satgate/delegate (checked again before the child is
-// minted). Over stdio, tools/list and the methods passed on to the default
-// upstream answer a request that supplies no token as before; one that
-// supplies a token (params._meta.token, or the connection's) is verified and
-// checked first.
+// minted). Over stdio every token a request supplies (params._meta.token and
+// the connection's) is verified and checked before anything is signed or
+// passed on, on every method that is, with sign-every-action on or off;
+// tools/list and the methods passed on to the default upstream answer a
+// request that supplies no token as before.
 //
 // A covered token is refused like a revoked one ("token revoked"). If the
 // ban state cannot be read the request is refused with the
