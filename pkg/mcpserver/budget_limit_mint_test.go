@@ -235,6 +235,17 @@ func TestFillTokenInfo_LegacyTwoDecimalBudgetLimitStillVerifies(t *testing.T) {
 	}
 }
 
+// Earlier releases wrote budgets within 512 of math.MaxInt64 as
+// "9223372036854775808.00" (the float64 nearest to them, 2^63). That value is
+// outside the int64 range and is refused; this delegator no longer writes it.
+func TestFillTokenInfo_LegacyBudgetLimitAboveInt64IsRefused(t *testing.T) {
+	svc, token := mintBudgetToken(t, "root", "api:*", "", "budget-parent", maxBudgetText)
+	child := legacyChild(t, svc, token, "budget_limit = 9223372036854775808.00")
+	if _, err := (&MacaroonAuthenticator{Service: svc}).Verify(context.Background(), child); err == nil || !strings.Contains(err.Error(), "invalid budget_limit caveat") {
+		t.Fatalf("budget_limit = 9223372036854775808.00 must be refused, got %v", err)
+	}
+}
+
 // legacyChild writes a child the way earlier releases' delegator did: the
 // parent link, a budget_id, the given budget_limit text, then the seal.
 func legacyChild(t *testing.T, svc *macaroon.Service, parentToken, budgetLimit string) string {
