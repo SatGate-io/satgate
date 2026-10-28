@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -76,6 +77,7 @@ type MemoryStore struct {
 	now      func() time.Time
 	counters map[string]*memCounter
 	stakes   map[string]*memStake
+	stakeSeq uint64
 	// Err, when set, is returned by every call (a store that is down).
 	Err error
 }
@@ -198,6 +200,18 @@ type EventReservation struct {
 	Units int64
 	// Max is the limit in the same units.
 	Max int64
+	// Reservation names one reservation, for ReleaseEvent: the identity
+	// ReserveEvent returned for it. ReserveEvent ignores it.
+	Reservation string
+}
+
+// EventReserveResult is what a store returns for ReserveEvent.
+type EventReserveResult struct {
+	ReserveResult
+	// Reservation is set when Status is Reserved: an identity no other
+	// reservation in the store ever has, bound to the generation of the
+	// key's totals (ResetEvents starts a new generation).
+	Reservation string
 }
 
 // EventStakeStore is the durable counter behind per-event stake limits. A
@@ -207,19 +221,26 @@ type EventReservation struct {
 // error; the call is then refused (fail closed).
 type EventStakeStore interface {
 	// ReserveEvent adds r.Units to the event's total at r.Key when r.CallID
-	// holds nothing there and the new total would not pass r.Max.
-	ReserveEvent(ctx context.Context, r EventReservation) (ReserveResult, error)
-	// ReleaseEvent removes what r.CallID holds at r.Key and lowers its
-	// event's total by that. It does nothing when there is none.
+	// holds nothing there and the new total would not pass r.Max. When it
+	// does, it returns the new reservation's identity.
+	ReserveEvent(ctx context.Context, r EventReservation) (EventReserveResult, error)
+	// ReleaseEvent removes the reservation r.Reservation names and lowers
+	// its event's total by what it holds. It changes nothing when that
+	// reservation is not held at r.Key for r.CallID and r.Event: already
+	// released, made before a ResetEvents, or never made. A release never
+	// changes another reservation.
 	ReleaseEvent(ctx context.Context, r EventReservation) error
 	// EventTotal reads one event's total at key, 0 when there is none.
 	EventTotal(ctx context.Context, key, event string) (int64, error)
-	// ResetEvents drops every event total at key in one step. A reservation
-	// made before it is gone with it; one made after it counts in full.
+	// ResetEvents drops every event total at key in one step and starts a
+	// new generation. A reservation made before it is gone with it, and
+	// releasing it afterwards changes nothing; one made after it counts in
+	// full.
 	ResetEvents(ctx context.Context, key string) error
 }
 
 type memStake struct {
+	gen    uint64
 	events map[string]int64
 	calls  map[string]memStakeCall
 }
@@ -227,6 +248,14 @@ type memStake struct {
 type memStakeCall struct {
 	event string
 	units int64
+	id    string
+}
+
+// nextStakeSeqLocked numbers generations and reservations; no number is
+// used twice in one store.
+func (m *MemoryStore) nextStakeSeqLocked() uint64 {
+	m.stakeSeq++
+	return m.stakeSeq
 }
 
 func (m *MemoryStore) stakeLocked(key string, create bool) *memStake {
@@ -235,33 +264,34 @@ func (m *MemoryStore) stakeLocked(key string, create bool) *memStake {
 	}
 	st := m.stakes[key]
 	if st == nil && create {
-		st = &memStake{events: map[string]int64{}, calls: map[string]memStakeCall{}}
+		st = &memStake{gen: m.nextStakeSeqLocked(), events: map[string]int64{}, calls: map[string]memStakeCall{}}
 		m.stakes[key] = st
 	}
 	return st
 }
 
 // ReserveEvent implements EventStakeStore.
-func (m *MemoryStore) ReserveEvent(_ context.Context, r EventReservation) (ReserveResult, error) {
+func (m *MemoryStore) ReserveEvent(_ context.Context, r EventReservation) (EventReserveResult, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if m.Err != nil {
-		return ReserveResult{}, m.Err
+		return EventReserveResult{}, m.Err
 	}
 	st := m.stakeLocked(r.Key, true)
 	total := st.events[r.Event]
 	if _, dup := st.calls[r.CallID]; dup {
-		return ReserveResult{Status: Duplicate, Total: total}, nil
+		return EventReserveResult{ReserveResult: ReserveResult{Status: Duplicate, Total: total}}, nil
 	}
 	if _, known := st.events[r.Event]; !known && len(st.events) >= MaxEventsPerStake {
-		return ReserveResult{Status: EventsFull, Total: 0}, nil
+		return EventReserveResult{ReserveResult: ReserveResult{Status: EventsFull, Total: 0}}, nil
 	}
 	if r.Units < 0 || r.Units > r.Max-total {
-		return ReserveResult{Status: OverLimit, Total: total}, nil
+		return EventReserveResult{ReserveResult: ReserveResult{Status: OverLimit, Total: total}}, nil
 	}
-	st.calls[r.CallID] = memStakeCall{event: r.Event, units: r.Units}
+	id := strconv.FormatUint(st.gen, 10) + "." + strconv.FormatUint(m.nextStakeSeqLocked(), 10)
+	st.calls[r.CallID] = memStakeCall{event: r.Event, units: r.Units, id: id}
 	st.events[r.Event] = total + r.Units
-	return ReserveResult{Status: Reserved, Total: total + r.Units}, nil
+	return EventReserveResult{ReserveResult: ReserveResult{Status: Reserved, Total: total + r.Units}, Reservation: id}, nil
 }
 
 // ReleaseEvent implements EventStakeStore.
@@ -276,7 +306,7 @@ func (m *MemoryStore) ReleaseEvent(_ context.Context, r EventReservation) error 
 		return nil
 	}
 	c, ok := st.calls[r.CallID]
-	if !ok || c.event != r.Event {
+	if !ok || r.Reservation == "" || c.id != r.Reservation || c.event != r.Event {
 		return nil
 	}
 	delete(st.calls, r.CallID)

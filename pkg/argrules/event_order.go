@@ -117,7 +117,8 @@ type EventOrder struct {
 	Contracts *big.Rat
 	// Price is the most the order can pay per contract for the exposure it
 	// opens. nil means the order gives no price that bounds it; it is then
-	// valued at 1 per contract.
+	// valued at 1 per contract. When given it must be strictly between 0
+	// and 1, on a Closing order too.
 	Price *big.Rat
 	// Closing is true only when the service guarantees the order cannot open
 	// exposure (it can only reduce a position the account holds). It is then
@@ -271,10 +272,12 @@ func EventOrderMaxCostOfCall(params json.RawMessage, sentTool, schema string) (E
 //  4. The market id is 1 to 64 printable ASCII characters, no space.
 //  5. The contract count is above zero, has at most 2 decimals and is under
 //     10^10.
-//  6. A Closing order is valued at 0 and stops here.
-//  7. The price, when given, is strictly between 0 and 1; no price means 1.
+//  6. The price, when given, is strictly between 0 and 1; no price means 1.
+//  7. A Closing order is valued at 0 and stops here.
 //  8. contracts x price rounds up to whole 10^-8 units; 10^10 or more is
 //     refused.
+//
+// Steps 1 to 6 apply to opening and closing orders alike.
 func EventOrderMaxCost(schema string, args map[string]json.RawMessage) (v EventOrderValue, why OrderCostWhy) {
 	s := lookupEventSchema(schema)
 	if s == nil {
@@ -306,16 +309,16 @@ func EventOrderMaxCost(schema string, args map[string]json.RawMessage) (v EventO
 		return EventOrderValue{}, WhyEventTooManyContracts
 	}
 	out := EventOrderValue{Contracts: hundredths.Num().Int64(), Market: order.Market}
-	if order.Closing {
-		out.Closing = true
-		return out, OrderCostValued
-	}
 	price := big.NewRat(1, 1)
 	if order.Price != nil {
 		if order.Price.Sign() <= 0 || order.Price.Cmp(big.NewRat(1, 1)) >= 0 {
 			return EventOrderValue{}, WhyEventBadPrice
 		}
 		price = order.Price
+	}
+	if order.Closing {
+		out.Closing = true
+		return out, OrderCostValued
 	}
 	cost, cwhy := costOf(new(big.Rat).Mul(order.Contracts, price))
 	if !cwhy.Valued() {

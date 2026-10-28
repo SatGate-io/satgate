@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -336,7 +337,7 @@ func TestExistingControlDocumentsAreByteIdentical(t *testing.T) {
 func TestMemoryStoreEventStake(t *testing.T) {
 	ctx := context.Background()
 	m := NewMemoryStore(nil)
-	r := func(event, call string, units int64) ReserveResult {
+	r := func(event, call string, units int64) EventReserveResult {
 		t.Helper()
 		out, err := m.ReserveEvent(ctx, EventReservation{Key: "k", Event: event, CallID: call, Units: units, Max: 10})
 		if err != nil {
@@ -344,14 +345,16 @@ func TestMemoryStoreEventStake(t *testing.T) {
 		}
 		return out
 	}
-	if out := r("E1", "c1", 6); out.Status != Reserved || out.Total != 6 {
-		t.Fatalf("%+v", out)
+	c1 := r("E1", "c1", 6)
+	if c1.Status != Reserved || c1.Total != 6 || c1.Reservation == "" {
+		t.Fatalf("%+v", c1)
 	}
 	if out := r("E1", "c2", 5); out.Status != OverLimit || out.Total != 6 {
 		t.Fatalf("%+v", out)
 	}
-	if out := r("E1", "c3", 4); out.Status != Reserved || out.Total != 10 {
-		t.Fatalf("%+v", out)
+	c3 := r("E1", "c3", 4)
+	if c3.Status != Reserved || c3.Total != 10 {
+		t.Fatalf("%+v", c3)
 	}
 	if out := r("E2", "c4", 10); out.Status != Reserved || out.Total != 10 {
 		t.Fatalf("another event is unaffected: %+v", out)
@@ -359,13 +362,13 @@ func TestMemoryStoreEventStake(t *testing.T) {
 	if out := r("E1", "c1", 1); out.Status != Duplicate {
 		t.Fatalf("%+v", out)
 	}
-	if err := m.ReleaseEvent(ctx, EventReservation{Key: "k", Event: "E1", CallID: "c3"}); err != nil {
+	if err := m.ReleaseEvent(ctx, EventReservation{Key: "k", Event: "E1", CallID: "c3", Reservation: c3.Reservation}); err != nil {
 		t.Fatal(err)
 	}
 	if n, _ := m.EventTotal(ctx, "k", "E1"); n != 6 {
 		t.Fatalf("after release %d", n)
 	}
-	_ = m.ReleaseEvent(ctx, EventReservation{Key: "k", Event: "E1", CallID: "c3"}) // twice is a no-op
+	_ = m.ReleaseEvent(ctx, EventReservation{Key: "k", Event: "E1", CallID: "c3", Reservation: c3.Reservation}) // twice is a no-op
 	if n, _ := m.EventTotal(ctx, "k", "E1"); n != 6 {
 		t.Fatalf("after second release %d", n)
 	}
@@ -375,7 +378,7 @@ func TestMemoryStoreEventStake(t *testing.T) {
 	if n, _ := m.EventTotal(ctx, "k", "E1"); n != 0 {
 		t.Fatalf("after reset %d", n)
 	}
-	_ = m.ReleaseEvent(ctx, EventReservation{Key: "k", Event: "E1", CallID: "c1"}) // from before the reset
+	_ = m.ReleaseEvent(ctx, EventReservation{Key: "k", Event: "E1", CallID: "c1", Reservation: c1.Reservation}) // from before the reset
 	if out := r("E1", "c5", 10); out.Status != Reserved || out.Total != 10 {
 		t.Fatalf("after reset: %+v", out)
 	}
@@ -445,7 +448,8 @@ func TestEventStakeResetIsAtomic(t *testing.T) {
 			for i := 0; i < 300; i++ {
 				id := fmt.Sprintf("%d-%d", w, i)
 				res := EventReservation{Key: "k", Event: fmt.Sprintf("E%d", i%3), CallID: id, Units: int64(1 + i%5), Max: 1 << 40}
-				_, _ = m.ReserveEvent(ctx, res)
+				out, _ := m.ReserveEvent(ctx, res)
+				res.Reservation = out.Reservation
 				if i%4 == 0 {
 					_ = m.ReleaseEvent(ctx, res)
 				}
@@ -471,6 +475,174 @@ func TestEventStakeResetIsAtomic(t *testing.T) {
 			t.Fatalf("event %s: total %d, calls hold %d", e, total, held[e])
 		}
 	}
+}
+
+// A release changes only the reservation it names. After ResetEvents, the
+// release of a reservation made before it changes nothing, even when a new
+// reservation for the same call and event is held.
+func TestMemoryStoreEventStakeReleaseAfterResetChangesNothing(t *testing.T) {
+	ctx := context.Background()
+	m := NewMemoryStore(nil)
+	reserve := func(call string, units int64) EventReserveResult {
+		t.Helper()
+		out, err := m.ReserveEvent(ctx, EventReservation{Key: "k", Event: "E1", CallID: call, Units: units, Max: 10})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return out
+	}
+	total := func() int64 {
+		t.Helper()
+		n, err := m.EventTotal(ctx, "k", "E1")
+		if err != nil {
+			t.Fatal(err)
+		}
+		return n
+	}
+	release := func(call, event, id string) {
+		t.Helper()
+		if err := m.ReleaseEvent(ctx, EventReservation{Key: "k", Event: event, CallID: call, Reservation: id}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	old := reserve("c1", 6)
+	if old.Status != Reserved || old.Reservation == "" {
+		t.Fatalf("first reserve: %+v", old)
+	}
+	if err := m.ResetEvents(ctx, "k"); err != nil {
+		t.Fatal(err)
+	}
+	fresh := reserve("c1", 4) // the same call id, after the reset
+	if fresh.Status != Reserved || fresh.Total != 4 || fresh.Reservation == "" || fresh.Reservation == old.Reservation {
+		t.Fatalf("reserve after reset: %+v (before: %+v)", fresh, old)
+	}
+	release("c1", "E1", old.Reservation) // from before the reset
+	if n := total(); n != 4 {
+		t.Fatalf("a release from before the reset changed the total to %d", n)
+	}
+	release("c1", "E1", "")                // names no reservation
+	release("c1", "E2", fresh.Reservation) // wrong event
+	release("c9", "E1", fresh.Reservation) // wrong call
+	release("c1", "E1", fresh.Reservation+"x")
+	if n := total(); n != 4 {
+		t.Fatalf("a release that names another reservation changed the total to %d", n)
+	}
+	if out := reserve("c2", 7); out.Status != OverLimit || out.Total != 4 {
+		t.Fatalf("4 + 7 passed a max of 10: %+v", out)
+	}
+	next := reserve("c2", 6)
+	if next.Status != Reserved || next.Total != 10 || next.Reservation == fresh.Reservation {
+		t.Fatalf("%+v", next)
+	}
+	release("c1", "E1", fresh.Reservation)
+	if n := total(); n != 6 {
+		t.Fatalf("releasing the live reservation left %d", n)
+	}
+}
+
+// Reserves, releases and resets running together keep each event's total
+// equal to the sum of the live reservations: those made since the last reset
+// and not released. Calls share ids and a release waits a few rounds, so a
+// release from before a reset meets a reservation for the same call made
+// after it. The totals are checked at every reset and at the end.
+func TestMemoryStoreEventStakeConcurrentReserveReleaseReset(t *testing.T) {
+	ctx := context.Background()
+	m := NewMemoryStore(nil)
+	type held struct {
+		event string
+		units int64
+	}
+	var (
+		// Reserve and release run under R, reset and the check under W, so
+		// the check sees no call half done.
+		genMu  sync.RWMutex
+		mu     sync.Mutex
+		live   = map[int64]held{}
+		nextID int64
+		failed atomic.Bool
+		wg     sync.WaitGroup
+	)
+	check := func(when string) { // genMu held for writing
+		want := map[string]int64{}
+		for _, h := range live {
+			want[h.event] += h.units
+		}
+		for _, e := range []string{"E0", "E1", "E2"} {
+			got, err := m.EventTotal(ctx, "k", e)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			if got != want[e] && !failed.Swap(true) {
+				t.Errorf("%s: event %s total %d, live reservations hold %d", when, e, got, want[e])
+			}
+		}
+	}
+	type pend struct {
+		res EventReservation
+		id  int64
+	}
+	const workers, rounds = 8, 1500
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func(w int) {
+			defer wg.Done()
+			rnd := rand.New(rand.NewSource(int64(w)))
+			var pending []pend
+			release := func(p pend) {
+				genMu.RLock()
+				defer genMu.RUnlock()
+				if err := m.ReleaseEvent(ctx, p.res); err != nil {
+					t.Error(err)
+				}
+				mu.Lock()
+				delete(live, p.id)
+				mu.Unlock()
+			}
+			for i := 0; i < rounds; i++ {
+				if rnd.Intn(25) == 0 {
+					genMu.Lock()
+					check("before a reset")
+					if err := m.ResetEvents(ctx, "k"); err != nil {
+						t.Error(err)
+					}
+					live = map[int64]held{}
+					genMu.Unlock()
+				}
+				res := EventReservation{Key: "k", Event: fmt.Sprintf("E%d", i%3), CallID: fmt.Sprintf("c%d", i%8), Units: int64(1 + rnd.Intn(5)), Max: 1 << 40}
+				genMu.RLock()
+				out, err := m.ReserveEvent(ctx, res)
+				var id int64
+				if err == nil && out.Status == Reserved {
+					mu.Lock()
+					nextID++
+					id = nextID
+					live[id] = held{res.Event, res.Units}
+					mu.Unlock()
+				}
+				genMu.RUnlock()
+				if err != nil {
+					t.Error(err)
+					return
+				}
+				if out.Status == Reserved && rnd.Intn(2) == 0 {
+					res.Reservation = out.Reservation
+					pending = append(pending, pend{res, id})
+				}
+				if len(pending) > 6 {
+					release(pending[0])
+					pending = pending[1:]
+				}
+			}
+			for _, p := range pending {
+				release(p)
+			}
+		}(w)
+	}
+	wg.Wait()
+	genMu.Lock()
+	check("at the end")
+	genMu.Unlock()
 }
 
 // The canonical category is the comparison form.

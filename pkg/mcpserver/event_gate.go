@@ -340,7 +340,16 @@ func (g *EventGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 	}
 	lctx, cancel := context.WithTimeout(ctx, timeout)
 	m, err := resolver.ResolveEventMarket(lctx, tenant, schema, v.Market)
+	// An answer that comes after the lookup's deadline, or after its context
+	// is done, is not used, even when the lookup returned no error.
+	late := lctx.Err()
+	if dl, ok := lctx.Deadline(); late == nil && ok && !time.Now().Before(dl) {
+		late = context.DeadlineExceeded
+	}
 	cancel()
+	if late != nil {
+		return nil, fmt.Errorf("event market lookup did not answer in time: %w", late)
+	}
 	switch {
 	case errors.Is(err, ErrEventMarketNotFound):
 		return &GateAdmission{Refusal: eventMarketRefusal(call.Tool, msgEventNotFound)}, nil
@@ -421,10 +430,16 @@ func (g *EventGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 				Message: fmt.Sprintf("%s: this request id was already used for the same call; send it with a new id to try again", call.Tool),
 			}}, nil
 		case toolcontrols.Reserved:
+			if out.Reservation == "" {
+				giveBack()
+				return nil, errors.New("event stake store returned no reservation identity")
+			}
 		default:
 			giveBack()
 			return nil, errors.New("event stake store returned an unknown status")
 		}
+		// A give-back releases this reservation and no other.
+		res.Reservation = out.Reservation
 		taken = append(taken, res)
 	}
 	// The admission carries no receipt detail: the event, its total and a
