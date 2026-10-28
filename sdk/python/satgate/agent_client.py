@@ -32,6 +32,7 @@ Example usage (OSS Gateway):
 
 import base64
 import json
+import logging
 import os
 import sys
 import time
@@ -48,6 +49,8 @@ from .exceptions import (
     PaymentRequiredError,
     PaymentFailedError,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -90,6 +93,36 @@ class CachedToken:
         return max(0, self.budget_limit - self.budget_used)
 
 
+def _resolve_cert_path(
+    tls_cert_path: Optional[str], cert_path: Optional[str]
+) -> Optional[str]:
+    """Return the one certificate path given, or None. cert_path is an alias."""
+    if (
+        tls_cert_path is not None
+        and cert_path is not None
+        and os.path.expanduser(tls_cert_path) != os.path.expanduser(cert_path)
+    ):
+        raise SatGateError("tls_cert_path and cert_path name different files; pass one")
+    path = tls_cert_path if tls_cert_path is not None else cert_path
+    if path is None:
+        return None
+    if not isinstance(path, str) or path == "":
+        raise SatGateError("tls_cert_path must be a non-empty path")
+    path = os.path.expanduser(path)
+    if not os.path.isfile(path):
+        raise SatGateError(f"tls_cert_path {path} is not a file")
+    return path
+
+
+def _tls_verify_setting(cert_path: Optional[str], insecure: bool) -> Union[bool, str]:
+    """The value passed to requests as verify=. Only insecure=True gives False."""
+    if insecure:
+        return False
+    if cert_path is not None:
+        return cert_path
+    return True
+
+
 class LightningWallet:
     """Base class for Lightning wallets"""
     
@@ -103,7 +136,17 @@ class LightningWallet:
 
 
 class LNDWallet(LightningWallet):
-    """LND Lightning wallet"""
+    """LND Lightning wallet (REST).
+
+    TLS is always verified unless ``insecure=True`` is passed:
+
+    * with no certificate path, the LND REST host must present a certificate
+      the system trusts; one it does not trust fails with ``SatGateError``;
+    * with ``tls_cert_path`` (or its alias ``cert_path``), the host is verified
+      against that file, for example LND's own ``tls.cert``;
+    * ``insecure=True`` turns verification off and logs a warning naming the
+      host. It cannot be combined with a certificate path.
+    """
     
     def __init__(
         self,
@@ -111,7 +154,10 @@ class LNDWallet(LightningWallet):
         macaroon_path: Optional[str] = None,
         macaroon_hex: Optional[str] = None,
         cert_path: Optional[str] = None,
-        use_rest: bool = True
+        use_rest: bool = True,
+        *,
+        tls_cert_path: Optional[str] = None,
+        insecure: bool = False,
     ):
         self.host = host
         self.use_rest = use_rest
@@ -125,8 +171,35 @@ class LNDWallet(LightningWallet):
         else:
             raise SatGateError("LND macaroon required")
         
-        # Load cert
-        self.cert_path = cert_path
+        self.cert_path = _resolve_cert_path(tls_cert_path, cert_path)
+        self.tls_cert_path = self.cert_path
+        if insecure is not True and insecure is not False:
+            raise SatGateError("insecure must be True or False")
+        if insecure and self.cert_path is not None:
+            raise SatGateError("insecure=True cannot be combined with tls_cert_path")
+        self.insecure = insecure
+        self._verify = _tls_verify_setting(self.cert_path, insecure)
+        if insecure:
+            logger.warning(
+                "LNDWallet: TLS certificate verification is disabled for %s "
+                "(insecure=True); the macaroon is sent to an unverified server",
+                self.host,
+            )
+    
+    def _request(self, method: str, url: str, **kwargs) -> requests.Response:
+        try:
+            return requests.request(method, url, verify=self._verify, **kwargs)
+        except requests.exceptions.SSLError as e:
+            if self.cert_path is not None:
+                hint = f"the certificate in {self.cert_path} does not verify it"
+            else:
+                hint = (
+                    "its certificate is not trusted by the system; pass "
+                    "tls_cert_path= (for example LND's tls.cert)"
+                )
+            raise SatGateError(
+                f"TLS verification failed for LND host {self.host}: {hint}"
+            ) from e
     
     def pay_invoice(self, invoice: str) -> str:
         if self.use_rest:
@@ -139,11 +212,11 @@ class LNDWallet(LightningWallet):
         headers = {"Grpc-Metadata-macaroon": self.macaroon}
         data = {"payment_request": invoice}
         
-        resp = requests.post(
+        resp = self._request(
+            "POST",
             url,
             json=data,
             headers=headers,
-            verify=self.cert_path or False,
             timeout=60
         )
         
@@ -163,10 +236,10 @@ class LNDWallet(LightningWallet):
         url = f"https://{self.host}/v1/balance/channels"
         headers = {"Grpc-Metadata-macaroon": self.macaroon}
         
-        resp = requests.get(
+        resp = self._request(
+            "GET",
             url,
             headers=headers,
-            verify=self.cert_path or False,
             timeout=10
         )
         

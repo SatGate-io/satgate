@@ -185,7 +185,7 @@ client = SatGateAgentClient(
     wallet=LNDWallet(
         host="localhost:10009",
         macaroon_path="~/.lnd/admin.macaroon",
-        cert_path="~/.lnd/tls.cert",
+        tls_cert_path="~/.lnd/tls.cert",  # TLS is always verified; cert_path= also works
     ),
 )
 

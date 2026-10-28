@@ -68,6 +68,31 @@ response = agent.get("/api/data")
 print(valid["valid"], response.status_code)
 ```
 
+## Lightning (LND) wallet and TLS
+
+`LNDWallet` talks to LND's REST port over HTTPS and always verifies the
+server's TLS certificate:
+
+```python
+from satgate import LNDWallet
+
+# LND's own self-signed certificate: verify against that file.
+wallet = LNDWallet(
+    host="localhost:8080",
+    macaroon_hex=open("/path/to/admin.macaroon", "rb").read().hex(),
+    tls_cert_path="~/.lnd/tls.cert",  # cert_path= is still accepted
+)
+```
+
+- With no `tls_cert_path`, the host must present a certificate the system
+  trusts. A host whose certificate is not trusted raises `SatGateError`
+  naming the host; the macaroon is not sent.
+- With `tls_cert_path` (or the older `cert_path`), the host is verified
+  against that file. A missing file is an error when the wallet is created.
+- `insecure=True` is the only way to turn verification off. It logs a warning
+  naming the host and cannot be combined with a certificate path. Use it only
+  for local testing.
+
 ## Docs
 
 - Developer docs: https://cloud.satgate.io/docs
