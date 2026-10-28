@@ -38,7 +38,7 @@ import sys
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 import requests
 
@@ -123,6 +123,26 @@ def _tls_verify_setting(cert_path: Optional[str], insecure: bool) -> Union[bool,
     return True
 
 
+def _redirect_target(url: str, location: Optional[str]) -> str:
+    """scheme://host[:port] of a redirect's Location, for an error message.
+
+    The path, query and any user info are left out.
+    """
+    if not location:
+        return "no Location"
+    try:
+        parts = urlsplit(urljoin(url, location))
+        host = parts.hostname or ""
+        if ":" in host:
+            host = f"[{host}]"
+        port = f":{parts.port}" if parts.port is not None else ""
+    except ValueError:
+        return "an unreadable Location"
+    if not parts.scheme or not host:
+        return "an unreadable Location"
+    return f"{parts.scheme}://{host}{port}"
+
+
 class LightningWallet:
     """Base class for Lightning wallets"""
     
@@ -187,8 +207,17 @@ class LNDWallet(LightningWallet):
             )
     
     def _request(self, method: str, url: str, **kwargs) -> requests.Response:
+        """Send one request carrying the macaroon header to the LND host.
+
+        Redirects are never followed: the macaroon is sent only to the
+        configured host, once. A 3xx answer raises SatGateError naming the
+        status and the host.
+        """
+        kwargs.pop("allow_redirects", None)
         try:
-            return requests.request(method, url, verify=self._verify, **kwargs)
+            resp = requests.request(
+                method, url, verify=self._verify, allow_redirects=False, **kwargs
+            )
         except requests.exceptions.SSLError as e:
             if self.cert_path is not None:
                 hint = f"the certificate in {self.cert_path} does not verify it"
@@ -200,6 +229,15 @@ class LNDWallet(LightningWallet):
             raise SatGateError(
                 f"TLS verification failed for LND host {self.host}: {hint}"
             ) from e
+        if 300 <= resp.status_code < 400:
+            target = _redirect_target(url, resp.headers.get("Location"))
+            resp.close()
+            raise SatGateError(
+                f"LND host {self.host} answered HTTP {resp.status_code} "
+                f"(redirect to {target}); LNDWallet does not follow redirects "
+                "and the macaroon was not sent again"
+            )
+        return resp
     
     def pay_invoice(self, invoice: str) -> str:
         if self.use_rest:

@@ -18,9 +18,15 @@ All notable changes to the `satgate` Python SDK are listed here.
   - `insecure=True` (keyword-only) is the only way to skip verification and
     logs a warning naming the host. It cannot be combined with a certificate
     path.
+- `LNDWallet` requests (`get_balance`, `pay_invoice`) no longer follow HTTP
+  redirects. The macaroon header is sent only to the configured host, once.
+  A 3xx answer raises `SatGateError` naming the status, the host and the
+  redirect's scheme, host and port.
 
 ### Compatibility
 
+- An LND REST endpoint reached through a redirect now fails with
+  `SatGateError`; point `host` at the final address.
 - Code that passed `cert_path=` keeps working unchanged.
 - Code that created `LNDWallet` without a certificate path against LND's
   default self-signed certificate now fails with `SatGateError`; pass

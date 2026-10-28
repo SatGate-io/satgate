@@ -92,6 +92,9 @@ wallet = LNDWallet(
 - `insecure=True` is the only way to turn verification off. It logs a warning
   naming the host and cannot be combined with a certificate path. Use it only
   for local testing.
+- Wallet requests never follow redirects, with or without `insecure=True`.
+  The macaroon is sent only to the configured host. A 3xx answer raises
+  `SatGateError` naming the status and the host.
 
 ## Docs
 
