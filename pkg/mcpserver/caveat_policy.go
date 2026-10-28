@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/satgate-io/satgate/pkg/toolcontrols"
-	"strconv"
 	"strings"
 
 	"github.com/satgate-io/satgate/pkg/argrules"
@@ -42,7 +41,9 @@ func ConsistentCaveat(mac *macaroon.Macaroon, key string) (string, error) {
 // caveats can only narrow the token: every scope caveat must allow a tool,
 // tenant_id values must agree, budget_limit is the minimum, a budget_id is
 // spent only when a budget_bind seals it, and delegation caps are the
-// minimum positive value. A non-numeric or zero caveat does not clear a cap.
+// minimum value. A budget_limit or delegation_budget caveat that is not a
+// whole number of credits above zero refuses the token: it can neither
+// clear a cap nor be truncated into a different one.
 func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) (*TokenInfo, error) {
 	if mac == nil {
 		return nil, fmt.Errorf("macaroon required")
@@ -74,6 +75,17 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if err != nil {
 		return nil, err
 	}
+	// Every budget_limit and delegation_budget caveat must read as a whole
+	// number of credits above zero; one that does not refuses the token, so
+	// a value that cannot be read never leaves a cap unset.
+	budgetLimit, _, err := narrowestBudgetLimit(mac)
+	if err != nil {
+		return nil, err
+	}
+	delegationBudget, _, err := narrowestWholeAmount(mac, "delegation_budget")
+	if err != nil {
+		return nil, err
+	}
 
 	tokenID := hashToken(mac.Identifier + mac.Signature)
 	info := &TokenInfo{
@@ -91,11 +103,9 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if budgetID != "" {
 		info.BudgetID = budgetID
 	}
-	if limit, ok := narrowestBudgetLimit(mac); ok {
-		info.BudgetLimit = limit
-	}
+	info.BudgetLimit = budgetLimit
 	info.DelegationDepth = narrowestDelegationDepth(mac)
-	info.DelegationBudget = narrowestPositiveAmount(mac, "delegation_budget")
+	info.DelegationBudget = delegationBudget
 	for _, caveat := range mac.Caveats {
 		if strings.HasPrefix(caveat, "parent = ") {
 			info.Depth++
@@ -214,55 +224,53 @@ func narrowestDelegationDepth(mac *macaroon.Macaroon) int {
 	return min
 }
 
-// narrowestPositiveAmount is the minimum successfully parsed positive amount.
-// Parse failures and non-positive values are ignored, so they cannot clear
-// an earlier cap.
-func narrowestPositiveAmount(mac *macaroon.Macaroon, key string) int64 {
-	found := false
-	var min int64
+// narrowestWholeAmount reads every caveat named key (the name before the first
+// "=", spaces trimmed) and returns the smallest value, with found false when
+// the token carries none. Each value is read exactly by
+// toolcontrols.ParseWholeAmount and must be written "key = <value>". Any caveat
+// with that name that is not a whole number above zero in range (zero, a
+// negative, a fraction such as 0.5, text that is not a plain decimal, a value
+// too large, or another spelling of the caveat) returns an error, so it can
+// neither clear nor lower-by-truncation a cap: the token is refused.
+func narrowestWholeAmount(mac *macaroon.Macaroon, key string) (min int64, found bool, err error) {
 	prefix := key + " = "
 	for _, caveat := range mac.Caveats {
-		if !strings.HasPrefix(caveat, prefix) {
+		if !caveatNamed(caveat, key) {
 			continue
 		}
-		v, err := strconv.ParseFloat(strings.TrimPrefix(caveat, prefix), 64)
-		if err != nil {
-			continue
+		raw, ok := strings.CutPrefix(caveat, prefix)
+		if !ok {
+			return 0, false, fmt.Errorf("invalid %s caveat: %w", key, toolcontrols.ErrNotWholeAmount)
 		}
-		iv := int64(v)
-		if iv <= 0 {
-			continue
+		v, perr := toolcontrols.ParseWholeAmount(raw)
+		if perr != nil {
+			return 0, false, fmt.Errorf("invalid %s caveat: %w", key, perr)
 		}
-		if !found || iv < min {
-			min = iv
+		if !found || v < min {
+			min = v
 			found = true
 		}
 	}
-	if !found {
-		return 0
-	}
-	return min
+	return min, found, nil
 }
 
-func narrowestBudgetLimit(mac *macaroon.Macaroon) (int64, bool) {
-	found := false
-	var min int64
-	for _, caveat := range mac.Caveats {
-		if !strings.HasPrefix(caveat, "budget_limit = ") {
-			continue
-		}
-		raw := strings.TrimPrefix(caveat, "budget_limit = ")
-		v, err := strconv.ParseFloat(raw, 64)
-		if err != nil {
-			continue
-		}
-		iv := int64(v)
-		if !found || iv < min {
-			min = iv
-			found = true
-		}
+// caveatNamed reports whether caveat's name (the text before the first "=",
+// spaces trimmed, or the whole caveat when it has no "=") is key.
+func caveatNamed(caveat, key string) bool {
+	name := caveat
+	if i := strings.IndexByte(caveat, '='); i >= 0 {
+		name = caveat[:i]
 	}
-	return min, found
+	return strings.TrimSpace(name) == key
+}
+
+// narrowestBudgetLimit is the smallest budget_limit on the token, in whole
+// credits. A token with no budget_limit caveat returns 0, false, nil and keeps
+// the budget it had before (none from its caveats). Any budget_limit caveat
+// that is not a positive whole number returns an error: see
+// narrowestWholeAmount.
+func narrowestBudgetLimit(mac *macaroon.Macaroon) (int64, bool, error) {
+	return narrowestWholeAmount(mac, "budget_limit")
 }
 
 // CheckToolArguments applies the token's argument rules to a tools/call and

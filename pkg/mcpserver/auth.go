@@ -22,7 +22,9 @@ type TokenInfo struct {
 	// this falls back to TokenID.
 	BudgetID string
 	// BudgetLimit is the minimum budget_limit caveat, 0 if none is set.
-	// A later caveat can only lower the cap.
+	// A later caveat can only lower the cap. FillTokenInfo refuses a token
+	// whose budget_limit is not a whole number of credits above zero, so a
+	// verified token's value here is never zero, negative or truncated.
 	BudgetLimit int64
 
 	// TenantID from the "tenant_id" caveat (for multi-tenant routing).
@@ -33,7 +35,8 @@ type TokenInfo struct {
 
 	// DelegationDepth is the max delegation depth allowed (from "delegation_depth" caveat).
 	DelegationDepth int
-	// DelegationBudget is the max budget per delegation (from "delegation_budget" caveat).
+	// DelegationBudget is the max budget per delegation (from "delegation_budget" caveat),
+	// the minimum when there are several; 0 if none is set. Read like BudgetLimit.
 	DelegationBudget int64
 	// Depth is the current token's depth in the delegation chain.
 	Depth int
