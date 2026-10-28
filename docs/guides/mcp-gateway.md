@@ -444,9 +444,12 @@ request may supply no token:
 | `initialize`, `ping` (answered by the proxy), notifications (not passed on) | not checked | not checked |
 
 "A token supplied" is `params._meta.token`, or, for a program that embeds the
-proxy and runs it with a connection credential, that credential; when both are
-present both are checked, on every row above, with sign-every-action on or
-off. `satgate-mcp` always installs the check (with the
+proxy and runs it with a connection credential, that credential. On the two
+rows above that check a token, when both are present both are checked, with
+sign-every-action on or off. The last row is not a credential check:
+`initialize` and `ping` are answered by the proxy itself and notifications
+are not passed on, so neither credential is checked there. `satgate-mcp`
+always installs the check (with the
 shared Redis, or its own memory). A program that embeds the proxy and does not
 call `SetLineageRevocationChecker` sees no change: over stdio `tools/list` and
 passed-on methods then check no token.
@@ -461,7 +464,11 @@ is read, or during that wait, are read again. A ban made on this proxy (by a
 program that embeds it) refuses every check in progress when it is made or
 while it is written to Redis, and a "not banned" answer from a lookup that
 started before that write ended is never cached or used for the token
-afterwards. The whole check, Redis reads and waits for the cache included, has
+afterwards. That ordering is kept by a per-process count of bans this proxy
+has written, which never wraps: if it ever reached its maximum (2^64 − 1),
+the next ban would still be recorded, and from then on this proxy would refuse
+every check as unavailable (below) until it is restarted. The whole check,
+Redis reads and waits for the cache included, has
 one deadline, **2 seconds** from its start; if no such answer can be had for
 every token by then, the request is refused, never served: HTTP `503`
 with `code: REVOCATION_UNAVAILABLE` (SSE connect, Streamable HTTP requests,
