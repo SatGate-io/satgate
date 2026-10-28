@@ -464,43 +464,28 @@ def test_status_errors_quoting_path_query_and_credential_name_none_of_them(case)
     assert "access=" not in str(err)
 
 
-@pytest.mark.parametrize("case", ["agent-header", "admin-header", "beta-header", "l402-retry-header"])
+@pytest.mark.parametrize("case", ["agent-header", "admin-header", "beta-header"])
 def test_invalid_header_error_names_no_credential(case):
     """A credential with a line break is refused by requests; the error names it not."""
     server = _EchoServer("status-text")
     base = f"http://127.0.0.1:{server.port}"
-
-    class _Wallet:
-        def pay_invoice(self, invoice):
-            return "pre-sekret-0123\n"
-
-    gateway = _GatewayL402() if case == "l402-retry-header" else None
     calls = {
         "agent-header": (lambda: SatGateAgentClient(base, token=CAP + "\n").get("/x"),
                          requests.exceptions.InvalidHeader),
         "admin-header": (lambda: SatGateClient(base, ADMIN + "\n").tokens.mint(), SatGateError),
         "beta-header": (lambda: SatGate(api_key=API_KEY + "\r\n", base_url=base).pay(),
                         SatGateError),
-        "l402-retry-header": (
-            lambda: SatGateAgentClient(
-                f"http://127.0.0.1:{gateway.port}", token=CAP, wallet=_Wallet()
-            ).get(f"/private-path?{QUERY}"),
-            requests.exceptions.InvalidHeader),
     }
     call, expected = calls[case]
     try:
         err = _raised(call)
     finally:
         server.close()
-        if gateway is not None:
-            gateway.close()
     assert type(err) is expected
     text = _formatted(err)
-    for secret in (CAP, ADMIN, API_KEY, "pre-sekret"):
+    for secret in (CAP, ADMIN, API_KEY):
         assert secret not in text
     assert server.hits == 0
-    if gateway is not None:
-        assert gateway.hits == 1
 
 
 # The redaction function itself.

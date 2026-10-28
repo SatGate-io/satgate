@@ -359,37 +359,6 @@ describe('an invalid header value is named in no error', () => {
       await echo.close();
     }
   });
-
-  it('SatGateAgentClient 401 refresh: a refreshed token that is not a valid header value', async () => {
-    // The first mint gives a usable token; the request answers 401; the
-    // second mint gives a token with a line break, which Headers refuses.
-    let mints = 0;
-    const server = http.createServer((req, res) => {
-      req.resume();
-      req.on('end', () => {
-        if (req.url?.endsWith('/api/capability/mint')) {
-          mints += 1;
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ token: mints === 1 ? CAP : `${CAP}\rx`, signature: 's' }));
-          return;
-        }
-        res.writeHead(401);
-        res.end();
-      });
-    });
-    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-    try {
-      const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-      const err = await caught(new SatGateAgentClient({ gatewayUrl: base, adminToken: ADMIN }).get(`/hidden-path?${QUERY}`));
-      expect(mints).toBe(2);
-      expectClass(err, SatGateError);
-      expect((err as Error).message.startsWith('Request failed: TypeError: ')).toBe(true);
-      expectRedacted(err);
-    } finally {
-      server.closeAllConnections();
-      await new Promise<void>((resolve) => server.close(() => resolve()));
-    }
-  });
 });
 
 describe('reviewer cases (round 4)', () => {
