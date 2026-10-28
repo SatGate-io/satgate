@@ -73,6 +73,7 @@ from .exceptions import (
     BudgetExceededError,
     TokenExpiredError,
     DelegationError,
+    RedirectRefusedError,
 )
 
 __version__ = "0.3.2"
@@ -125,4 +126,5 @@ __all__ = [
     "BudgetExceededError",
     "TokenExpiredError",
     "DelegationError",
+    "RedirectRefusedError",
 ]

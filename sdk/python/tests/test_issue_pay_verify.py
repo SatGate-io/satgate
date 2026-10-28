@@ -24,7 +24,10 @@ class RecordingSession:
             FakeResponse(body={"decision": "allow", "evidence_pack_id": "ep_123"}),
         ]
 
-    def post(self, url, json, timeout):
+    def request(self, method, url, json, timeout, allow_redirects):
+        assert method == "POST"
+        # The session carries the API key, so no call may follow a redirect.
+        assert allow_redirects is False
         self.calls.append({"url": url, "json": json, "timeout": timeout})
         return self.responses.pop(0)
 

@@ -93,3 +93,21 @@ class DelegationError(SatGateError):
     """Token delegation failed"""
     pass
 
+
+class RedirectRefusedError(SatGateError):
+    """A request that carries a credential was answered with a redirect.
+
+    The SDK never follows a redirect on such a request, so the credential is
+    sent only to the configured host, once. The message names only the status
+    and that host.
+    """
+
+    def __init__(self, status_code: int, host: str, label: str = "host"):
+        super().__init__(
+            f"{label} {host} answered HTTP {status_code}; the SDK does not "
+            "follow redirects on requests that carry a credential, and the "
+            "credential was not sent again"
+        )
+        self.status_code = status_code
+        self.host = host
+

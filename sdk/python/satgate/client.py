@@ -12,6 +12,7 @@ import requests
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 from datetime import datetime
+from ._http import send_without_redirects
 from .models import Token, TokenInfo, BanRecord, Stats
 from .exceptions import SatGateError, AuthenticationError, NotFoundError
 
@@ -45,6 +46,17 @@ class SatGateClient:
         self.tokens = TokensService(self)
         self.governance = GovernanceService(self)
     
+    def _send(self, method: str, url: str, **kwargs) -> requests.Response:
+        """Send one request through the session, never following a redirect.
+
+        The session carries X-Admin-Token on every request, so every request
+        this client makes goes through here. A 3xx answer raises
+        RedirectRefusedError naming the status and the gateway host.
+        """
+        return send_without_redirects(
+            method, url, session=self.session, label="SatGate gateway", **kwargs
+        )
+
     def _request(
         self,
         method: str,
@@ -60,9 +72,9 @@ class SatGateClient:
             headers["X-Admin-Token"] = self.admin_token
         
         try:
-            response = self.session.request(
-                method=method,
-                url=url,
+            response = self._send(
+                method,
+                url,
                 json=data,
                 headers=headers,
                 timeout=self.timeout
@@ -105,7 +117,8 @@ class SatGateClient:
         """
         url = f"{self.base_url}/api/capability/ping"
         try:
-            resp = self.session.get(
+            resp = self._send(
+                "GET",
                 url,
                 headers={"Authorization": f"Bearer {token}"},
                 timeout=self.timeout

@@ -119,7 +119,7 @@ def test_lnd_wallet_never_follows_redirect_to_http(servers, operation, status):
         tls_cert_path=str(servers.cert),
     )
     message = _assert_refused(wallet, operation, origin, sink, status)
-    assert f"http://127.0.0.1:{sink.port}" in message
+    assert str(sink.port) not in message
 
 
 @pytest.mark.parametrize("status", REDIRECT_STATUSES)
@@ -137,7 +137,8 @@ def test_lnd_wallet_never_follows_redirect_to_another_host(servers, operation, s
         tls_cert_path=str(servers.cert),
     )
     message = _assert_refused(wallet, operation, origin, sink, status)
-    assert f"https://localhost:{sink.port}" in message
+    assert "localhost" not in message
+    assert str(sink.port) not in message
 
 
 @pytest.mark.parametrize("operation", OPERATIONS)
@@ -163,7 +164,7 @@ def test_lnd_wallet_insecure_still_never_follows_redirects(servers, operation):
     _assert_refused(wallet, operation, origin, sink, 302)
 
 
-def test_lnd_wallet_redirect_error_names_only_scheme_host_and_port(servers):
+def test_lnd_wallet_redirect_error_names_only_status_and_host(servers):
     origin = servers(
         cert=servers.cert, key=servers.key, status=302,
         location="http://user:pw@127.0.0.1:9/path?q=hidden",
@@ -175,8 +176,8 @@ def test_lnd_wallet_redirect_error_names_only_scheme_host_and_port(servers):
     with pytest.raises(SatGateError) as exc:
         wallet.get_balance()
     message = str(exc.value)
-    assert "http://127.0.0.1:9" in message
-    for part in ("user", "pw", "/path", "hidden"):
+    assert message.startswith(f"LND host {wallet.host} answered HTTP 302;")
+    for part in ("127.0.0.1:9", "user", "pw", "/path", "hidden"):
         assert part not in message
 
 

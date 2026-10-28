@@ -94,7 +94,23 @@ wallet = LNDWallet(
   for local testing.
 - Wallet requests never follow redirects, with or without `insecure=True`.
   The macaroon is sent only to the configured host. A 3xx answer raises
-  `SatGateError` naming the status and the host.
+  `RedirectRefusedError` (a `SatGateError`) naming the status and the host.
+
+## Redirects
+
+No SDK request that carries a credential follows an HTTP redirect. That
+covers every request that sends an `Authorization` header, `X-Admin-Token`,
+an LND macaroon or a token in the JSON body: `SatGateClient` (all requests;
+its session sends the admin token), `SatGateAgentClient` (minting, every
+request with the capability token including the 401 refresh and the L402
+retry, `validate_token`, `delegate`, `call` and the admin helpers), `SatGate`
+(`issue`, `pay`, `verify`), `LNDWallet` and `AlbyWallet`.
+
+Such a request is sent once, to the configured URL. A 3xx answer raises
+`satgate.RedirectRefusedError` (a `SatGateError`) naming only the status and
+the host that answered; the credential is not sent again. Point the client at
+the final address (for example `https://` rather than an `http://` URL that
+redirects to it). `SatGateClient.health()` returns `False` in that case.
 
 ## Docs
 

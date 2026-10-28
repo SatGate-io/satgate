@@ -20,13 +20,30 @@ All notable changes to the `satgate` Python SDK are listed here.
     path.
 - `LNDWallet` requests (`get_balance`, `pay_invoice`) no longer follow HTTP
   redirects. The macaroon header is sent only to the configured host, once.
-  A 3xx answer raises `SatGateError` naming the status, the host and the
-  redirect's scheme, host and port.
+  A 3xx answer raises `RedirectRefusedError` naming the status and the host.
+- No SDK request that carries a credential follows an HTTP redirect any
+  more. Every such request (`SatGateClient`, whose session sends
+  `X-Admin-Token` on every request; `SatGateAgentClient` minting, gateway
+  requests with the capability token including the 401 refresh and the L402
+  retry, `validate_token` and `delegate` with the token in the body, `call`,
+  and the admin helpers; `SatGate` `issue`/`pay`/`verify`; `AlbyWallet`;
+  `LNDWallet`) is sent once with `allow_redirects=False`, whatever the
+  caller passes. A 3xx answer raises the new `satgate.RedirectRefusedError`
+  (a subclass of `SatGateError`, with `status_code` and `host`) naming only
+  the status and the host that answered. Before, these requests followed
+  redirects and, depending on the status, resent `X-Admin-Token`, the API key
+  or a token in the body to the redirect target.
 
 ### Compatibility
 
 - An LND REST endpoint reached through a redirect now fails with
   `SatGateError`; point `host` at the final address.
+- A gateway, SatGate API or Alby URL that answers with a redirect (for
+  example `http://` redirecting to `https://`, or a trailing-slash redirect)
+  now raises `RedirectRefusedError` instead of being followed; configure the
+  final URL. `SatGateClient.health()` returns `False` for such a gateway.
+  `SatGateAgentClient.fetch_jwks()` sends no credential and still follows
+  redirects.
 - Code that passed `cert_path=` keeps working unchanged.
 - Code that created `LNDWallet` without a certificate path against LND's
   default self-signed certificate now fails with `SatGateError`; pass
