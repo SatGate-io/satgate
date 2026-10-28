@@ -64,6 +64,19 @@ export interface LNDWalletOptions {
   certPath?: string;
 }
 
+/** scheme://host[:port] of a redirect's Location, for an error message. */
+function redirectTarget(base: string, location: string | null): string {
+  if (!location) {
+    return 'no Location';
+  }
+  try {
+    const target = new URL(location, base);
+    return `${target.protocol}//${target.host}`;
+  } catch {
+    return 'an unreadable Location';
+  }
+}
+
 export class LNDWallet implements LightningWallet {
   private host: string;
   private macaroon: string;
@@ -82,11 +95,30 @@ export class LNDWallet implements LightningWallet {
       throw new SatGateError('LND macaroon required');
     }
   }
+
+  /**
+   * Send one request carrying the macaroon header to the LND host. Redirects
+   * are never followed: the macaroon is sent only to the configured host,
+   * once. A 3xx answer throws SatGateError naming the status and the host.
+   */
+  private async request(url: string, init: RequestInit): Promise<Response> {
+    const response = await fetch(url, { ...init, redirect: 'manual' });
+    if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+      const target = redirectTarget(url, response.headers.get('location'));
+      await response.body?.cancel().catch(() => undefined);
+      const status = response.status || 'redirect';
+      throw new SatGateError(
+        `LND host ${this.host} answered HTTP ${status} (redirect to ${target}); ` +
+        'LNDWallet does not follow redirects and the macaroon was not sent again',
+      );
+    }
+    return response;
+  }
   
   async payInvoice(invoice: string): Promise<string> {
     const url = `https://${this.host}/v1/channels/transactions`;
     
-    const response = await fetch(url, {
+    const response = await this.request(url, {
       method: 'POST',
       headers: {
         'Grpc-Metadata-macaroon': this.macaroon,
@@ -111,7 +143,7 @@ export class LNDWallet implements LightningWallet {
   async getBalance(): Promise<number> {
     const url = `https://${this.host}/v1/balance/channels`;
     
-    const response = await fetch(url, {
+    const response = await this.request(url, {
       headers: { 'Grpc-Metadata-macaroon': this.macaroon },
     });
     
