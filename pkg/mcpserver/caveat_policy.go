@@ -150,7 +150,7 @@ func (t *TokenInfo) AllowsTool(toolName string) bool {
 			return true
 		}
 	}
-	if t.Scope == "" || t.Scope == "*" || t.Scope == "api:*" || t.Scope == "mcp:*" {
+	if t.Scope == "" {
 		return true
 	}
 	return matchScope(t.Scope, toolName)
@@ -176,10 +176,13 @@ func rejectWideningScope(mac *macaroon.Macaroon) error {
 	return nil
 }
 
+// scopeCaveatUniversal reports whether a scope caveat value allows every
+// tool: it lists "*" or "mcp:*". "api:*" allows no tool (see
+// toolScopeWordGrants), so it is not universal.
 func scopeCaveatUniversal(scope string) bool {
 	for _, part := range strings.Split(scope, ",") {
 		for _, word := range strings.Fields(part) {
-			if word == "*" || word == "api:*" || word == "mcp:*" {
+			if word == "*" || word == toolScopeNamespace+":*" {
 				return true
 			}
 		}

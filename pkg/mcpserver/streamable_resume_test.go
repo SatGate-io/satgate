@@ -338,7 +338,7 @@ func TestStreamableResumeRefusesExpiredMacaroon(t *testing.T) {
 		t.Fatal(err)
 	}
 	svc := auth.(*MacaroonAuthenticator).Service
-	short, err := svc.Mint("api:*", time.Now().Add(1500*time.Millisecond))
+	short, err := svc.Mint("mcp:*", time.Now().Add(1500*time.Millisecond))
 	if err != nil {
 		t.Fatal(err)
 	}

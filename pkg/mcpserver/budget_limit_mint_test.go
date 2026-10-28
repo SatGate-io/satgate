@@ -21,7 +21,7 @@ const maxBudgetText = "9223372036854775807" // math.MaxInt64
 func mintChildAndVerify(t *testing.T, amount int64) ([]string, *TokenInfo, error) {
 	t.Helper()
 	ctx := context.Background()
-	svc, token := mintBudgetToken(t, "root", "api:*", "", "budget-parent", maxBudgetText)
+	svc, token := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", maxBudgetText)
 	auth := &MacaroonAuthenticator{Service: svc}
 	parent, err := auth.Verify(ctx, token)
 	if err != nil {
@@ -109,7 +109,7 @@ func TestDelegate_UpperRangeBudgetNotRoundedThroughFloat(t *testing.T) {
 // of its own, as before.
 func TestDelegate_ZeroBudgetChildCarriesNoBudgetLimit(t *testing.T) {
 	ctx := context.Background()
-	svc, token := mintBudgetToken(t, "root", "api:*", "", "budget-parent", "100")
+	svc, token := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", "100")
 	auth := &MacaroonAuthenticator{Service: svc}
 	parent, err := auth.Verify(ctx, token)
 	if err != nil {
@@ -143,7 +143,7 @@ func TestHandleDelegate_BudgetAboveLargestRefusedAtMint(t *testing.T) {
 		"exponent form":         `{"budget":1e3,"scope":"api:read"}`,
 	} {
 		t.Run(name, func(t *testing.T) {
-			svc, token := mintBudgetToken(t, "root", "api:*", "", "budget-parent", maxBudgetText)
+			svc, token := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", maxBudgetText)
 			parent, err := (&MacaroonAuthenticator{Service: svc}).Verify(ctx, token)
 			if err != nil {
 				t.Fatal(err)
@@ -175,7 +175,7 @@ func TestHandleDelegate_BudgetAboveLargestRefusedAtMint(t *testing.T) {
 // The same largest-budget delegation made over the MCP HTTP transport returns
 // a child that verifies.
 func TestDelegate_LargestWholeBudgetOverHTTPVerifies(t *testing.T) {
-	svc, tok := mintBudgetToken(t, "root", "api:*", "", "budget-parent", maxBudgetText)
+	svc, tok := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", maxBudgetText)
 	p := newEvidenceTestProxy(t)
 	p.config.Auth.Mode = "header"
 	p.SetAuthenticator(&MacaroonAuthenticator{Service: svc})
@@ -222,7 +222,7 @@ func TestFillTokenInfo_LegacyTwoDecimalBudgetLimitStillVerifies(t *testing.T) {
 		"9223372036854774784.00": 9223372036854774784,
 	} {
 		t.Run(text, func(t *testing.T) {
-			svc, token := mintBudgetToken(t, "root", "api:*", "", "budget-parent", maxBudgetText)
+			svc, token := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", maxBudgetText)
 			child := legacyChild(t, svc, token, "budget_limit = "+text)
 			info, err := (&MacaroonAuthenticator{Service: svc}).Verify(ctx, child)
 			if err != nil {
@@ -239,7 +239,7 @@ func TestFillTokenInfo_LegacyTwoDecimalBudgetLimitStillVerifies(t *testing.T) {
 // "9223372036854775808.00" (the float64 nearest to them, 2^63). That value is
 // outside the int64 range and is refused; this delegator no longer writes it.
 func TestFillTokenInfo_LegacyBudgetLimitAboveInt64IsRefused(t *testing.T) {
-	svc, token := mintBudgetToken(t, "root", "api:*", "", "budget-parent", maxBudgetText)
+	svc, token := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", maxBudgetText)
 	child := legacyChild(t, svc, token, "budget_limit = 9223372036854775808.00")
 	if _, err := (&MacaroonAuthenticator{Service: svc}).Verify(context.Background(), child); err == nil || !strings.Contains(err.Error(), "invalid budget_limit caveat") {
 		t.Fatalf("budget_limit = 9223372036854775808.00 must be refused, got %v", err)

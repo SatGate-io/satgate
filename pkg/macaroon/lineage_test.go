@@ -36,7 +36,7 @@ func TestLineage_ContainsEveryAncestorAndEndsAtOwnSignature(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Offline attenuation, as any holder can do without the root key.
-	grandchild, err := svc.DelegateWithoutVerify(svc.Encode(child), []string{"expires = 30m", "scope = api:read:x"})
+	grandchild, err := svc.DelegateWithoutVerify(svc.Encode(child), []string{"expires = " + time.Now().Add(30*time.Minute).UTC().Format(time.RFC3339), "scope = api:read:x"})
 	if err != nil {
 		t.Fatal(err)
 	}

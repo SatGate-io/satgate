@@ -64,7 +64,7 @@ func newLineageRig(t *testing.T, checker LineageRevocationChecker) *lineageRig {
 // mint returns a root token and its signature.
 func (r *lineageRig) mint() (string, string) {
 	r.t.Helper()
-	mac, err := r.svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := r.svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		r.t.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func TestMCPLineage_BannedDescendantNotAdmittedChargedOrForwarded(t *testing.T) 
 	gov := governance.NewService(nil)
 	r := newLineageRig(t, gov)
 	root, rootSig := r.mint()
-	child, _ := r.delegate(root, "scope = api:*")
+	child, _ := r.delegate(root, "scope = mcp:*")
 	budget := r.fund(child, 10)
 	gov.Ban(rootSig, "test", "admin")
 
@@ -328,7 +328,7 @@ func TestMCPLineage_BannedTokenRefusedBeforePassedOn(t *testing.T) {
 	}
 	p.proxy.SetAuthenticator(&MacaroonAuthenticator{Service: svc})
 	p.proxy.SetLineageRevocationChecker(gov)
-	root, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	root, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}

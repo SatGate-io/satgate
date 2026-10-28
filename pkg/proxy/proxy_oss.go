@@ -1293,18 +1293,15 @@ func (g *Gateway) handleCapabilityDelegate(w http.ResponseWriter, r *http.Reques
 	if g.governance != nil {
 		// Extract scope from caveats
 		scope := "api:*"
-		expiresAt := time.Now().Add(1 * time.Hour) // Default
 		for _, caveat := range child.Caveats {
 			if strings.HasPrefix(caveat, "scope = ") {
 				scope = strings.TrimPrefix(caveat, "scope = ")
 			}
-			if strings.HasPrefix(caveat, "expires = ") {
-				if ts, err := time.Parse(time.RFC3339, strings.TrimPrefix(caveat, "expires = ")); err == nil {
-					expiresAt = ts
-				} else if exp, err := time.ParseDuration(strings.TrimPrefix(caveat, "expires = ")); err == nil {
-					expiresAt = time.Now().Add(exp)
-				}
-			}
+		}
+		// The earliest expiry the child carries, read the way Verify reads it.
+		expiresAt, ok := child.GetExpiry()
+		if !ok {
+			expiresAt = time.Now().Add(1 * time.Hour) // display default
 		}
 		g.governance.RegisterDelegation(child.Signature, scope, expiresAt, parentSig)
 	}
@@ -1428,32 +1425,20 @@ func (g *Gateway) handleCapabilityAdmin(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Check scope caveats - ALL scope caveats must allow the required scope
-	// (macaroon semantics: adding caveats can only restrict, never expand permissions)
+	// Every scope caveat must grant the required scope (macaroon semantics:
+	// adding caveats can only restrict, never expand permissions), and the
+	// token must carry at least one. Matching is macaroon.ScopeGrants.
 	requiredScope := "api:capability:admin"
-	mostRestrictiveScope := "" // Track the most restrictive scope found
-	allScopesAllow := true     // Assume allowed until proven otherwise
-
+	mostRestrictiveScope := mac.GetScope() // last scope caveat, for the message
+	hasScopeCaveat := false
 	for _, caveat := range mac.Caveats {
 		if strings.HasPrefix(caveat, "scope = ") {
-			scopeValue := strings.TrimPrefix(caveat, "scope = ")
-			mostRestrictiveScope = scopeValue // Keep track of last (most restrictive) scope
-
-			// Check if this specific scope caveat allows the required scope
-			scopeAllows := scopeValue == requiredScope ||
-				scopeValue == "api:capability:*" ||
-				scopeValue == "api:*" ||
-				(strings.HasSuffix(scopeValue, ":*") && strings.HasPrefix(requiredScope, strings.TrimSuffix(scopeValue, "*")))
-
-			// If ANY scope caveat denies access, the token is denied (macaroon AND semantics)
-			if !scopeAllows {
-				allScopesAllow = false
-				// Don't break - keep looping to find the most restrictive scope for error message
-			}
+			hasScopeCaveat = true
+			break
 		}
 	}
 
-	if !allScopesAllow || mostRestrictiveScope == "" {
+	if !hasScopeCaveat || !mac.HasScope(requiredScope) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(map[string]interface{}{

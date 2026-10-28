@@ -157,7 +157,7 @@ func TestMacaroonAuthenticator_AppendedBudgetLimitClamped(t *testing.T) {
 
 func TestDelegator_ChildBudgetIDStillVerifies(t *testing.T) {
 	ctx := context.Background()
-	svc, parentToken := mintBudgetToken(t, "root", "api:*", "tenant-a", "budget-parent", "100")
+	svc, parentToken := mintBudgetToken(t, "root", "mcp:*", "tenant-a", "budget-parent", "100")
 	auth := &MacaroonAuthenticator{Service: svc}
 	parent, err := auth.Verify(ctx, parentToken)
 	if err != nil {
@@ -170,7 +170,7 @@ func TestDelegator_ChildBudgetIDStillVerifies(t *testing.T) {
 	result, err := NewDelegator(svc, budget).Delegate(ctx, parent, &DelegateParams{
 		Budget: 30,
 		Label:  "research-agent",
-		Scope:  "api:read",
+		Scope:  "search",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -185,8 +185,8 @@ func TestDelegator_ChildBudgetIDStillVerifies(t *testing.T) {
 	if child.BudgetID == parent.BudgetID {
 		t.Fatal("child must not spend the parent budget")
 	}
-	if !child.AllowsTool("api:read") || child.AllowsTool("api:write") {
-		t.Fatalf("child scope should be api:read only, scope=%q", child.Scope)
+	if !child.AllowsTool("search") || child.AllowsTool("write") {
+		t.Fatalf("child scope should be search only, scope=%q", child.Scope)
 	}
 	if child.BudgetLimit != 30 {
 		t.Fatalf("child limit = %d, want 30", child.BudgetLimit)
@@ -282,7 +282,7 @@ func TestMacaroonAuthenticator_CopiedBudgetSealRejected(t *testing.T) {
 
 func TestDelegator_ProductionChildResolvesSealedBudget(t *testing.T) {
 	ctx := context.Background()
-	svc, parentToken := mintBudgetToken(t, "root", "api:*", "", "budget-parent", "40")
+	svc, parentToken := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", "40")
 	auth := &MacaroonAuthenticator{Service: svc}
 	parent, err := auth.Verify(ctx, parentToken)
 	if err != nil {
@@ -381,7 +381,7 @@ func assertDepthStopsAt(t *testing.T, issued, extra string, stop int) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -418,7 +418,7 @@ func assertDepthStopsAt(t *testing.T, issued, extra string, stop int) {
 func assertBudgetCap(t *testing.T, issued, extra string, cap int64) {
 	t.Helper()
 	ctx := context.Background()
-	svc, token := mintBudgetToken(t, "root", "api:*", "", "budget-parent", "100")
+	svc, token := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", "100")
 	mac, err := svc.Decode(token)
 	if err != nil {
 		t.Fatal(err)

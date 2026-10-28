@@ -1,7 +1,6 @@
 package macaroon
 
 import (
-	"strings"
 	"time"
 )
 
@@ -13,18 +12,11 @@ type VerifiedMacaroon struct {
 	ExpiresAt time.Time
 }
 
-// HasScope checks if the verified macaroon has a specific scope.
+// HasScope reports whether the verified macaroon grants required. An empty
+// Scope keeps full access; any other Scope is compared with ScopeGrants.
 func (v *VerifiedMacaroon) HasScope(required string) bool {
-	if v.Scope == "" || v.Scope == "*" {
+	if v.Scope == "" {
 		return true
 	}
-	if v.Scope == required {
-		return true
-	}
-	// Check wildcard patterns
-	if strings.HasSuffix(v.Scope, "*") {
-		prefix := strings.TrimSuffix(v.Scope, "*")
-		return strings.HasPrefix(required, prefix)
-	}
-	return false
+	return ScopeGrants(v.Scope, required)
 }

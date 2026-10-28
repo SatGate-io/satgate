@@ -188,7 +188,8 @@ func New(cfg *Config) (*Proxy, error) {
 					log.Info().Str("tokenId", tokenID).Msg("root token available programmatically; not printing secret")
 					fmt.Fprintf(os.Stderr, "TOKEN_ID=%s\n", tokenID)
 				} else {
-					rootMac, mintErr := macAuth.Service.Mint("api:*", time.Now().Add(24*time.Hour))
+					// "mcp:*" allows every tool; an "api:*" token allows none.
+					rootMac, mintErr := macAuth.Service.Mint(toolScopeNamespace+":*", time.Now().Add(24*time.Hour))
 					if mintErr != nil {
 						return nil, fmt.Errorf("auto-mint root token: %w", mintErr)
 					}
@@ -1704,11 +1705,10 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 	return resp, nil
 }
 
-// generateRequestID creates an idempotency key from token + tool + request ID.
-// matchScope checks if a tool name matches a comma-separated scope string.
-// Supports exact match and wildcard prefix (e.g., "db:*" matches "db:query").
-// Handles tenant-prefixed scopes (e.g., "tenant-uuid:*" or "tenant-uuid:mcp:*")
-// by stripping the tenant prefix before matching.
+// matchScope reports whether a comma-separated scope caveat value allows a
+// tool. Each word is compared with macaroon.ScopeGrants against the tool's
+// scope "mcp:<tool>" (see toolScopeWordGrants). A tenant UUID prefix on a
+// word ("<uuid>:mcp:*") is stripped before matching.
 func matchScope(scope, toolName string) bool {
 	// No scope, wildcard included, allows a tool whose name starts with the
 	// reserved argument-rules prefix. An older runtime allows a tool whose name
@@ -1725,22 +1725,38 @@ func matchScope(scope, toolName string) bool {
 			s = s[37:]
 		}
 
-		if s == "*" || s == "api:*" || s == "mcp:*" {
-			return true
-		}
-		if strings.HasSuffix(s, ":*") {
-			prefix := strings.TrimSuffix(s, ":*")
-			if strings.HasPrefix(toolName, prefix+":") || strings.HasPrefix(toolName, prefix+"_") {
-				return true
-			}
-		}
-		if s == toolName {
+		if toolScopeWordGrants(s, toolName) {
 			return true
 		}
 	}
 	return false
 }
 
+// toolScopeNamespace is the scope namespace of MCP tools: calling tool T
+// needs scope "mcp:T".
+const toolScopeNamespace = "mcp"
+
+// toolScopeWordGrants reports whether one scope word allows a tool. The tool
+// needs scope "mcp:<tool>", and the word is compared with macaroon.ScopeGrants:
+//
+//   - "*", "mcp:*" and "mcp:<tool>" are read as written;
+//   - a word in the "api:" namespace is an HTTP API scope and allows no tool;
+//   - any other word is a tool name or tool-name wildcard written without the
+//     namespace, and is read as "mcp:<word>": "search" allows the tool
+//     "search", and "db:*" allows "db:query" (not "db_query").
+func toolScopeWordGrants(word, toolName string) bool {
+	required := toolScopeNamespace + ":" + toolName
+	switch {
+	case word == "*" || strings.HasPrefix(word, toolScopeNamespace+":"):
+		return macaroon.ScopeGrants(word, required)
+	case strings.HasPrefix(word, "api:"):
+		return false
+	default:
+		return macaroon.ScopeGrants(toolScopeNamespace+":"+word, required)
+	}
+}
+
+// generateRequestID creates an idempotency key from token + tool + request ID.
 func generateRequestID(tokenID, toolName string, reqID json.RawMessage) string {
 	h := sha256.New()
 	h.Write([]byte(tokenID))

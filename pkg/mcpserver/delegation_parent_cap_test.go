@@ -26,7 +26,7 @@ func (b *spendCountingBudget) Spend(ctx context.Context, tokenID, toolName strin
 // the parent's stored balance to balance.
 func narrowedParent(t *testing.T, issued, narrowed string, balance int64) (*MacaroonAuthenticator, *TokenInfo, *spendCountingBudget) {
 	t.Helper()
-	svc, tok := mintBudgetToken(t, "root", "api:*", "", "budget-parent", issued)
+	svc, tok := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", issued)
 	if narrowed != "" {
 		tok = appendCaveat(t, svc, tok, "budget_limit = "+narrowed)
 	}
@@ -143,7 +143,7 @@ func TestDelegate_AcceptedAllocationEqualsChildVerifiedBudget(t *testing.T) {
 // balance; an ask at the cap is then accepted and the
 // child verifies with exactly the reported allocation.
 func TestDelegate_HTTPAllocationAboveInheritedCapRefused(t *testing.T) {
-	svc, tok := mintBudgetToken(t, "root", "api:*", "", "budget-parent", "100")
+	svc, tok := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", "100")
 	tok = appendCaveat(t, svc, tok, "budget_limit = 20")
 	p := newEvidenceTestProxy(t)
 	p.config.Auth.Mode = "header"

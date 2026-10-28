@@ -26,7 +26,7 @@ func TestDelegator_Delegate(t *testing.T) {
 	d := NewDelegator(svc, budget)
 
 	// Mint parent token
-	mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func TestDelegator_Delegate(t *testing.T) {
 	parentInfo := &TokenInfo{
 		TokenID:  parentTokenID,
 		BudgetID: parentTokenID,
-		Scope:    "api:*",
+		Scope:    "mcp:*",
 		RawToken: parentToken,
 	}
 
@@ -111,7 +111,7 @@ func TestDelegator_InsufficientBudget(t *testing.T) {
 	budget := NewInMemoryBudgetEnforcer()
 	d := NewDelegator(svc, budget)
 
-	mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,7 +151,7 @@ func TestDelegator_MultipleDelegations(t *testing.T) {
 	budget := NewInMemoryBudgetEnforcer()
 	d := NewDelegator(svc, budget)
 
-	mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -241,7 +241,7 @@ func unextendableParent(t *testing.T) (*macaroon.Service, *TokenInfo) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	mac, err := other.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := other.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -311,7 +311,7 @@ func TestDelegateOtherErrorsKeepTheirMessages(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	mac, _ := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, _ := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	d := NewDelegator(svc, NewInMemoryBudgetEnforcer())
 	base := TokenInfo{TokenID: "p", BudgetID: "p", RawToken: svc.Encode(mac)}
 

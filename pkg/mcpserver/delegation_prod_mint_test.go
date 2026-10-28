@@ -21,7 +21,7 @@ func TestZeroCreditChildWithTheOptionOffIsMintedAsProdMintsIt(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	root, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	root, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}

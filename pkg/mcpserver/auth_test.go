@@ -56,7 +56,7 @@ func TestMacaroonAuthenticator(t *testing.T) {
 	auth := &MacaroonAuthenticator{Service: svc}
 
 	// Mint a token
-	mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,8 +70,8 @@ func TestMacaroonAuthenticator(t *testing.T) {
 	if info.TokenID == "" {
 		t.Error("expected non-empty token ID")
 	}
-	if info.Scope != "api:*" {
-		t.Errorf("expected api:*, got %s", info.Scope)
+	if info.Scope != "mcp:*" {
+		t.Errorf("expected mcp:*, got %s", info.Scope)
 	}
 	if info.RawToken != token {
 		t.Error("expected raw token to be preserved")
@@ -102,7 +102,7 @@ func TestMacaroonAuthenticator_WithBudgetID(t *testing.T) {
 	auth := &MacaroonAuthenticator{Service: svc}
 
 	// Mint a token with budget_id caveat
-	mac, err := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}

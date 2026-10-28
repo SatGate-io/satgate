@@ -90,7 +90,7 @@ func newStdioRig(t *testing.T, checker LineageRevocationChecker, wrap func(conte
 
 func (r *stdioRig) mint() (string, string) {
 	r.t.Helper()
-	mac, err := r.svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, err := r.svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	if err != nil {
 		r.t.Fatal(err)
 	}
@@ -185,7 +185,7 @@ func TestMCPStdio_SuppliedTokenBannedOrUnreadableRefusedOnEveryMethod(t *testing
 func TestMCPStdio_ConnectionTokenBannedRefusedOnToolsListAndPassedOn(t *testing.T) {
 	gov := governance.NewService(nil)
 	svc, _ := macaroon.NewService(stdioLineageRoot)
-	mac, _ := svc.Mint("api:*", time.Now().Add(time.Hour))
+	mac, _ := svc.Mint("mcp:*", time.Now().Add(time.Hour))
 	childMac, err := svc.Delegate(svc.Encode(mac), []string{"label = conn"})
 	if err != nil {
 		t.Fatal(err)
@@ -205,7 +205,7 @@ func TestMCPStdio_ConnectionTokenBannedRefusedOnToolsListAndPassedOn(t *testing.
 func TestMCPStdio_SuppliedTokenThatDoesNotVerifyRefused(t *testing.T) {
 	r := newStdioRig(t, governance.NewService(nil), nil)
 	other, _ := macaroon.NewService("some-other-root")
-	mac, _ := other.Mint("api:*", time.Now().Add(time.Hour))
+	mac, _ := other.Mint("mcp:*", time.Now().Add(time.Hour))
 	forged := other.Encode(mac)
 	for _, m := range append([]string{MethodToolsList}, stdioPassedOn...) {
 		if resp := r.call(m, forged); resp.Error == nil || !strings.Contains(resp.Error.Message, "authentication failed") {
@@ -243,7 +243,7 @@ func TestMCPStdio_UnbannedAndTokenlessRequestsServed(t *testing.T) {
 func TestMCPStdio_NoCheckerLeavesToolsListAndPassedOnUnchanged(t *testing.T) {
 	r := newStdioRig(t, nil, nil)
 	other, _ := macaroon.NewService("some-other-root")
-	mac, _ := other.Mint("api:*", time.Now().Add(time.Hour))
+	mac, _ := other.Mint("mcp:*", time.Now().Add(time.Hour))
 	for _, tok := range []string{other.Encode(mac), ""} {
 		if resp := r.call(MethodToolsList, tok); !listed(resp) {
 			t.Fatalf("tools/list without a checker refused: %+v", resp.Error)

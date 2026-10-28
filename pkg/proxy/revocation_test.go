@@ -152,7 +152,7 @@ func TestRevocation_BanCoversTokensDelegatedBeforeTheBan(t *testing.T) {
 	gw := newRevocationGateway(t, up.URL, governance.NewService(nil))
 	root, rootSig := mintRoot(t, gw)
 	child := delegateVia(t, gw, root, "scope = api:read")
-	grandchild := delegateVia(t, gw, child.Token, "expires = 30m")
+	grandchild := delegateVia(t, gw, child.Token, "expires = "+time.Now().Add(30*time.Minute).UTC().Format(time.RFC3339))
 
 	for name, tok := range map[string]string{"root": root, "child": child.Token, "grandchild": grandchild.Token} {
 		if rec := bearerGet(t, gw, "/api/x", tok); rec.Code != http.StatusOK {
@@ -226,7 +226,7 @@ func TestRevocation_BanningAChildLeavesParentAndSiblings(t *testing.T) {
 	// Siblings differ in their caveats: two delegations of one parent with
 	// the same caveats are the same token.
 	b := delegateVia(t, gw, root, "scope = api:write")
-	aChild := delegateVia(t, gw, a.Token, "expires = 30m")
+	aChild := delegateVia(t, gw, a.Token, "expires = "+time.Now().Add(30*time.Minute).UTC().Format(time.RFC3339))
 	banVia(t, gw, a.Signature)
 
 	if rec := bearerGet(t, gw, "/api/x", root); rec.Code != http.StatusOK {

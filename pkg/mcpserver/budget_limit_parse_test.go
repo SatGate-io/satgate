@@ -92,7 +92,7 @@ func TestFillTokenInfo_InvalidDelegationBudgetRefusesToken(t *testing.T) {
 	ctx := context.Background()
 	for _, value := range invalidWholeAmounts {
 		t.Run(value, func(t *testing.T) {
-			svc, token := mintBudgetToken(t, "root", "api:*", "", "budget-parent", "100")
+			svc, token := mintBudgetToken(t, "root", "mcp:*", "", "budget-parent", "100")
 			token = appendCaveat(t, svc, token, "delegation_budget = 10", "delegation_budget = "+value)
 			if _, err := (&MacaroonAuthenticator{Service: svc}).Verify(ctx, token); err == nil || !strings.Contains(err.Error(), "invalid delegation_budget caveat") {
 				t.Fatalf("delegation_budget = %q must refuse the token, got %v", value, err)
