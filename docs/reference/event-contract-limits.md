@@ -38,7 +38,14 @@ A call is refused, never valued, when:
 - the schema's reader refuses the shape. Readers use the fixed reasons below
   for resting orders, orders sized by amount, amend or replace, batches, and
   a close that cannot be guaranteed;
-- the cost is 10^10 or more.
+- the cost is 10^10 or more (opening orders only; a closing order has no
+  cost).
+
+Every check in this list except the last applies to closing orders exactly as
+to opening orders, including the price bound when the reader returns a price.
+A closing order skips only the cost: it is valued at 0, always passes
+`max_cost`, and is not counted against day or week limits, approvals or
+per-event totals.
 
 ## Registry
 
@@ -138,6 +145,11 @@ The existing keys, with `"value":"event_max_cost"` and `"schema"`:
 - `reset` must be `manual`. Totals are never reset by time. The host program
   resets them with `EventStakeStore.ResetEvents(ctx,
   mcpserver.EventStakeKey(tenantID, limit))`.
+- Each reservation has its own identity, returned by `ReserveEvent` and bound
+  to the generation of the totals; `ResetEvents` starts a new generation. A
+  give-back releases only the reservation it names. A reservation made
+  before a reset is dropped by it, and giving it back afterwards changes
+  nothing, so it never lowers a total counted after the reset.
 - A counter holds at most 10,000 events. A new event past that is refused
   until the totals are reset.
 - At most 8 entries per token.
@@ -153,7 +165,11 @@ a call that an event control covers, it checks in this order:
    (`NewEventGate(store, map[schema]service)` or `BoundUpstream`).
 3. The market is found, has an event, has two outcomes, a contract on it is
    worth at most 1, it is not a combination of markets, and it is open for
-   trading (`Tradable`, and `ClosesAt` not passed).
+   trading (`Tradable`, and `ClosesAt` not passed). The lookup has a time
+   limit (`EventGate.LookupTimeout`, default 5 seconds). An answer that comes
+   after that deadline, or after the call's context is done, is not used,
+   even when the lookup returned no error: the call is refused with
+   `tool_controls_unavailable` before anything is reserved or sent.
 4. Every `event_markets` entry allows it.
 5. Every `event_stakes` entry has room. The value is reserved and given back
    only when the call is known not to have run (the spending limit rule).
@@ -177,7 +193,7 @@ Codes:
 | `TOOL_SPEND_LIMIT_DENIED` | the order cannot be valued; a day, week or per-event total would be passed; per-event totals are full; two schemas; the call's name or layout cannot be matched |
 | `EVENT_MARKET_NOT_ALLOWED` | not on an allow list; market not found, no event, not two outcomes, worth more than 1, a combination, not open; schema not bound to the tool's service; no market lookup registered |
 | `APPROVAL_REQUIRED`, `APPROVAL_CHECK_FAILED` | as for other approvals |
-| `tool_controls_unavailable` | lookup error or timeout, store error, store without per-event totals, tool table unavailable, no event gate installed |
+| `tool_controls_unavailable` | lookup error, or a lookup answer after its deadline, store error, store without per-event totals, tool table unavailable, no event gate installed |
 
 Reasons an order cannot be valued (each follows "this token counts each order
 at the most it can cost, and "):
