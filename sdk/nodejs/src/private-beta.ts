@@ -1,6 +1,6 @@
 import fetch, { Response } from 'node-fetch';
 import { SatGateAuthError, SatGateError } from './errors';
-import { fetchWithoutRedirects, readJson, redact, requestRedaction } from './transport';
+import { fetchWithoutRedirects, withoutUrlInErrors } from './transport';
 
 const BETA_ACCESS_MESSAGE =
   'This API namespace requires private beta access. Visit cloud.satgate.io/docs to request access.';
@@ -89,16 +89,15 @@ export class SatGate {
     }
 
     const url = `${this.baseUrl}${path}`;
-    const init: RequestInit = {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    };
     let response: Response;
     try {
       // The request carries the API key: it never follows a redirect.
-      response = await fetchWithoutRedirects<Response>(url, init, {
+      response = await fetchWithoutRedirects<Response>(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      }, {
         label: 'SatGate API host',
         fetchImpl: fetch as unknown as (url: string, init: RequestInit) => Promise<Response>,
       });
@@ -107,7 +106,7 @@ export class SatGate {
       if (err instanceof SatGateError) {
         throw err;
       }
-      throw new SatGateError(`Request failed: ${redact(String(err), err, requestRedaction(url, init))}`);
+      throw new SatGateError(`Request failed: ${err}`);
     }
     clearTimeout(timeoutId);
 
@@ -116,10 +115,9 @@ export class SatGate {
     }
 
     if (!response.ok) {
-      const errBody = await readJson<Record<string, unknown>>(response).catch(() => ({})) as Record<string, unknown>;
-      const quoted = errBody.message || errBody.error;
+      const errBody = await response.json().catch(() => ({})) as Record<string, unknown>;
       throw new SatGateError(
-        quoted ? redact(String(quoted), response) : `Request failed with status ${response.status}`,
+        (errBody.message as string) || (errBody.error as string) || `Request failed with status ${response.status}`,
         response.status
       );
     }
@@ -127,9 +125,8 @@ export class SatGate {
     if (response.status === 204) {
       return {} as T;
     }
-    // node-fetch writes the request URL into body-read errors; readJson
-    // redacts them.
-    return readJson<T>(response);
+    // node-fetch writes the request URL into body-read errors.
+    return withoutUrlInErrors(url, () => response.json() as Promise<T>);
   }
 
   private toApiPayload(value: unknown): JsonValue {

@@ -32,14 +32,7 @@ import {
   PaymentFailedError,
   RequestUrlRefusedError,
 } from './errors';
-import {
-  fetchWithoutRedirects,
-  readJson,
-  readText,
-  redact,
-  redactingErrors,
-  requestRedaction,
-} from './transport';
+import { fetchWithoutRedirects } from './transport';
 
 export interface AgentResponse<T = unknown> {
   statusCode: number;
@@ -115,13 +108,13 @@ export class LNDWallet implements LightningWallet {
     });
     
     if (!response.ok) {
-      throw new PaymentFailedError(`LND payment failed: ${redact(await readText(response), response)}`);
+      throw new PaymentFailedError(`LND payment failed: ${await response.text()}`);
     }
     
-    const result = await readJson<{ payment_preimage?: string; payment_error?: string }>(response);
+    const result = await response.json() as { payment_preimage?: string; payment_error?: string };
     
     if (result.payment_error) {
-      throw new PaymentFailedError(`Payment error: ${redact(String(result.payment_error), response)}`);
+      throw new PaymentFailedError(`Payment error: ${result.payment_error}`);
     }
     
     return result.payment_preimage || '';
@@ -135,10 +128,10 @@ export class LNDWallet implements LightningWallet {
     });
     
     if (!response.ok) {
-      throw new SatGateError(`Failed to get balance: ${redact(await readText(response), response)}`);
+      throw new SatGateError(`Failed to get balance: ${await response.text()}`);
     }
     
-    const result = await readJson<{ balance?: string }>(response);
+    const result = await response.json() as { balance?: string };
     return parseInt(result.balance || '0', 10);
   }
 }
@@ -178,10 +171,10 @@ export class AlbyWallet implements LightningWallet {
     }, { label: 'Alby API host' });
     
     if (!response.ok) {
-      throw new PaymentFailedError(`Alby payment failed: ${redact(await readText(response), response)}`);
+      throw new PaymentFailedError(`Alby payment failed: ${await response.text()}`);
     }
     
-    const result = await readJson<{ payment_preimage?: string }>(response);
+    const result = await response.json() as { payment_preimage?: string };
     return result.payment_preimage || '';
   }
   
@@ -195,10 +188,10 @@ export class AlbyWallet implements LightningWallet {
     }, { label: 'Alby API host' });
     
     if (!response.ok) {
-      throw new SatGateError(`Failed to get balance: ${redact(await readText(response), response)}`);
+      throw new SatGateError(`Failed to get balance: ${await response.text()}`);
     }
     
-    const result = await readJson<{ balance?: number }>(response);
+    const result = await response.json() as { balance?: number };
     return result.balance || 0;
   }
 }
@@ -297,9 +290,8 @@ export class SatGateAgentClient {
     // Mint new token via OSS endpoint
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-    let response: Response | undefined;
     try {
-      response = await this.send(`${this.gatewayUrl}/api/capability/mint`, {
+      const response = await this.send(`${this.gatewayUrl}/api/capability/mint`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -315,15 +307,15 @@ export class SatGateAgentClient {
       clearTimeout(timeoutId);
       
       if (!response.ok) {
-        throw new AuthenticationError(`Mint failed (${response.status}): ${redact(await readText(response), response)}`);
+        throw new AuthenticationError(`Mint failed (${response.status}): ${await response.text()}`);
       }
       
-      const result = await readJson<{
+      const result = await response.json() as {
         token: string;
         signature: string;
         scope?: string;
         expiresAt?: string;
-      }>(response);
+      };
       
       // Parse expiration
       let expiresAt = Date.now() + 3600000; // Default 1 hour
@@ -346,7 +338,7 @@ export class SatGateAgentClient {
       return this.tokenCache.token;
     } catch (e) {
       if (e instanceof SatGateError) throw e;
-      throw new AuthenticationError(`Failed to mint token: ${redact(String(e), e, response)}`);
+      throw new AuthenticationError(`Failed to mint token: ${e}`);
     } finally {
       clearTimeout(timeoutId);
     }
@@ -364,7 +356,7 @@ export class SatGateAgentClient {
     const contentType = response.headers.get('Content-Type') || '';
     if (contentType.includes('application/json')) {
       try {
-        challenge = await readJson<Record<string, unknown>>(response);
+        challenge = await response.json() as Record<string, unknown>;
       } catch { /* ignore parse errors */ }
     }
     
@@ -398,16 +390,13 @@ export class SatGateAgentClient {
     try {
       preimage = await this.wallet.payInvoice(invoice);
     } catch (e) {
-      throw new PaymentFailedError(`Lightning payment failed: ${redact(String(e), e, response)}`);
+      throw new PaymentFailedError(`Lightning payment failed: ${e}`);
     }
     
     // Build L402 token and retry
     const l402Token = `L402 ${macaroon}:${preimage}`;
-    const headers = await redactingErrors(() => {
-      const built = new Headers(options.headers);
-      built.set('Authorization', l402Token);
-      return built;
-    }, requestRedaction(url, { ...options, headers: { Authorization: l402Token } }), response);
+    const headers = new Headers(options.headers);
+    headers.set('Authorization', l402Token);
     
     const retryResponse = await this.send(url, { ...options, headers });
     const costSats = (challenge.amount_sats as number) || (challenge.amount as number) || 0;
@@ -415,7 +404,7 @@ export class SatGateAgentClient {
     return {
       statusCode: retryResponse.status,
       headers: Object.fromEntries(retryResponse.headers.entries()),
-      data: await readJson(retryResponse),
+      data: await retryResponse.json(),
       cost: costSats,
     };
   }
@@ -435,15 +424,10 @@ export class SatGateAgentClient {
     
     // Add capability token if available
     const token = await this.getToken();
-    // An invalid header value is named in the error Headers throws.
-    const headers = await redactingErrors(() => {
-      const built = new Headers(options.headers);
-      if (token && !built.has('Authorization')) {
-        built.set('Authorization', `Bearer ${token}`);
-      }
-      return built;
-    }, requestRedaction(url, { ...options, headers: token ? { Authorization: `Bearer ${token}` } : {} }),
-    requestRedaction(url, options));
+    const headers = new Headers(options.headers);
+    if (token && !headers.has('Authorization')) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
     
     const requestOptions: RequestInit = {
       ...options,
@@ -469,7 +453,7 @@ export class SatGateAgentClient {
           return {
             statusCode: response.status,
             headers: Object.fromEntries(response.headers.entries()),
-            data: await readJson<T>(response),
+            data: await response.json() as T,
             cost: 0,
             budgetRemaining: this.tokenCache?.budgetLimit
               ? this.tokenCache.budgetLimit - this.tokenCache.budgetUsed
@@ -487,21 +471,18 @@ export class SatGateAgentClient {
           this.tokenCache = undefined;
           const newToken = await this.getToken();
           if (newToken) {
-            await redactingErrors(
-              () => headers.set('Authorization', `Bearer ${newToken}`),
-              requestRedaction(url, { headers: { Authorization: `Bearer ${newToken}` } }),
-            );
+            headers.set('Authorization', `Bearer ${newToken}`);
           }
           continue;
         }
         
         // Other error
-        throw new SatGateError(`Request failed: ${response.status} ${redact(await readText(response), response)}`);
+        throw new SatGateError(`Request failed: ${response.status} ${await response.text()}`);
         
       } catch (e) {
         clearTimeout(timeoutId);
         if (e instanceof SatGateError) throw e;
-        throw new SatGateError(`Request failed: ${redact(String(e), e, requestRedaction(url, requestOptions))}`);
+        throw new SatGateError(`Request failed: ${e}`);
       }
     }
     
@@ -582,10 +563,9 @@ export class SatGateAgentClient {
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-    let response: Response | undefined;
     
     try {
-      response = await this.send(`${this.gatewayUrl}/api/capability/delegate`, {
+      const response = await this.send(`${this.gatewayUrl}/api/capability/delegate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -598,15 +578,15 @@ export class SatGateAgentClient {
       clearTimeout(timeoutId);
       
       if (!response.ok) {
-        throw new SatGateError(`Delegation failed: ${redact(await readText(response), response)}`);
+        throw new SatGateError(`Delegation failed: ${await response.text()}`);
       }
       
-      const result = await readJson<{ token: string }>(response);
+      const result = await response.json() as { token: string };
       return result.token;
     } catch (e) {
       clearTimeout(timeoutId);
       if (e instanceof SatGateError) throw e;
-      throw new SatGateError(`Delegation failed: ${redact(String(e), e, response)}`);
+      throw new SatGateError(`Delegation failed: ${e}`);
     }
   }
   

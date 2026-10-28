@@ -89,7 +89,8 @@ or password (for example a gateway URL or an LND `host` with `user:pass@`),
 or one that cannot be parsed, rejects with `RequestUrlRefusedError` (a
 `SatGateError`, with `host`) naming only the host and port, and no request
 is sent; put credentials in the SDK options, not in the URL (before, such a
-URL failed with a `TypeError` from `fetch`).
+URL failed with a `TypeError` from `fetch`). A network or
+response-body error names no part of the request URL but its host and port.
 
 The SDK keeps no session or cookie jar: a request carries no cookie or
 credential beyond the headers and body the SDK (or your options) set. In a
@@ -99,56 +100,6 @@ browser, `fetch` still applies its default cookie rule
 Compatibility: earlier releases followed these redirects. A gateway, LND,
 Alby or SatGate API URL that answers with a redirect (for example `http://`
 redirecting to `https://`) now fails; configure the final URL.
-
-## Error messages
-
-Every error message the SDK builds or rethrows about a request is redacted
-for that request:
-
-- an error from `fetch` (a network error, an invalid header value),
-  rethrown as the same error object;
-- an error reading or parsing the response body (`SyntaxError`,
-  `TypeError`, node-fetch's `FetchError`), rethrown as the same error
-  object;
-- a status error quoting the response: `Request failed: <status> ...`,
-  `Mint failed (...)`, `Delegation failed: ...`, `LND payment failed: ...`,
-  `Alby payment failed: ...`, `Payment error: ...`, `Failed to get balance:
-  ...`, and the response's `error` or `message` field used as the message of
-  `SatGateError` or `ValidationError`;
-- an SDK error quoting another: `Request failed: ...`, `Ping failed: ...`,
-  `Failed to mint token: ...`, `Delegation failed: ...`, `Lightning payment
-  failed: ...`.
-
-In the message and stack of such an error, and of the errors in its `cause`
-chain:
-
-- the request URL is named by its host and port. Its path and query read
-  `[path and query removed]`; the path alone, or a tail of it from a `/`,
-  reads `[path removed]`; the query string, each `name=value` pair, each
-  query value and each query name (as a whole word) read `[redacted]`;
-- every credential the request carried reads `[redacted]` wherever it
-  appears, including text quoted from the response body, also when
-  URL-encoded or JSON-escaped: the values of request headers whose names
-  contain `auth`, `token`, `key`, `secret`, `macaroon`, `cookie` or
-  `password` (so `Authorization`, `X-Admin-Token` and
-  `Grpc-Metadata-macaroon`), the token after the scheme, the parts of Basic
-  and L402 credentials, the string values of JSON body fields whose names
-  contain `token`, `macaroon`, `preimage`, `secret`, `password`, `passwd`,
-  `key`, `credential`, `capability`, `auth`, `signature` or `receipt`, and
-  the query values;
-- the response text a JSON parse error quotes reads `(response text
-  removed)`.
-
-A credential, query name or query value shorter than 3 characters is not
-replaced on its own (it would match ordinary text such as a status code);
-it is removed only as part of the URL, the query string or a `name=value`
-pair. Other text the server sent is quoted as before.
-
-Not redacted: error types, `statusCode` and `cause` are unchanged, and only
-`message` and `stack` are rewritten, not other properties of an error. The
-response data the SDK returns (`AgentResponse.data`, the parsed body of a
-successful call) and `PaymentRequiredError.challenge` are the server's
-answer as received.
 
 ## Docs
 

@@ -20,7 +20,7 @@ import {
   NotFoundError,
   ValidationError,
 } from './errors';
-import { fetchWithoutRedirects, readJson, redact, requestRedaction } from './transport';
+import { fetchWithoutRedirects } from './transport';
 
 export interface SatGateClientOptions {
   /** Gateway URL (e.g., "http://localhost:8080") */
@@ -58,22 +58,20 @@ export class SatGateClient {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    const url = `${this.baseUrl}${path}`;
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (includeAdminToken) {
-      headers['X-Admin-Token'] = this.token;
-    }
-    const init: RequestInit = {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      signal: controller.signal,
-    };
-
     try {
-      const response = await fetchWithoutRedirects(url, init, { label: 'SatGate gateway' });
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (includeAdminToken) {
+        headers['X-Admin-Token'] = this.token;
+      }
+
+      const response = await fetchWithoutRedirects(`${this.baseUrl}${path}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      }, { label: 'SatGate gateway' });
 
       clearTimeout(timeoutId);
 
@@ -84,13 +82,13 @@ export class SatGateClient {
         throw new NotFoundError();
       }
       if (response.status === 400) {
-        const errBody = await readJson<Record<string, unknown>>(response);
-        throw new ValidationError(errBody.error ? redact(String(errBody.error), response) : 'Validation failed');
+        const errBody = await response.json() as Record<string, unknown>;
+        throw new ValidationError((errBody.error as string) || 'Validation failed');
       }
       if (!response.ok) {
-        const errBody = await readJson<Record<string, unknown>>(response).catch(() => ({})) as Record<string, unknown>;
+        const errBody = await response.json().catch(() => ({})) as Record<string, unknown>;
         throw new SatGateError(
-          errBody.error ? redact(String(errBody.error), response) : `Request failed with status ${response.status}`,
+          (errBody.error as string) || `Request failed with status ${response.status}`,
           response.status
         );
       }
@@ -99,14 +97,13 @@ export class SatGateClient {
         return {} as T;
       }
 
-      // Not awaited: a parse error rejects as the (redacted) SyntaxError, as before.
-      return readJson<T>(response);
+      return response.json() as Promise<T>;
     } catch (err: unknown) {
       clearTimeout(timeoutId);
       if (err instanceof SatGateError) {
         throw err;
       }
-      throw new SatGateError(`Request failed: ${redact(String(err), err, requestRedaction(url, init))}`);
+      throw new SatGateError(`Request failed: ${err}`);
     }
   }
 
@@ -130,22 +127,20 @@ export class SatGateClient {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
     
-    const url = `${this.baseUrl}/api/capability/ping`;
-    const init: RequestInit = {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${bearerToken}` },
-      signal: controller.signal,
-    };
     try {
-      const response = await fetchWithoutRedirects(url, init, { label: 'SatGate gateway' });
+      const response = await fetchWithoutRedirects(`${this.baseUrl}/api/capability/ping`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${bearerToken}` },
+        signal: controller.signal,
+      }, { label: 'SatGate gateway' });
       clearTimeout(timeoutId);
-      return readJson<Record<string, unknown>>(response);
+      return response.json() as Promise<Record<string, unknown>>;
     } catch (err: unknown) {
       clearTimeout(timeoutId);
       if (err instanceof SatGateError) {
         throw err;
       }
-      throw new SatGateError(`Ping failed: ${redact(String(err), err, requestRedaction(url, init))}`);
+      throw new SatGateError(`Ping failed: ${err}`);
     }
   }
 }
