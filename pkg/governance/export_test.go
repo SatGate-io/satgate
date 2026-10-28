@@ -1,9 +1,12 @@
 package governance
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
-// Hooks for the external tests in this directory (package governance_test),
-// which drive the decision through the HTTP gateway.
+// Hooks for the tests in this directory; the external tests (package
+// governance_test) drive the decision through the HTTP gateway.
 
 // HoldCacheLockForTest takes the cache lock and returns its release.
 func (s *Service) HoldCacheLockForTest() (release func()) {
@@ -14,6 +17,32 @@ func (s *Service) HoldCacheLockForTest() (release func()) {
 // SetClockForTest replaces the service clock. Call it before the service is
 // used concurrently.
 func (s *Service) SetClockForTest(now func() time.Time) { s.now = now }
+
+// SetBanSequenceForTest sets the count of ended ban store writes (banSeq),
+// to put the service at the boundary of that count.
+func (s *Service) SetBanSequenceForTest(v uint64) {
+	s.cacheMu.Lock()
+	defer s.cacheMu.Unlock()
+	s.banSeq = v
+}
+
+// BanSequenceForTest returns banSeq and whether it is spent.
+func (s *Service) BanSequenceForTest() (seq uint64, spent bool) {
+	s.cacheMu.Lock()
+	defer s.cacheMu.Unlock()
+	return s.banSeq, s.banSeqSpent
+}
+
+// TurnOverBanCacheForTest fills the ban cache past its bound with "not
+// banned" answers, so that it is cleared and every earlier entry is gone.
+func (s *Service) TurnOverBanCacheForTest() {
+	s.cacheMu.Lock()
+	defer s.cacheMu.Unlock()
+	at := s.now()
+	for i := 0; i <= maxBanCacheEntries; i++ {
+		s.putCacheLocked(fmt.Sprintf("filler-%d", i), false, at)
+	}
+}
 
 // OldestCachedAnswerForTest returns the start of the oldest cached lookup
 // among sigs.

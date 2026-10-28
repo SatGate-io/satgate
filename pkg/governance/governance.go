@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -84,7 +85,11 @@ type Service struct {
 	// that was reading the store while one was made still honours it.
 	// banSeq counts the store writes of bans made here that have ended;
 	// every store answer records it as it was when its lookup started (see
-	// answerPredatesLocalBanLocked).
+	// answerPredatesLocalBanLocked). It never wraps: a store write that
+	// ends when banSeq is at its maximum sets banSeqSpent instead, and from
+	// then on every access decision on this gateway is refused with
+	// ErrRevocationUnavailable until the process restarts (Reset does not
+	// clear it).
 	shared      bool
 	banCacheTTL time.Duration
 	now         func() time.Time
@@ -93,6 +98,7 @@ type Service struct {
 	pendingBans map[string]BanRecord
 	localBans   map[string]localBan
 	banSeq      uint64
+	banSeqSpent bool
 }
 
 // localBan is a ban made on this gateway with a shared store. A decision
@@ -351,7 +357,9 @@ func (s *Service) Ban(signature, reason, bannedBy string) {
 // written to the store, and other gateways on the store honour it within
 // BanCacheTTL. If the write fails, this gateway keeps honouring the ban and
 // the error (wrapping ErrRevocationUnavailable) says that other gateways may
-// not; the caller should retry.
+// not; the caller should retry. A ban made when the count of bans written
+// here is at its maximum is still recorded here and in the store, and from
+// then on this gateway refuses every access decision (see banSeq).
 func (s *Service) BanContext(ctx context.Context, signature, reason, bannedBy string) error {
 	record := BanRecord{
 		Signature: signature,
@@ -391,7 +399,7 @@ func (s *Service) BanContext(ctx context.Context, signature, reason, bannedBy st
 		lb.writing--
 	}
 	lb.done = now
-	s.banSeq++
+	s.advanceBanSeqLocked()
 	lb.seq = s.banSeq
 	s.localBans[signature] = lb
 	s.pruneLocalBansLocked(now)
@@ -404,6 +412,27 @@ func (s *Service) BanContext(ctx context.Context, signature, reason, bannedBy st
 	delete(s.pendingBans, signature)
 	return nil
 }
+
+// advanceBanSeqLocked counts a store write of a ban made here that has
+// ended. banSeq never wraps: at its maximum it stays there and the gateway
+// stops allowing (banSeqSpent), because a later ban could no longer be
+// ordered after the lookups that started before it. The ban itself is
+// already recorded here and in the store; only access decisions change, to
+// refusals with errBanSeqSpent. cacheMu is held.
+func (s *Service) advanceBanSeqLocked() {
+	if s.banSeq < math.MaxUint64 {
+		s.banSeq++
+		return
+	}
+	if !s.banSeqSpent {
+		s.banSeqSpent = true
+		log.Error().Msg("Local ban sequence exhausted; this gateway refuses every access decision until it is restarted")
+	}
+}
+
+// errBanSeqSpent is the refusal of every decision once banSeq is at its
+// maximum and a further ban has been made here.
+var errBanSeqSpent = fmt.Errorf("%w: local ban sequence exhausted; restart this gateway", ErrRevocationUnavailable)
 
 // Unban removes a token from the ban list. With a shared store, other
 // gateways stop honouring the ban within BanCacheTTL.
@@ -464,7 +493,10 @@ func (s *Service) IsBanned(signature string) bool {
 // since the decision started covers any of them, and less than
 // BanStoreReadTimeout has passed since the decision started. If the store
 // cannot be read in time it returns an error wrapping
-// ErrRevocationUnavailable, and the caller must refuse the request.
+// ErrRevocationUnavailable, and the caller must refuse the request. Once a
+// ban written from this process would take the count of such bans past
+// math.MaxUint64 (see banSeq), every decision returns that error until the
+// process restarts.
 func (s *Service) IsAnyBanned(ctx context.Context, signatures []string) (bool, error) {
 	if !s.shared {
 		s.mu.RLock()
@@ -517,6 +549,10 @@ func (s *Service) decideLineage(ctx context.Context, signatures []string) (bool,
 
 	answers := make([]lineageAnswer, len(signatures))
 	s.cacheMu.Lock()
+	if s.banSeqSpent {
+		s.cacheMu.Unlock()
+		return false, errBanSeqSpent
+	}
 	banned, stale, err := s.settleLocked(dctx, signatures, answers, start, deadline)
 	s.cacheMu.Unlock()
 	if banned {
@@ -597,8 +633,18 @@ var errDecisionDeadline = fmt.Errorf("%w: decision did not end within %s", ErrRe
 // after any ban of that signature made here (answerPredatesLocalBanLocked).
 // A newer answer in the cache (from another lookup, or a ban made here)
 // replaces the one held; a ban made here since start, or one not yet written
-// to the store, covers its signature whatever the store said.
+// to the store, covers its signature whatever the store said. Once banSeq is
+// spent (advanceBanSeqLocked) it allows nothing: a ban made here covering
+// the lineage still answers banned, anything else errBanSeqSpent.
 func (s *Service) settleLocked(ctx context.Context, signatures []string, answers []lineageAnswer, start, deadline time.Time) (bool, []int, error) {
+	if s.banSeqSpent {
+		for _, sig := range signatures {
+			if _, ok := s.localBanLocked(sig, start); ok {
+				return true, nil, nil
+			}
+		}
+		return false, nil, errBanSeqSpent
+	}
 	now := s.now()
 	var stale []int
 	for i, sig := range signatures {
@@ -1523,6 +1569,8 @@ func (s *Service) Reset() {
 	s.banCache = make(map[string]banCacheEntry)
 	s.pendingBans = make(map[string]BanRecord)
 	s.localBans = make(map[string]localBan)
+	// banSeq and banSeqSpent are kept: answers read before the reset
+	// may still be in flight.
 	s.cacheMu.Unlock()
 
 	// Reset counters

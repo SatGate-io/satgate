@@ -45,6 +45,13 @@ func newHTTPRig(t *testing.T, clock func() time.Time) *httpRig {
 	if clock != nil {
 		gb.SetClockForTest(clock)
 	}
+	return newHTTPRigWith(t, ga, gb)
+}
+
+// newHTTPRigWith serves an HTTP gateway whose decisions use gb; ga is another
+// gateway on the same store (or nil).
+func newHTTPRigWith(t *testing.T, ga, gb *governance.Service) *httpRig {
+	t.Helper()
 	var hits atomic.Int64
 	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		hits.Add(1)

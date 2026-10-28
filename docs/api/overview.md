@@ -110,7 +110,11 @@ token as active (status `unknown`).
   was being written to Redis, is refused, whatever Redis answered it. A "not
   banned" answer from a lookup that started before the ban's write to Redis
   ended is never cached or used for that token afterwards, even if the cache
-  dropped its entries meanwhile, so later requests are refused too.
+  dropped its entries meanwhile, so later requests are refused too. That
+  ordering is kept by a per-process count of bans the gateway has written,
+  which never wraps: if it ever reached its maximum (2^64 − 1), the next ban
+  would still be recorded, and from then on that gateway would refuse every
+  checked request with `503` until it is restarted.
 
 **The MCP runtime.** `satgate-mcp` with `revocation.redis.addr` set to the
 gateways' Redis reads the same ban list, with the same 2-second bound, read
