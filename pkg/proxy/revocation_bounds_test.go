@@ -19,7 +19,12 @@ import (
 )
 
 // Tests for the propagation and read-time bounds on the gateway, and for the
-// views and the simulation when the shared ban store is involved.
+// views and the simulation when the shared ban store is involved. They use
+// only API that existed before these bounds were enforced.
+
+// banReadDeadline is the documented bound on one read of the ban store
+// (governance.BanStoreReadTimeout).
+const banReadDeadline = 2 * time.Second
 
 // heldBanStore answers BannedAmong from the real store and then waits for
 // release before returning, once.
@@ -160,8 +165,8 @@ func TestRevocation_SlowRedisRefusedWith503WithinReadDeadline(t *testing.T) {
 	if rec.Code != http.StatusServiceUnavailable {
 		t.Fatalf("slow Redis: want 503, got %d", rec.Code)
 	}
-	if elapsed > governance.BanStoreReadTimeout+300*time.Millisecond {
-		t.Fatalf("refusal took %s; read deadline is %s", elapsed, governance.BanStoreReadTimeout)
+	if elapsed > banReadDeadline+300*time.Millisecond {
+		t.Fatalf("refusal took %s; read deadline is %s", elapsed, banReadDeadline)
 	}
 	if hits.Load() != 0 {
 		t.Fatal("upstream contacted while the ban state could not be read")

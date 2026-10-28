@@ -149,7 +149,10 @@ func macaroonServiceOf(a Authenticator) *macaroon.Service {
 // Pass the gateway's governance service; with Redis it is shared with every
 // gateway on that Redis. Nil turns the check off (the default). It applies to
 // macaroons only: a static token or the no-auth identity is not a ban
-// subject. Call it before the proxy serves requests.
+// subject. The lineage is recomputed with the root key of the
+// MacaroonAuthenticator that verified the token (or auth.rootKey); a token
+// accepted by another authenticator whose chain does not follow from that key
+// is refused. Call it before the proxy serves requests.
 func (p *Proxy) SetLineageRevocationChecker(rc LineageRevocationChecker) {
 	p.lineageGate().set(rc)
 }

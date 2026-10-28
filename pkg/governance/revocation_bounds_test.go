@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -424,5 +425,31 @@ func TestViews_StoreUnavailableShowsNoTokenActive(t *testing.T) {
 	}
 	if got := b.GetStats()["active"]; got != 0 {
 		t.Fatalf("stats active with the store down: %v", got)
+	}
+}
+
+// Reviewer case: the ban cache never holds more than maxBanCacheEntries
+// answers.
+func TestSharedStore_BanCacheStaysBounded(t *testing.T) {
+	mr := miniredis.RunT(t)
+	s := NewService(newMiniRedisStore(t, mr.Addr()))
+	sigs := make([]string, 0, maxBanCacheEntries+100)
+	for i := 0; i < maxBanCacheEntries+100; i++ {
+		sigs = append(sigs, "sig-"+strconv.Itoa(i))
+	}
+	for i := 0; i < len(sigs); i += 5000 {
+		end := i + 5000
+		if end > len(sigs) {
+			end = len(sigs)
+		}
+		if _, err := s.IsAnyBanned(context.Background(), sigs[i:end]); err != nil {
+			t.Fatal(err)
+		}
+		s.cacheMu.Lock()
+		n := len(s.banCache)
+		s.cacheMu.Unlock()
+		if n > maxBanCacheEntries {
+			t.Fatalf("ban cache holds %d answers, bound is %d", n, maxBanCacheEntries)
+		}
 	}
 }
