@@ -127,7 +127,9 @@ def test_fetch_jwks_sends_no_session_header_auth_or_cookie_set_by_the_caller(
     assert not _carries_any_secret(request)
 
 
-def test_fetch_jwks_sends_no_netrc_credentials(servers, cert_pair, tmp_path, monkeypatch):
+def test_fetch_jwks_sends_no_netrc_credentials(
+    servers, cert_pair, tmp_path, monkeypatch
+):
     cert, _ = cert_pair
     netrc = tmp_path / "netrc"
     netrc.write_text(f"machine 127.0.0.1 login user password {NETRC_PASSWORD}\n")
@@ -215,7 +217,8 @@ def test_reviewer_jwks_redirect_with_session_cookie_is_not_followed(servers, cer
             seen_cookie_at_sink.append("cookie" in headers)
             return 200, {}, b'{"keys":[]}'
         if path == "/seed":
-            return 200, {"Set-Cookie": f"session={COOKIE}; Path=/; Secure; HttpOnly"}, b"{}"
+            cookie = f"session={COOKIE}; Path=/; Secure; HttpOnly"
+            return 200, {"Set-Cookie": cookie}, b"{}"
         return 302, {"Location": "/sink"}, b""
 
     origin = servers(answer)
@@ -239,7 +242,8 @@ def test_reviewer_jwks_request_carries_no_session_credential_and_is_refused(
         if path.startswith("/.well-known/"):
             return 302, {"Location": "/target"}, b""
         if path == "/seed":
-            return 200, {"Set-Cookie": f"session={COOKIE}; Secure; HttpOnly; Path=/"}, b"{}"
+            cookie = f"session={COOKIE}; Secure; HttpOnly; Path=/"
+            return 200, {"Set-Cookie": cookie}, b"{}"
         return 200, {"Content-Type": "application/json"}, b'{"keys":[]}'
 
     origin = servers(answer)

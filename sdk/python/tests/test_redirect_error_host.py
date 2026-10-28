@@ -99,7 +99,9 @@ def test_lnd_tls_error_and_insecure_warning_omit_userinfo_path_and_query(
     origin = redirecting()
     host = LND_HOSTS["userinfo_path_and_query"](origin.port)
     other_cert, _ = _make_cert(tmp_path, "other")
-    wallet = LNDWallet(host=host, macaroon_hex=MACAROON_HEX, tls_cert_path=str(other_cert))
+    wallet = LNDWallet(
+        host=host, macaroon_hex=MACAROON_HEX, tls_cert_path=str(other_cert)
+    )
     with pytest.raises(SatGateError) as exc:
         wallet.get_balance()
     assert f"LND host 127.0.0.1:{origin.port}:" in str(exc.value)
@@ -115,14 +117,16 @@ def test_lnd_tls_error_and_insecure_warning_omit_userinfo_path_and_query(
 
 @pytest.mark.parametrize("use_session", [False, True])
 @pytest.mark.parametrize("status", [301, 302, 303, 307, 308])
-def test_helper_redirect_error_host_comes_from_request_url_without_userinfo_path_or_query(
+def test_helper_redirect_error_names_only_host_and_port_of_request_url(
     redirecting, use_session, status
 ):
     origin = redirecting(status)
     url = f"https://{USER}:{PASSWORD}@127.0.0.1:{origin.port}{CFG_PATH}?{CFG_QUERY}"
     session = requests.Session() if use_session else None
     with pytest.raises(RedirectRefusedError) as exc:
-        send_without_redirects("GET", url, session=session, label="test host", timeout=10)
+        send_without_redirects(
+            "GET", url, session=session, label="test host", timeout=10
+        )
     _assert_host_only(exc.value, origin.port, status=status, label="test host")
 
 
@@ -135,9 +139,8 @@ def test_helper_has_no_host_override():
 
 
 def test_request_host_keeps_only_host_and_written_port():
-    assert request_host(f"https://{USER}:{PASSWORD}@LND.Example:443{CFG_PATH}?{CFG_QUERY}#f") == (
-        "lnd.example:443"
-    )
+    url = f"https://{USER}:{PASSWORD}@LND.Example:443{CFG_PATH}?{CFG_QUERY}#f"
+    assert request_host(url) == "lnd.example:443"
     assert request_host("https://lnd.example/x") == "lnd.example"
     assert request_host("https://[::1]:8080/x?y=1") == "[::1]:8080"
     assert request_host("https://lnd.example:notaport/") == "an unreadable host"
@@ -151,7 +154,8 @@ def test_gateway_redirect_error_omits_userinfo_path_and_query_of_gateway_url(
     base = f"https://{USER}:{PASSWORD}@127.0.0.1:{origin.port}{CFG_PATH}"
     with pytest.raises(RedirectRefusedError) as exc:
         if client == "agent":
-            SatGateAgentClient(gateway_url=base, token="cap-0123").get(f"/x?{CFG_QUERY}")
+            agent = SatGateAgentClient(gateway_url=base, token="cap-0123")
+            agent.get(f"/x?{CFG_QUERY}")
         else:
             SatGateClient(base, "adm-0123").tokens.mint()
     _assert_host_only(exc.value, origin.port, label="SatGate gateway")
@@ -162,7 +166,9 @@ def test_gateway_redirect_error_omits_userinfo_path_and_query_of_gateway_url(
 
 # Reviewer case: an LND host configured with user information, answered with
 # a 302, gives an error with neither the user name nor the password in it.
-def test_reviewer_lnd_redirect_error_has_no_url_user_information(redirecting, cert_pair):
+def test_reviewer_lnd_redirect_error_has_no_url_user_information(
+    redirecting, cert_pair
+):
     cert, _ = cert_pair
     origin = redirecting()
     wallet = LNDWallet(
@@ -181,7 +187,9 @@ def test_reviewer_lnd_redirect_error_has_no_url_user_information(redirecting, ce
 # Reviewer case: with a long random password in the LND host, the refusal is
 # a RedirectRefusedError whose host is exactly 127.0.0.1:<port> and whose
 # message does not contain the password.
-def test_reviewer_lnd_redirect_error_host_is_exactly_host_and_port(redirecting, cert_pair):
+def test_reviewer_lnd_redirect_error_host_is_exactly_host_and_port(
+    redirecting, cert_pair
+):
     cert, _ = cert_pair
     origin = redirecting()
     password = "f" * 64
