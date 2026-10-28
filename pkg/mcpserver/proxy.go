@@ -1706,9 +1706,8 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 }
 
 // matchScope reports whether a comma-separated scope caveat value allows a
-// tool. Each word is compared with macaroon.ScopeGrants against the tool's
-// scope "mcp:<tool>" (see toolScopeWordGrants). A tenant UUID prefix on a
-// word ("<uuid>:mcp:*") is stripped before matching.
+// tool. Each word (scopeWords) is compared with macaroon.ScopeGrants against
+// the tool's scope "mcp:<tool>" (see toolScopeWordGrants).
 func matchScope(scope, toolName string) bool {
 	// No scope, wildcard included, allows a tool whose name starts with the
 	// reserved argument-rules prefix. An older runtime allows a tool whose name
@@ -1716,20 +1715,59 @@ func matchScope(scope, toolName string) bool {
 	if macaroon.IsReservedToolName(toolName) {
 		return false
 	}
-	for _, s := range strings.Split(scope, ",") {
-		s = strings.TrimSpace(s)
-
-		// Strip tenant UUID prefix if present (format: "uuid:scope")
-		// UUIDs are 36 chars with hyphens (8-4-4-4-12)
-		if len(s) > 37 && s[36] == ':' && s[8] == '-' && s[13] == '-' {
-			s = s[37:]
-		}
-
+	for _, s := range scopeWords(scope) {
 		if toolScopeWordGrants(s, toolName) {
 			return true
 		}
 	}
 	return false
+}
+
+// scopeWords splits a scope caveat value into its words, the one reading
+// every MCP scope check uses. Words are separated by "," and are not trimmed:
+// a word with surrounding or inner whitespace stays malformed, and
+// macaroon.ScopeGrants refuses it, as the HTTP gateway does. A word that
+// starts with a tenant UUID and ":" ("<uuid>:mcp:*") has that prefix removed
+// (stripTenantPrefix); every other namespace stays as written.
+func scopeWords(scope string) []string {
+	words := strings.Split(scope, ",")
+	for i, w := range words {
+		words[i] = stripTenantPrefix(w)
+	}
+	return words
+}
+
+// stripTenantPrefix removes a leading "<tenant uuid>:" from a scope word. The
+// prefix is removed only when the first 36 bytes are a complete UUID in its
+// canonical 8-4-4-4-12 hexadecimal form and byte 37 is ":". Anything else is
+// a scope namespace, not a tenant, and the word is returned unchanged.
+func stripTenantPrefix(word string) string {
+	if len(word) > 37 && word[36] == ':' && isCanonicalUUID(word[:36]) {
+		return word[37:]
+	}
+	return word
+}
+
+// isCanonicalUUID reports whether s is a UUID written as 36 bytes: 32
+// hexadecimal digits (either case) in groups of 8-4-4-4-12 joined by "-".
+func isCanonicalUUID(s string) bool {
+	if len(s) != 36 {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch i {
+		case 8, 13, 18, 23:
+			if c != '-' {
+				return false
+			}
+		default:
+			if !('0' <= c && c <= '9' || 'a' <= c && c <= 'f' || 'A' <= c && c <= 'F') {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // toolScopeNamespace is the scope namespace of MCP tools: calling tool T

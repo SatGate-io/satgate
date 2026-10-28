@@ -83,14 +83,28 @@ type L402Binding struct {
 	InvoiceAmountSats int64
 }
 
-// parseCaveat splits a "key = value" caveat the way verifyCaveat does. The key
-// is trimmed so that spacing variants of a key count as the same key.
+// parseCaveat splits a "key = value" caveat. It is the one reading of a
+// caveat key: verifyCaveat uses it, so a key counts as whatever Verify reads
+// it as. The key is trimmed so that spacing variants of a key count as the
+// same key. The value is returned as written.
 func parseCaveat(caveat string) (key, value string, ok bool) {
 	parts := strings.SplitN(caveat, " = ", 2)
 	if len(parts) != 2 {
 		return "", "", false
 	}
 	return strings.TrimSpace(parts[0]), parts[1], true
+}
+
+// ScopeCaveatValue reports whether caveat is a scope caveat, reading its key
+// exactly as Verify does, and returns its value as written (not trimmed).
+// Every reader that decides access from scope caveats finds them with this
+// function, so a scope caveat Verify accepts is never skipped.
+func ScopeCaveatValue(caveat string) (value string, ok bool) {
+	key, value, parsed := parseCaveat(caveat)
+	if !parsed || key != CaveatScope {
+		return "", false
+	}
+	return value, true
 }
 
 // checkSingleValued refuses a token in which a single-valued key appears more
@@ -639,13 +653,11 @@ func (s *Service) verifyCaveat(caveat string) error {
 		return nil
 	}
 
-	parts := strings.SplitN(caveat, " = ", 2)
-	if len(parts) != 2 {
+	key, value, ok := parseCaveat(caveat)
+	if !ok {
 		return fmt.Errorf("invalid caveat format: %s", caveat)
 	}
-
-	key := strings.TrimSpace(parts[0])
-	value := strings.TrimSpace(parts[1])
+	value = strings.TrimSpace(value)
 
 	switch key {
 	case CaveatExpires:
@@ -662,7 +674,7 @@ func (s *Service) verifyCaveat(caveat string) error {
 		}
 		return nil
 
-	case "scope":
+	case CaveatScope:
 		// Scope is checked at request time, not here. Argument rules ride in
 		// a scope word, and only an enforcing verifier may accept them.
 		if !s.acceptArgumentRules && IsArgumentRulesScope(value) {
@@ -682,11 +694,11 @@ func (s *Service) verifyCaveat(caveat string) error {
 // can only narrow access. Each caveat value is compared as one scope; a value
 // that is a list does not grant anything. A token with no scope caveat keeps
 // full access. A caveat counts as a scope caveat when its key, parsed as
-// Verify parses it (surrounding spaces trimmed), is "scope".
+// Verify parses it (surrounding spaces trimmed), is "scope" (ScopeCaveatValue).
 func (m *Macaroon) HasScope(requiredScope string) bool {
 	for _, caveat := range m.Caveats {
-		key, value, ok := parseCaveat(caveat)
-		if !ok || key != CaveatScope {
+		value, ok := ScopeCaveatValue(caveat)
+		if !ok {
 			continue
 		}
 		if !ScopeGrants(value, requiredScope) {

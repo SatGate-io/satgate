@@ -1210,10 +1210,10 @@ func childAuthorityForEvent(svc *macaroon.Service, child *macaroon.Macaroon, tok
 		rules = string(raw)
 	}
 	for _, c := range child.Caveats {
-		if !strings.HasPrefix(c, "scope = ") {
+		v, ok := macaroon.ScopeCaveatValue(c)
+		if !ok {
 			continue
 		}
-		v := strings.TrimPrefix(c, "scope = ")
 		if argrules.IsRuleScope(v) {
 			continue
 		}
