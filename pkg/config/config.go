@@ -471,11 +471,14 @@ type Upstream struct {
 	URL     string        `yaml:"url"`
 	Timeout time.Duration `yaml:"timeout"`
 	// Headers are set on every request the gateway forwards to this
-	// upstream, after the gateway has removed the credentials it consumed or
-	// owns, so they are how an upstream gets its own credential (for example
-	// Authorization). A configured header replaces a client header of the
-	// same name. A header SatGate owns (X-Admin-Token, X-Tenant-ID,
-	// X-SatGate-*) is refused at load (see CheckUpstreamHeaders).
+	// upstream, as the request leaves the gateway and after every other
+	// change, so each arrives with exactly its configured value and replaces
+	// a client header of the same name. They are how an upstream gets its own
+	// credential (for example Authorization). Host sets the request's Host.
+	// Names SatGate owns, hop-by-hop names, names the proxy manages
+	// (X-Forwarded-For, X-Forwarded-Host, X-Forwarded-Proto, Forwarded),
+	// Content-Length, and any entry that cannot be delivered as written are
+	// refused at load (see CheckUpstreamHeaders).
 	Headers        map[string]string `yaml:"headers"`
 	HealthCheck    *HealthCheck      `yaml:"healthCheck"`
 	CircuitBreaker *CircuitBreaker   `yaml:"circuitBreaker"`

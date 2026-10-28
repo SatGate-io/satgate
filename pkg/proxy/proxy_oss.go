@@ -879,10 +879,12 @@ func (g *Gateway) proxyRequest(w http.ResponseWriter, r *http.Request, route *co
 	}
 
 	// The upstream gets a copy of the request without the credentials the
-	// gateway consumed or owns (upstream_credentials.go); the proxy's
-	// Director then sets the upstream's configured headers.
-	out := r.Clone(r.Context())
-	g.removeGatewayCredentials(out.Header, authorizationConsumed(route))
+	// gateway consumed or owns (upstream_credentials.go). upstreamTransport
+	// then sets the upstream's configured headers and cleans the trailers
+	// as the request leaves.
+	consumed := authorizationConsumed(route)
+	out := r.Clone(withForwardRules(r.Context(), forwardRules{consumed: consumed}))
+	g.removeGatewayCredentials(out.Header, consumed)
 
 	// Forward request
 	proxy.ServeHTTP(w, out)
@@ -966,15 +968,16 @@ func (g *Gateway) getDemoResponse(route *config.Route) map[string]interface{} {
 }
 
 // createProxy creates a reverse proxy for an upstream URL. headers are the
-// upstream's configured headers (config.Upstream.Headers), set on every
-// request it forwards; a configured header replaces a client header of the
-// same name.
+// upstream's configured headers (config.Upstream.Headers): upstreamTransport
+// sets them on every request it forwards, after the reverse proxy's own
+// changes, so each arrives with its configured value and replaces a client
+// header of the same name.
 func (g *Gateway) createProxy(upstreamURL string, headers map[string]string) (*httputil.ReverseProxy, error) {
 	target, err := url.Parse(upstreamURL)
 	if err != nil {
 		return nil, err
 	}
-	configured := upstreamHeaders(headers)
+	configured, configuredHost := upstreamHeaders(headers)
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	// Wrap Director to set req.Host = target.Host for CDN compatibility
@@ -984,10 +987,6 @@ func (g *Gateway) createProxy(upstreamURL string, headers map[string]string) (*h
 	proxy.Director = func(r *http.Request) {
 		defaultDirector(r)
 		r.Host = targetHost
-		for name, values := range configured {
-			r.Header[name] = append([]string(nil), values...)
-		}
-		keepConfiguredHeaders(r.Header, configured)
 	}
 
 	// Configure transport with SSRF-safe dialer that blocks private IPs at connect time.
@@ -1012,15 +1011,20 @@ func (g *Gateway) createProxy(upstreamURL string, headers map[string]string) (*h
 			return nil
 		}
 	}
-	proxy.Transport = &http.Transport{
-		DialContext: ssrfDialer.DialContext,
-		TLSClientConfig: &tls.Config{
-			MinVersion: tls.VersionTLS12,
+	proxy.Transport = &upstreamTransport{
+		g:       g,
+		headers: configured,
+		host:    configuredHost,
+		base: &http.Transport{
+			DialContext: ssrfDialer.DialContext,
+			TLSClientConfig: &tls.Config{
+				MinVersion: tls.VersionTLS12,
+			},
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
 		},
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
 	}
 
 	// Modify response to strip CORS headers from upstream (we set our own)

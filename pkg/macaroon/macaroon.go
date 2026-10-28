@@ -316,31 +316,38 @@ func (s *Service) Verify(token string) (*Macaroon, error) {
 }
 
 // SignedByThisKey reports whether token is a macaroon, in either format
-// Verify accepts, whose signature chain verifies under this service's root
-// key. Caveats are not checked: an expired or narrowed token signed here is
-// still one this service issued. It answers what a token is, never whether it
-// grants anything; use Verify for that.
+// Verify accepts (libmacaroon binary or SatGate JSON), whose signature chain
+// verifies under this service's root key. Caveats are not checked: an expired
+// or narrowed token signed here is still one this service issued. It answers
+// what a token is, never whether it grants anything; use Verify for that.
+//
+// It recognises more encodings than Verify accepts: either format in the
+// standard or the URL-safe base64 alphabet, padded or not (Verify takes
+// binary in standard base64 and JSON in URL-safe unpadded or standard
+// base64). Recognising a token is never a reason to accept it.
 func (s *Service) SignedByThisKey(token string) bool {
-	token = strings.TrimSpace(token)
+	token = strings.TrimRight(strings.TrimSpace(token), "=")
 	if token == "" {
 		return false
 	}
-	data, err := base64.StdEncoding.DecodeString(token)
+	enc := base64.RawStdEncoding
+	if strings.ContainsAny(token, "-_") {
+		enc = base64.RawURLEncoding
+	}
+	data, err := enc.DecodeString(token)
 	if err != nil {
-		data, err = base64.RawStdEncoding.DecodeString(token)
-	}
-	if err == nil {
-		var v2mac macaroonv2.Macaroon
-		if v2mac.UnmarshalBinary(data) == nil &&
-			v2mac.Verify(s.rootKey, func(string) error { return nil }, nil) == nil {
-			return true
-		}
-	}
-	mac, err := s.Decode(token)
-	if err != nil || mac.Signature == "" {
 		return false
 	}
-	return hmac.Equal([]byte(mac.Signature), []byte(s.chainedSignature(mac)))
+	var v2mac macaroonv2.Macaroon
+	if v2mac.UnmarshalBinary(data) == nil &&
+		v2mac.Verify(s.rootKey, func(string) error { return nil }, nil) == nil {
+		return true
+	}
+	var mac Macaroon
+	if json.Unmarshal(data, &mac) != nil || mac.Signature == "" {
+		return false
+	}
+	return hmac.Equal([]byte(mac.Signature), []byte(s.chainedSignature(&mac)))
 }
 
 func (s *Service) verifyBinary(token string) (*Macaroon, error) {
