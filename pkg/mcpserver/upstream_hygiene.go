@@ -2,7 +2,6 @@ package mcpserver
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"io"
 	"sort"
@@ -10,7 +9,7 @@ import (
 )
 
 // What the proxy hands to an upstream it starts or calls: the environment of
-// a stdio upstream's process, and the caller's SatGate token.
+// a stdio upstream's process, and params without the caller's SatGate token.
 
 // stdioBaseEnv is the fixed list of variables of the proxy's environment
 // every stdio upstream receives (each only if the proxy has it). It is what a
@@ -87,57 +86,6 @@ func stdioEnv(cfg UpstreamConfig, lookup func(string) (string, bool)) []string {
 	}
 	sort.Strings(configured)
 	return append(env, configured...)
-}
-
-// verifiedCredentialKey carries, on a request's context, the credential the
-// proxy verified for that request. It is set only where Authenticator.Verify
-// accepted the credential (authenticate, or verifyConnectionCredential), and
-// it is the only value an upstream configured with ForwardCallerToken is
-// given: params are never read for it, so nothing a caller writes into
-// _meta can take its place.
-type verifiedCredentialKey struct{}
-
-func withVerifiedCredential(ctx context.Context, token string) context.Context {
-	if token == "" {
-		return ctx
-	}
-	return context.WithValue(ctx, verifiedCredentialKey{}, token)
-}
-
-func verifiedCredentialFrom(ctx context.Context) string {
-	t, _ := ctx.Value(verifiedCredentialKey{}).(string)
-	return t
-}
-
-// verifyConnectionCredential is ctx for a method passed to the default
-// upstream without going through authenticate. When that upstream is
-// configured with ForwardCallerToken and the request carries no verified
-// credential yet, the connection's own credential (the Authorization header,
-// or ?token= with server.allowQueryToken; never params) is verified, and
-// checked for revocation, and only if both pass is it carried on. Otherwise
-// ctx is returned as it is, and the upstream gets no credential.
-func (p *Proxy) verifyConnectionCredential(ctx context.Context) context.Context {
-	if verifiedCredentialFrom(ctx) != "" || p.upstream == nil || !p.upstream.defaultForwardsCallerToken() {
-		return ctx
-	}
-	tok := transportTokenFrom(ctx)
-	if tok == "" || p.auth == nil {
-		return ctx
-	}
-	info, err := p.auth.Verify(ctx, tok)
-	if err != nil || info == nil {
-		return ctx
-	}
-	if p.revocation != nil && info.BudgetID != "" {
-		rctx := ctx
-		if info.TenantID != "" {
-			rctx = context.WithValue(ctx, CtxTenantID, info.TenantID)
-		}
-		if p.revocation.IsRevoked(rctx, info.BudgetID) {
-			return ctx
-		}
-	}
-	return withVerifiedCredential(ctx, tok)
 }
 
 // withoutMetaToken returns params with the token removed from _meta. Member
@@ -284,33 +232,10 @@ func (o jsonObject) write(members []objectMember) json.RawMessage {
 	return b.Bytes()
 }
 
-// defaultForwardsCallerToken reports whether the default upstream is
-// configured with ForwardCallerToken.
-func (m *UpstreamManager) defaultForwardsCallerToken() bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	cfg, ok := m.config[m.defaultUp]
-	return ok && cfg.ForwardCallerToken
-}
-
-// outboundParams is what is sent to the upstream named name: params without
-// any _meta.token, and with the request's verified credential (see
-// verifiedCredentialKey) put back only when that upstream is configured with
-// ForwardCallerToken. A request with no verified credential forwards none.
-func (m *UpstreamManager) outboundParams(ctx context.Context, name string, params json.RawMessage) json.RawMessage {
-	params = withoutMetaToken(params)
-	tok := verifiedCredentialFrom(ctx)
-	if tok == "" {
-		return params
-	}
-	m.mu.Lock()
-	cfg, ok := m.config[name]
-	m.mu.Unlock()
-	if !ok || !cfg.ForwardCallerToken {
-		return params
-	}
-	if len(params) == 0 || string(params) == "null" {
-		return injectMetaToken(json.RawMessage(`{}`), tok)
-	}
-	return injectMetaToken(params, tok)
+// outboundParams is what is sent to an upstream: params without any
+// _meta.token. No upstream receives the caller's SatGate token, whichever
+// transport, tenant or method the request takes; an upstream that needs a
+// credential is given its own (UpstreamConfig.Headers or Env).
+func outboundParams(params json.RawMessage) json.RawMessage {
+	return withoutMetaToken(params)
 }

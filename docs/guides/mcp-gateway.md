@@ -121,7 +121,6 @@ upstreams:
     env:                     # Env vars set for the subprocess (see "Upstream Environment")
       API_KEY: "${MY_API_KEY}"
     # envPassthrough: [HTTPS_PROXY]  # Names of proxy env vars the subprocess also receives
-    # forwardCallerToken: false      # Pass the credential the proxy verified for the request in params._meta.token. Off by default.
     timeout: 30s             # Per-request timeout (default: 30s)
     displayName: "My Server" # Name shown to agents when two upstreams share a tool name (default: the key)
 
@@ -341,17 +340,9 @@ Over stdio the caller is the local process that started the proxy: in `config` m
 
 Agents authenticate to the proxy with the `Authorization` header, `Bearer` scheme (SSE and Streamable HTTP), or `params._meta.token` (stdio). The token is for the proxy:
 
-- **Not forwarded by default.** The proxy removes `_meta.token` from every request before it reaches an upstream, including a `_meta.token` the agent put there itself. Other `_meta` members (such as `progressToken`) are passed on.
-- **Opt-in per upstream.** An upstream that must check the caller's SatGate token itself can be given it with `forwardCallerToken: true`. That upstream then holds the caller's token and can act as the caller with it until it expires or is revoked; enable it only for an upstream you run and trust.
-- **Only the verified credential.** What an opted-in upstream receives in `_meta.token` is the credential the proxy verified for that request, never a value from the request's params that it did not verify: for `tools/call` (and every method, with sign-every-action on) the token authentication accepted; for a method the proxy passes on outside the `tools/call` path (`resources/list`, `prompts/get` and the like), the connection's credential (the `Authorization` header, or the URL token with `allowQueryToken`), which the proxy verifies and checks for revocation first. A request with no credential that verifies (none sent, one that fails verification or is revoked, or, with sign-every-action off, a stdio request other than `tools/call`) forwards none.
-
-```yaml
-upstreams:
-  my-verifying-server:
-    transport: stdio
-    command: ["./verifier-mcp"]
-    forwardCallerToken: true
-```
+- **Never forwarded.** The proxy removes `_meta.token` from every request before it reaches an upstream, including a `_meta.token` the agent put there itself, on every path: `tools/call` (shared and per-tenant upstreams), `tools/list`, and every method passed on to the default upstream, over every upstream transport (stdio, SSE, Streamable HTTP). The agent's `Authorization` header is not sent to an upstream either: an SSE or Streamable HTTP upstream receives only the `headers` configured for it. Other `_meta` members (such as `progressToken`) are passed on.
+- **Upstreams get their own credentials.** An upstream that needs a credential is given its own: `env` or `envPassthrough` for a stdio upstream, and `UpstreamConfig.Headers` for an SSE or Streamable HTTP upstream added in code (for example `Authorization: Bearer <the upstream's own token>`).
+- **`forwardCallerToken` is refused.** Builds before this change accepted `forwardCallerToken: true`, which passed the caller's SatGate token to that upstream; the upstream could then act as the caller wherever the token is accepted. A configuration or an `UpstreamConfig` that sets it is now refused (`forwardCallerToken is no longer supported ...`). Remove the line and give the upstream its own credential as above.
 
 **Token in the URL.** By default `GET /sse`, `POST /message` and the Streamable HTTP endpoint (every HTTP method) refuse with 401 any request whose URL has a `token` query parameter, whatever its value: also empty, repeated, or next to an `Authorization` header. A URL ends up in access logs, browser history and `Referer` headers. The value is not repeated in the response or the log. Send the token in the `Authorization` header. For a client that cannot set a header, `server.allowQueryToken: true` restores the URL fallback (the header first, else the first `token` value):
 
@@ -425,9 +416,8 @@ revocation:
 The check runs wherever the proxy accepts a token, before anything is admitted,
 spent, forwarded or minted: SSE connect and every message, Streamable HTTP
 `initialize`, every request and every resumed session, `tools/list` and the
-methods passed on to an upstream, the credential passed to an upstream with
-`forwardCallerToken` (never passed on for a banned token), `satgate/delegate`
-(checked again before the helper is minted), and stdio as below.
+methods passed on to an upstream, `satgate/delegate` (checked again before
+the helper is minted), and stdio as below.
 A banned token gets `403` with `code: TOKEN_REVOKED` where the refusal is an
 HTTP answer (SSE connect, Streamable `initialize` and resume; `401` with the
 sign-in challenge when the OAuth challenge is on), and otherwise the JSON-RPC

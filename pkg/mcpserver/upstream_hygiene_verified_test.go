@@ -18,11 +18,11 @@ import (
 	zlog "github.com/rs/zerolog/log"
 )
 
-// More tests for upstream_hygiene.go: an upstream configured with
-// forwardCallerToken receives only the credential the proxy verified for the
-// request, never a value from params; the token query parameter is refused by
-// its presence; and what the proxy forwards keeps every byte it does not need
-// to remove.
+// More tests for upstream_hygiene.go: no upstream receives a caller's
+// credential, the one the proxy verified or one written into params, and
+// forwardCallerToken is refused; the token query parameter is refused by its
+// presence; and what the proxy forwards keeps every byte it does not need to
+// remove.
 
 const (
 	// callerWrittenValue is a value a caller puts into params._meta.token
@@ -71,67 +71,79 @@ func streamableCall(t *testing.T, base, sid, bearer, raw string) *Response {
 	return &resp
 }
 
-func wantForwarded(t *testing.T, what string, params json.RawMessage, want string) {
+// wantNoCredential fails if params, as the upstream received them, carry
+// any credential: _meta.token in any spelling, the verified credential
+// anywhere, or the value a caller wrote into _meta.
+func wantNoCredential(t *testing.T, what string, params json.RawMessage) {
 	t.Helper()
-	got, has := metaTokenOf(t, params)
-	switch {
-	case want == "" && has:
-		t.Errorf("%s: upstream received a credential, want none: %s", what, redactToken(params))
-	case want != "" && (!has || got != want):
-		t.Errorf("%s: upstream did not receive the verified credential: %s", what, redactToken(params))
+	if _, has := metaTokenOf(t, params); has {
+		t.Errorf("%s: upstream received a credential: %s", what, redactToken(params))
+	}
+	if strings.Contains(string(params), hygieneToken) {
+		t.Errorf("%s: upstream received the caller's verified credential", what)
 	}
 	if strings.Contains(string(params), callerWrittenValue) {
 		t.Errorf("%s: upstream received the value the caller wrote into _meta", what)
 	}
 }
 
-// With forwardCallerToken on, the upstream receives the credential the proxy
-// verified for the request, not the value a caller wrote into _meta.token,
-// for tools/call and for every method passed on to the default upstream, over
-// both HTTP transports. The rest of _meta is passed on. Off, it receives none.
-func TestForwardedCredentialIsTheVerifiedOne(t *testing.T) {
+// No upstream receives the caller's credential, the one the proxy verified
+// or a value the caller wrote into _meta.token, for tools/call and for every
+// method passed on to the default upstream, over both HTTP transports. The
+// rest of _meta is passed on.
+func TestNoUpstreamReceivesCallerCredential(t *testing.T) {
 	methods := []string{"resources/list", "resources/read", "prompts/list", "prompts/get", "completion/complete", "logging/setLevel", "custom/method"}
-	for _, forward := range []bool{false, true} {
-		want := ""
-		if forward {
-			want = hygieneToken
+	p := newTokenProbe(t)
+	sid := mustInitSession(t, p.srv.URL, hygieneToken)
+	conn := eaOpenSSE(t, p.srv.URL, hygieneToken)
+	defer conn.body.Close()
+	for _, method := range methods {
+		raw := `{"jsonrpc":"2.0","id":500,"method":"` + method + `","params":{"_meta":{"token":"` + callerWrittenValue + `","progressToken":7}}}`
+		params := receivedParams(t, method, streamableCall(t, p.srv.URL, sid, hygieneToken, raw))
+		wantNoCredential(t, "streamable "+method, params)
+		if !strings.Contains(string(params), `"progressToken":7`) {
+			t.Errorf("streamable %s: the rest of _meta was not passed on: %s", method, redactToken(params))
 		}
-		p := newTokenProbe(t, forward)
-		sid := mustInitSession(t, p.srv.URL, hygieneToken)
-		conn := eaOpenSSE(t, p.srv.URL, hygieneToken)
-		for _, method := range methods {
-			raw := `{"jsonrpc":"2.0","id":500,"method":"` + method + `","params":{"_meta":{"token":"` + callerWrittenValue + `","progressToken":7}}}`
-			what := fmt.Sprintf("forward=%v streamable %s", forward, method)
-			params := receivedParams(t, method, streamableCall(t, p.srv.URL, sid, hygieneToken, raw))
-			wantForwarded(t, what, params, want)
-			if !strings.Contains(string(params), `"progressToken":7`) {
-				t.Errorf("%s: the rest of _meta was not passed on: %s", what, redactToken(params))
-			}
-			if status := conn.post([]byte(raw)); status != http.StatusAccepted {
-				t.Fatalf("POST /message status %d", status)
-			}
-			what = fmt.Sprintf("forward=%v sse %s", forward, method)
-			wantForwarded(t, what, receivedParams(t, method, conn.next()), want)
-		}
-		// tools/call with no _meta: the transport's credential, verified by
-		// authenticate.
-		raw := `{"jsonrpc":"2.0","id":501,"method":"tools/call","params":{"name":"report","arguments":{}}}`
-		wantForwarded(t, fmt.Sprintf("forward=%v streamable tools/call", forward),
-			receivedParams(t, MethodToolsCall, streamableCall(t, p.srv.URL, sid, hygieneToken, raw)), want)
 		if status := conn.post([]byte(raw)); status != http.StatusAccepted {
 			t.Fatalf("POST /message status %d", status)
 		}
-		wantForwarded(t, fmt.Sprintf("forward=%v sse tools/call", forward), receivedParams(t, MethodToolsCall, conn.next()), want)
-		_ = conn.body.Close()
+		wantNoCredential(t, "sse "+method, receivedParams(t, method, conn.next()))
+	}
+	// tools/call with no _meta: the transport's credential, verified by
+	// authenticate, is not passed on either.
+	raw := `{"jsonrpc":"2.0","id":501,"method":"tools/call","params":{"name":"report","arguments":{}}}`
+	wantNoCredential(t, "streamable tools/call", receivedParams(t, MethodToolsCall, streamableCall(t, p.srv.URL, sid, hygieneToken, raw)))
+	if status := conn.post([]byte(raw)); status != http.StatusAccepted {
+		t.Fatalf("POST /message status %d", status)
+	}
+	wantNoCredential(t, "sse tools/call", receivedParams(t, MethodToolsCall, conn.next()))
+
+	// Direct dispatch: with the token in params, and with the connection
+	// credential on the context.
+	for i, c := range []struct {
+		ctx    context.Context
+		method string
+		params string
+	}{
+		{context.Background(), "resources/list", `{"_meta":{"token":"` + hygieneToken + `"}}`},
+		{context.Background(), MethodToolsCall, `{"name":"report","arguments":{},"_meta":{"token":"` + hygieneToken + `"}}`},
+		{withTransportToken(context.Background(), hygieneToken), "resources/list", `{"_meta":{"token":"` + callerWrittenValue + `"}}`},
+	} {
+		req := &Request{JSONRPC: "2.0", ID: json.RawMessage(fmt.Sprint(504 + i)), Method: c.method, Params: json.RawMessage(c.params)}
+		resp, err := p.proxy.handleRequest(c.ctx, req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		wantNoCredential(t, fmt.Sprintf("direct %s #%d", c.method, i), receivedParams(t, c.method, resp))
 	}
 }
 
 // A Streamable HTTP session resumed on another proxy (and the same call
-// repeated) forwards the verified credential, not the caller's value.
-func TestForwardedCredentialResumedStream(t *testing.T) {
-	before := newTokenProbe(t, true)
+// repeated) forwards no credential.
+func TestNoCredentialForwardedResumedStream(t *testing.T) {
+	before := newTokenProbe(t)
 	sid := mustInitSession(t, before.srv.URL, hygieneToken)
-	after := newTokenProbe(t, true)
+	after := newTokenProbe(t)
 	for i := 0; i < 2; i++ {
 		for _, method := range []string{"resources/list", MethodToolsCall} {
 			raw := `{"jsonrpc":"2.0","id":502,"method":"` + method + `","params":{"name":"report","arguments":{},"_meta":{"token":"` + callerWrittenValue + `","progressToken":9}}}`
@@ -139,17 +151,16 @@ func TestForwardedCredentialResumedStream(t *testing.T) {
 				raw = `{"jsonrpc":"2.0","id":502,"method":"tools/call","params":{"name":"report","arguments":{},"_meta":{"progressToken":9}}}`
 			}
 			params := receivedParams(t, method, streamableCall(t, after.srv.URL, sid, hygieneToken, raw))
-			wantForwarded(t, fmt.Sprintf("resumed %s #%d", method, i), params, hygieneToken)
+			wantNoCredential(t, fmt.Sprintf("resumed %s #%d", method, i), params)
 		}
 	}
 }
 
 // A request whose connection credential does not verify is refused before
-// any upstream is reached (auth mode header). One that has none forwards no
-// credential, even when params carry one that would verify: params are never
-// where the forwarded credential comes from.
+// any upstream is reached (auth mode header); one that has none forwards
+// none, even when params carry one that would verify.
 func TestNoCredentialForwardedWithoutVerification(t *testing.T) {
-	p := newTokenProbe(t, true)
+	p := newTokenProbe(t)
 	conn := eaOpenSSE(t, p.srv.URL, hygieneToken)
 	defer conn.body.Close()
 	for _, bearer := range []string{otherConnectionCredential, ""} {
@@ -165,33 +176,39 @@ func TestNoCredentialForwardedWithoutVerification(t *testing.T) {
 			}
 			continue
 		}
-		wantForwarded(t, "sse bearer=false", receivedParams(t, "resources/list", resp), "")
+		wantNoCredential(t, "sse bearer=false", receivedParams(t, "resources/list", resp))
 	}
+}
 
-	// Direct dispatch, no connection credential: the request verifies with
-	// the token in params (header mode requires one), and a method passed
-	// on outside tools/call forwards none; tools/call forwards the
-	// credential authenticate verified.
-	req := &Request{JSONRPC: "2.0", ID: json.RawMessage(`504`), Method: "resources/list",
-		Params: json.RawMessage(`{"_meta":{"token":"` + hygieneToken + `"}}`)}
-	resp, err := p.proxy.handleRequest(context.Background(), req)
-	if err != nil {
+// forwardCallerToken is refused: by LoadConfig, and by an UpstreamManager
+// given it directly (Start and AddUpstream), so no configuration can make the
+// proxy pass a caller's token on.
+func TestForwardCallerTokenRefused(t *testing.T) {
+	file := filepath.Join(t.TempDir(), "config.yaml")
+	raw := "auth:\n  mode: none\nupstreams:\n  test:\n    transport: stdio\n    command: [echo]\n    forwardCallerToken: true\n"
+	if err := os.WriteFile(file, []byte(raw), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	wantForwarded(t, "direct resources/list", receivedParams(t, "resources/list", resp), "")
-	req = &Request{JSONRPC: "2.0", ID: json.RawMessage(`505`), Method: MethodToolsCall,
-		Params: json.RawMessage(`{"name":"report","arguments":{},"_meta":{"token":"` + hygieneToken + `"}}`)}
-	if resp, err = p.proxy.handleRequest(context.Background(), req); err != nil {
-		t.Fatal(err)
+	if _, err := LoadConfig(file); err == nil || !strings.Contains(err.Error(), "forwardCallerToken is no longer supported") {
+		t.Fatalf("LoadConfig with forwardCallerToken: %v", err)
 	}
-	wantForwarded(t, "direct tools/call", receivedParams(t, MethodToolsCall, resp), hygieneToken)
-	// The connection credential on the context, a caller's value in params.
-	req = &Request{JSONRPC: "2.0", ID: json.RawMessage(`506`), Method: "resources/list",
-		Params: json.RawMessage(`{"_meta":{"token":"` + callerWrittenValue + `"}}`)}
-	if resp, err = p.proxy.handleRequest(withTransportToken(context.Background(), hygieneToken), req); err != nil {
-		t.Fatal(err)
+	cfg := helperUpstream(nil, nil)
+	cfg.ForwardCallerToken = true
+	m := NewUpstreamManager(map[string]UpstreamConfig{"probe": cfg}, nil, "probe")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := m.Start(ctx); err == nil || !strings.Contains(err.Error(), "forwardCallerToken is no longer supported") {
+		t.Fatalf("Start with forwardCallerToken: %v", err)
 	}
-	wantForwarded(t, "direct resources/list with connection credential", receivedParams(t, "resources/list", resp), hygieneToken)
+	_ = m.Close()
+	m = NewUpstreamManager(map[string]UpstreamConfig{}, nil, "")
+	defer m.Close()
+	if err := m.AddUpstream(ctx, "probe", cfg); err == nil || !strings.Contains(err.Error(), "forwardCallerToken is no longer supported") {
+		t.Fatalf("AddUpstream with forwardCallerToken: %v", err)
+	}
+	if names := m.UpstreamNames(); len(names) != 0 {
+		t.Fatalf("an upstream with forwardCallerToken was kept: %v", names)
+	}
 }
 
 type revokeEveryKey struct{}
@@ -201,7 +218,7 @@ func (revokeEveryKey) IsRevoked(context.Context, string) bool { return true }
 // A connection credential that verifies but is revoked is not forwarded: in
 // auth mode header the request is refused before any upstream is reached.
 func TestNoCredentialForwardedWhenRevoked(t *testing.T) {
-	p := newTokenProbe(t, true)
+	p := newTokenProbe(t)
 	sid := mustInitSession(t, p.srv.URL, hygieneToken)
 	p.proxy.SetRevocationChecker(revokeEveryKey{})
 	raw := `{"jsonrpc":"2.0","id":507,"method":"resources/list","params":{}}`
@@ -211,99 +228,92 @@ func TestNoCredentialForwardedWhenRevoked(t *testing.T) {
 	}
 }
 
-// Network upstreams (SSE and Streamable HTTP) get the verified credential
-// from the context only, never the one in params, and every other value as
-// written.
-func TestNetworkUpstreamsGetOnlyVerifiedCredential(t *testing.T) {
+// Network upstreams (SSE and Streamable HTTP) get no credential from params
+// or from the connection, and every other value as written.
+func TestNetworkUpstreamsGetNoCallerCredential(t *testing.T) {
 	for _, kind := range []string{"sse", "streamable"} {
-		for _, forward := range []bool{false, true} {
-			t.Run(fmt.Sprintf("%s/forward=%v", kind, forward), func(t *testing.T) {
-				events := make(chan []byte, 32)
-				handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					if r.Method == http.MethodGet {
-						w.Header().Set("Content-Type", "text/event-stream")
-						if kind == "sse" {
-							fmt.Fprint(w, "event: endpoint\ndata: /message\n\n")
-						} else {
-							fmt.Fprint(w, ": keepalive\n\n")
-						}
-						w.(http.Flusher).Flush()
-						for {
-							select {
-							case <-r.Context().Done():
-								return
-							case ev := <-events:
-								fmt.Fprintf(w, "event: message\ndata: %s\n\n", ev)
-								w.(http.Flusher).Flush()
-							}
-						}
-					}
-					if r.Method == http.MethodDelete {
-						w.WriteHeader(http.StatusNoContent)
-						return
-					}
-					var req Request
-					if json.NewDecoder(r.Body).Decode(&req) != nil {
-						w.WriteHeader(http.StatusBadRequest)
-						return
-					}
-					if len(req.ID) == 0 {
-						w.WriteHeader(http.StatusNoContent)
-						return
-					}
-					var result any
-					switch req.Method {
-					case MethodInitialize:
-						result = map[string]any{"protocolVersion": "2024-11-05", "capabilities": map[string]any{"tools": map[string]any{}},
-							"serverInfo": map[string]string{"name": "echo", "version": "1"}}
-					case MethodToolsList:
-						result = map[string]any{"tools": []any{map[string]any{"name": "report", "inputSchema": map[string]string{"type": "object"}}}}
-					default:
-						result = map[string]any{"echo": req.Params}
-					}
-					envelope := map[string]any{"jsonrpc": "2.0", "id": req.ID, "result": result}
+		t.Run(kind, func(t *testing.T) {
+			events := make(chan []byte, 32)
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet {
+					w.Header().Set("Content-Type", "text/event-stream")
 					if kind == "sse" {
-						b, _ := json.Marshal(envelope)
-						events <- b
-						w.WriteHeader(http.StatusAccepted)
-						return
+						fmt.Fprint(w, "event: endpoint\ndata: /message\n\n")
+					} else {
+						fmt.Fprint(w, ": keepalive\n\n")
 					}
-					w.Header().Set("Content-Type", "application/json")
-					w.Header().Set("Mcp-Session-Id", "test-session")
-					_ = json.NewEncoder(w).Encode(envelope)
-				})
-				srv := httptest.NewServer(handler)
-				defer srv.Close()
-				path := "/mcp"
+					w.(http.Flusher).Flush()
+					for {
+						select {
+						case <-r.Context().Done():
+							return
+						case ev := <-events:
+							fmt.Fprintf(w, "event: message\ndata: %s\n\n", ev)
+							w.(http.Flusher).Flush()
+						}
+					}
+				}
+				if r.Method == http.MethodDelete {
+					w.WriteHeader(http.StatusNoContent)
+					return
+				}
+				var req Request
+				if json.NewDecoder(r.Body).Decode(&req) != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					return
+				}
+				if len(req.ID) == 0 {
+					w.WriteHeader(http.StatusNoContent)
+					return
+				}
+				var result any
+				switch req.Method {
+				case MethodInitialize:
+					result = map[string]any{"protocolVersion": "2024-11-05", "capabilities": map[string]any{"tools": map[string]any{}},
+						"serverInfo": map[string]string{"name": "echo", "version": "1"}}
+				case MethodToolsList:
+					result = map[string]any{"tools": []any{map[string]any{"name": "report", "inputSchema": map[string]string{"type": "object"}}}}
+				default:
+					result = map[string]any{"echo": req.Params}
+				}
+				envelope := map[string]any{"jsonrpc": "2.0", "id": req.ID, "result": result}
 				if kind == "sse" {
-					path = "/sse"
+					b, _ := json.Marshal(envelope)
+					events <- b
+					w.WriteHeader(http.StatusAccepted)
+					return
 				}
-				cfg := UpstreamConfig{Transport: kind, URL: srv.URL + path, ForwardCallerToken: forward}
-				m := NewUpstreamManager(map[string]UpstreamConfig{"probe": cfg}, nil, "probe", true)
-				ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-				defer cancel()
-				if err := m.Start(ctx); err != nil {
-					t.Fatalf("network upstream start: %v", err)
-				}
-				defer m.Close()
-				want := ""
-				if forward {
-					want = hygieneToken
-				}
-				for i := 0; i < 2; i++ {
-					resp, err := m.ForwardRequest(withVerifiedCredential(ctx, hygieneToken), "resources/list",
-						json.RawMessage(`{"_meta":{"TOKEN":"`+callerWrittenValue+`","token":"`+callerWrittenValue+`","progressToken":9007199254740993},"n":1.50}`), 3*time.Second)
-					if err != nil {
-						t.Fatalf("network forward: %v", err)
-					}
-					params := receivedParams(t, "resources/list", resp)
-					wantForwarded(t, "network", params, want)
-					if !bytes.Contains(params, []byte(`"progressToken":9007199254740993`)) || !bytes.Contains(params, []byte(`"n":1.50`)) {
-						t.Errorf("other values changed: %s", redactToken(params))
-					}
-				}
+				w.Header().Set("Content-Type", "application/json")
+				w.Header().Set("Mcp-Session-Id", "test-session")
+				_ = json.NewEncoder(w).Encode(envelope)
 			})
-		}
+			srv := httptest.NewServer(handler)
+			defer srv.Close()
+			path := "/mcp"
+			if kind == "sse" {
+				path = "/sse"
+			}
+			cfg := UpstreamConfig{Transport: kind, URL: srv.URL + path}
+			m := NewUpstreamManager(map[string]UpstreamConfig{"probe": cfg}, nil, "probe", true)
+			ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+			defer cancel()
+			if err := m.Start(ctx); err != nil {
+				t.Fatalf("network upstream start: %v", err)
+			}
+			defer m.Close()
+			for i := 0; i < 2; i++ {
+				resp, err := m.ForwardRequest(withTransportToken(ctx, hygieneToken), "resources/list",
+					json.RawMessage(`{"_meta":{"TOKEN":"`+callerWrittenValue+`","token":"`+callerWrittenValue+`","progressToken":9007199254740993},"n":1.50}`), 3*time.Second)
+				if err != nil {
+					t.Fatalf("network forward: %v", err)
+				}
+				params := receivedParams(t, "resources/list", resp)
+				wantNoCredential(t, "network", params)
+				if !bytes.Contains(params, []byte(`"progressToken":9007199254740993`)) || !bytes.Contains(params, []byte(`"n":1.50`)) {
+					t.Errorf("other values changed: %s", redactToken(params))
+				}
+			}
+		})
 	}
 }
 
@@ -311,7 +321,7 @@ func TestNetworkUpstreamsGetOnlyVerifiedCredential(t *testing.T) {
 // the upstream, on any method, transport, resumed session or repeated call;
 // numbers keep their bytes.
 func TestDefaultUpstreamWritesHaveNoCredential(t *testing.T) {
-	p := newTokenProbe(t, false)
+	p := newTokenProbe(t)
 	sid := mustInitSession(t, p.srv.URL, hygieneToken)
 	variants := []string{
 		`{"token":"` + hygieneToken + `","progressToken":9007199254740993}`,
@@ -326,14 +336,14 @@ func TestDefaultUpstreamWritesHaveNoCredential(t *testing.T) {
 		for _, v := range variants {
 			raw := `{"jsonrpc":"2.0","id":400,"method":"` + method + `","params":{"name":"report","arguments":{"n":1.50,"s":"exact"},"_meta":` + v + `}}`
 			received := receivedParams(t, method, streamableCall(t, p.srv.URL, sid, hygieneToken, raw))
-			wantForwarded(t, "streamable "+method, received, "")
+			wantNoCredential(t, "streamable "+method, received)
 			if !bytes.Contains(received, []byte(`"n":1.50`)) {
 				t.Errorf("number bytes changed: %s", redactToken(received))
 			}
 			if status := conn.post([]byte(raw)); status != http.StatusAccepted {
 				t.Fatalf("SSE post status %d", status)
 			}
-			wantForwarded(t, "sse "+method, receivedParams(t, method, conn.next()), "")
+			wantNoCredential(t, "sse "+method, receivedParams(t, method, conn.next()))
 		}
 	}
 	// Resumed on a new server, then the same call again.
@@ -341,7 +351,7 @@ func TestDefaultUpstreamWritesHaveNoCredential(t *testing.T) {
 	defer srv.Close()
 	for i := 0; i < 2; i++ {
 		raw := `{"jsonrpc":"2.0","id":401,"method":"tools/call","params":{"name":"report","arguments":{},"_meta":{"token":"` + hygieneToken + `","progressToken":9}}}`
-		wantForwarded(t, "resumed", receivedParams(t, MethodToolsCall, streamableCall(t, srv.URL, sid, hygieneToken, raw)), "")
+		wantNoCredential(t, "resumed", receivedParams(t, MethodToolsCall, streamableCall(t, srv.URL, sid, hygieneToken, raw)))
 	}
 	// Batches are refused and notifications accepted without forwarding.
 	if status, _ := rawPost(t, p.srv.URL, sid, hygieneToken, http.MethodPost, "/mcp", `[{"jsonrpc":"2.0","method":"custom/method","params":{"_meta":{"token":"x"}}}]`); status != http.StatusBadRequest {
@@ -357,7 +367,7 @@ func TestDefaultUpstreamWritesHaveNoCredential(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	wantForwarded(t, "direct", receivedParams(t, MethodToolsCall, resp), "")
+	wantNoCredential(t, "direct", receivedParams(t, MethodToolsCall, resp))
 }
 
 // --- the token query parameter ----------------------------------------------

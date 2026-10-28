@@ -77,18 +77,17 @@ func TestHygieneHelperUpstream(t *testing.T) {
 }
 
 // helperUpstream is the config of a stdio upstream run by this test binary.
-func helperUpstream(env map[string]string, passthrough []string, forward bool) UpstreamConfig {
+func helperUpstream(env map[string]string, passthrough []string) UpstreamConfig {
 	e := map[string]string{hygieneHelperEnv: "1"}
 	for k, v := range env {
 		e[k] = v
 	}
 	return UpstreamConfig{
-		Transport:          "stdio",
-		Command:            []string{os.Args[0], "-test.run=^TestHygieneHelperUpstream$"},
-		Timeout:            20 * time.Second,
-		Env:                e,
-		EnvPassthrough:     passthrough,
-		ForwardCallerToken: forward,
+		Transport:      "stdio",
+		Command:        []string{os.Args[0], "-test.run=^TestHygieneHelperUpstream$"},
+		Timeout:        20 * time.Second,
+		Env:            e,
+		EnvPassthrough: passthrough,
 	}
 }
 
@@ -153,7 +152,7 @@ func TestStdioUpstreamSeesOnlyAllowedEnv(t *testing.T) {
 	t.Setenv("PATH", os.Getenv("PATH"))
 
 	cfg := helperUpstream(map[string]string{"SATGATE_HYGIENE_CONFIGURED": "configured-value"},
-		[]string{"SATGATE_HYGIENE_PASSED", "SATGATE_HYGIENE_NOT_SET"}, false)
+		[]string{"SATGATE_HYGIENE_PASSED", "SATGATE_HYGIENE_NOT_SET"})
 	m := NewUpstreamManager(map[string]UpstreamConfig{"envprobe": cfg}, nil, "envprobe")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -239,12 +238,12 @@ type tokenProbe struct {
 	proxy *Proxy
 }
 
-func newTokenProbe(t *testing.T, forward bool) *tokenProbe {
+func newTokenProbe(t *testing.T) *tokenProbe {
 	t.Helper()
 	cfg := &Config{
 		Server:      ServerConfig{Transport: "sse", Name: "hygiene-test", Version: "test"},
 		Auth:        AuthConfig{Mode: "header", RootKey: "hygiene-test-root"},
-		Upstreams:   map[string]UpstreamConfig{"probe": helperUpstream(nil, nil, forward)},
+		Upstreams:   map[string]UpstreamConfig{"probe": helperUpstream(nil, nil)},
 		Budget:      BudgetConfig{Limit: 1000, FailMode: "closed"},
 		Tools:       ToolsConfig{DefaultCost: 1},
 		Enforcement: EnforcementConfig{Mode: "observe"},
@@ -302,14 +301,10 @@ func receivedParams(t *testing.T, method string, resp *Response) json.RawMessage
 	return r.Echo
 }
 
-func checkUpstreamToken(t *testing.T, transport string, forward bool, call map[string]any, params json.RawMessage) {
+func checkUpstreamToken(t *testing.T, transport string, call map[string]any, params json.RawMessage) {
 	t.Helper()
-	tok, has := metaTokenOf(t, params)
-	switch {
-	case !forward && has:
-		t.Errorf("%s id=%v: upstream received _meta.token by default: %s", transport, call["id"], redactToken(params))
-	case forward && (!has || tok != hygieneToken):
-		t.Errorf("%s id=%v: opted-in upstream did not receive the caller's token: %s", transport, call["id"], redactToken(params))
+	if _, has := metaTokenOf(t, params); has {
+		t.Errorf("%s id=%v: upstream received _meta.token: %s", transport, call["id"], redactToken(params))
 	}
 	if call["id"] == 12 && !strings.Contains(string(params), `"progressToken":7`) {
 		t.Errorf("%s: the rest of _meta was not passed on: %s", transport, redactToken(params))
@@ -321,36 +316,32 @@ func redactToken(b json.RawMessage) string {
 }
 
 func TestUpstreamGetsNoCallerTokenSSE(t *testing.T) {
-	for _, forward := range []bool{false, true} {
-		p := newTokenProbe(t, forward)
-		conn := eaOpenSSE(t, p.srv.URL, hygieneToken)
-		for _, call := range hygieneCalls() {
-			if status := conn.post(mustJSON(t, call)); status != http.StatusAccepted {
-				t.Fatalf("POST /message status %d", status)
-			}
-			params := receivedParams(t, call["method"].(string), conn.next())
-			checkUpstreamToken(t, "sse", forward, call, params)
+	p := newTokenProbe(t)
+	conn := eaOpenSSE(t, p.srv.URL, hygieneToken)
+	for _, call := range hygieneCalls() {
+		if status := conn.post(mustJSON(t, call)); status != http.StatusAccepted {
+			t.Fatalf("POST /message status %d", status)
 		}
-		_ = conn.body.Close()
+		params := receivedParams(t, call["method"].(string), conn.next())
+		checkUpstreamToken(t, "sse", call, params)
 	}
+	_ = conn.body.Close()
 }
 
 func TestUpstreamGetsNoCallerTokenStreamable(t *testing.T) {
-	for _, forward := range []bool{false, true} {
-		p := newTokenProbe(t, forward)
-		sid := mustInitSession(t, p.srv.URL, hygieneToken)
-		for _, call := range hygieneCalls() {
-			status, _, body := streamablePost(t, p.srv.URL+"/mcp", sid, hygieneToken, call)
-			if status != http.StatusOK {
-				t.Fatalf("streamable status %d: %s", status, redactToken(json.RawMessage(body)))
-			}
-			var resp Response
-			if err := json.Unmarshal([]byte(body), &resp); err != nil {
-				t.Fatalf("streamable body %q: %v", redactToken(json.RawMessage(body)), err)
-			}
-			params := receivedParams(t, call["method"].(string), &resp)
-			checkUpstreamToken(t, "streamable", forward, call, params)
+	p := newTokenProbe(t)
+	sid := mustInitSession(t, p.srv.URL, hygieneToken)
+	for _, call := range hygieneCalls() {
+		status, _, body := streamablePost(t, p.srv.URL+"/mcp", sid, hygieneToken, call)
+		if status != http.StatusOK {
+			t.Fatalf("streamable status %d: %s", status, redactToken(json.RawMessage(body)))
 		}
+		var resp Response
+		if err := json.Unmarshal([]byte(body), &resp); err != nil {
+			t.Fatalf("streamable body %q: %v", redactToken(json.RawMessage(body)), err)
+		}
+		params := receivedParams(t, call["method"].(string), &resp)
+		checkUpstreamToken(t, "streamable", call, params)
 	}
 }
 

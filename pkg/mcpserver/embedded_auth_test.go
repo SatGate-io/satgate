@@ -293,7 +293,7 @@ func TestEmbeddedStreamableRefusesGovernedMethodsWithUpstreamRunning(t *testing.
 	captureLogs(t)
 	cfg := &Config{
 		Server:          ServerConfig{Transport: "http"},
-		Upstreams:       map[string]UpstreamConfig{"probe": helperUpstream(nil, nil, false)},
+		Upstreams:       map[string]UpstreamConfig{"probe": helperUpstream(nil, nil)},
 		DefaultUpstream: "probe",
 		Enforcement:     EnforcementConfig{Mode: "observe"},
 	}

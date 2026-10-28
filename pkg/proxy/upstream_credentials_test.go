@@ -390,3 +390,32 @@ func TestUpstreamCredentials_L402ProofNotLogged(t *testing.T) {
 		t.Error("the log carries the L402 proof")
 	}
 }
+
+// A client cannot keep a configured header from the upstream by naming it in
+// its Connection header.
+func TestUpstreamCredentials_ConfiguredHeaderSurvivesConnectionHeader(t *testing.T) {
+	up := newHeaderRecorder(t)
+	cfg := &config.Config{
+		Upstreams: map[string]config.Upstream{"backend": {URL: up.srv.URL, Headers: map[string]string{
+			"Authorization": "Bearer upstream-configured",
+		}}},
+		Routes: []config.Route{{Name: "r", Match: config.RouteMatch{PathPrefix: "/api/"}, Upstream: "backend",
+			Policy: config.RoutePolicy{Kind: "public"}}},
+	}
+	gw := newTestGateway(t, cfg)
+	req := httptest.NewRequest(http.MethodGet, "/api/data", nil)
+	req.Header.Set("Connection", "authorization, X-Hop")
+	req.Header.Set("X-Hop", "dropped as hop-by-hop")
+	rec := httptest.NewRecorder()
+	gw.ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status %d", rec.Code)
+	}
+	got := up.headers(t)
+	if got.Get("Authorization") != "Bearer upstream-configured" {
+		t.Error("the configured Authorization did not reach the upstream")
+	}
+	if got.Get("X-Hop") != "" {
+		t.Error("a header the client named in Connection was passed on")
+	}
+}

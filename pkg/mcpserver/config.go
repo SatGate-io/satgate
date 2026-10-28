@@ -1,6 +1,7 @@
 package mcpserver
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -240,12 +241,12 @@ type UpstreamConfig struct {
 	// skipped. Nothing else from the proxy's environment reaches the upstream.
 	EnvPassthrough []string `yaml:"envPassthrough,omitempty"`
 
-	// ForwardCallerToken passes the caller's SatGate token on to this
-	// upstream in params._meta.token. Off by default: the proxy removes
-	// _meta.token from every request it forwards, including one the caller
-	// put there. Turn it on only for an upstream that must verify the
-	// caller's SatGate token itself; that upstream then holds the caller's
-	// token and can use it as the caller until it expires or is revoked.
+	// ForwardCallerToken is no longer supported, and a configuration or
+	// upstream that sets it is refused (see errForwardCallerToken). The
+	// proxy removes _meta.token from every request it forwards, including
+	// one the caller put there, and passes no SatGate credential to any
+	// upstream. An upstream that needs a credential is given its own in
+	// Headers (network transports) or Env (stdio).
 	ForwardCallerToken bool `yaml:"forwardCallerToken,omitempty"`
 
 	// Headers are additional HTTP headers sent with every request (e.g., Authorization).
@@ -329,6 +330,12 @@ type LoggingConfig struct {
 	// JSON output format.
 	JSON bool `yaml:"json"`
 }
+
+// errForwardCallerToken refuses an upstream configured with
+// forwardCallerToken. The option passed the caller's whole SatGate token on,
+// which the upstream could then use as the caller anywhere the token is
+// accepted; it was removed rather than kept that way.
+var errForwardCallerToken = errors.New("forwardCallerToken is no longer supported: the caller's SatGate token is never passed to an upstream; give the upstream its own credential in headers or env")
 
 // LoadConfig reads and parses a YAML config file.
 func LoadConfig(path string) (*Config, error) {
@@ -426,6 +433,9 @@ func (c *Config) validate() error {
 	}
 
 	for name, u := range c.Upstreams {
+		if u.ForwardCallerToken {
+			return fmt.Errorf("upstream %q: %w", name, errForwardCallerToken)
+		}
 		switch u.Transport {
 		case "stdio":
 			if len(u.Command) == 0 {

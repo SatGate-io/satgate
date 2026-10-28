@@ -987,6 +987,7 @@ func (g *Gateway) createProxy(upstreamURL string, headers map[string]string) (*h
 		for name, values := range configured {
 			r.Header[name] = append([]string(nil), values...)
 		}
+		keepConfiguredHeaders(r.Header, configured)
 	}
 
 	// Configure transport with SSRF-safe dialer that blocks private IPs at connect time.

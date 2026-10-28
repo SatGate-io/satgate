@@ -48,7 +48,7 @@ upstreams:
   my-backend:
     url: "https://api.example.com"
     timeout: 30s
-    headers: {}
+    headers: {}                   # Set on every forwarded request; see "What an upstream receives"
     healthCheck:
       path: /health
       interval: 30s
@@ -105,6 +105,48 @@ configuration in which two routes share a name is refused at startup with
 unique`. An agent policy promoted at run time (`/api/agent/promote`) whose
 name is already used by a route is refused with `409 route_name_in_use`, and
 a saved agent route whose name is in use is not restored at startup.
+
+### What an upstream receives
+
+The gateway forwards a copy of each request it lets through. Before
+forwarding, it removes the credentials it consumed or owns:
+
+| Removed | When | Why |
+|---|---|---|
+| `Authorization` (every value) | The route's policy is `capability` (also the default when no policy kind is set), `l402` or `identity` | The gateway checked this credential to let the request through. |
+| `Authorization` values that carry a token this gateway issued | Any other route (`public`, `chargeback`) | A macaroon signed under this gateway's root key, sent as `Bearer <token>`, as the bare token, or as `L402`/`LSAT <macaroon>:<preimage>`, is a SatGate credential, not the upstream's. |
+| `X-Admin-Token`, `X-Tenant-ID`, every `X-SatGate-*` header | Always | SatGate reads these itself (admin authentication, tenant selection) or reserves the names; a client's value must not reach the upstream as if SatGate had set it. |
+| SatGate's session cookies (`cloud_session`, `__Host-cloud_session`, `__Host-admin_session`, `impersonation`, `__Host-impersonation`, and any cookie whose name starts with `satgate`) | Always | They are SatGate sign-in sessions. Other cookies are passed on exactly as sent. |
+
+On a `public` or `chargeback` route, an `Authorization` value that is not a
+token this gateway issued (an upstream API key, a JWT, `Basic` credentials,
+a macaroon from another issuer) is passed on unchanged: the gateway did not
+check it, and on a route the gateway does not guard it belongs to the
+upstream. Every header not listed above is passed on unchanged.
+
+**Giving an upstream its own credentials.** Set them in the upstream's
+`headers`. They are set on every request to that upstream after the removal
+above, so a configured header replaces a client header of the same name
+(the configured value wins):
+
+```yaml
+upstreams:
+  my-backend:
+    url: "https://api.example.com"
+    headers:
+      Authorization: "Bearer ${MY_BACKEND_TOKEN}"
+```
+
+A configuration is refused at load if an upstream's `headers` sets a header
+SatGate owns (`X-Admin-Token`, `X-Tenant-ID`, `X-SatGate-*`), has a name that
+is not a valid HTTP header name, a value with a line break or other control
+character, or two names that differ only in case.
+
+**Compatibility.** Earlier versions forwarded the client's `Authorization`,
+`X-Admin-Token`, `X-Tenant-ID` and cookies as sent, and ignored `headers`.
+An upstream that relied on receiving the client's SatGate token must now be
+given its own credential in `headers`. A configuration whose `headers` names
+a header SatGate owns no longer loads.
 
 ## Optional Sections
 

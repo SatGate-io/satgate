@@ -151,6 +151,38 @@ func removeGatewayCookies(h http.Header) {
 	h["Cookie"] = kept
 }
 
+// keepConfiguredHeaders removes from h's Connection header every name of a
+// configured header. The reverse proxy drops the headers a Connection header
+// names after the Director has run, so without this a client could keep a
+// configured header from reaching the upstream.
+func keepConfiguredHeaders(h, configured http.Header) {
+	values := h.Values("Connection")
+	if len(values) == 0 || len(configured) == 0 {
+		return
+	}
+	kept := make([]string, 0, len(values))
+	for _, v := range values {
+		var names []string
+		for _, f := range strings.Split(v, ",") {
+			f = strings.TrimSpace(f)
+			if f == "" {
+				continue
+			}
+			if _, isConfigured := configured[http.CanonicalHeaderKey(f)]; !isConfigured {
+				names = append(names, f)
+			}
+		}
+		if len(names) > 0 {
+			kept = append(kept, strings.Join(names, ", "))
+		}
+	}
+	if len(kept) == 0 {
+		h.Del("Connection")
+		return
+	}
+	h["Connection"] = kept
+}
+
 // upstreamHeaders returns headers with canonical names, ready to be set on
 // each request to an upstream. The configuration was checked when it was
 // loaded and when the gateway was built (config.CheckUpstreamHeaders).

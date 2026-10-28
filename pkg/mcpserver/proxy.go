@@ -1304,10 +1304,9 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 		timeout = ucfg.Timeout
 	}
 
-	// The caller's token stays with the proxy: it is removed from params. An
-	// upstream that opts in (UpstreamConfig.ForwardCallerToken) gets only the
-	// credential authenticate verified, which dispatchAuthenticated put on ctx
-	// (see upstream_hygiene.go).
+	// The caller's token stays with the proxy: it is removed from params
+	// before any router sees them, and removed again by every UpstreamManager
+	// as it writes to an upstream (see upstream_hygiene.go).
 	resp, err = p.router.ForwardToolCallForTenant(ctx, tenantID, tc.Name, withoutMetaToken(req.Params), timeout)
 	// What the router returned, as the gate must read it: the reply below is
 	// rewritten into a JSON-RPC error on a transport failure, which would
@@ -1695,12 +1694,8 @@ func (p *Proxy) forwardToDefault(ctx context.Context, req *Request) (*Response, 
 	timeout := 30 * time.Second
 
 	// As for tools/call: the caller's token is not passed on (see
-	// upstream_hygiene.go). An upstream that opted in gets the credential
-	// verified for this request: the one authenticate verified (forwardGoverned),
-	// else the connection's own credential once it verifies here. Never a
-	// value read from params.
-	fwdCtx := p.verifyConnectionCredential(ctx)
-	resp, err := p.upstream.ForwardRequest(fwdCtx, req.Method, withoutMetaToken(req.Params), timeout)
+	// upstream_hygiene.go).
+	resp, err := p.upstream.ForwardRequest(ctx, req.Method, withoutMetaToken(req.Params), timeout)
 	if err != nil {
 		return NewErrorResponse(req.ID, CodeUpstreamError, fmt.Sprintf("upstream: %v", err)), nil
 	}
