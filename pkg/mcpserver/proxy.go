@@ -606,6 +606,10 @@ func (p *Proxy) refuseUnauthenticated(ctx context.Context, req *Request) *Respon
 	}
 	if err != nil {
 		p.publishAuthFailure(req, err)
+		// The token's ban state could not be read: refused, never served.
+		if isRevocationUnavailable(err) {
+			return revocationUnavailableResponse(req.ID)
+		}
 		return NewErrorResponse(req.ID, CodePolicyDenied, err.Error())
 	}
 	if p.revocation != nil && info.BudgetID != "" {

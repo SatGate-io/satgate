@@ -424,9 +424,10 @@ revocation:
 
 The check runs wherever the proxy accepts a token, before anything is admitted,
 spent, forwarded or minted: SSE connect and every message, Streamable HTTP
-`initialize`, every request and every resumed session, stdio, the credential
-passed to an upstream with `forwardCallerToken` (not passed on for a banned
-token), and `satgate/delegate` (checked again before the helper is minted).
+`initialize`, every request and every resumed session, stdio, `tools/list` and
+the methods passed on to an upstream, the credential passed to an upstream
+with `forwardCallerToken` (never passed on for a banned token), and
+`satgate/delegate` (checked again before the helper is minted).
 A banned token gets `403` with `code: TOKEN_REVOKED` where the refusal is an
 HTTP answer (SSE connect, Streamable `initialize` and resume; `401` with the
 sign-in challenge when the OAuth challenge is on), and otherwise the JSON-RPC

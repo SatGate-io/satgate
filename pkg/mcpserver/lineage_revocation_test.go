@@ -318,7 +318,7 @@ func TestMCPLineage_StdioDispatchRefusesBannedToken(t *testing.T) {
 }
 
 // forwardCallerToken: the connection credential of a banned lineage is not
-// passed on to the upstream.
+// passed on to the upstream; the method is refused before it is passed on.
 func TestMCPLineage_ForwardedCredentialWithheldForBannedToken(t *testing.T) {
 	gov := governance.NewService(nil)
 	p := newTokenProbe(t, true)
@@ -341,7 +341,15 @@ func TestMCPLineage_ForwardedCredentialWithheldForBannedToken(t *testing.T) {
 	raw := `{"jsonrpc":"2.0","id":510,"method":"resources/list","params":{}}`
 	wantForwarded(t, "before the ban", receivedParams(t, "resources/list", streamableCall(t, p.srv.URL, sid, child, raw)), child)
 	gov.Ban(root.Signature, "test", "admin")
-	wantForwarded(t, "after the ban", receivedParams(t, "resources/list", streamableCall(t, p.srv.URL, sid, child, raw)), "")
+	resp := streamableCall(t, p.srv.URL, sid, child, raw)
+	if resp.Error == nil || !strings.Contains(resp.Error.Message, "token revoked") || len(resp.Result) != 0 {
+		t.Fatalf("resources/list with a banned lineage was passed on: %+v", resp.Error)
+	}
+	// The verification that decides what is forwarded refuses it too.
+	ctx := p.proxy.verifyConnectionCredential(withTransportToken(context.Background(), child))
+	if verifiedCredentialFrom(ctx) != "" {
+		t.Fatal("a banned lineage's credential was marked for forwarding")
+	}
 }
 
 // The delegator checks the parent again before it mints a helper, so a
@@ -502,5 +510,45 @@ func TestMCPLineage_NoCheckerLeavesBehaviourUnchanged(t *testing.T) {
 	sid := mustInitSession(t, r.srv.URL, root)
 	if _, _, body := streamablePost(t, r.srv.URL+"/mcp", sid, root, toolCallBody(2, "echo")); !strings.Contains(body, `"result"`) {
 		t.Fatal("without a checker a token was refused")
+	}
+}
+
+// tools/list and the methods passed on to an upstream, which need a verified
+// token in header mode, refuse a banned lineage, and answer
+// revocation-unavailable when the ban state cannot be read.
+func TestMCPLineage_ToolsListAndPassedOnMethodsRefuseBannedToken(t *testing.T) {
+	mr := miniredis.RunT(t)
+	gov, err := governance.NewServiceWithRedis(&governance.RedisConfig{Addr: mr.Addr()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = gov.Close() })
+	r := newLineageRig(t, gov)
+	root, rootSig := r.mint()
+	child, _ := r.delegate(root, "label = list")
+	sid := mustInitSession(t, r.srv.URL, child)
+	list := map[string]any{"jsonrpc": "2.0", "id": 2, "method": MethodToolsList}
+	passed := map[string]any{"jsonrpc": "2.0", "id": 3, "method": "resources/list", "params": map[string]any{}}
+	if _, _, body := streamablePost(t, r.srv.URL+"/mcp", sid, child, list); !strings.Contains(body, `"result"`) {
+		t.Fatal("tools/list before the ban was refused")
+	}
+
+	if err := gov.BanContext(context.Background(), rootSig, "test", "admin"); err != nil {
+		t.Fatal(err)
+	}
+	for _, msg := range []map[string]any{list, passed} {
+		code, _, body := streamablePost(t, r.srv.URL+"/mcp", sid, child, msg)
+		if e := rpcErrorIn(t, body); code != http.StatusOK || e == nil || e.Code != CodePolicyDenied || !strings.Contains(e.Message, "token revoked") {
+			t.Fatalf("%v with a banned lineage: status %d error %+v", msg["method"], code, e)
+		}
+	}
+
+	mr.Close()
+	time.Sleep(governance.BanCacheTTL)
+	for _, msg := range []map[string]any{list, passed} {
+		code, _, body := streamablePost(t, r.srv.URL+"/mcp", sid, child, msg)
+		if code != http.StatusServiceUnavailable || !isRevocationUnavailableResponse(&Response{Error: rpcErrorIn(t, body)}) {
+			t.Fatalf("%v with the ban store down: status %d", msg["method"], code)
+		}
 	}
 }
