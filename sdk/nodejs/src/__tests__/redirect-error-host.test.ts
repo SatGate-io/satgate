@@ -1,6 +1,6 @@
 import { LNDWallet, SatGateAgentClient } from '../agent-client';
 import { SatGateClient } from '../client';
-import { RedirectRefusedError } from '../errors';
+import { RedirectRefusedError, RequestUrlRefusedError } from '../errors';
 import { fetchWithoutRedirects, requestHost } from '../transport';
 
 /*
@@ -10,9 +10,10 @@ import { fetchWithoutRedirects, requestHost } from '../transport';
  * was sent to, with user information, path and query removed. LNDWallet's
  * host string is configured by the caller and may contain any of these.
  *
- * Node's global fetch refuses a URL with user information before sending,
- * so these tests answer every request with a 302 from a stub fetch and
- * record the URL each request was sent to.
+ * These tests answer every request with a 302 from a stub fetch and record
+ * the URL each request was sent to. A URL with user information is refused
+ * before sending (RequestUrlRefusedError, also naming only host and port),
+ * so the stub gets nothing.
  */
 
 const USER = 'synthetic-user';
@@ -35,6 +36,18 @@ function expectHostOnly(err: unknown, host: string, label: string, status = 302)
   expect(e.host).toBe(host);
   expect(e.statusCode).toBe(status);
   expect(e.message.startsWith(`${label} ${host} answered HTTP ${status};`)).toBe(true);
+  expectNoUrlParts(e);
+}
+
+function expectRefusedHostOnly(err: unknown, host: string, label: string): void {
+  expect(err).toBeInstanceOf(RequestUrlRefusedError);
+  const e = err as RequestUrlRefusedError;
+  expect(e.host).toBe(host);
+  expect(e.message.startsWith(`${label} URL for ${host} has a user name or password in it;`)).toBe(true);
+  expectNoUrlParts(e);
+}
+
+function expectNoUrlParts(e: RedirectRefusedError | RequestUrlRefusedError): void {
   for (const part of FORBIDDEN) {
     expect(e.message).not.toContain(part);
     expect(e.host).not.toContain(part);
@@ -71,15 +84,20 @@ describe('redirect errors name only the host and port of the request URL', () =>
       it(`LNDWallet ${operation}: a configured host with ${shape} gives an error naming only host and port`, async () => {
         const wallet = new LNDWallet({ host, macaroonHex: MACAROON_HEX });
         const err = await caught(operation === 'payInvoice' ? wallet.payInvoice('lnbc1') : wallet.getBalance());
-        expectHostOnly(err, 'lnd.example:8080', 'LND host');
-        expect(sent).toHaveLength(1);
+        if (host.includes('@')) {
+          expectRefusedHostOnly(err, 'lnd.example:8080', 'LND host');
+          expect(sent).toHaveLength(0);
+        } else {
+          expectHostOnly(err, 'lnd.example:8080', 'LND host');
+          expect(sent).toHaveLength(1);
+        }
       });
     }
   }
 
   for (const status of [301, 302, 303, 307, 308]) {
-    it(`fetchWithoutRedirects: ${status} names only host and port of a URL with user information, path and query`, async () => {
-      const url = `https://${USER}:${PASSWORD}@gw.example:8443${CFG_PATH}?${CFG_QUERY}`;
+    it(`fetchWithoutRedirects: ${status} names only host and port of a URL with a path and query`, async () => {
+      const url = `https://gw.example:8443${CFG_PATH}?${CFG_QUERY}`;
       const err = await caught(fetchWithoutRedirects(url, {}, {
         label: 'test host',
         fetchImpl: async () => ({ status, body: null }),
@@ -102,14 +120,14 @@ describe('redirect errors name only the host and port of the request URL', () =>
     expect(requestHost('not a url')).toBe('an unreadable host');
   });
 
-  it('SatGateAgentClient: a gateway URL with user information, path and query gives an error naming only host and port', async () => {
-    const agent = new SatGateAgentClient({ gatewayUrl: `https://${USER}:${PASSWORD}@gw.example:8443${CFG_PATH}`, token: 'cap-0123' });
+  it('SatGateAgentClient: a gateway URL with a path and query gives an error naming only host and port', async () => {
+    const agent = new SatGateAgentClient({ gatewayUrl: `https://gw.example:8443${CFG_PATH}`, token: 'cap-0123' });
     const err = await caught(agent.get(`/x?${CFG_QUERY}`));
     expectHostOnly(err, 'gw.example:8443', 'SatGate gateway');
   });
 
-  it('SatGateClient: a URL with user information and a path gives an error naming only host and port', async () => {
-    const client = new SatGateClient({ url: `https://${USER}:${PASSWORD}@gw.example:8443${CFG_PATH}`, token: 'adm-0123' });
+  it('SatGateClient: a URL with a path gives an error naming only host and port', async () => {
+    const client = new SatGateClient({ url: `https://gw.example:8443${CFG_PATH}`, token: 'adm-0123' });
     const err = await caught(client.tokens.mint());
     expectHostOnly(err, 'gw.example:8443', 'SatGate gateway');
   });

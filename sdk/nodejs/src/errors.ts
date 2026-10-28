@@ -69,6 +69,27 @@ export class RedirectRefusedError extends SatGateError {
   }
 }
 
+/**
+ * The SDK refused a request URL before sending anything: the URL has user
+ * information (a user name or password), or it cannot be parsed. `host` and
+ * the message name only the host and port of the URL, never its user
+ * information, path or query.
+ */
+export class RequestUrlRefusedError extends SatGateError {
+  public readonly host: string;
+
+  constructor(host: string, label: string = 'host', reason: 'user-info' | 'unparseable' = 'user-info') {
+    super(
+      reason === 'user-info'
+        ? `${label} URL for ${host} has a user name or password in it; the SDK does not ` +
+          'send a request to a URL with user information, and no request was sent'
+        : `${label} URL could not be parsed; no request was sent`,
+    );
+    this.name = 'RequestUrlRefusedError';
+    this.host = host;
+  }
+}
+
 export class RateLimitError extends SatGateError {
   constructor(
     message: string = 'Rate limit exceeded',

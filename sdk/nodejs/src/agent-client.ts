@@ -30,6 +30,7 @@ import {
   AuthenticationError,
   PaymentRequiredError,
   PaymentFailedError,
+  RequestUrlRefusedError,
 } from './errors';
 import { fetchWithoutRedirects } from './transport';
 
@@ -413,7 +414,13 @@ export class SatGateAgentClient {
     path: string,
     options: RequestInit = {}
   ): Promise<AgentResponse<T>> {
-    const url = new URL(path, this.gatewayUrl).toString();
+    let url: string;
+    try {
+      url = new URL(path, this.gatewayUrl).toString();
+    } catch {
+      // URL's own error carries both strings; name neither.
+      throw new RequestUrlRefusedError('an unreadable host', 'SatGate gateway', 'unparseable');
+    }
     
     // Add capability token if available
     const token = await this.getToken();

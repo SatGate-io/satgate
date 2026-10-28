@@ -84,6 +84,14 @@ information, path or query, also when they are part of the `host` given to
 `LNDWallet`); the request is not sent again. `SatGateClient.health()`
 resolves `false` in that case.
 
+The request URL is checked before anything is sent. A URL with a user name
+or password (for example a gateway URL or an LND `host` with `user:pass@`),
+or one that cannot be parsed, rejects with `RequestUrlRefusedError` (a
+`SatGateError`, with `host`) naming only the host and port, and no request
+is sent; put credentials in the SDK options, not in the URL (before, such a
+URL failed with a `TypeError` from `fetch`). A network or
+response-body error names no part of the request URL but its host and port.
+
 The SDK keeps no session or cookie jar: a request carries no cookie or
 credential beyond the headers and body the SDK (or your options) set. In a
 browser, `fetch` still applies its default cookie rule

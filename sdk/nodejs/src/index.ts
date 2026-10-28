@@ -91,4 +91,5 @@ export {
   DelegationError,
   SatGateAuthError,
   RedirectRefusedError,
+  RequestUrlRefusedError,
 } from './errors';
