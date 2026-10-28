@@ -79,14 +79,32 @@ type Service struct {
 	// is the source of truth and is read on the request path through
 	// banCache, so a ban written by another gateway is honoured here within
 	// banCacheTTL. pendingBans holds bans made here that could not be
-	// written to the store; this gateway keeps honouring them.
+	// written to the store; this gateway keeps honouring them. localBans
+	// holds bans made here recently (see localBan), so a decision or view
+	// that was reading the store while one was made still honours it.
 	shared      bool
 	banCacheTTL time.Duration
 	now         func() time.Time
 	cacheMu     sync.Mutex
 	banCache    map[string]banCacheEntry
 	pendingBans map[string]BanRecord
+	localBans   map[string]localBan
 }
+
+// localBan is a ban made on this gateway with a shared store. A decision
+// that started before the ban's store write ended may have read the store
+// before the ban reached it; it honours the ban anyway (localBanLocked).
+type localBan struct {
+	record  BanRecord
+	writing int       // store writes of this ban in progress
+	done    time.Time // when the last store write of this ban ended
+}
+
+// localBanKeep is how long a local ban is kept after its store write ended.
+// A decision lasts at most BanStoreReadTimeout, so one that started before
+// the write ended has finished by then; later decisions read the ban from
+// the store (or pendingBans if the write failed).
+const localBanKeep = BanStoreReadTimeout + BanCacheTTL
 
 // BanCacheTTL is how long a gateway backed by a shared store (Redis) reuses
 // one answer from the store for a signature, counted from the moment the
@@ -187,6 +205,7 @@ func NewService(store Store) *Service {
 		now:         time.Now,
 		banCache:    make(map[string]banCacheEntry),
 		pendingBans: make(map[string]BanRecord),
+		localBans:   make(map[string]localBan),
 	}
 }
 
@@ -332,18 +351,37 @@ func (s *Service) BanContext(ctx context.Context, signature, reason, bannedBy st
 	s.banned[signature] = record
 	s.mu.Unlock()
 
-	// Persist to store (sync for ban operations - critical path)
-	err := s.store.Ban(ctx, record)
 	if !s.shared {
-		if err != nil {
+		// Persist to store (sync for ban operations - critical path)
+		if err := s.store.Ban(ctx, record); err != nil {
 			log.Error().Err(err).Str("signature", shortSig(signature)).Msg("Failed to persist ban record")
 		}
 		return nil
 	}
 
+	// From here until localBanKeep after the write ends, every decision
+	// on this gateway honours the ban, whatever it read from the store.
+	s.cacheMu.Lock()
+	lb := s.localBans[signature]
+	lb.record = record
+	lb.writing++
+	s.localBans[signature] = lb
+	s.cacheMu.Unlock()
+
+	err := s.store.Ban(ctx, record)
+
 	s.cacheMu.Lock()
 	defer s.cacheMu.Unlock()
-	s.putCacheLocked(signature, true, s.now())
+	now := s.now()
+	lb = s.localBans[signature]
+	lb.record = record
+	if lb.writing > 0 {
+		lb.writing--
+	}
+	lb.done = now
+	s.localBans[signature] = lb
+	s.pruneLocalBansLocked(now)
+	s.putCacheLocked(signature, true, now)
 	if err != nil {
 		s.pendingBans[signature] = record
 		log.Error().Err(err).Str("signature", shortSig(signature)).Msg("Ban not written to the shared store; only this gateway honours it")
@@ -373,6 +411,7 @@ func (s *Service) Unban(signature string) bool {
 		s.cacheMu.Lock()
 		_, wasPending := s.pendingBans[signature]
 		delete(s.pendingBans, signature)
+		delete(s.localBans, signature)
 		delete(s.banCache, signature)
 		s.cacheMu.Unlock()
 		wasShared = wasShared || wasPending
@@ -403,11 +442,13 @@ func (s *Service) IsBanned(signature string) bool {
 // covers it.
 //
 // With the in-memory store it reads this process's ban list and never fails.
-// With a shared store it reads the store, reusing each answer for
-// BanCacheTTL from when the lookup that produced it started; the read is
-// bounded to BanStoreReadTimeout. If the store cannot be read in time, or its
-// answer arrives when it is already BanCacheTTL old, it returns an error
-// wrapping ErrRevocationUnavailable, and the caller must refuse the request.
+// With a shared store the answer comes from decideLineage: it allows only
+// when, at the moment it allows, every signature has a "not banned" answer
+// from a store lookup that started less than BanCacheTTL before, and no ban
+// made on this gateway since the decision started covers any of them. The
+// whole decision, store reads included, is bounded to BanStoreReadTimeout.
+// If the store cannot be read in time it returns an error wrapping
+// ErrRevocationUnavailable, and the caller must refuse the request.
 func (s *Service) IsAnyBanned(ctx context.Context, signatures []string) (bool, error) {
 	if !s.shared {
 		s.mu.RLock()
@@ -419,63 +460,152 @@ func (s *Service) IsAnyBanned(ctx context.Context, signatures []string) (bool, e
 		}
 		return false, nil
 	}
+	return s.decideLineage(ctx, signatures)
+}
 
+// lineageAnswer is the answer a decision holds for one signature: a store
+// answer (banned or not) from a lookup that started at at.
+type lineageAnswer struct {
+	banned bool
+	at     time.Time
+	known  bool
+}
+
+// decideLineage is the one access decision with a shared store; every
+// caller (IsAnyBanned, IsBanned, so the HTTP gateway and the MCP runtime)
+// goes through it.
+//
+// It starts at start and holds one answer per signature: from the cache, or
+// from a store lookup made here. A "banned" answer is honoured if its lookup
+// started less than BanCacheTTL before start. Before allowing, at the moment
+// it allows, every signature must have a "not banned" answer whose lookup
+// started less than BanCacheTTL before that moment, and the local ban set
+// (bans made here: pendingBans, and localBans since start) is read again
+// under the same lock; a ban there refuses. Signatures with no such answer
+// are read from the store: first those, then, if answers taken from the
+// cache aged past BanCacheTTL while they were read, every signature again in
+// one lookup. A lookup whose answer arrives BanCacheTTL or more after it
+// started, or a decision still without a fresh answer for every signature
+// after that, is refused with ErrRevocationUnavailable. All reads share one
+// deadline, BanStoreReadTimeout after start.
+func (s *Service) decideLineage(ctx context.Context, signatures []string) (bool, error) {
 	start := s.now()
-	misses := make([]string, 0, len(signatures))
+	dctx, cancel := context.WithTimeout(ctx, banStoreTimeout)
+	defer cancel()
+
+	answers := make([]lineageAnswer, len(signatures))
 	s.cacheMu.Lock()
-	for _, sig := range signatures {
-		if _, pending := s.pendingBans[sig]; pending {
-			s.cacheMu.Unlock()
-			return true, nil
-		}
-		if e, ok := s.banCache[sig]; ok && start.Sub(e.at) < s.banCacheTTL {
-			if e.banned {
-				s.cacheMu.Unlock()
-				return true, nil
-			}
-			continue
-		}
-		misses = append(misses, sig)
-	}
+	banned, stale := s.settleLocked(signatures, answers, start, start)
 	s.cacheMu.Unlock()
-	if len(misses) == 0 {
-		return false, nil
-	}
-
-	found, err := boundedRead(ctx, func(rctx context.Context) ([]bool, error) {
-		return s.lookupBans(rctx, misses)
-	})
-	if err != nil {
-		log.Error().Err(err).Msg("Ban store unavailable; refusing request")
-		return false, fmt.Errorf("%w: %v", ErrRevocationUnavailable, err)
-	}
-	// The answer describes the store as it was at some moment after start,
-	// so it is fresh for banCacheTTL from start, not from now.
-	fresh := s.now().Sub(start) < s.banCacheTTL
-
-	s.cacheMu.Lock()
-	defer s.cacheMu.Unlock()
-	hit := false
-	for i, sig := range misses {
-		// A newer answer, or a ban made here while the store was being
-		// read, is kept; a ban in either answer is honoured.
-		if e, ok := s.banCache[sig]; ok && (e.at.After(start) || (e.at.Equal(start) && e.banned)) {
-			hit = hit || e.banned || found[i]
-			continue
-		}
-		if fresh {
-			s.putCacheLocked(sig, found[i], start)
-		}
-		hit = hit || found[i]
-	}
-	if hit {
+	if banned {
 		return true, nil
 	}
-	if !fresh {
-		log.Error().Msg("Ban store answered after the cache TTL; refusing request")
-		return false, fmt.Errorf("%w: ban store answer arrived after %s", ErrRevocationUnavailable, s.banCacheTTL)
+
+	for round := 0; len(stale) > 0; round++ {
+		if round == 2 {
+			log.Error().Msg("Ban store answers did not stay fresh for the whole lineage; refusing request")
+			return false, fmt.Errorf("%w: no answer younger than %s for every lineage entry", ErrRevocationUnavailable, s.banCacheTTL)
+		}
+		toRead := stale
+		if round > 0 {
+			// Answers aged while the store was read: read the whole
+			// lineage in one lookup so every answer has the same start.
+			toRead = make([]int, len(signatures))
+			for i := range toRead {
+				toRead[i] = i
+			}
+		}
+		sigs := make([]string, len(toRead))
+		for j, i := range toRead {
+			sigs[j] = signatures[i]
+		}
+		readStart := s.now()
+		found, err := boundedRead(dctx, func(rctx context.Context) ([]bool, error) {
+			return s.lookupBans(rctx, sigs)
+		})
+		if err != nil {
+			log.Error().Err(err).Msg("Ban store unavailable; refusing request")
+			return false, fmt.Errorf("%w: %v", ErrRevocationUnavailable, err)
+		}
+		end := s.now()
+		// The answer describes the store as it was at some moment after
+		// readStart, so it is fresh for banCacheTTL from readStart.
+		fresh := end.Sub(readStart) < s.banCacheTTL
+
+		s.cacheMu.Lock()
+		for j, i := range toRead {
+			answers[i] = lineageAnswer{banned: found[j], at: readStart, known: true}
+			if fresh {
+				s.putAnswerLocked(signatures[i], found[j], readStart)
+			}
+		}
+		banned, stale = s.settleLocked(signatures, answers, start, end)
+		s.cacheMu.Unlock()
+		if banned {
+			return true, nil
+		}
+		if !fresh {
+			log.Error().Msg("Ban store answered after the cache TTL; refusing request")
+			return false, fmt.Errorf("%w: ban store answer arrived after %s", ErrRevocationUnavailable, s.banCacheTTL)
+		}
 	}
 	return false, nil
+}
+
+// settleLocked brings answers up to date at the moment now of a decision that
+// started at start, and reports whether a ban covers the lineage, and
+// otherwise which signatures (by index) have no "not banned" answer whose
+// lookup started less than BanCacheTTL before now. A newer answer in the
+// cache (from another lookup, or a ban made here) replaces the one held; a
+// ban made here since start, or one not yet written to the store, covers
+// its signature whatever the store said. cacheMu is held.
+func (s *Service) settleLocked(signatures []string, answers []lineageAnswer, start, now time.Time) (bool, []int) {
+	var stale []int
+	for i, sig := range signatures {
+		if _, ok := s.localBanLocked(sig, start); ok {
+			return true, nil
+		}
+		a := &answers[i]
+		if e, ok := s.banCache[sig]; ok && (!a.known || e.at.After(a.at) || (e.at.Equal(a.at) && e.banned)) {
+			*a = lineageAnswer{banned: e.banned, at: e.at, known: true}
+		}
+		switch {
+		case !a.known:
+			stale = append(stale, i)
+		case a.banned:
+			if start.Sub(a.at) < s.banCacheTTL {
+				return true, nil
+			}
+			stale = append(stale, i) // an old ban: the store is read again
+		case now.Sub(a.at) >= s.banCacheTTL:
+			stale = append(stale, i)
+		}
+	}
+	return false, stale
+}
+
+// localBanLocked returns the ban made on this gateway that covers sig for a
+// decision or view that started at start: one not yet written to the shared
+// store (pendingBans), or one whose store write was in progress at start or
+// ended since. cacheMu is held.
+func (s *Service) localBanLocked(sig string, start time.Time) (BanRecord, bool) {
+	if rec, ok := s.pendingBans[sig]; ok {
+		return rec, true
+	}
+	if lb, ok := s.localBans[sig]; ok && (lb.writing > 0 || !lb.done.Before(start)) {
+		return lb.record, true
+	}
+	return BanRecord{}, false
+}
+
+// pruneLocalBansLocked drops local bans whose store write ended localBanKeep
+// or more before now. cacheMu is held.
+func (s *Service) pruneLocalBansLocked(now time.Time) {
+	for sig, lb := range s.localBans {
+		if lb.writing == 0 && now.Sub(lb.done) >= localBanKeep {
+			delete(s.localBans, sig)
+		}
+	}
 }
 
 // boundedRead runs read with a context that ends BanStoreReadTimeout from now
@@ -522,6 +652,16 @@ func (s *Service) lookupBans(ctx context.Context, signatures []string) ([]bool, 
 		found[i] = banned
 	}
 	return found, nil
+}
+
+// putAnswerLocked records an answer from a store lookup that started at at,
+// unless the cache already holds a newer one (or a ban made at the same
+// moment). cacheMu is held.
+func (s *Service) putAnswerLocked(sig string, banned bool, at time.Time) {
+	if e, ok := s.banCache[sig]; ok && (e.at.After(at) || (e.at.Equal(at) && e.banned)) {
+		return
+	}
+	s.putCacheLocked(sig, banned, at)
 }
 
 // putCacheLocked records one answer from the shared store, obtained by a
@@ -587,6 +727,7 @@ func (s *Service) currentBans(ctx context.Context) (map[string]BanRecord, error)
 		}
 		return out, nil
 	}
+	start := s.now()
 	list, err := boundedRead(ctx, s.store.GetBanList)
 	if err != nil {
 		log.Error().Err(err).Msg("Ban store unavailable; ban state of the views unknown")
@@ -596,9 +737,18 @@ func (s *Service) currentBans(ctx context.Context) (map[string]BanRecord, error)
 	for _, ban := range list {
 		out[ban.Signature] = ban
 	}
+	// Bans made here that the list may not include: not yet written, or
+	// written while the list was being read (the rule decideLineage uses).
 	s.cacheMu.Lock()
-	for sig, ban := range s.pendingBans {
-		out[sig] = ban
+	for sig := range s.pendingBans {
+		out[sig], _ = s.localBanLocked(sig, start)
+	}
+	for sig := range s.localBans {
+		if ban, ok := s.localBanLocked(sig, start); ok {
+			if _, listed := out[sig]; !listed {
+				out[sig] = ban
+			}
+		}
 	}
 	s.cacheMu.Unlock()
 	return out, nil
@@ -1303,6 +1453,7 @@ func (s *Service) Reset() {
 	s.cacheMu.Lock()
 	s.banCache = make(map[string]banCacheEntry)
 	s.pendingBans = make(map[string]BanRecord)
+	s.localBans = make(map[string]localBan)
 	s.cacheMu.Unlock()
 
 	// Reset counters
