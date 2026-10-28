@@ -439,13 +439,14 @@ request may supply no token:
 
 | stdio request | With a token supplied | With no token supplied |
 |---|---|---|
-| `tools/call`, `satgate/delegate`, `satgate/budget`, `budget/check` (and, with sign-every-action on, every method passed on) | verified and its lineage checked; refused if it does not verify, if a ban covers it, or if its ban state cannot be read | `header` mode: refused (a token is required); `config` and `none`: the configured or default identity, as before |
-| `tools/list`, and every method passed on to the default upstream (`resources/list`, `resources/read`, `prompts/list`, `prompts/get`, `completion/complete`, any method the proxy does not answer itself) | verified and its lineage checked before the list is answered or the method passed on; refused the same way | answered or passed on, as before |
+| `tools/call`, `satgate/delegate`, `satgate/budget`, `budget/check` (and, with sign-every-action on, every method passed on) | every supplied token verified and its lineage checked before anything is signed, spent or passed on; refused if one does not verify, if a ban covers one, or if the ban state of one cannot be read | `header` mode: refused (a token is required); `config` and `none`: the configured or default identity, as before |
+| `tools/list`, and (with sign-every-action off) every method passed on to the default upstream (`resources/list`, `resources/read`, `prompts/list`, `prompts/get`, `completion/complete`, any method the proxy does not answer itself) | every supplied token verified and its lineage checked before the list is answered or the method passed on; refused the same way | answered or passed on, as before |
 | `initialize`, `ping` (answered by the proxy), notifications (not passed on) | not checked | not checked |
 
 "A token supplied" is `params._meta.token`, or, for a program that embeds the
 proxy and runs it with a connection credential, that credential; when both are
-present both are checked. `satgate-mcp` always installs the check (with the
+present both are checked, on every row above, with sign-every-action on or
+off. `satgate-mcp` always installs the check (with the
 shared Redis, or its own memory). A program that embeds the proxy and does not
 call `SetLineageRevocationChecker` sees no change: over stdio `tools/list` and
 passed-on methods then check no token.
@@ -453,12 +454,16 @@ passed-on methods then check no token.
 **The 2-second bound, as enforced.** With `revocation.redis.addr`, a request
 is allowed only if, at the moment it is allowed, every token in its lineage has
 a "not banned" answer from a Redis lookup that started less than 2 seconds
-before that moment, cached or just read; cached answers that reach that age
-while another token of the lineage is read are read again. A ban made on this
-proxy (by a program that embeds it) refuses every check in progress when it is
-made or while it is written to Redis. All Redis reads of one check share one
-deadline, **2 seconds** from the start of the check; if no such answer can be
-had for every token by then, the request is refused, never served: HTTP `503`
+before that moment, cached or just read. That moment is taken when the check
+holds the ban cache, after its last cache update, so a wait for the cache
+counts; cached answers that reach that age while another token of the lineage
+is read, or during that wait, are read again. A ban made on this proxy (by a
+program that embeds it) refuses every check in progress when it is made or
+while it is written to Redis, and a "not banned" answer from a lookup that
+started before that write ended is never cached or used for the token
+afterwards. The whole check, Redis reads and waits for the cache included, has
+one deadline, **2 seconds** from its start; if no such answer can be had for
+every token by then, the request is refused, never served: HTTP `503`
 with `code: REVOCATION_UNAVAILABLE` (SSE connect, Streamable HTTP requests,
 `initialize` and resume), or the JSON-RPC error `-32603` with `data.error:
 "revocation_unavailable"` (SSE messages, stdio).
