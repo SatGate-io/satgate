@@ -978,8 +978,11 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 	var params DelegateParams
 	if err := json.Unmarshal(req.Params, &params); err != nil {
 		msg := fmt.Sprintf("invalid delegate params: %v", err)
+		// A budget written as a JSON number that no int64 holds (a fraction,
+		// an exponent, or a value above math.MaxInt64) gets a message that
+		// says what is allowed. Other unreadable params keep their message.
 		var typeErr *json.UnmarshalTypeError
-		if errors.As(err, &typeErr) && typeErr.Field == "budget" {
+		if errors.As(err, &typeErr) && typeErr.Field == "budget" && strings.HasPrefix(typeErr.Value, "number") {
 			msg = "invalid delegate params: " + errBudgetParamRange
 		}
 		unreadable := NewErrorResponse(req.ID, CodeInvalidParams, msg)
