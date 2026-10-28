@@ -187,12 +187,13 @@ def test_send_without_redirects_raises_the_same_exception_type_and_object():
     _assert_no_url_parts(err)
 
 
-def test_hide_url_keeps_other_text_and_the_object():
+def test_redact_exception_keeps_other_text_and_the_object():
     url = f"https://{USER}:{PASSWORD}@gw.example:8443{CFG_PATH}?{CFG_QUERY}"
     exc = ValueError(
         f"cannot load {url}; also {CFG_PATH}?{CFG_QUERY} and {USER}:{PASSWORD}@x", 7
     )
-    assert _http.hide_url(exc, url) is exc
+    redaction = _http.Redaction.for_request("GET", url)
+    assert _http.redact_exception(exc, redaction) is exc
     assert exc.args == (
         "cannot load gw.example:8443; also [path and query removed] and x",
         7,
