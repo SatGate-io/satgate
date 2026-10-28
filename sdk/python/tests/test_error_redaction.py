@@ -68,11 +68,15 @@ class _EchoServer:
             def _reply(self):
                 server.hits += 1
                 length = int(self.headers.get("Content-Length", "0"))
-                body = self.rfile.read(length).decode("utf-8", "replace") if length else ""
+                body = (
+                    self.rfile.read(length).decode("utf-8", "replace") if length else ""
+                )
+                h = self.headers
                 echo = (
-                    f"cannot serve {self.path}; authorization={self.headers.get('Authorization')}"
-                    f" admin={self.headers.get('X-Admin-Token')}"
-                    f" macaroon={self.headers.get('Grpc-Metadata-macaroon')} body={body}"
+                    f"cannot serve {self.path};"
+                    f" authorization={h.get('Authorization')}"
+                    f" admin={h.get('X-Admin-Token')}"
+                    f" macaroon={h.get('Grpc-Metadata-macaroon')} body={body}"
                 )
                 status, ctype, data = 200, "text/plain", echo.encode()
                 if server.shape == "status-text":
@@ -132,7 +136,9 @@ def _chain(err):
             continue
         seen.add(id(e))
         out.append(e)
-        pending.extend([e.__cause__, e.__context__, getattr(e, "reason", None), *e.args])
+        pending.extend(
+            [e.__cause__, e.__context__, getattr(e, "reason", None), *e.args]
+        )
     return out
 
 
@@ -182,78 +188,138 @@ STATUS = {"status-text": SatGateError, "status-json": SatGateError}
 CALLS = {
     "SatGateClient tokens.mint": (
         lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).tokens.mint(),
-        {**STATUS, "bad-request": SatGateError, "not-json": requests.JSONDecodeError,
-         "cut-short": SatGateError}),
+        {
+            **STATUS,
+            "bad-request": SatGateError,
+            "not-json": requests.JSONDecodeError,
+            "cut-short": SatGateError,
+        },
+    ),
     "SatGateClient tokens.validate": (
         lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).tokens.validate(CAP),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateClient tokens.delegate": (
-        lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).tokens.delegate(PARENT),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+        lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).tokens.delegate(
+            PARENT
+        ),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateClient governance.ban": (
-        lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).governance.ban("sig-sekret-0123"),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+        lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).governance.ban(
+            "sig-sekret-0123"
+        ),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateClient governance.get_graph": (
-        lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).governance.get_graph(),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+        lambda b: SatGateClient(
+            f"{b}{BASE_PATH}?{QUERY}", ADMIN
+        ).governance.get_graph(),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateClient ping": (
         lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).ping(CAP),
-        {"not-json": SatGateError, "cut-short": SatGateError}),
+        {"not-json": SatGateError, "cut-short": SatGateError},
+    ),
     "SatGate issue": (
-        lambda b: SatGate(api_key=API_KEY, base_url=f"{b}{BASE_PATH}?{QUERY}").issue(task="t"),
-        {**STATUS, "not-json": requests.JSONDecodeError, "cut-short": SatGateError}),
+        lambda b: SatGate(api_key=API_KEY, base_url=f"{b}{BASE_PATH}?{QUERY}").issue(
+            task="t"
+        ),
+        {**STATUS, "not-json": requests.JSONDecodeError, "cut-short": SatGateError},
+    ),
     "SatGate pay": (
         lambda b: SatGate(api_key=API_KEY, base_url=f"{b}{BASE_PATH}").pay(
-            capability={"token": CAP}, upstream="u"),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+            capability={"token": CAP}, upstream="u"
+        ),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGate verify": (
         lambda b: SatGate(api_key=API_KEY, base_url=f"{b}{BASE_PATH}").verify(
-            {"signature": "sig-sekret-0123"}),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+            {"signature": "sig-sekret-0123"}
+        ),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateAgentClient get (capability token, params)": (
         lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", token=CAP).get(
-            "/private-path", params={"private-query": QUERY_VALUE}),
-        {**STATUS, "cut-short": requests.exceptions.ChunkedEncodingError}),
+            "/private-path", params={"private-query": QUERY_VALUE}
+        ),
+        {**STATUS, "cut-short": requests.exceptions.ChunkedEncodingError},
+    ),
     "SatGateAgentClient get (admin token mint)": (
-        lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", admin_token=ADMIN).get(f"/x?{QUERY}"),
-        {"status-text": AuthenticationError, "status-json": AuthenticationError,
-         "not-json": AuthenticationError, "cut-short": AuthenticationError}),
+        lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", admin_token=ADMIN).get(
+            f"/x?{QUERY}"
+        ),
+        {
+            "status-text": AuthenticationError,
+            "status-json": AuthenticationError,
+            "not-json": AuthenticationError,
+            "cut-short": AuthenticationError,
+        },
+    ),
     "SatGateAgentClient post": (
         lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", token=CAP).post(
-            f"/private-path?{QUERY}", json={"token": PARENT}),
-        STATUS),
+            f"/private-path?{QUERY}", json={"token": PARENT}
+        ),
+        STATUS,
+    ),
     "SatGateAgentClient validate_token": (
         lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", token=CAP).validate_token(),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateAgentClient delegate": (
         lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", token=CAP).delegate(),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateAgentClient fetch_jwks": (
         lambda b: SatGateAgentClient(f"{b}{BASE_PATH}").fetch_jwks(),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateAgentClient stage_policy": (
-        lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", admin_token=ADMIN).stage_policy({"a": 1}),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+        lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", admin_token=ADMIN).stage_policy(
+            {"a": 1}
+        ),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateAgentClient simulate_policy": (
-        lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", admin_token=ADMIN).simulate_policy("p"),
-        STATUS),
+        lambda b: SatGateAgentClient(
+            f"{b}{BASE_PATH}", admin_token=ADMIN
+        ).simulate_policy("p"),
+        STATUS,
+    ),
     "SatGateAgentClient promote_policy": (
-        lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", admin_token=ADMIN).promote_policy("p"),
-        STATUS),
+        lambda b: SatGateAgentClient(
+            f"{b}{BASE_PATH}", admin_token=ADMIN
+        ).promote_policy("p"),
+        STATUS,
+    ),
     "SatGateAgentClient fetch_pack": (
         lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", admin_token=ADMIN).fetch_pack(
-            f"private-pack?{QUERY}"),
-        {**STATUS, "not-json": requests.JSONDecodeError}),
+            f"private-pack?{QUERY}"
+        ),
+        {**STATUS, "not-json": requests.JSONDecodeError},
+    ),
     "SatGateAgentClient mint_capability": (
-        lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", admin_token=ADMIN).mint_capability("s"),
-        STATUS),
+        lambda b: SatGateAgentClient(
+            f"{b}{BASE_PATH}", admin_token=ADMIN
+        ).mint_capability("s"),
+        STATUS,
+    ),
     "AlbyWallet get_balance": (
         lambda b: _alby(f"{b}{BASE_PATH}?{QUERY}").get_balance(),
-        {**STATUS, "not-json": requests.JSONDecodeError, "cut-short": requests.exceptions.ChunkedEncodingError}),
+        {
+            **STATUS,
+            "not-json": requests.JSONDecodeError,
+            "cut-short": requests.exceptions.ChunkedEncodingError,
+        },
+    ),
     "AlbyWallet pay_invoice": (
         lambda b: _alby(f"{b}{BASE_PATH}?{QUERY}").pay_invoice("lnbc1"),
-        {"status-text": PaymentFailedError, "status-json": PaymentFailedError,
-         "not-json": requests.JSONDecodeError}),
+        {
+            "status-text": PaymentFailedError,
+            "status-json": PaymentFailedError,
+            "not-json": requests.JSONDecodeError,
+        },
+    ),
 }
 
 
@@ -281,17 +347,26 @@ def lnd_cert(tmp_path):
 LND_CALLS = {
     "LNDWallet get_balance": (
         lambda w: w.get_balance(),
-        {"status-text": SatGateError, "not-json": requests.JSONDecodeError}),
+        {"status-text": SatGateError, "not-json": requests.JSONDecodeError},
+    ),
     "LNDWallet pay_invoice": (
         lambda w: w.pay_invoice("lnbc1"),
-        {"status-text": PaymentFailedError, "payment-error": PaymentFailedError,
-         "not-json": requests.JSONDecodeError}),
+        {
+            "status-text": PaymentFailedError,
+            "payment-error": PaymentFailedError,
+            "not-json": requests.JSONDecodeError,
+        },
+    ),
 }
 
 
 @pytest.mark.parametrize(
     "name,shape",
-    [(name, shape) for name in sorted(LND_CALLS) for shape in sorted(LND_CALLS[name][1])],
+    [
+        (name, shape)
+        for name in sorted(LND_CALLS)
+        for shape in sorted(LND_CALLS[name][1])
+    ],
 )
 def test_lnd_wallet_error_names_no_macaroon_path_or_query(name, shape, lnd_cert):
     cert, key = lnd_cert
@@ -361,22 +436,32 @@ class _GatewayL402:
 TRANSPORT_CALLS = {
     "SatGateAgentClient get (params)": (
         lambda b: SatGateAgentClient(f"{b}{BASE_PATH}", token=CAP).get(
-            "/private-path", params={"private-query": QUERY_VALUE}),
-        requests.ConnectionError),
+            "/private-path", params={"private-query": QUERY_VALUE}
+        ),
+        requests.ConnectionError,
+    ),
     "SatGateAgentClient get (session params)": (
-        lambda b: _with_session_params(SatGateAgentClient(f"{b}{BASE_PATH}", token=CAP)).get("/x"),
-        requests.ConnectionError),
+        lambda b: _with_session_params(
+            SatGateAgentClient(f"{b}{BASE_PATH}", token=CAP)
+        ).get("/x"),
+        requests.ConnectionError,
+    ),
     "SatGateAgentClient call": (
         lambda b: SatGateAgentClient(f"{b}{BASE_PATH}").call(
-            "POST", f"/private-path?{QUERY}", body={"token": PARENT}, token=CAP),
-        requests.ConnectionError),
+            "POST", f"/private-path?{QUERY}", body={"token": PARENT}, token=CAP
+        ),
+        requests.ConnectionError,
+    ),
     "SatGateClient tokens.validate": (
         lambda b: SatGateClient(f"{b}{BASE_PATH}?{QUERY}", ADMIN).tokens.validate(CAP),
-        SatGateError),
+        SatGateError,
+    ),
     "SatGate pay": (
         lambda b: SatGate(api_key=API_KEY, base_url=f"{b}{BASE_PATH}?{QUERY}").pay(
-            capability={"token": CAP}),
-        SatGateError),
+            capability={"token": CAP}
+        ),
+        SatGateError,
+    ),
 }
 
 
@@ -400,9 +485,9 @@ def test_transport_error_names_no_query_parameter_or_credential(name):
 def test_transport_error_names_neither_query_name_nor_value_passed_as_params():
     """A refused connection for get(path, params=...) names no query name or value."""
     err = _raised(
-        lambda: SatGateAgentClient(f"http://127.0.0.1:{_closed_port()}", token="fixture").get(
-            "/private-path", params={"private-query": QUERY_VALUE}
-        )
+        lambda: SatGateAgentClient(
+            f"http://127.0.0.1:{_closed_port()}", token="fixture"
+        ).get("/private-path", params={"private-query": QUERY_VALUE})
     )
     assert type(err) is requests.ConnectionError
     assert "private-query" not in str(err)
@@ -415,7 +500,9 @@ def test_status_error_quoting_an_echoed_path_names_neither_path_nor_query_value(
     server = _EchoServer("status-json")
     try:
         client = SatGateClient(f"http://127.0.0.1:{server.port}", "fixture")
-        err = _raised(lambda: client._request("GET", f"/private-route?credential={QUERY_VALUE}"))
+        err = _raised(
+            lambda: client._request("GET", f"/private-route?credential={QUERY_VALUE}")
+        )
     finally:
         server.close()
     assert type(err) is SatGateError
@@ -424,7 +511,9 @@ def test_status_error_quoting_an_echoed_path_names_neither_path_nor_query_value(
     assert QUERY_VALUE not in str(err)
 
 
-@pytest.mark.parametrize("pack_id", ["private-path?private-query", f"review-pack?access={QUERY_VALUE}"])
+@pytest.mark.parametrize(
+    "pack_id", ["private-path?private-query", f"review-pack?access={QUERY_VALUE}"]
+)
 def test_admin_helper_error_names_no_request_path_or_query(pack_id):
     server = _EchoServer("status-text")
     try:
@@ -434,7 +523,15 @@ def test_admin_helper_error_names_no_request_path_or_query(pack_id):
         server.close()
     assert type(err) is SatGateError
     assert str(err).startswith("fetch_pack failed: 500 ")
-    for part in ("private-path", "private-query", "review-pack", "access=", QUERY_VALUE, "/api/", ADMIN):
+    for part in (
+        "private-path",
+        "private-query",
+        "review-pack",
+        "access=",
+        QUERY_VALUE,
+        "/api/",
+        ADMIN,
+    ):
         assert part not in str(err)
 
 
@@ -448,7 +545,8 @@ def test_status_errors_quoting_path_query_and_credential_name_none_of_them(case)
     base = f"http://127.0.0.1:{server.port}/private-route?access={QUERY_VALUE}"
     calls = {
         "agent-status": lambda: SatGateAgentClient(base, token=CAP).get(
-            f"/private-route?access={QUERY_VALUE}"),
+            f"/private-route?access={QUERY_VALUE}"
+        ),
         "admin-status": lambda: SatGateClient(base, ADMIN).tokens.mint(),
         "beta-status": lambda: SatGate(api_key=API_KEY, base_url=base).pay(),
     }
@@ -464,7 +562,9 @@ def test_status_errors_quoting_path_query_and_credential_name_none_of_them(case)
     assert "access=" not in str(err)
 
 
-@pytest.mark.parametrize("case", ["agent-header", "admin-header", "beta-header", "l402-retry-header"])
+@pytest.mark.parametrize(
+    "case", ["agent-header", "admin-header", "beta-header", "l402-retry-header"]
+)
 def test_invalid_header_error_names_no_credential(case):
     """A credential with a line break is refused by requests; the error names it not."""
     server = _EchoServer("status-text")
@@ -476,16 +576,24 @@ def test_invalid_header_error_names_no_credential(case):
 
     gateway = _GatewayL402() if case == "l402-retry-header" else None
     calls = {
-        "agent-header": (lambda: SatGateAgentClient(base, token=CAP + "\n").get("/x"),
-                         requests.exceptions.InvalidHeader),
-        "admin-header": (lambda: SatGateClient(base, ADMIN + "\n").tokens.mint(), SatGateError),
-        "beta-header": (lambda: SatGate(api_key=API_KEY + "\r\n", base_url=base).pay(),
-                        SatGateError),
+        "agent-header": (
+            lambda: SatGateAgentClient(base, token=CAP + "\n").get("/x"),
+            requests.exceptions.InvalidHeader,
+        ),
+        "admin-header": (
+            lambda: SatGateClient(base, ADMIN + "\n").tokens.mint(),
+            SatGateError,
+        ),
+        "beta-header": (
+            lambda: SatGate(api_key=API_KEY + "\r\n", base_url=base).pay(),
+            SatGateError,
+        ),
         "l402-retry-header": (
             lambda: SatGateAgentClient(
                 f"http://127.0.0.1:{gateway.port}", token=CAP, wallet=_Wallet()
             ).get(f"/private-path?{QUERY}"),
-            requests.exceptions.InvalidHeader),
+            requests.exceptions.InvalidHeader,
+        ),
     }
     call, expected = calls[case]
     try:
@@ -510,14 +618,25 @@ def test_redact_replaces_url_path_query_and_credentials_and_keeps_other_text():
     redaction = _http.Redaction.for_request(
         "POST",
         f"https://u-sekret:p-sekret@gw.example:8443/private-base/x?{QUERY}",
-        headers={"Authorization": f"Bearer {CAP}", "X-Admin-Token": ADMIN, "X-Api-Key": "k+sekret/0123="},
+        headers={
+            "Authorization": f"Bearer {CAP}",
+            "X-Admin-Token": ADMIN,
+            "X-Api-Key": "k+sekret/0123=",
+        },
         params={"page-token": "pt-sekret-0123"},
-        json={"parentToken": PARENT, "caveats": ["scope = api:read"], "nested": {"preimage": "pre-sekret"}},
+        json={
+            "parentToken": PARENT,
+            "caveats": ["scope = api:read"],
+            "nested": {"preimage": "pre-sekret"},
+        },
     )
     text = (
-        f"GET https://gw.example:8443/private-base/x?{QUERY}&page-token=pt-sekret-0123 failed;"
-        f" /private-base/x and /x; {CAP} {ADMIN} {PARENT} pre-sekret u-sekret p-sekret;"
-        f" quoted \"Bearer {CAP}\" encoded {quote('k+sekret/0123=', safe='')}; status 500;"
+        f"GET https://gw.example:8443/private-base/x?{QUERY}"
+        "&page-token=pt-sekret-0123 failed;"
+        f" /private-base/x and /x; {CAP} {ADMIN} {PARENT}"
+        " pre-sekret u-sekret p-sekret;"
+        f' quoted "Bearer {CAP}" encoded {quote("k+sekret/0123=", safe="")};'
+        " status 500;"
         " scope = api:read; the private-query name"
     )
     out = _http.redact(text, redaction)
@@ -534,7 +653,9 @@ def test_redact_exception_keeps_the_object_type_attributes_and_chain():
     outer = requests.ConnectionError(f"outer /private-path {CAP}", request=request)
     outer.__cause__ = inner
     redaction = _http.Redaction.for_request(
-        "GET", "http://127.0.0.1:1/private-path", headers={"Authorization": f"Bearer {CAP}"}
+        "GET",
+        "http://127.0.0.1:1/private-path",
+        headers={"Authorization": f"Bearer {CAP}"},
     )
     assert _http.redact_exception(outer, redaction) is outer
     assert type(outer) is requests.ConnectionError

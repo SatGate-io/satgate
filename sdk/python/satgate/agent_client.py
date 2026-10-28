@@ -466,7 +466,9 @@ class SatGateAgentClient:
             return self._token_cache.token
             
         except requests.RequestException as e:
-            raise AuthenticationError(f"Failed to mint token: {redact(str(e), e, resp)}")
+            raise AuthenticationError(
+                f"Failed to mint token: {redact(str(e), e, resp)}"
+            )
     
     def _handle_l402(self, response: requests.Response, method: str, url: str, **kwargs) -> AgentResponse:
         """Handle an L402 Payment Required response"""
@@ -510,7 +512,9 @@ class SatGateAgentClient:
         try:
             preimage = self.wallet.pay_invoice(invoice)
         except Exception as e:
-            raise PaymentFailedError(f"Lightning payment failed: {redact(str(e), e, response)}")
+            raise PaymentFailedError(
+                f"Lightning payment failed: {redact(str(e), e, response)}"
+            )
         
         # Build L402 token and retry
         l402_token = f"L402 {macaroon}:{preimage}"
@@ -585,7 +589,9 @@ class SatGateAgentClient:
                 continue
             
             # Other error
-            raise SatGateError(f"Request failed: {resp.status_code} {redact(resp.text, resp)}")
+            raise SatGateError(
+                f"Request failed: {resp.status_code} {redact(resp.text, resp)}"
+            )
         
         raise SatGateError("Max retries exceeded")
     
@@ -707,23 +713,32 @@ class SatGateAgentClient:
 
     def stage_policy(self, policy: dict) -> dict:
         """Stage a policy. It is not live until promote."""
-        return self._admin_json("POST", "/api/agent/policy", policy, operation="stage_policy")
+        return self._admin_json(
+            "POST", "/api/agent/policy", policy, operation="stage_policy"
+        )
 
     def simulate_policy(self, policy_id: str, **fields) -> dict:
         """Run a staged policy against its upstream and return the signed pack."""
         body = {"policy_id": policy_id}
         body.update({key: value for key, value in fields.items() if value is not None})
-        return self._admin_json("POST", "/api/agent/simulate", body, operation="simulate_policy")
+        return self._admin_json(
+            "POST", "/api/agent/simulate", body, operation="simulate_policy"
+        )
 
     def promote_policy(self, policy_id: str) -> dict:
         """Make a simulated policy live. Does not invent a price."""
         return self._admin_json(
-            "POST", "/api/agent/promote", {"policy_id": policy_id}, operation="promote_policy"
+            "POST",
+            "/api/agent/promote",
+            {"policy_id": policy_id},
+            operation="promote_policy",
         )
 
     def fetch_pack(self, pack_id: str) -> dict:
         """Fetch a pack the gateway already signed."""
-        return self._admin_json("GET", "/api/agent/pack/" + pack_id, operation="fetch_pack")
+        return self._admin_json(
+            "GET", "/api/agent/pack/" + pack_id, operation="fetch_pack"
+        )
 
     def call(self, method: str, path: str, body: Optional[dict] = None, token: Optional[str] = None) -> dict:
         """Call a promoted route. Returns the upstream body and the live pack id."""
@@ -778,7 +793,9 @@ class SatGateAgentClient:
             label="SatGate gateway",
         )
         if resp.status_code >= 400:
-            raise SatGateError(f"jwks failed: {resp.status_code} {redact(resp.text, resp)}")
+            raise SatGateError(
+                f"jwks failed: {resp.status_code} {redact(resp.text, resp)}"
+            )
         return read_json(resp)
 
     def verify_pack(self, pack: dict, jwks: dict, require_trusted_issuer: bool = True) -> dict:

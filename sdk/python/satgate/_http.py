@@ -65,7 +65,9 @@ REDACTED = "[redacted]"
 MIN_REDACTED_LENGTH = 3
 
 # Request headers whose values are credentials.
-_CREDENTIAL_HEADER = re.compile(r"auth|token|key|secret|macaroon|cookie|password", re.IGNORECASE)
+_CREDENTIAL_HEADER = re.compile(
+    r"auth|token|key|secret|macaroon|cookie|password", re.IGNORECASE
+)
 # JSON body fields whose string values (at any depth below them) are
 # credentials: the capability token, a parent token, a macaroon, a
 # preimage, a receipt or capability object, an API key.
@@ -115,10 +117,15 @@ def _body_credentials(value: Any) -> Iterable[str]:
     if isinstance(value, dict):
         for key, item in value.items():
             if isinstance(key, str) and _CREDENTIAL_FIELD.search(key):
-                if isinstance(item, (str, bytes)):
-                    yield item if isinstance(item, str) else item.decode("utf-8", "replace")
+                if isinstance(item, bytes):
+                    item = item.decode("utf-8", "replace")
+                if isinstance(item, str):
+                    yield item
                     continue
-                if isinstance(item, (list, tuple)) and all(isinstance(i, str) for i in item):
+                strings = isinstance(item, (list, tuple)) and all(
+                    isinstance(i, str) for i in item
+                )
+                if strings:
                     yield from item
                     continue
             yield from _body_credentials(item)
@@ -140,7 +147,8 @@ def _header_credentials(value: Any) -> Iterable[str]:
         yield rest
         if scheme == "basic":
             try:
-                user, _, password = base64.b64decode(rest).decode("utf-8").partition(":")
+                decoded = base64.b64decode(rest).decode("utf-8")
+                user, _, password = decoded.partition(":")
             except (binascii.Error, UnicodeDecodeError, ValueError):
                 user = password = ""
             yield user
@@ -357,7 +365,10 @@ class Redaction:
 def _redaction_of(sources: Iterable[Any]) -> Redaction:
     combined = Redaction()
     for source in sources:
-        found = source if isinstance(source, Redaction) else getattr(source, _ATTRIBUTE, None)
+        if isinstance(source, Redaction):
+            found = source
+        else:
+            found = getattr(source, _ATTRIBUTE, None)
         if isinstance(found, Redaction):
             combined.merge(found)
     return combined
@@ -432,7 +443,8 @@ def redact_exception(exc: BaseException, *sources: Any) -> BaseException:
                 except (AttributeError, TypeError):
                     pass
         attach(current, redaction)
-        pending.extend([current.__cause__, current.__context__, getattr(current, "reason", None)])
+        reason = getattr(current, "reason", None)
+        pending.extend([current.__cause__, current.__context__, reason])
     return exc
 
 
