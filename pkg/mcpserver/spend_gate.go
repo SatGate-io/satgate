@@ -57,6 +57,11 @@ const counterGrace = time.Hour
 // Known effect, accepted: an order the broker itself rejects (insufficient
 // funds, market closed) still counts toward the day's total.
 //
+// A limit that carries value "event_max_cost" counts each event contract
+// order at the most it can cost under the limit's value schema
+// (argrules.EventOrderMaxCost), the number every event control uses. An order
+// that can only close a position is not counted.
+//
 // A limit that carries value "order_max_cost" (toolcontrols.SpendLimit.Value)
 // does not read its field. It counts each call at the most it can cost,
 // argrules.OrderMaxCost: dollar_amount, or quantity times limit_price for a
@@ -301,18 +306,29 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 
 	// A call is valued once per order tool it stands for, and every value
 	// limit it meets reserves that one number.
+	// A limit with value event_max_cost values the call under its schema
+	// (argrules.EventOrderMaxCostOfCall), once per schema.
 	type costResult struct {
-		cost argrules.OrderCost
-		why  argrules.OrderCostWhy
+		cost    argrules.OrderCost
+		why     argrules.OrderCostWhy
+		closing bool // an event contract order that can only close a position
 	}
 	costs := map[string]costResult{}
 	valueOf := func(l toolcontrols.SpendLimit) costResult {
 		name := ownName(l)
+		if l.Value == argrules.EventCostBasis {
+			name = "\x00event:" + l.Schema
+		}
 		if r, ok := costs[name]; ok {
 			return r
 		}
 		var r costResult
-		r.cost, r.why = argrules.OrderMaxCostOfCall(call.Params, call.Tool, name)
+		if l.Value == argrules.EventCostBasis {
+			ev, why := argrules.EventOrderMaxCostOfCall(call.Params, call.Tool, l.Schema)
+			r = costResult{cost: argrules.OrderCost{Units: ev.Units}, why: why, closing: ev.Closing}
+		} else {
+			r.cost, r.why = argrules.OrderMaxCostOfCall(call.Params, call.Tool, name)
+		}
 		costs[name] = r
 		return r
 	}
@@ -357,6 +373,12 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			v := valueOf(l)
 			if !v.why.Valued() {
 				return deny(valueRefusal(call.Tool, v.why), g.remainingAt(ctx, l, key)), nil
+			}
+			if v.closing {
+				// An event contract order that can only close a position is
+				// not counted against a cost limit. Every other check on it
+				// still runs (the EventGate's market checks, argument rules).
+				continue
 			}
 			units = v.cost.Units
 		} else {

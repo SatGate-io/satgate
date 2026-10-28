@@ -60,6 +60,12 @@ type TokenInfo struct {
 	// enforces them.
 	ApprovalRules []toolcontrols.ApprovalRule
 
+	// EventMarkets and EventStakes are the event contract controls the token
+	// carries (see toolcontrols event.go). Nil for a token with none. The
+	// EventGate enforces them.
+	EventMarkets []toolcontrols.EventMarketRule
+	EventStakes  []toolcontrols.EventStakeLimit
+
 	// SealedPrefix is how many leading caveats a valid budget_bind seal
 	// covers (see macaroon.Service.BudgetSealedPrefix). A spending limit that
 	// names a shared budget counts only when the caveat that carries it is one

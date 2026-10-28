@@ -82,7 +82,14 @@ type ApprovalRule struct {
 	// an order tool. A call that cannot be valued is refused, never held (the
 	// owner cannot approve a number SatGate cannot work out). Empty means the
 	// rule reads Field, as before, and an unreadable field is held.
+	//
+	// It may instead be argrules.EventCostBasis ("event_max_cost") with
+	// Schema: the rule compares the most an event contract order can cost
+	// (argrules.EventOrderMaxCost) with Above. An order that can only close a
+	// position counts 0 and is never held.
 	Value string
+	// Schema is the value schema of an event_max_cost rule (see SpendLimit).
+	Schema string
 
 	// ID names the rule (set by ParseScopeValue / CollectApprovals).
 	ID string
@@ -112,7 +119,7 @@ func parseApprovalRule(raw json.RawMessage) (ApprovalRule, error) {
 		return ApprovalRule{}, ctlErr("an approval rule must be an object")
 	}
 	var r ApprovalRule
-	var sawTools, sawField, sawAbove, sawValue bool
+	var sawTools, sawField, sawAbove, sawValue, sawSchema bool
 	for k, v := range obj {
 		switch k {
 		case "tools":
@@ -136,6 +143,11 @@ func parseApprovalRule(raw json.RawMessage) (ApprovalRule, error) {
 				return ApprovalRule{}, ctlErr("value must be a string")
 			}
 			sawValue = true
+		case "schema":
+			if err := json.Unmarshal(v, &r.Schema); err != nil {
+				return ApprovalRule{}, ctlErr("schema must be a string")
+			}
+			sawSchema = true
 		default:
 			return ApprovalRule{}, ctlErr("unknown approval rule key %q", clip(k))
 		}
@@ -145,6 +157,9 @@ func parseApprovalRule(raw json.RawMessage) (ApprovalRule, error) {
 	}
 	if sawValue && r.Value == "" {
 		return ApprovalRule{}, ctlErr("value must be %q", argrules.OrderCostBasis)
+	}
+	if sawSchema && r.Schema == "" {
+		return ApprovalRule{}, ctlErr("schema must name a value schema")
 	}
 	if err := r.validate(); err != nil {
 		return ApprovalRule{}, err
@@ -182,7 +197,7 @@ func (r *ApprovalRule) validate() error {
 		return ctlErr("above has more than %d digits before or %d after the point", MaxWholeDigits, MaxScale)
 	}
 	r.above = d
-	return validateValueBasis(r.Value, r.Field, r.Tools)
+	return validateValueBasis(r.Value, r.Field, r.Tools, r.Schema)
 }
 
 // ThresholdUnits is Above as whole 10^-8 units, exact: Above is written with
@@ -227,7 +242,7 @@ func DescribeApprovals(rules []ApprovalRule) []string {
 	for _, r := range rules {
 		if r.Value != "" {
 			out = append(out, fmt.Sprintf("%s: orders that can cost more than %s wait for your approval, counting each order at the most it can cost (%s)",
-				strings.Join(r.Tools, " and "), FormatAmount(r.Field, r.Above), argrules.OrderCostCountedAs))
+				strings.Join(r.Tools, " and "), FormatAmount(r.Field, r.Above), countedAs(r.Value)))
 			continue
 		}
 		out = append(out, fmt.Sprintf("%s: calls with %s above %s wait for your approval",

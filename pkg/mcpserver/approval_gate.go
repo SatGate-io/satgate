@@ -131,15 +131,31 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 	// when an earlier rule would have held it.
 	var held *toolcontrols.ApprovalRule
 	var heldUnits int64 // the cost the holding rule compared, when it has a value basis
-	var cost argrules.OrderCost
-	var costWhy argrules.OrderCostWhy
-	costed := false
+	type costResult struct {
+		cost argrules.OrderCost
+		why  argrules.OrderCostWhy
+	}
+	costs := map[string]costResult{}
+	valueOf := func(r toolcontrols.ApprovalRule) costResult {
+		key := r.Value + "\x00" + r.Schema
+		if c, ok := costs[key]; ok {
+			return c
+		}
+		var c costResult
+		if r.Value == argrules.EventCostBasis {
+			// An order that can only close a position counts 0: never held.
+			ev, why := argrules.EventOrderMaxCostOfCall(call.Params, call.Tool, r.Schema)
+			c = costResult{cost: argrules.OrderCost{Units: ev.Units}, why: why}
+		} else {
+			c.cost, c.why = argrules.OrderMaxCostOfCall(call.Params, call.Tool, call.Tool)
+		}
+		costs[key] = c
+		return c
+	}
 	for i := range rules {
 		if rules[i].Value != "" {
-			if !costed {
-				cost, costWhy = argrules.OrderMaxCostOfCall(call.Params, call.Tool, call.Tool)
-				costed = true
-			}
+			v := valueOf(rules[i])
+			cost, costWhy := v.cost, v.why
 			if !costWhy.Valued() {
 				return &GateAdmission{Refusal: approvalRefusal(toolcontrols.DenialCodeApprovalUnreadable, rules[i].Field, "",
 					fmt.Sprintf("%s: this token asks the owner before an order that can cost more than %s, counting each order at the most it can cost, and %s, so it was not sent and nobody was asked",
