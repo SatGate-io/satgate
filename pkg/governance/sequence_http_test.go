@@ -32,11 +32,11 @@ func (h *heldStore) BannedAmong(ctx context.Context, sigs []string) ([]bool, err
 
 // Sol's HTTP case: a request for a delegated token is reading the store when
 // its root is banned on this gateway with the count of ended ban writes at
-// its maximum, and the cache then turns over. The request in flight is
-// refused 401; the next request is refused 503; the upstream is never
-// reached; a decision for an unrelated token is refused as unavailable. With
-// an ordinary count the next request is refused 401 and the unrelated token
-// allowed (the control).
+// its maximum, and the cache then turns over. The request in flight and the
+// next request are refused 503 (revocation unavailable); the upstream is
+// never reached; a decision for an unrelated token is refused as unavailable.
+// With an ordinary count both requests are refused 401 and the unrelated
+// token allowed (the control).
 func TestSettlementHTTP_LocalAncestorBanAtSequenceMaximumNeverServes(t *testing.T) {
 	for _, tc := range []struct {
 		name string
@@ -71,8 +71,8 @@ func TestSettlementHTTP_LocalAncestorBanAtSequenceMaximumNeverServes(t *testing.
 			}
 			g.TurnOverBanCacheForTest()
 			close(h.release)
-			if code := <-done; code != http.StatusUnauthorized {
-				t.Fatalf("request in flight: want 401, got %d", code)
+			if code := <-done; code != tc.want {
+				t.Fatalf("request in flight: want %d, got %d", tc.want, code)
 			}
 			if code := r.get(t, tok); code != tc.want {
 				t.Fatalf("request after the completed local ancestor ban: want %d, got %d", tc.want, code)

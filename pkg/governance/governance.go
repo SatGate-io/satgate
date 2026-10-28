@@ -609,6 +609,11 @@ func (s *Service) decideLineage(ctx context.Context, signatures []string) (bool,
 		if banned {
 			return true, nil
 		}
+		if err == errBanSeqSpent {
+			// Spent while the store was read: the refusal every
+			// decision gets now, fresh answer or not.
+			return false, err
+		}
 		if !fresh {
 			log.Error().Msg("Ban store answered after the cache TTL; refusing request")
 			return false, fmt.Errorf("%w: ban store answer arrived after %s", ErrRevocationUnavailable, s.banCacheTTL)
@@ -634,15 +639,11 @@ var errDecisionDeadline = fmt.Errorf("%w: decision did not end within %s", ErrRe
 // A newer answer in the cache (from another lookup, or a ban made here)
 // replaces the one held; a ban made here since start, or one not yet written
 // to the store, covers its signature whatever the store said. Once banSeq is
-// spent (advanceBanSeqLocked) it allows nothing: a ban made here covering
-// the lineage still answers banned, anything else errBanSeqSpent.
+// spent (advanceBanSeqLocked) it returns errBanSeqSpent, whatever the
+// lineage, as a decision that starts then does: a decision in progress when
+// the sequence is spent ends with the same refusal.
 func (s *Service) settleLocked(ctx context.Context, signatures []string, answers []lineageAnswer, start, deadline time.Time) (bool, []int, error) {
 	if s.banSeqSpent {
-		for _, sig := range signatures {
-			if _, ok := s.localBanLocked(sig, start); ok {
-				return true, nil, nil
-			}
-		}
 		return false, nil, errBanSeqSpent
 	}
 	now := s.now()
