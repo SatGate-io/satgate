@@ -110,7 +110,9 @@ type StaticTokenAuthenticator struct {
 }
 
 func (a *StaticTokenAuthenticator) Verify(_ context.Context, token string) (*TokenInfo, error) {
-	if token == "" {
+	// A token that is empty after trimming whitespace is no token. It is
+	// refused before any compare, and so is a blank configured token.
+	if blankToken(token) || blankToken(a.Token) {
 		return nil, fmt.Errorf("token required")
 	}
 	// Compare fixed-length digests, so the time taken does not depend on
@@ -135,12 +137,15 @@ type MacaroonAuthenticator struct {
 }
 
 func (a *MacaroonAuthenticator) Verify(_ context.Context, token string) (*TokenInfo, error) {
-	if token == "" {
+	if blankToken(token) {
 		return nil, fmt.Errorf("token required")
 	}
 
 	// Strip "Bearer " prefix if present
 	token = strings.TrimPrefix(token, "Bearer ")
+	if blankToken(token) {
+		return nil, fmt.Errorf("token required")
+	}
 
 	// The proxy enforces argument rules (FillTokenInfo, handleToolsCall), so
 	// it is the one verifier that may accept a token that carries them.
@@ -163,8 +168,8 @@ func NewAuthenticator(cfg AuthConfig) (Authenticator, error) {
 		return &NoAuthAuthenticator{}, nil
 
 	case "config":
-		if cfg.Token == "" {
-			return nil, fmt.Errorf("auth.token required for mode=config")
+		if blankToken(cfg.Token) {
+			return nil, errAuthTokenRequired()
 		}
 		return &StaticTokenAuthenticator{
 			Token:   cfg.Token,

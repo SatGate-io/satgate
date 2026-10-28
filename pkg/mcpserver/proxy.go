@@ -630,7 +630,8 @@ func (p *Proxy) publishAuthFailure(req *Request, authErr error) {
 	})
 }
 
-// extractMetaToken pulls the token from params._meta.token if present.
+// extractMetaToken pulls the token from params._meta.token if present. A
+// value that is empty after trimming whitespace is no token: it returns "".
 func extractMetaToken(params json.RawMessage) string {
 	if len(params) == 0 {
 		return ""
@@ -643,7 +644,7 @@ func extractMetaToken(params json.RawMessage) string {
 	if err := json.Unmarshal(params, &meta); err != nil {
 		return ""
 	}
-	return meta.Meta.Token
+	return presentedToken(meta.Meta.Token)
 }
 
 // handleInitialize responds to the MCP initialize request.

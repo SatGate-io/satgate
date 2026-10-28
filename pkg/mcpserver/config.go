@@ -91,6 +91,25 @@ func errAuthModeRequired(transport string) error {
 	return fmt.Errorf("auth.mode is required to serve over SSE / Streamable HTTP%s: set auth.mode to \"header\" (macaroon tokens) or \"config\" (one static token in auth.token); to serve without authentication, write auth.mode: none", where)
 }
 
+// errAuthTokenRequired is the refusal of auth.mode "config" whose auth.token
+// is empty, or only whitespace. Such a value is no token: it is never
+// compared with what a client presents.
+func errAuthTokenRequired() error {
+	return fmt.Errorf("auth.token is required for auth.mode \"config\" and must not be empty or only whitespace: set auth.token to the static token clients send (Authorization: Bearer <token>), or set auth.mode to \"header\" (macaroon tokens)")
+}
+
+// authTokenMissing reports that auth.mode is "config" and auth.token is
+// empty after trimming Unicode whitespace. Other modes do not read auth.token.
+func (c *Config) authTokenMissing() bool {
+	return c.Auth.Mode == "config" && blankToken(c.Auth.Token)
+}
+
+// blankToken reports whether a token, configured or presented, is empty
+// after trimming Unicode whitespace: it counts as no token.
+func blankToken(token string) bool {
+	return strings.TrimSpace(token) == ""
+}
+
 // noneModeWarning is logged once per network server when auth.mode is none.
 const noneModeWarning = "auth.mode is none: any client that can reach this address can list and call tools without a token"
 
@@ -103,13 +122,17 @@ func (c *Config) authModeMissing() bool {
 
 // networkAuthError is the refusal shared by SSEServer.ListenAndServe and the
 // handler (SSEServer.ServeHTTP): non-nil when the configuration does not set
-// auth.mode. It logs nothing.
+// auth.mode, or sets auth.mode "config" with no auth.token (empty or only
+// whitespace). It logs nothing.
 func (c *Config) networkAuthError() error {
 	if c == nil {
 		return fmt.Errorf("no configuration: %w", errAuthModeRequired(""))
 	}
 	if c.authModeMissing() {
 		return errAuthModeRequired(c.Server.Transport)
+	}
+	if c.authTokenMissing() {
+		return errAuthTokenRequired()
 	}
 	return nil
 }
@@ -385,6 +408,9 @@ func (c *Config) applyDefaults() {
 func (c *Config) validate() error {
 	if IsNetworkTransport(c.Server.Transport) && c.authModeUnset {
 		return errAuthModeRequired(c.Server.Transport)
+	}
+	if c.authTokenMissing() {
+		return errAuthTokenRequired()
 	}
 	if h := strings.TrimSpace(c.Server.Host); h != "" {
 		if _, _, err := net.SplitHostPort(h); err == nil {

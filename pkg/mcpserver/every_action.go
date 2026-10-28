@@ -830,6 +830,7 @@ type transportTokenKey struct{}
 // verified like any other before it is used: nothing a caller wrote into
 // params can name a different identity through it.
 func withTransportToken(ctx context.Context, token string) context.Context {
+	token = presentedToken(token)
 	if token == "" {
 		return ctx
 	}

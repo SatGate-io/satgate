@@ -135,12 +135,15 @@ Budget isolation: when the child exhausts their budget, siblings and parent are 
 With `config` or `header`, every method over SSE and Streamable HTTP except
 `initialize`, `ping` and notifications needs a token that verifies:
 `tools/call`, `tools/list`, the `satgate/*` methods and every method passed on
-to an upstream. A missing or empty token gets JSON-RPC error `-32001`
+to an upstream. A missing or empty token, or one of only whitespace, gets
+JSON-RPC error `-32001`
 `authentication required: no token provided` (the same answer in both modes),
 and Streamable HTTP `initialize` without one gets `401`. Over stdio the caller
 is the local process that started the proxy: `config` mode runs a request
 without a token under the configured identity, and `tools/list` needs no
-token. The static token is compared in constant time.
+token. The static token is compared in constant time. In `config` mode
+`auth.token` must be non-empty: a value that is empty or only whitespace is a
+configuration error (`LoadConfig`, `New`, and the listener and handler checks).
 
 Over SSE and Streamable HTTP the token goes in the `Authorization` header
 (`Bearer` scheme). By default any request to `GET /sse`, `POST /message` or the
@@ -169,6 +172,12 @@ restores the URL fallback for a client that cannot send a header.
   over SSE and Streamable HTTP; requests without it are now refused.
 - `tools/list` and passed-on methods need a token in `config` and `header`
   modes over SSE and Streamable HTTP.
+- A config-mode token must be non-empty. `auth.mode: config` with an
+  `auth.token` that is empty or only whitespace (an environment variable that
+  expands to nothing, for example) no longer loads, on any transport; an
+  embedded handler or listener whose `Config` has such a value answers `503`
+  with the `auth.token is required ...` message. A presented token of only
+  whitespace counts as no token.
 - Add `auth.mode` to every `sse` / `http` configuration, `server.host: 0.0.0.0`
   where other machines (or a container's port mapping) must connect, and
   `enforcement.mode: observe` where a budget should only be watched.

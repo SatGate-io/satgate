@@ -108,7 +108,7 @@ server:
 # --- Authentication ---
 auth:
   mode: none                # "none", "config" or "header". Required for sse/http; stdio without it means "none".
-  # token: "my-secret"      # Static bearer token (mode: config)
+  # token: "my-secret"      # Static bearer token (mode: config). Required and non-empty for mode: config; a value of only whitespace is refused.
   # rootKey: "hex-key"      # Macaroon root key (mode: header)
   # autoMintRoot: true       # Auto-mint a root macaroon on startup (mode: header)
   # rootToken: "stable-tok"  # Reuse this root token across restarts (with autoMintRoot)
@@ -289,6 +289,8 @@ auth:
   token: "${SATGATE_MCP_TOKEN}"
 ```
 
+`auth.token` must be non-empty. A value that is empty or only whitespace after environment expansion (an unset variable, for example) is a configuration error: `LoadConfig` and `New` refuse it with `auth.token is required for auth.mode "config" and must not be empty or only whitespace ...`, and an embedded handler or listener whose `Config` has such a value refuses every request with that message (see [Listener and startup checks](#listener-and-startup-checks)). A presented token that is empty after trimming whitespace, in the `Authorization` header or in `params._meta.token`, counts as no token.
+
 **`header`** — Macaroon-based auth. Agents send a macaroon the same way. Supports delegation (sub-agent tokens with carved budgets).
 
 ```yaml
@@ -320,7 +322,7 @@ auth:
 With `mode: config` or `mode: header`, a request over SSE (`POST /message`) or Streamable HTTP must carry a token that verifies before the proxy reveals the tool list or reaches an upstream:
 
 - `tools/call`, `satgate/delegate`, `satgate/budget`, `budget/check`, `tools/list`, and every method the proxy passes on to an upstream (`resources/list`, `prompts/get` and the like).
-- A request with no token, or an empty one, gets the JSON-RPC error `-32001` with the message `authentication required: no token provided`; a token that does not verify gets `-32001` `authentication failed: ...`; a revoked one `-32001` `token revoked`. The answer is the same in both modes.
+- A request with no token, an empty one, or one that is only whitespace gets the JSON-RPC error `-32001` with the message `authentication required: no token provided`; a token that does not verify gets `-32001` `authentication failed: ...`; a revoked one `-32001` `token revoked`. The answer is the same in both modes.
 - Streamable HTTP refuses `initialize` with `401` (`authentication required` / `authentication failed`) and creates no session.
 - `GET /sse` without a token still opens the stream (some clients send the token only on `POST /message`), as in header mode; with the authorization challenge on (`WithOAuthChallenge`) it gets `401`.
 - `initialize`, `ping` and notifications need no token.
@@ -330,6 +332,7 @@ Over stdio the caller is the local process that started the proxy: in `config` m
 #### Listener and startup checks
 
 - `server.transport: sse` or `http` with no `auth.mode` refuses to start: `auth.mode is required to serve over SSE / Streamable HTTP ...`. Set `auth.mode` to `header` or `config`, or write `auth.mode: none` to serve without authentication (the proxy then logs a warning at startup).
+- `auth.mode: config` with no `auth.token`, an empty one, or one of only whitespace does not load, on any transport: `auth.token is required for auth.mode "config" ...`. An embedded handler or listener whose `Config` has such a value (set in code) refuses in the same way as for a missing `auth.mode`: `503` with that message on every route, and `ListenAndServe` returns it. `header` and `none` modes do not read `auth.token`.
 - The same rule applies to the handler of an embedded server (`NewSSEServer(...).Handler()`, or the `SSEServer` itself as an `http.Handler`). If the configuration does not set `auth.mode` (`Auth.Mode` empty, or a file loaded without `auth.mode`, including a stdio-only file), every request to that handler gets `503` with the same `auth.mode is required ...` message. This covers every route: `/mcp`, `/sse`, `/message`, `/health` and routes added with `Handle` / `HandleFunc`. The request is refused before any MCP method runs or an upstream is contacted. The error is logged once, when `NewSSEServer` is called. With an explicit `none`, the warning is also logged once, at that point.
 - The listener binds `server.host`, default `127.0.0.1` (this machine only), on `server.port`, default `9100`. Set `host: 0.0.0.0` (or `::`) to accept connections from other machines, for example in a container. `host` takes no port.
 - A stdio-only configuration starts as before, with or without an `auth` block.
@@ -585,6 +588,8 @@ This release changes three defaults of the MCP proxy:
    - With `budget.limit` greater than 0 and no `enforcement.mode`, enforcement is `control` instead of `observe`, so an exhausted budget denies calls. To keep the old behaviour, write `enforcement.mode: observe`.
 
 A stdio-only configuration starts as before, with or without an `auth` block; only the enforcement default applies to it. Code that builds a `Config` itself (without `LoadConfig`) keeps the enforcement mode it sets. `NewSSEServer` listens on the address it is given, and `Config.ListenAddr` returns the default one.
+
+**A config-mode token must be non-empty.** `auth.mode: config` with an `auth.token` that is empty or only whitespace (including an environment variable that expands to nothing) no longer loads, on any transport; before, a value of only whitespace was accepted. Set `auth.token` to a non-empty value. A token presented as only whitespace counts as no token and gets `authentication required: no token provided` (before: `authentication failed: invalid token`).
 
 **Embedded handlers follow the same rule as the listener.** Code that serves `NewSSEServer(...).Handler()` (or the `SSEServer` itself) from its own `http.Server` must set `Auth.Mode`, the same as code that calls `SSEServer.ListenAndServe`. Without it, every request to the handler, on every route including `/health`, gets `503` with the `auth.mode is required ...` message. A file loaded with `LoadConfig` that has no `auth.mode` counts as unset even for stdio, unless the code sets `Auth.Mode` to `header` or `config` before `New`. To keep serving without authentication, set `auth.mode: none` in the file, or `Auth.Mode: "none"` in a `Config` built in code. The warning is then logged once when the server is created.
 
