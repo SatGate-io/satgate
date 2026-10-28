@@ -640,15 +640,7 @@ func (p *Proxy) recordAuthRefusal(ctx context.Context, req *Request, authErr err
 func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Response, error) {
 	tokenInfo, verified, authErr := p.authenticate(ctx, req)
 	if authErr != nil {
-		log.Warn().Err(authErr).Str("method", req.Method).Msg("authentication failed")
-		p.events.Publish(Event{
-			Type:      EventAuthFailure,
-			Timestamp: time.Now(),
-			Data: map[string]interface{}{
-				"method": req.Method,
-				"error":  authErr.Error(),
-			},
-		})
+		p.publishAuthFailure(req, authErr)
 		if p.signEveryAction {
 			if unavailable := p.recordAuthRefusal(ctx, req, authErr); unavailable != nil {
 				return unavailable, nil
@@ -838,6 +830,7 @@ type transportTokenKey struct{}
 // verified like any other before it is used: nothing a caller wrote into
 // params can name a different identity through it.
 func withTransportToken(ctx context.Context, token string) context.Context {
+	token = presentedToken(token)
 	if token == "" {
 		return ctx
 	}
