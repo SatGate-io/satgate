@@ -6,10 +6,10 @@ import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import pytest
+from test_lnd_wallet_tls import MACAROON_HEX, _LNDServer, _make_cert
 
 from satgate.agent_client import LNDWallet
 from satgate.exceptions import SatGateError
-from test_lnd_wallet_tls import MACAROON_HEX, _LNDServer, _make_cert
 
 REDIRECT_STATUSES = [301, 302, 303, 307, 308]
 OPERATIONS = ["get_balance", "pay_invoice"]
@@ -18,7 +18,9 @@ OPERATIONS = ["get_balance", "pay_invoice"]
 class _Recorder:
     """A local server that records each request's path and macaroon header."""
 
-    def __init__(self, bind="127.0.0.1", cert=None, key=None, status=200, location=None):
+    def __init__(
+        self, bind="127.0.0.1", cert=None, key=None, status=200, location=None
+    ):
         self.requests = []
         recorder = self
 
@@ -81,6 +83,9 @@ def servers(tmp_path):
         return server
 
     make.cert, make.key = cert, key
+    make.redirect = lambda status, location: make(
+        cert=cert, key=key, status=status, location=location
+    )
     yield make
     for server in made:
         server.close()
@@ -108,7 +113,7 @@ def _assert_refused(wallet, operation, origin, sink, status):
 @pytest.mark.parametrize("operation", OPERATIONS)
 def test_lnd_wallet_never_follows_redirect_to_http(servers, operation, status):
     sink = servers()
-    origin = servers(cert=servers.cert, key=servers.key, status=status, location=sink.url())
+    origin = servers.redirect(status, sink.url())
     wallet = LNDWallet(
         host=f"127.0.0.1:{origin.port}", macaroon_hex=MACAROON_HEX,
         tls_cert_path=str(servers.cert),
@@ -137,7 +142,7 @@ def test_lnd_wallet_never_follows_redirect_to_another_host(servers, operation, s
 
 @pytest.mark.parametrize("operation", OPERATIONS)
 def test_lnd_wallet_never_follows_redirect_on_the_same_host(servers, operation):
-    origin = servers(cert=servers.cert, key=servers.key, status=307, location="/elsewhere")
+    origin = servers.redirect(307, "/elsewhere")
     wallet = LNDWallet(
         host=f"127.0.0.1:{origin.port}", macaroon_hex=MACAROON_HEX,
         tls_cert_path=str(servers.cert),
@@ -151,7 +156,7 @@ def test_lnd_wallet_never_follows_redirect_on_the_same_host(servers, operation):
 @pytest.mark.parametrize("operation", OPERATIONS)
 def test_lnd_wallet_insecure_still_never_follows_redirects(servers, operation):
     sink = servers()
-    origin = servers(cert=servers.cert, key=servers.key, status=302, location=sink.url())
+    origin = servers.redirect(302, sink.url())
     wallet = LNDWallet(
         host=f"127.0.0.1:{origin.port}", macaroon_hex=MACAROON_HEX, insecure=True
     )
@@ -180,7 +185,7 @@ def test_lnd_wallet_redirect_error_names_only_scheme_host_and_port(servers):
 @pytest.mark.parametrize("operation", OPERATIONS)
 def test_lnd_wallet_macaroon_never_reaches_http_after_redirect(servers, operation):
     sink = servers()
-    origin = servers(cert=servers.cert, key=servers.key, status=302, location=sink.url())
+    origin = servers.redirect(302, sink.url())
     wallet = LNDWallet(
         host=f"127.0.0.1:{origin.port}", macaroon_hex=MACAROON_HEX,
         tls_cert_path=str(servers.cert),
@@ -194,9 +199,11 @@ def test_lnd_wallet_macaroon_never_reaches_http_after_redirect(servers, operatio
 # here REQUESTS_CA_BUNDLE; tls_cert_path; cert_path) and insecure=False, a 307
 # to plain HTTP sends no request carrying the header, for both operations.
 @pytest.mark.parametrize("trust", ["default", "tls_cert_path", "cert_path"])
-def test_lnd_wallet_redirect_refused_for_every_certificate_option(servers, monkeypatch, trust):
+def test_lnd_wallet_redirect_refused_for_every_certificate_option(
+    servers, monkeypatch, trust
+):
     sink = servers()
-    origin = servers(cert=servers.cert, key=servers.key, status=307, location=sink.url())
+    origin = servers.redirect(307, sink.url())
     kwargs = {}
     if trust == "default":
         monkeypatch.setenv("REQUESTS_CA_BUNDLE", str(servers.cert))
@@ -204,7 +211,8 @@ def test_lnd_wallet_redirect_refused_for_every_certificate_option(servers, monke
         monkeypatch.delenv("REQUESTS_CA_BUNDLE", raising=False)
         kwargs[trust] = str(servers.cert)
     wallet = LNDWallet(
-        host=f"127.0.0.1:{origin.port}", macaroon_hex=MACAROON_HEX, insecure=False, **kwargs
+        host=f"127.0.0.1:{origin.port}", macaroon_hex=MACAROON_HEX,
+        insecure=False, **kwargs,
     )
     for operation in OPERATIONS:
         with pytest.raises(SatGateError):
@@ -220,7 +228,9 @@ def test_lnd_wallet_insecure_warns_once_for_both_operations(tmp_path, caplog):
     server = _LNDServer(cert, key)
     try:
         with caplog.at_level(logging.WARNING, logger="satgate.agent_client"):
-            wallet = LNDWallet(host=server.host, macaroon_hex=MACAROON_HEX, insecure=True)
+            wallet = LNDWallet(
+                host=server.host, macaroon_hex=MACAROON_HEX, insecure=True
+            )
             wallet.get_balance()
             wallet.pay_invoice("lnbc1")
         entries = [r for r in caplog.records if r.name == "satgate.agent_client"]
