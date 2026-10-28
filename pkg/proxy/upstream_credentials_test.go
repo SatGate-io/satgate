@@ -164,10 +164,11 @@ func TestUpstreamCredentials_L402RouteRemovesProof(t *testing.T) {
 	}
 }
 
-// On a public route the gateway checked nothing. An Authorization value that
-// carries a token this gateway issued is removed; any other is the
-// upstream's own and is passed on unchanged.
-func TestUpstreamCredentials_PublicRouteRemovesOnlyGatewayTokens(t *testing.T) {
+// On a public route the gateway checked nothing. When an Authorization
+// value carries a token this gateway issued, the whole Authorization field
+// is not forwarded, a foreign value beside it included; a field with no
+// such token is the upstream's own and is passed on unchanged.
+func TestUpstreamCredentials_PublicRouteDropsFieldWithGatewayTokenKeepsForeignField(t *testing.T) {
 	up := newHeaderRecorder(t)
 	gw, _ := newTestGatewayWithUpstream(t, up.srv, "public")
 	token, _ := mintRoot(t, gw)
@@ -210,7 +211,8 @@ func TestUpstreamCredentials_PublicRouteRemovesOnlyGatewayTokens(t *testing.T) {
 		{"basic", []string{"Basic dXNlcjpwYXNz"}, []string{"Basic dXNlcjpwYXNz"}},
 		{"foreign macaroon", []string{"Bearer " + foreign}, []string{"Bearer " + foreign}},
 		{"foreign l402", []string{"L402 " + foreign + ":00"}, []string{"L402 " + foreign + ":00"}},
-		{"mixed", []string{"Bearer " + token, "Bearer upstream-own-api-key"}, []string{"Bearer upstream-own-api-key"}},
+		{"foreign value beside a gateway token, dropped with it", []string{"Bearer " + token, "Bearer upstream-own-api-key"}, nil},
+		{"foreign value before a gateway token, dropped with it", []string{"Bearer upstream-own-api-key", "Bearer " + token}, nil},
 	}
 	for _, c := range cases {
 		req := httptest.NewRequest(http.MethodGet, "/api/data", nil)
@@ -225,7 +227,7 @@ func TestUpstreamCredentials_PublicRouteRemovesOnlyGatewayTokens(t *testing.T) {
 		}
 		got := up.headers(t)
 		if v := got.Values("Authorization"); strings.Join(v, "\n") != strings.Join(c.want, "\n") {
-			t.Errorf("%s: upstream Authorization has %d values, want %d (gateway tokens removed, others kept)", c.name, len(v), len(c.want))
+			t.Errorf("%s: upstream Authorization has %d values, want %d (a field with a gateway token dropped whole, others kept)", c.name, len(v), len(c.want))
 		}
 		wantOwnedRemovedForeignKept(t, "public "+c.name, got)
 	}

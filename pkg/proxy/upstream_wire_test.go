@@ -220,15 +220,13 @@ func TestUpstreamCredentials_IssuedTokenRemovedInEveryAuthorizationForm(t *testi
 	}
 }
 
-// On public and chargeback routes, a credential the gateway did not issue
-// reaches the upstream unchanged, alone, beside a gateway token in another
-// value, or joined to one with a comma.
+// On public and chargeback routes, an Authorization field that carries no
+// token this gateway issued reaches the upstream unchanged.
 func TestUpstreamCredentials_ForeignCredentialForwardedUnchanged(t *testing.T) {
 	for _, kind := range []string{"public", "chargeback"} {
 		t.Run(kind, func(t *testing.T) {
 			up := newRequestRecorder(t)
 			gw, _ := newTestGatewayWithUpstream(t, up.srv, kind)
-			tok, _ := mintRoot(t, gw)
 			front := httptest.NewServer(gw)
 			defer front.Close()
 			for name, v := range foreignForms(t) {
@@ -237,22 +235,34 @@ func TestUpstreamCredentials_ForeignCredentialForwardedUnchanged(t *testing.T) {
 					t.Errorf("%s: foreign credential was changed or dropped (%d values)", name, len(g))
 				}
 			}
-			mixed := []struct {
-				name string
-				send []string
-				want []string
-			}{
-				{"separate values", []string{"Bearer " + tok, "Basic Zm9yZWlnbg=="}, []string{"Basic Zm9yZWlnbg=="}},
-				{"gateway first, comma", []string{"Bearer " + tok + ", Basic Zm9yZWlnbg=="}, []string{"Basic Zm9yZWlnbg=="}},
-				{"gateway last, comma", []string{"Basic Zm9yZWlnbg==,Bearer " + tok}, []string{"Basic Zm9yZWlnbg=="}},
-				{"digest beside", []string{`Digest username="u", realm="r", response="abc"`, "Bearer " + tok}, []string{`Digest username="u", realm="r", response="abc"`}},
-				{"digest then token, comma", []string{`Digest username="u", realm="r", Bearer ` + tok}, []string{`Digest username="u", realm="r"`}},
-				{"l402 and api key", []string{"L402 " + tok + ":" + strings.Repeat("ab", 32), "Bearer upstream-key"}, []string{"Bearer upstream-key"}},
+		})
+	}
+}
+
+// On public and chargeback routes, a foreign credential in the same
+// Authorization field as a gateway token, in another value or joined to it
+// with a comma, is not forwarded either: the whole field is dropped.
+func TestUpstreamCredentials_ForeignCredentialBesideGatewayTokenDroppedWithField(t *testing.T) {
+	for _, kind := range []string{"public", "chargeback"} {
+		t.Run(kind, func(t *testing.T) {
+			up := newRequestRecorder(t)
+			gw, _ := newTestGatewayWithUpstream(t, up.srv, kind)
+			tok, _ := mintRoot(t, gw)
+			front := httptest.NewServer(gw)
+			defer front.Close()
+			mixed := map[string][]string{
+				"separate values":          {"Bearer " + tok, "Basic Zm9yZWlnbg=="},
+				"foreign value first":      {"Basic Zm9yZWlnbg==", "Bearer " + tok},
+				"gateway first, comma":     {"Bearer " + tok + ", Basic Zm9yZWlnbg=="},
+				"gateway last, comma":      {"Basic Zm9yZWlnbg==,Bearer " + tok},
+				"digest beside":            {`Digest username="u", realm="r", response="abc"`, "Bearer " + tok},
+				"digest then token, comma": {`Digest username="u", realm="r", Bearer ` + tok},
+				"l402 and api key":         {"L402 " + tok + ":" + strings.Repeat("ab", 32), "Bearer upstream-key"},
 			}
-			for _, m := range mixed {
-				got := sendAuthorization(t, front.URL, up, m.send...)
-				if g := got.Header.Values("Authorization"); strings.Join(g, "\n") != strings.Join(m.want, "\n") {
-					t.Errorf("%s: upstream Authorization has %d values, want only the foreign credential", m.name, len(g))
+			for name, send := range mixed {
+				got := sendAuthorization(t, front.URL, up, send...)
+				if g := got.Header.Values("Authorization"); len(g) != 0 {
+					t.Errorf("%s: upstream received %d Authorization values, want none", name, len(g))
 				}
 			}
 		})
@@ -632,9 +642,9 @@ func TestReviewerCase_CompatRefusalsNameUpstreamAndEntry(t *testing.T) {
 
 // Reviewer case: for each route kind and each kind of upstream response
 // (normal, redirect, error, upgrade), the forwarding routes send no gateway
-// credential and keep the foreign one where the route does not consume
-// Authorization, the refusing routes forward nothing, and a redirect is
-// not followed.
+// credential (on public and chargeback routes the foreign value sent in the
+// same Authorization field goes with it), the refusing routes forward
+// nothing, and a redirect is not followed.
 func TestReviewerCase_RouteAndResponseMatrixKeepsCredentialBoundary(t *testing.T) {
 	for _, kind := range []string{"public", "chargeback", "capability", "", "deny", "fiat402", "unknown"} {
 		for _, status := range []int{200, 302, 500, 101} {
@@ -694,12 +704,8 @@ func TestReviewerCase_RouteAndResponseMatrixKeepsCredentialBoundary(t *testing.T
 					t.Fatal("no upstream request")
 				}
 				wantOwnedRemovedForeignKept(t, "wire matrix", h)
-				expected := ""
-				if kind == "public" || kind == "chargeback" {
-					expected = "Basic foreign-fixture"
-				}
-				if h.Get("Authorization") != expected {
-					t.Error("credential boundary mismatch")
+				if v := h.Values("Authorization"); len(v) != 0 {
+					t.Errorf("credential boundary mismatch: upstream received %d Authorization values", len(v))
 				}
 				select {
 				case <-got:

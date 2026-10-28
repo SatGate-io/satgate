@@ -10,15 +10,13 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/satgate-io/satgate/pkg/config"
 )
 
 // Tests of the removal boundary for gateway tokens in Authorization on
 // public and chargeback routes (upstream_credentials.go): every form the
-// gateway accepts, inside one wrapper; each credential and parameter judged
-// on its own; two or more wrappers forwarded like other client data; work
-// linear in the value's length. Values are fixtures, not credentials.
+// gateway accepts, inside one wrapper; two or more wrappers forwarded like
+// other client data. The whole-field rule and its cost are tested in
+// upstream_whole_field_test.go. Values are fixtures, not credentials.
 
 // percentFirst percent-encodes the first character of s, as a client that
 // percent-encodes a value does for a character it escapes.
@@ -38,118 +36,6 @@ func escapeEvery(s string) string {
 }
 
 func b64(s string) string { return base64.StdEncoding.EncodeToString([]byte(s)) }
-
-// sendAuthorizationTrailer sends value as an Authorization trailer to an
-// MCP-enabled route (the gateway reads the body, so trailers are
-// forwarded) and returns the Authorization trailer values the upstream
-// received.
-func sendAuthorizationTrailer(t *testing.T, kind string, value func(gw *Gateway) string) []string {
-	t.Helper()
-	up := newRequestRecorder(t)
-	gw, cfg := newTestGatewayWithUpstream(t, up.srv, kind)
-	cfg.Routes[0].MCP = &config.MCPConfig{Enabled: true}
-	front := httptest.NewServer(gw)
-	defer front.Close()
-	raw := trailerRequest("/api/data", "", [][2]string{{"Authorization", value(gw)}})
-	if status := sendRaw(t, front.URL, raw); status != http.StatusOK {
-		t.Fatalf("status %d", status)
-	}
-	return up.take(t).Trailer.Values("Authorization")
-}
-
-// boundaryCase is an Authorization value built from a token the gateway
-// issued, and the values the upstream must receive for it.
-type boundaryCase struct {
-	name  string
-	value func(tok string) string
-	want  func(tok string) []string
-}
-
-func none(string) []string { return nil }
-
-// An unrelated malformed, empty or very long part of an Authorization value
-// never stops a gateway token in another part of it from being removed, in
-// headers and in trailers, on public and chargeback routes. Foreign
-// credentials joined to it are kept.
-func TestUpstreamCredentials_UnrelatedMalformedPartDoesNotStopRemoval(t *testing.T) {
-	long := strings.Repeat("%Z", 20000)
-	cases := []boundaryCase{
-		{"percent token, malformed percent in another parameter", func(tok string) string {
-			return `Digest token="` + percentFirst(tok) + `", realm="%GG"`
-		}, none},
-		{"malformed percent before the percent token", func(tok string) string {
-			return `Digest realm="%GG", token="` + percentFirst(tok) + `"`
-		}, none},
-		{"lone percent after the percent token", func(tok string) string {
-			return "Bearer " + percentFirst(tok) + " %"
-		}, none},
-		{"invalid base64 and malformed percent beside the percent token", func(tok string) string {
-			return `Digest nonce="` + strings.Repeat("A", 17) + `", token=` + percentFirst(tok) + `, opaque="%zz"`
-		}, none},
-		{"long malformed parameter (3 KB)", func(tok string) string {
-			return `Digest token="` + percentFirst(tok) + `", opaque="` + long[:3000] + `"`
-		}, none},
-		{"very long malformed parameter (40 KB)", func(tok string) string {
-			return `Digest token="` + percentFirst(tok) + `", opaque="` + long + `"`
-		}, none},
-		{"empty elements", func(tok string) string {
-			return `Digest , , token="` + percentFirst(tok) + `", ,realm=""`
-		}, none},
-		{"every character of the quoted token escaped", func(tok string) string {
-			return `Digest token="` + escapeEvery(tok) + `", realm="%GG"`
-		}, none},
-		{"Basic credentials with a non-UTF-8 user name", func(tok string) string {
-			return "Basic " + b64("\xe9t\xe9:"+tok)
-		}, none},
-		{"Basic credentials with a malformed parameter", func(tok string) string {
-			return "Basic " + b64("user:"+tok) + `, realm="%GG"`
-		}, none},
-		{"unclosed quote after the token: whole value judged", func(tok string) string {
-			return "Bearer " + percentFirst(tok) + `, Digest realm="unclosed`
-		}, none},
-		{"unclosed quote before the token: whole value judged", func(tok string) string {
-			return `Digest realm="unclosed, Bearer ` + tok
-		}, none},
-		{"foreign credential kept beside the percent token", func(tok string) string {
-			return `Basic Zm9yZWlnbg==, Digest token="` + percentFirst(tok) + `", realm="%GG"`
-		}, func(string) []string { return []string{"Basic Zm9yZWlnbg=="} }},
-	}
-	for _, kind := range []string{"public", "chargeback"} {
-		t.Run(kind+"/headers", func(t *testing.T) {
-			up := newRequestRecorder(t)
-			gw, _ := newTestGatewayWithUpstream(t, up.srv, kind)
-			tok, _ := mintRoot(t, gw)
-			front := httptest.NewServer(gw)
-			defer front.Close()
-			for _, c := range cases {
-				got := sendAuthorization(t, front.URL, up, c.value(tok)).Header.Values("Authorization")
-				if want := c.want(tok); strings.Join(got, "\n") != strings.Join(want, "\n") {
-					t.Errorf("%s: upstream received %d Authorization values, want %d (the foreign ones only)", c.name, len(got), len(want))
-				}
-			}
-		})
-		t.Run(kind+"/trailers", func(t *testing.T) {
-			for _, c := range cases {
-				if strings.Contains(c.name, "40 KB") {
-					// A trailer line longer than 4 KB is not forwarded
-					// (the gateway answers 502), before this change as
-					// after it; the 3 KB case covers the trailer path.
-					continue
-				}
-				t.Run(c.name, func(t *testing.T) {
-					var tok string
-					got := sendAuthorizationTrailer(t, kind, func(gw *Gateway) string {
-						tok, _ = mintRoot(t, gw)
-						return c.value(tok)
-					})
-					if want := c.want(tok); strings.Join(got, "\n") != strings.Join(want, "\n") {
-						t.Errorf("upstream received %d Authorization trailer values, want %d (the foreign ones only)", len(got), len(want))
-					}
-				})
-			}
-		})
-	}
-}
 
 // A malformed Authorization value that carries no gateway token reaches the
 // upstream byte for byte.
@@ -269,60 +155,4 @@ func measureRemoval(gw *Gateway, h http.Header) parserCost {
 		best.allocs = after.Mallocs - before.Mallocs
 	}
 	return best
-}
-
-// Removing gateway tokens from Authorization costs allocations and time
-// linear in the input: four times the input (5 KB, 20 KB, 80 KB of
-// parameters; 1000, 4000, 16000 values or credentials) costs less than six
-// times as much, whether or not a token is removed.
-func TestRemoveGatewayCredentials_FourTimesInputCostsUnderSixTimes(t *testing.T) {
-	gw, _ := newTestGatewayWithUpstream(t, newHeaderRecorder(t).srv, "public")
-	tok, _ := mintRoot(t, gw)
-	shapes := map[string]func(n int) []string{
-		"many parameters": func(n int) []string {
-			return []string{"Digest a=1" + strings.Repeat(", a=1", n)}
-		},
-		"many parameters, token last": func(n int) []string {
-			return []string{"Digest a=1" + strings.Repeat(", a=1", n) + `, token="` + percentFirst(tok) + `"`}
-		},
-		"many quoted escaped parameters": func(n int) []string {
-			return []string{"Digest a=1" + strings.Repeat(`, a="\%"`, n)}
-		},
-		"many credentials, token last": func(n int) []string {
-			return []string{strings.Repeat("Basic Zm9v, ", n) + "Bearer " + tok}
-		},
-		"many values": func(n int) []string {
-			v := make([]string, n)
-			for i := range v {
-				v[i] = "Basic foreign-fixture"
-			}
-			return v
-		},
-		"many values, token last": func(n int) []string {
-			v := make([]string, n)
-			for i := range v {
-				v[i] = "Basic foreign-fixture"
-			}
-			return append(v, "Bearer "+tok)
-		},
-	}
-	for name, shape := range shapes {
-		t.Run(name, func(t *testing.T) {
-			var prev parserCost
-			for i, n := range []int{1000, 4000, 16000} {
-				h := http.Header{"Authorization": shape(n)}
-				c := measureRemoval(gw, h)
-				t.Logf("n=%d input=%d bytes: allocated %d bytes in %d allocations, %v", n, len(strings.Join(h["Authorization"], "")), c.bytes, c.allocs, c.elapsed)
-				if i > 0 {
-					if c.bytes > 6*prev.bytes || c.allocs > 6*prev.allocs {
-						t.Errorf("n=%d: allocations grew more than 6x for 4x the input (%d -> %d bytes, %d -> %d allocations)", n, prev.bytes, c.bytes, prev.allocs, c.allocs)
-					}
-					if c.elapsed > 6*prev.elapsed {
-						t.Errorf("n=%d: time grew more than 6x for 4x the input (%v -> %v)", n, prev.elapsed, c.elapsed)
-					}
-				}
-				prev = c
-			}
-		})
-	}
 }

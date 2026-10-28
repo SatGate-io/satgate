@@ -115,58 +115,56 @@ block and from request trailers alike:
 | Removed | When | Why |
 |---|---|---|
 | `Authorization` (every value) | The route's policy is `capability` (also the default when no policy kind is set), `l402` or `identity` | The gateway checked this credential to let the request through. |
-| Each credential in an `Authorization` value that carries a token this gateway issued | Any other route (`public`, `chargeback`) | A macaroon signed under this gateway's root key is a SatGate credential, not the upstream's, in the forms listed below. |
+| The whole `Authorization` field (every value) when any value carries a token this gateway issued | Any other route (`public`, `chargeback`) | A macaroon signed under this gateway's root key is a SatGate credential, not the upstream's. The rule and its boundary are below. |
 | `X-Admin-Token`, `X-Tenant-ID`, every `X-SatGate-*` header | Always | SatGate reads these itself (admin authentication, tenant selection) or reserves the names; a client's value must not reach the upstream as if SatGate had set it. |
 | SatGate's session cookies (`cloud_session`, `__Host-cloud_session`, `__Host-admin_session`, `impersonation`, `__Host-impersonation`, and any cookie whose name starts with `satgate`) | Always | They are SatGate sign-in sessions. Other cookies are passed on exactly as sent. |
 
-**Which gateway tokens are removed (the removal boundary).** On `public`
-and `chargeback` routes the gateway removes a token it issued from every
-`Authorization` line, in the header block and in trailers, in every form
-the gateway itself accepts one:
+**The rule on `public` and `chargeback` routes.** If a token this gateway
+issued is found anywhere in an `Authorization` value, as written or inside
+one wrapper, the whole `Authorization` field is not forwarded: every value
+of it, including a foreign credential (an upstream API key, `Basic`
+credentials, another issuer's token) sent in the same field, which is
+dropped with it. If no value carries such a token, every value is forwarded
+exactly as sent. Nothing is split, rewritten or partly removed. The header
+block and the request trailers are each judged on their own `Authorization`
+lines.
 
-- `Bearer <token>` or the bare token (capability routes,
-  `/api/capability/ping`, `/api/capability/admin` and the MCP server, which
-  also accepts `Bearer Bearer <token>`);
-- `L402 <macaroon>:<preimage>` and `LSAT <macaroon>:<preimage>`;
-- the token itself in either macaroon format (JSON or binary), in standard
-  or URL-safe base64, padded or not.
+A token is found by character class, not by parsing: the gateway does not
+read quotes, commas, parameters or schemes, so a broken quote, a malformed
+parameter or percent sequence, invalid base64, empty elements or a very
+long value elsewhere in the value cannot hide a token. It takes the runs of
+base64 and base64url characters (padded or not) in:
 
-For removal (never for acceptance) it also finds the token under any other
-scheme name or none, in any letter case, after any whitespace or other
-separator, and as the macaroon of an `L402`/`LSAT` value with or without a
-preimage; and inside exactly one of these wrappers:
+- the value as written, and with its backslash escapes (as in a quoted
+  string) resolved, wherever they are;
+- the value with its percent-encoding decoded once (a `%` that does not
+  start a valid `%XX` sequence is kept as written);
+- each run of the value as written, decoded from base64 once, in either
+  alphabet, padded or not (`Basic` credentials `user:<token>` or
+  `<token>:`, or any other single base64 layer).
 
-- a quoted string (its backslash escapes resolved);
-- an auth-param value (`token=...`);
-- `Basic` credentials (`user:<token>` or `<token>:`);
-- one layer of percent-encoding;
-- one layer of base64, in either alphabet, with or without padding.
+A run is the gateway's token when it decodes, the way the gateway's own
+token reader decodes a token, to a macaroon signed under this gateway's
+root key, in either format (JSON or binary); the macaroon of an
+`L402`/`LSAT` value is the run before the `:`. Every spelling the gateway
+accepts is recognised, including the line breaks its base64 decoding skips.
+This covers every form the gateway accepts a token in (`Bearer <token>`,
+the bare token, `Bearer Bearer <token>` at the MCP server,
+`L402 <macaroon>:<preimage>` and `LSAT <macaroon>:<preimage>`), and the same
+token under any other scheme or none, in any letter case, after any
+separator, quoted or as a parameter value. Expired and attenuated tokens
+the gateway issued count; a macaroon from another root key does not.
 
-A quoted string and an auth-param value are HTTP syntax and are always
-opened, so the token in one may also be in one percent or base64 encoding
-(for example `token="<percent-encoded token>"`). The result of a decoding
-is never decoded again.
-
-Not decoded, and forwarded like any other client data: a token the client
+Out of scope, and forwarded like any other client data: a token the client
 wraps in two or more encodings (base64 of base64, percent-encoding of
 percent-encoding, base64 of percent-encoded text, percent-encoded `Basic`
 credentials and the like), and a token in any header other than
 `Authorization`, in the query string or in the body. The gateway never
 accepts its token in those forms.
 
-Each comma-joined credential in a value is judged on its own, and so is
-each of its parts: a part that does not decode (a malformed percent
-sequence, invalid base64, a broken quote or parameter, an empty or very
-long part) is left as written and does not stop a gateway token elsewhere
-in the value from being removed. A credential that carries a gateway token
-is removed whole, with its parameters; the other credentials are passed on
-joined with `, `, and a value left with none is dropped. A value whose
-credentials cannot be told apart (a quoted string that is not closed) is
-judged whole and dropped if it carries a gateway token in any of the forms
-above. A value that carries none is passed on byte for byte: an upstream
-API key, a JWT, `Basic` credentials or a macaroon from another issuer
-reaches the upstream unchanged, because the gateway did not check it and,
-on a route the gateway does not guard, it belongs to the upstream.
+The work is linear in the length of the field: each run yields at most one
+decoded result, and that result is searched for runs but never decoded as
+a wrapper again.
 
 **Request trailers.** Trailers lose what the table above removes, and also
 every hop-by-hop name and every name the upstream has a configured header
@@ -240,7 +238,12 @@ Also refused:
 **Compatibility.** Earlier versions forwarded the client's `Authorization`,
 `X-Admin-Token`, `X-Tenant-ID`, cookies and trailers as sent, and never
 applied `headers`. An upstream that relied on receiving the client's SatGate
-token must now be given its own credential in `headers`. Because `headers`
+token must now be given its own credential in `headers`. On `public` and
+`chargeback` routes, a request that carries this gateway's token in
+`Authorization` reaches the upstream with no `Authorization` at all, even
+when a foreign credential was sent beside it; configure the upstream's
+credential in `headers` rather than relying on the client to send both.
+Because `headers`
 had no effect before, this version refuses at load an upstream `headers`
 entry that is owned by SatGate, malformed, contains a control character,
 duplicates another name by case, or cannot be delivered as configured (the

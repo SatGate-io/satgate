@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Unit tests for upstreamTransport and the Authorization splitter in
+// Unit tests for upstreamTransport and the token finder in
 // upstream_credentials.go.
 
 type roundTripFunc func(*http.Request) (*http.Response, error)
@@ -105,38 +105,6 @@ func TestUpstreamTransport_NoRulesRemovesEveryAuthorizationTrailer(t *testing.T)
 	}
 	if len(sent["Authorization"]) != 0 {
 		t.Error("an Authorization trailer was kept without forwarding rules")
-	}
-}
-
-// credentials splits at commas that start a new credential, never inside a
-// quoted string or between a credential's auth-params.
-func TestCredentialsSplitsJoinedValues(t *testing.T) {
-	cases := []struct {
-		in   string
-		want []string
-	}{
-		{"Bearer a", []string{"Bearer a"}},
-		{"Bearer a, Basic b", []string{"Bearer a", " Basic b"}},
-		{"a,b", []string{"a", "b"}},
-		{`Digest username="u", realm="r,s", response="x"`, []string{`Digest username="u", realm="r,s", response="x"`}},
-		{`Digest a=1, b=2, Bearer t`, []string{`Digest a=1, b=2`, ` Bearer t`}},
-		{"Bearer abc==, Basic d", []string{"Bearer abc==", " Basic d"}},
-		{"abc==,def", []string{"abc==", "def"}},
-		{"Bearer a,", []string{"Bearer a,"}},
-		{`L402 macaroon="m", preimage="p"`, []string{`L402 macaroon="m", preimage="p"`}},
-	}
-	for _, c := range cases {
-		got, ok := credentials(c.in)
-		if !ok || strings.Join(got, "|") != strings.Join(c.want, "|") {
-			t.Errorf("credentials(%q) = %q, %v, want %q", c.in, got, ok, c.want)
-		}
-	}
-	// A quoted string that is not closed: where the credentials end cannot
-	// be told, so the value is not split.
-	for _, in := range []string{`Digest realm="r, Bearer x`, `Bearer a, b="\`, `"`} {
-		if got, ok := credentials(in); ok {
-			t.Errorf("credentials(%q) = %q, want no split", in, got)
-		}
 	}
 }
 
