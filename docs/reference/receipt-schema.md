@@ -104,8 +104,13 @@ failure cannot be proven by signing a new receipt and remains unsigned.
 Price refusals precede controls, reservation and spend. Invalid control admissions
 are settled before signing; real spending-limit and approval denials keep their
 policy meaning. For tools/call, budget backend receipts are produced only for the
-fail-closed blocking branch, never Observe or configured fail-open Control, and
-pending-capacity receipts are signed after proof preflight and before a hold.
+fail-closed blocking branch, never Observe or configured fail-open Control.
+Pending-capacity receipts for a pending reservation that could not be made are
+signed after proof preflight and before any hold. The one exception is in
+Observe: when money is held for a `tools/call` or a credit-bearing
+`satgate/delegate`, its receipt was only prepared (never published) and the
+pending journal definitely did not store its gap, the hold is released first
+and the `pending_capacity_exhausted` refusal is signed after that.
 No refusal reserves an additional pending slot. Missing hold support and
 preparation failure after a hold of a tools/call remain unsigned. A possibly persisted allowed receipt or
 `outcome_unknown` is never reinterpreted as a refusal. With both switches on, a
@@ -135,11 +140,13 @@ with a key issued or a call sent:
 
 These receipts name the method (`route_or_tool` such as `mcp:satgate/delegate`
 or `mcp:satgate/budget`) and the server's request_id, never the JSON-RPC id.
-An Observe call that goes through stays unsigned and is counted in the gap
-receipt below. With both switches on that also covers a call that could not be
-given a server identity, a gap the pending journal definitely did not store when
-no money is held for it (kept and counted in memory, as without a journal), and
-a journaled gap older than 48 hours (counted in its own minute, not dropped).
+An Observe call whose allowed receipt could not be made goes through and is
+counted in the gap receipt below; an Observe call whose allowed receipt is made
+gets that receipt. With both switches on the count also covers a call that
+could not be given a server identity, a gap the pending journal definitely did
+not store when no money is held for it (kept and counted in memory, as without a
+journal), and a journaled gap older than 48 hours (counted in its own minute,
+not dropped).
 With either switch off each of these keeps its previous behavior.
 
 ## Receipts when sign-every-action is on
