@@ -42,6 +42,11 @@ type Config struct {
 	// Revocation says where satgate-mcp reads token bans from.
 	Revocation RevocationConfig `yaml:"revocation,omitempty"`
 
+	// Controls turns on the stateful token controls (spending limits, owner
+	// approvals, event contract limits) in satgate-mcp. Left out, a token
+	// that carries one is refused on every call, as before.
+	Controls ControlsConfig `yaml:"controls,omitempty"`
+
 	// Logging controls log output.
 	Logging LoggingConfig `yaml:"logging"`
 
@@ -322,6 +327,27 @@ type EnforcementConfig struct {
 	Mode string `yaml:"mode"`
 }
 
+// ControlsConfig configures the stateful token controls satgate-mcp enforces.
+type ControlsConfig struct {
+	// Store holds the counters: "" (no controls are enforced; a token that
+	// carries one is refused) or "memory" (this process's memory: totals
+	// start again when the process restarts).
+	Store string `yaml:"store,omitempty"`
+
+	// EventContracts binds each event contract value schema to the upstream
+	// whose order tool it reads. A schema must be registered by the program
+	// (see argrules.RegisterEventSchema and RegisterEventMarketResolver);
+	// satgate-mcp as built from this repository registers none, so an entry
+	// here refuses to start.
+	EventContracts []EventContractConfig `yaml:"eventContracts,omitempty"`
+}
+
+// EventContractConfig binds one value schema to one upstream.
+type EventContractConfig struct {
+	Schema   string `yaml:"schema"`
+	Upstream string `yaml:"upstream"`
+}
+
 // LoggingConfig controls log output.
 type LoggingConfig struct {
 	// Level: "debug", "info" (default), "warn", "error"
@@ -476,6 +502,34 @@ func (c *Config) validate() error {
 		return fmt.Errorf("budget.failMode must be closed or open (got %q)", c.Budget.FailMode)
 	}
 
+	return c.Controls.validate(c.Upstreams)
+}
+
+// validate checks the controls section's shape. Whether a schema is
+// registered is checked at start (ControlGateFromConfig), after the program
+// has registered its schemas.
+func (cc ControlsConfig) validate(upstreams map[string]UpstreamConfig) error {
+	switch cc.Store {
+	case "", "memory":
+	default:
+		return fmt.Errorf("controls.store must be memory or left out (got %q)", cc.Store)
+	}
+	if len(cc.EventContracts) > 0 && cc.Store == "" {
+		return fmt.Errorf("controls.eventContracts needs controls.store: memory")
+	}
+	seen := map[string]bool{}
+	for i, e := range cc.EventContracts {
+		if e.Schema == "" || e.Upstream == "" {
+			return fmt.Errorf("controls.eventContracts[%d] needs schema and upstream", i)
+		}
+		if _, ok := upstreams[e.Upstream]; !ok {
+			return fmt.Errorf("controls.eventContracts[%d]: upstream %q not found", i, e.Upstream)
+		}
+		if seen[e.Schema] {
+			return fmt.Errorf("controls.eventContracts: schema %q is bound twice", e.Schema)
+		}
+		seen[e.Schema] = true
+	}
 	return nil
 }
 

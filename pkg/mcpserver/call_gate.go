@@ -151,6 +151,15 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 		log.Error().Str("tool", toolName).Msg("token carries a control but no call gate is installed; refusing the call")
 		return nil, p.controlsUnavailableResponse(ctx, req, tokenInfo, toolName)
 	}
+	if !gateEnforcesEventControls(p.gate) {
+		// The token carries an event contract control and the installed
+		// gate does not enforce them (no EventGate in the chain): refuse
+		// rather than let the spending and approval gates pass it unchecked.
+		if ctl, err := collectEventControls(tokenInfo, toolName); err != nil || ctl.any {
+			log.Error().Str("tool", toolName).Msg("token carries an event contract control but no event gate is installed; refusing the call")
+			return nil, p.controlsUnavailableResponse(ctx, req, tokenInfo, toolName)
+		}
+	}
 	adm, err := p.gate.Admit(ctx, GateCall{
 		Token:     tokenInfo,
 		Tool:      toolName,

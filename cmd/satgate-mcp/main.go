@@ -78,6 +78,12 @@ func main() {
 	defer bans.Close()
 	proxy.SetLineageRevocationChecker(bans)
 
+	// Stateful token controls (controls.store). A config that asks for event
+	// contract limits with no registered value schema stops here.
+	if err := installControls(proxy, cfg); err != nil {
+		log.Fatal().Err(err).Msg("Failed to set up token controls")
+	}
+
 	// Context with signal handling
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -110,6 +116,23 @@ func main() {
 	}
 
 	log.Info().Msg("MCP proxy stopped")
+}
+
+// installControls installs the call gate cfg.Controls asks for, if any.
+// Event contract limits work only in a host program that registers its value
+// schemas; this program registers none, so a config with
+// controls.eventContracts is refused here.
+func installControls(proxy *mcpserver.Proxy, cfg *mcpserver.Config) error {
+	gate, err := mcpserver.ControlGateFromConfig(cfg)
+	if err != nil {
+		return err
+	}
+	if gate != nil {
+		proxy.SetCallGate(gate)
+		log.Info().Str("store", cfg.Controls.Store).Int("event_schemas", len(cfg.Controls.EventContracts)).
+			Msg("Token controls enforced; totals are kept in this process's memory")
+	}
+	return nil
 }
 
 // newRevocationService returns the ban list the proxy checks: the shared

@@ -47,6 +47,17 @@ package argrules
 // Any other name, a malformed value, or a size over the limits below is an
 // error at mint and at verify.
 //
+// Event contract orders (opt-in; see event_order.go):
+//
+//	{"tool":"place_event_order","shapes":[
+//	   {"event_order":{"schema":"<registered schema>","max_cost":"25","max_contracts":"100"}}]}
+//
+// The reserved field name "event_order" with a schema caps what one event
+// contract order can cost (EventOrderMaxCost) and how many contracts it can
+// be. The schema must be registered in the process that reads the rule; one
+// that is not refuses the document. A release that predates the condition
+// refuses the document (unknown condition "schema"): it fails closed.
+//
 // Order cost (opt-in):
 //
 //	{"tool":"place_equity_order","shapes":[
@@ -129,6 +140,13 @@ type Condition struct {
 	// the call at no more than MaxCost. It is set by {"order":{"max_cost":"100"}}
 	// and only on place_equity_order and place_crypto_order.
 	MaxCost *Decimal
+
+	// EventOrder, when set, makes this the per-order cap on an event contract
+	// order (see event_order.go): like MaxCost it is on the whole call, and
+	// Field is the reserved name "event_order". It is set by
+	// {"event_order":{"schema":"<name>","max_cost":"25","max_contracts":"100"}}
+	// and only names a schema registered in this process.
+	EventOrder *EventOrderLimit
 }
 
 // URLCondition limits an absolute https URL.
@@ -290,6 +308,13 @@ func parseCondition(tool, field string, raw json.RawMessage) (Condition, error) 
 	obj, err := objectOf(raw)
 	if err != nil {
 		return Condition{}, ruleErr("conditions for %s.%s must be an object", tool, field)
+	}
+	if _, hasSchema := obj["schema"]; hasSchema && field == EventOrderField {
+		// The reserved event_order condition. It is read only when it names a
+		// schema, so a rule on an argument that happens to be called
+		// event_order (one_of, max, ...) keeps the meaning it always had. A
+		// release that predates it refuses "schema" as an unknown condition.
+		return parseEventOrderCondition(tool, obj)
 	}
 	cond := Condition{Field: field}
 	kinds := 0
@@ -589,6 +614,15 @@ func Marshal(rules []Rule) ([]byte, error) {
 				if f.MaxCost != nil {
 					cond["max_cost"] = f.MaxCost.String()
 				}
+				if f.EventOrder != nil {
+					cond["schema"] = f.EventOrder.Schema
+					if f.EventOrder.MaxCost != nil {
+						cond["max_cost"] = f.EventOrder.MaxCost.String()
+					}
+					if f.EventOrder.MaxContracts != nil {
+						cond["max_contracts"] = f.EventOrder.MaxContracts.String()
+					}
+				}
 				if f.URL != nil {
 					u := map[string]any{"hosts": f.URL.Hosts}
 					if len(f.URL.Ports) > 0 {
@@ -708,6 +742,8 @@ func describeRules(rules []Rule, clause func(Condition) string) []string {
 
 func describeCondition(f Condition) string {
 	switch {
+	case f.EventOrder != nil:
+		return "event contract order (value schema " + f.EventOrder.Schema + ") " + f.EventOrder.clauses()
 	case f.MaxCost != nil:
 		return fmt.Sprintf("order cost is at most %s", f.MaxCost)
 	case f.Absent:

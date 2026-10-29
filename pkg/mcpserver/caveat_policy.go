@@ -71,6 +71,14 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 	if err != nil {
 		return nil, err
 	}
+	eventMarkets, err := toolcontrols.CollectEventMarkets(mac.Caveats)
+	if err != nil {
+		return nil, err
+	}
+	eventStakes, err := toolcontrols.CollectEventStakes(mac.Caveats)
+	if err != nil {
+		return nil, err
+	}
 	budgetID, err := svc.ResolveIssuedBudgetID(mac)
 	if err != nil {
 		return nil, err
@@ -96,6 +104,8 @@ func FillTokenInfo(svc *macaroon.Service, mac *macaroon.Macaroon, token string) 
 		ArgumentRules: rules,
 		SpendLimits:   limits,
 		ApprovalRules: approvals,
+		EventMarkets:  eventMarkets,
+		EventStakes:   eventStakes,
 		SealedPrefix:  sealed,
 		Raw:           mac,
 		RawToken:      token,
@@ -387,13 +397,85 @@ func (t *TokenInfo) SpendLimitsFor(toolName string) ([]toolcontrols.SpendLimit, 
 // name or shape cannot be matched exactly to the limits (see SpendGate.Admit).
 // A token whose controls cannot be read needs one for every tool: the call is
 // refused rather than sent unchecked.
+//
+// A token with an event contract control needs one too: event_markets and
+// event_stakes anywhere on the token, or an argument rule with an
+// event_order condition for this tool (the market behind the order must be
+// looked up even when the only limit on it is a per-order cap).
 func (t *TokenInfo) NeedsCallGate(toolName string) bool {
 	limits, err := t.AllSpendLimits()
 	if err != nil || len(limits) > 0 {
 		return true
 	}
 	rules, err := t.AllApprovalRules()
-	return err != nil || len(rules) > 0
+	if err != nil || len(rules) > 0 {
+		return true
+	}
+	markets, err := t.AllEventMarkets()
+	if err != nil || len(markets) > 0 {
+		return true
+	}
+	stakes, err := t.AllEventStakes()
+	if err != nil || len(stakes) > 0 {
+		return true
+	}
+	schemas, err := t.eventOrderRuleSchemas(toolName)
+	return err != nil || len(schemas) > 0
+}
+
+// AllEventMarkets returns every event_markets entry the token carries. Like
+// AllSpendLimits it reads the caveats again when the token has them.
+func (t *TokenInfo) AllEventMarkets() ([]toolcontrols.EventMarketRule, error) {
+	if t == nil {
+		return nil, nil
+	}
+	if t.Raw != nil {
+		return toolcontrols.CollectEventMarkets(t.Raw.Caveats)
+	}
+	return t.EventMarkets, nil
+}
+
+// AllEventStakes returns every event_stakes entry the token carries, each
+// with its counter ID. Like AllSpendLimits it reads the caveats again when
+// the token has them.
+func (t *TokenInfo) AllEventStakes() ([]toolcontrols.EventStakeLimit, error) {
+	if t == nil {
+		return nil, nil
+	}
+	if t.Raw != nil {
+		return toolcontrols.CollectEventStakes(t.Raw.Caveats)
+	}
+	return t.EventStakes, nil
+}
+
+// eventOrderRuleSchemas lists the value schemas of the event_order conditions
+// in the token's argument rules for toolName (rules name a tool exactly).
+func (t *TokenInfo) eventOrderRuleSchemas(toolName string) ([]string, error) {
+	if t == nil {
+		return nil, nil
+	}
+	rules := t.ArgumentRules
+	if t.Raw != nil {
+		var err error
+		rules, err = argrules.Collect(t.Raw.Caveats, matchScope)
+		if err != nil {
+			return nil, err
+		}
+	}
+	var out []string
+	for _, r := range rules {
+		if r.Tool != toolName {
+			continue
+		}
+		for _, s := range r.Shapes {
+			for _, c := range s.Fields {
+				if c.EventOrder != nil {
+					out = append(out, c.EventOrder.Schema)
+				}
+			}
+		}
+	}
+	return out, nil
 }
 
 // AllApprovalRules returns every "ask me" rule the token carries, whatever

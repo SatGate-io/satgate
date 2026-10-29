@@ -72,6 +72,15 @@
 // always meant, and its canonical form is unchanged. A release that predates
 // the key refuses the document (unknown key): it fails closed.
 //
+// # Event contract orders (opt-in)
+//
+// A spending limit or an "ask me" rule may instead carry
+// "value":"event_max_cost" with "schema":"<name>": it then counts each event
+// contract order at the most it can cost, by argrules.EventOrderMaxCost under
+// that value schema. The document may also carry "event_markets" and
+// "event_stakes". See event.go. A schema that is not registered in the
+// process refuses the document.
+//
 // Unknown keys, repeated keys, a missing key other than tz, and anything over
 // the size limits are errors at mint and at verify.
 package toolcontrols
@@ -159,7 +168,15 @@ type SpendLimit struct {
 	// counts each call at the most it can cost (argrules.OrderMaxCost) instead
 	// of reading Field. Field must then be dollar_amount and every tool an
 	// order tool. Empty means the limit reads Field, as before.
+	//
+	// It may instead be argrules.EventCostBasis ("event_max_cost"): the limit
+	// counts each event contract order at the most it can cost
+	// (argrules.EventOrderMaxCost under Schema). Field must then be
+	// dollar_amount; the tools may be any tools.
 	Value string
+	// Schema is the value schema of an event_max_cost limit, registered in
+	// this process. It is set exactly when Value is event_max_cost.
+	Schema string
 
 	// ID names the limit's counter: the hex SHA-256 prefix of the caveat word
 	// it was read from. It is set by Collect and ParseScopeValue; a limit
@@ -180,6 +197,9 @@ type SpendLimit struct {
 type Doc struct {
 	SpendLimits []SpendLimit
 	Approvals   []ApprovalRule
+	// EventMarkets and EventStakes are the event contract controls (event.go).
+	EventMarkets []EventMarketRule
+	EventStakes  []EventStakeLimit
 }
 
 // Covers reports whether the limit counts calls to tool. Names match without
@@ -219,7 +239,7 @@ func ParseJSON(doc []byte) (*Doc, error) {
 	if err := json.Unmarshal(doc, &top); err != nil || top == nil {
 		return nil, ctlErr("document must be an object")
 	}
-	var limitsRaw, approvalsRaw json.RawMessage
+	var limitsRaw, approvalsRaw, marketsRaw, stakesRaw json.RawMessage
 	sawV := false
 	for k, v := range top {
 		switch k {
@@ -232,6 +252,10 @@ func ParseJSON(doc []byte) (*Doc, error) {
 			limitsRaw = v
 		case "approvals":
 			approvalsRaw = v
+		case "event_markets":
+			marketsRaw = v
+		case "event_stakes":
+			stakesRaw = v
 		default:
 			return nil, ctlErr("unknown document key %q", clip(k))
 		}
@@ -278,7 +302,21 @@ func ParseJSON(doc []byte) (*Doc, error) {
 			out.Approvals = append(out.Approvals, a)
 		}
 	}
-	if len(out.SpendLimits) == 0 && len(out.Approvals) == 0 {
+	if marketsRaw != nil {
+		list, err := parseEventList(marketsRaw, "event_markets", MaxEventMarketRules, parseEventMarketRule)
+		if err != nil {
+			return nil, err
+		}
+		out.EventMarkets = list
+	}
+	if stakesRaw != nil {
+		list, err := parseEventList(stakesRaw, "event_stakes", MaxEventStakes, parseEventStakeLimit)
+		if err != nil {
+			return nil, err
+		}
+		out.EventStakes = list
+	}
+	if out.empty() {
 		return nil, ctlErr("document has no controls")
 	}
 	return out, nil
@@ -290,7 +328,7 @@ func parseSpendLimit(raw json.RawMessage) (SpendLimit, error) {
 		return SpendLimit{}, ctlErr("a spending limit must be an object")
 	}
 	var l SpendLimit
-	var sawTools, sawField, sawMax, sawWindow, sawValue bool
+	var sawTools, sawField, sawMax, sawWindow, sawValue, sawSchema bool
 	for k, v := range obj {
 		switch k {
 		case "tools":
@@ -336,6 +374,11 @@ func parseSpendLimit(raw json.RawMessage) (SpendLimit, error) {
 				return SpendLimit{}, ctlErr("value must be a string")
 			}
 			sawValue = true
+		case "schema":
+			if err := json.Unmarshal(v, &l.Schema); err != nil {
+				return SpendLimit{}, ctlErr("schema must be a string")
+			}
+			sawSchema = true
 		default:
 			return SpendLimit{}, ctlErr("unknown spending limit key %q", clip(k))
 		}
@@ -347,6 +390,9 @@ func parseSpendLimit(raw json.RawMessage) (SpendLimit, error) {
 		// An empty value is not "no value": refuse it rather than read it as
 		// the old meaning.
 		return SpendLimit{}, ctlErr("value must be %q", argrules.OrderCostBasis)
+	}
+	if sawSchema && l.Schema == "" {
+		return SpendLimit{}, ctlErr("schema must name a value schema")
 	}
 	if err := l.validate(); err != nil {
 		return SpendLimit{}, err
@@ -403,8 +449,11 @@ func (l *SpendLimit) validate() error {
 		return ctlErr("max is out of range")
 	}
 	l.max, l.units = rat, units
-	if err := validateValueBasis(l.Value, l.Field, l.Tools); err != nil {
+	if err := validateValueBasis(l.Value, l.Field, l.Tools, l.Schema); err != nil {
 		return err
+	}
+	if l.Value == argrules.EventCostBasis && l.Symbols != nil {
+		return ctlErr("a limit with value %q cannot list symbols", argrules.EventCostBasis)
 	}
 	return l.validateSymbols()
 }
@@ -415,7 +464,21 @@ func (l *SpendLimit) validate() error {
 // must be an order tool, so no other tool and no other field can be counted
 // this way (options stay off: nothing here values their price, legs or
 // quantity).
-func validateValueBasis(value, field string, tools []string) error {
+//
+// With argrules.EventCostBasis the field must be dollar_amount and schema must
+// name a registered value schema; the tools may be any tools (the schema, not
+// a tool name, says how an order is read). schema is refused with any other
+// value.
+func validateValueBasis(value, field string, tools []string, schema string) error {
+	if value == argrules.EventCostBasis {
+		if field != OrderCostField {
+			return ctlErr("a limit with value %q must have field %q", argrules.EventCostBasis, OrderCostField)
+		}
+		return validateSchema(schema)
+	}
+	if schema != "" {
+		return ctlErr("schema is only written with value %q", argrules.EventCostBasis)
+	}
 	if value == "" {
 		return nil
 	}
@@ -534,7 +597,7 @@ func clip(s string) string {
 // Marshal is the canonical document: limits in order, tools sorted, tz always
 // written, keys in a fixed order. It is what a minting service acknowledges.
 func Marshal(d *Doc) ([]byte, error) {
-	if d == nil || (len(d.SpendLimits) == 0 && len(d.Approvals) == 0) {
+	if d == nil || d.empty() {
 		return nil, ctlErr("no controls")
 	}
 	var b strings.Builder
@@ -574,6 +637,10 @@ func Marshal(d *Doc) ([]byte, error) {
 			vj, _ := json.Marshal(cp.Value)
 			fmt.Fprintf(&b, `,"value":%s`, vj)
 		}
+		if cp.Schema != "" {
+			sj, _ := json.Marshal(cp.Schema)
+			fmt.Fprintf(&b, `,"schema":%s`, sj)
+		}
 		b.WriteByte('}')
 	}
 	if len(d.SpendLimits) > 0 {
@@ -598,9 +665,16 @@ func Marshal(d *Doc) ([]byte, error) {
 				vj, _ := json.Marshal(cp.Value)
 				fmt.Fprintf(&b, `,"value":%s`, vj)
 			}
+			if cp.Schema != "" {
+				sj, _ := json.Marshal(cp.Schema)
+				fmt.Fprintf(&b, `,"schema":%s`, sj)
+			}
 			b.WriteByte('}')
 		}
 		b.WriteString(`]`)
+	}
+	if err := marshalEventControls(&b, d); err != nil {
+		return nil, err
 	}
 	b.WriteString(`}`)
 	out := []byte(b.String())
@@ -646,6 +720,19 @@ func Caveat(d *Doc) (string, error) {
 	return "scope = " + v, nil
 }
 
+// empty reports whether the document holds no control.
+func (d *Doc) empty() bool {
+	return len(d.SpendLimits) == 0 && len(d.Approvals) == 0 && len(d.EventMarkets) == 0 && len(d.EventStakes) == 0
+}
+
+// countedAs is the few words that say what a value basis counts an order at.
+func countedAs(value string) string {
+	if value == argrules.EventCostBasis {
+		return argrules.EventOrderCountedAs
+	}
+	return argrules.OrderCostCountedAs
+}
+
 // limitID names the counter of limit index i in the word value.
 func limitID(value string, i int) string {
 	sum := sha256.Sum256([]byte(fmt.Sprintf("%s#%d", value, i)))
@@ -685,6 +772,9 @@ func ParseScopeValue(value string) (*Doc, error) {
 	}
 	for i := range d.Approvals {
 		d.Approvals[i].ID = limitID(value, 1000+i)
+	}
+	for i := range d.EventStakes {
+		d.EventStakes[i].ID = limitID(value, 2000+i)
 	}
 	return d, nil
 }
@@ -783,7 +873,7 @@ func Describe(limits []SpendLimit) []string {
 			strings.Join(l.Tools, " and "), FormatAmount(l.Field, l.Max), l.Window.phrase(), l.Field)
 		if l.Value != "" {
 			line = fmt.Sprintf("%s: at most %s %s in total, counting each order at the most it can cost (%s)",
-				strings.Join(l.Tools, " and "), FormatAmount(l.Field, l.Max), l.Window.phrase(), argrules.OrderCostCountedAs)
+				strings.Join(l.Tools, " and "), FormatAmount(l.Field, l.Max), l.Window.phrase(), countedAs(l.Value))
 		}
 		if len(l.Symbols) > 0 {
 			line += ", for " + strings.Join(l.Symbols, " and ") + " only"

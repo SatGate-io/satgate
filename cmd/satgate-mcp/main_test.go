@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
@@ -54,5 +55,47 @@ func TestNewRevocationService_UnreachableStoreIsAnError(t *testing.T) {
 	if svc, err := newRevocationService(cfg); err == nil {
 		_ = svc.Close()
 		t.Fatal("an unreachable shared store was accepted")
+	}
+}
+
+// Event contract limits need value schemas the program registers, and this
+// program registers none: a config that asks for them stops the start with an
+// error that says so, and installs no gate.
+func TestInstallControls_EventLimitsWithoutASchemaRefuseToStart(t *testing.T) {
+	cfg := &mcpserver.Config{
+		Server:    mcpserver.ServerConfig{Transport: "stdio"},
+		Auth:      mcpserver.AuthConfig{Mode: "none"},
+		Upstreams: map[string]mcpserver.UpstreamConfig{"venue": {Transport: "stdio", Command: []string{"true"}}},
+		Controls: mcpserver.ControlsConfig{Store: "memory", EventContracts: []mcpserver.EventContractConfig{
+			{Schema: "some_schema_v1", Upstream: "venue"},
+		}},
+	}
+	proxy, err := mcpserver.New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = installControls(proxy, cfg)
+	if err == nil || !strings.Contains(err.Error(), `value schema "some_schema_v1" is not registered by this program (registered: none)`) {
+		t.Fatalf("started with event limits and no schema: %v", err)
+	}
+}
+
+// controls.store memory with no event entries installs the gates; no
+// controls section installs none.
+func TestInstallControls_MemoryStoreAndNone(t *testing.T) {
+	for _, store := range []string{"", "memory"} {
+		cfg := &mcpserver.Config{
+			Server:    mcpserver.ServerConfig{Transport: "stdio"},
+			Auth:      mcpserver.AuthConfig{Mode: "none"},
+			Upstreams: map[string]mcpserver.UpstreamConfig{"venue": {Transport: "stdio", Command: []string{"true"}}},
+			Controls:  mcpserver.ControlsConfig{Store: store},
+		}
+		proxy, err := mcpserver.New(cfg)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := installControls(proxy, cfg); err != nil {
+			t.Fatalf("store %q: %v", store, err)
+		}
 	}
 }
