@@ -107,8 +107,15 @@ func (p *Proxy) SignEveryAction() bool { return p.signEveryAction }
 // module upgrade. Both switches must be on to emit these refusals or deliver
 // existing admission handles on a transport error. Call before serving requests.
 // Disabling it stops future emission; it does not rewrite archived receipts.
+//
+// With both switches on, the remaining stops of a verified key's action are
+// also signed with these reasons (satgate/delegate stopped on SatGate's side,
+// an Observe call stopped for want of pending room), and an Observe call that
+// goes through with no receipt is counted even when it cannot be journaled or
+// is older than PendingHorizon (see closesGaps).
 func (p *Proxy) SetSignUnavailableCheckRefusals(on bool) {
 	p.signUnavailableCheckRefusals = on
+	p.every().refusals.Store(on)
 }
 
 func (p *Proxy) unavailableCheckRefusalsEnabled() bool {
@@ -141,6 +148,9 @@ func (p *Proxy) wireDelegator() {
 	p.delegator.reversalFailed = func() { p.reversalFailures.Add(1) }
 	p.delegator.reportMiss = func(ctx context.Context, parent *TokenInfo) error {
 		return p.reportObserveMiss(ctx, parent, MethodSatGateDelegate, "", p.enforcementModeFor(ctx, tenantOf(parent)))
+	}
+	p.delegator.refuseUnavailable = func(ctx context.Context, parent *TokenInfo, reason unavailableCheckReason, resp *Response) *Response {
+		return p.refuseUnavailableMethod(ctx, parent, MethodSatGateDelegate, MethodSatGateDelegate, reason, resp)
 	}
 }
 
@@ -336,15 +346,7 @@ func recordIdentifiedDecision(ctx context.Context, ea *everyAction, rec Evidence
 // nothing was read from a balance, so it claims none.
 func (p *Proxy) signAllowed(ctx context.Context, req *Request, tokenInfo *TokenInfo, method, tool, requestID, mode string) (*MCPEvidence, *Response) {
 	stop := func(err error, stage string) (*MCPEvidence, *Response) {
-		log.Error().Err(err).Str("method", method).Str("tool", tool).Str("stage", stage).Msg("MCP allow receipt unavailable")
-		if !p.allowReceiptFailureBlocks(mode) {
-			log.Warn().Str("method", method).Str("tool", tool).Str("mode", mode).Msg("observe mode: passing the call on with no receipt")
-			if err := p.reportObserveMiss(ctx, tokenInfo, method, tool, mode); err != nil {
-				return nil, pendingFailureResponse(req.ID, tool, err)
-			}
-			return nil, nil
-		}
-		return nil, proofUnavailableResponse(req.ID, tool)
+		return nil, p.receiptFailed(ctx, req, tokenInfo, method, tool, mode, err, stage)
 	}
 	if p.evidence == nil {
 		return stop(errors.New("sign every action is on but no evidence recorder is installed"), "no_recorder")
@@ -360,6 +362,21 @@ func (p *Proxy) signAllowed(ctx context.Context, req *Request, tokenInfo *TokenI
 		return stop(err, "record")
 	}
 	return ev, nil
+}
+
+// receiptFailed is what a call whose allowed receipt could not be made gets:
+// nil (go on) in Observe once the miss is reported, otherwise the response
+// that stops it.
+func (p *Proxy) receiptFailed(ctx context.Context, req *Request, tokenInfo *TokenInfo, method, tool, mode string, err error, stage string) *Response {
+	log.Error().Err(err).Str("method", method).Str("tool", tool).Str("stage", stage).Msg("MCP allow receipt unavailable")
+	if !p.allowReceiptFailureBlocks(mode) {
+		log.Warn().Str("method", method).Str("tool", tool).Str("mode", mode).Msg("observe mode: passing the call on with no receipt")
+		if err := p.reportObserveMiss(ctx, tokenInfo, method, tool, mode); err != nil {
+			return pendingFailureResponse(req.ID, tool, err)
+		}
+		return nil
+	}
+	return proofUnavailableResponse(req.ID, tool)
 }
 
 // refuseSigned signs the refusal of a verified key's call that no earlier
@@ -414,6 +431,13 @@ func (r unavailableCheckReason) reason() string {
 // signing timeout and recorder archive contract. No failure is retried as a
 // refusal: in particular, a possibly persisted allow is never passed here.
 func (p *Proxy) refuseUnavailableCheck(ctx context.Context, tokenInfo *TokenInfo, tool string, reason unavailableCheckReason, resp *Response) *Response {
+	return p.refuseUnavailableMethod(ctx, tokenInfo, MethodToolsCall, tool, reason, resp)
+}
+
+// refuseUnavailableMethod is refuseUnavailableCheck for any authenticated
+// method: tools/call with its tool, or another method with tool set to the
+// method's name. The receipt names the method, never anything the agent sent.
+func (p *Proxy) refuseUnavailableMethod(ctx context.Context, tokenInfo *TokenInfo, method, tool string, reason unavailableCheckReason, resp *Response) *Response {
 	if !p.unavailableCheckRefusalsEnabled() {
 		return resp
 	}
@@ -433,7 +457,7 @@ func (p *Proxy) refuseUnavailableCheck(ctx context.Context, tokenInfo *TokenInfo
 	}
 	// No Request is passed: not even the caller's JSON-RPC id is a signed
 	// field here. The response correlation id remains only in the envelope.
-	ev, err := p.recordMethodDecision(ctx, nil, tokenInfo, MethodToolsCall, tool, MCPDecision{
+	ev, err := p.recordMethodDecision(ctx, nil, tokenInfo, method, tool, MCPDecision{
 		Decision:           "denied",
 		DecisionReason:     reason.reason(),
 		BudgetNotEvaluated: true,
@@ -728,7 +752,10 @@ func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Respo
 			slot := p.every().pending.reserve(kindGap)
 			if slot == nil {
 				log.Error().Str("method", req.Method).Msg("the pending store is full; refusing the Observe call until it drains")
-				return proofUnavailableResponse(req.ID, refusalTool(req)), nil
+				// With both switches on, the stop itself is signed. It takes
+				// no slot (refuseUnavailableMethod never reserves one).
+				return p.refuseUnavailableMethod(ctx, tokenInfo, req.Method, refusalTool(req), unavailablePendingCapacity,
+					proofUnavailableResponse(req.ID, refusalTool(req))), nil
 			}
 			defer slot.release()
 			ctx = withMissSlot(ctx, slot)
