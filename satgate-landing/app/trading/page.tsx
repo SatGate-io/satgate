@@ -38,6 +38,37 @@ const whatItDoes = [
   { icon: Receipt, text: 'Every action your agent takes is recorded in a signed receipt, and you can stop your agent with one button.' },
 ];
 
+const checkerUrl = 'https://github.com/SatGate-io/satgate/tree/main/tools';
+
+const auditTitle = 'Built for audit';
+const auditIntro = 'SatGate keeps a record your auditor can check.';
+
+const auditItems = [
+  {
+    lead: 'Every action on the record.',
+    text: 'Every action your agent takes through SatGate is recorded in a signed receipt, including orders SatGate refused.',
+  },
+  {
+    lead: 'Checked before the money moves.',
+    text: 'SatGate checks each order against your limits before it reaches your broker. A refused order never gets there.',
+  },
+  {
+    lead: 'No need to trust the AI company.',
+    text: (
+      <>
+        Your agent never writes its own record. Anyone with your receipts can check them against SatGate&apos;s published keys using{' '}
+        <a href={checkerUrl} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">
+          our open-source checker
+        </a>
+        .
+      </>
+    ),
+  },
+];
+
+const auditDetail =
+  'SatGate\'s receipts show what SatGate decided. Your broker\'s statement shows what was filled. Calls from an agent you\'ve stopped are turned away, and if SatGate can\'t make a receipt, the order is still stopped.';
+
 const comparisonTitle = 'What Robinhood gives you, and what SatGate adds';
 const comparisonIntro =
   'Robinhood gives your agent its own account that you fund, and shows its activity in the Robinhood app. SatGate adds the following on top.';
@@ -142,6 +173,21 @@ export default function TradingPage() {
             </a>
             <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Continue with Personal for <span className="whitespace-nowrap">$9.99 a month.</span></p>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="audit-title">
+        <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
+          <h2 id="audit-title" className="mb-3 text-2xl font-bold text-white">{auditTitle}</h2>
+          <p className="mb-6 text-gray-300">{auditIntro}</p>
+          <ul className="list-disc space-y-3 pl-5 text-gray-300 marker:text-cyan-300">
+            {auditItems.map(({ lead, text }) => (
+              <li key={lead}>
+                <span className="font-semibold text-white">{lead}</span> {text}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-sm text-gray-400">{auditDetail}</p>
         </div>
       </section>
 
