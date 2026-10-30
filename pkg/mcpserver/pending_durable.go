@@ -136,11 +136,18 @@ func (ea *everyAction) preparePending(ctx context.Context, r PendingRecord) (con
 	r.Minute = RateWindowStart(r.Since)
 	data, err := ea.pendingBudget.PreparePendingBudget(ctx, r)
 	if err != nil {
-		return ctx, nil, err
+		return ctx, nil, &pendingBudgetError{err}
 	}
 	prep := &pendingPreparation{work: PendingWork{Version: 1, Record: r, BudgetData: data}}
 	return context.WithValue(ctx, pendingPreparationKey{}, prep), prep, nil
 }
+
+// pendingBudgetError is a failure of the budget store's PreparePendingBudget,
+// as opposed to a setup without one.
+type pendingBudgetError struct{ err error }
+
+func (e *pendingBudgetError) Error() string { return e.err.Error() }
+func (e *pendingBudgetError) Unwrap() error { return e.err }
 
 // keepPrepared stores before publication/debit. stored=true means an effect
 // failure can safely be recovered. false+UNKNOWN must NOT release or refuse.
@@ -186,10 +193,13 @@ func (ea *everyAction) resolveDurable(ctx context.Context, w PendingWork) (Pendi
 	if w.Version != 1 {
 		return "", errors.New("unsupported pending version")
 	}
-	if time.Since(w.Record.Minute) > PendingHorizon {
+	if time.Since(w.Record.Minute) > PendingHorizon && (w.Record.Kind != PendingGap || !ea.closesGaps()) {
 		log.Warn().Str("kind", w.Record.Kind).Msg("durable pending entry passed the 48-hour horizon; final uncounted no-op")
 		return PendingAgedOut, nil
 	}
+	// With both switches on, a gap is a call that went through: it is counted
+	// in its own minute however late, never dropped. Until the count lands the
+	// entry stays open.
 	switch w.Record.Kind {
 	case PendingGap:
 		wr, ok := ea.recorder().(WindowRecorder)

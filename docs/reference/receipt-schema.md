@@ -83,9 +83,9 @@ Each reason requires `decision: denied`, a verified key, and no evaluated budget
 | reason | meaning |
 | --- | --- |
 | `tool_price_unavailable` | A required checked price lookup failed; the call was not sent. No fallback price is claimed. |
-| `tool_controls_unavailable` | Required spending/approval controls could not be checked, were absent, or returned an invalid admission; not a limit or approval denial. |
-| `budget_backend_error` | A required fail-closed budget/hold backend operation failed; not budget exhaustion or a known failed-store return value. |
-| `pending_capacity_exhausted` | The local Control pending reservation could not be made before a hold; not evidence the customer's funds were exhausted. |
+| `tool_controls_unavailable` | Required spending/approval controls could not be checked, were absent, or returned an invalid admission; not a limit or approval denial. For `satgate/delegate`: the stored handoff limit could not be read, or the child key or the child's row could not be made or written. |
+| `budget_backend_error` | A required fail-closed budget/hold backend operation failed; not budget exhaustion or a known failed-store return value. For `satgate/delegate`: the carve got no usable answer, the child's budget could not be created, or the carve's pending entry could not be prepared. |
+| `pending_capacity_exhausted` | A local pending reservation could not be made (Control, before a hold; Observe, for the call's gap or a carve), or the pending journal definitely did not store a gap whose money is held; not evidence the customer's funds were exhausted. |
 
 `budget` and the Pack's `budget_state` are exactly
 `{"spend_mode":"not_evaluated","cost_credits":0}` (integer zero, no extra keys).
@@ -103,17 +103,51 @@ failure cannot be proven by signing a new receipt and remains unsigned.
 
 Price refusals precede controls, reservation and spend. Invalid control admissions
 are settled before signing; real spending-limit and approval denials keep their
-policy meaning. Budget backend receipts are produced only for the fail-closed
-blocking branch, never Observe or configured fail-open Control. Pending-capacity
-receipts are Control-only, after proof preflight and before a hold, without
-reserving an additional pending slot. Missing hold support and preparation failure
-after a hold remain unsigned. A possibly persisted allowed receipt or
+policy meaning. For tools/call, budget backend receipts are produced only for the
+fail-closed blocking branch, never Observe or configured fail-open Control.
+Pending-capacity receipts for a pending reservation that could not be made are
+signed after proof preflight and before any hold. The one exception is in
+Observe: when money is held for a `tools/call` or a credit-bearing
+`satgate/delegate`, its receipt was only prepared (never published) and the
+pending journal definitely did not store its gap, the hold is released first
+and the `pending_capacity_exhausted` refusal is signed after that.
+No refusal reserves an additional pending slot. Missing hold support and
+preparation failure after a hold of a tools/call remain unsigned. A possibly persisted allowed receipt or
 `outcome_unknown` is never reinterpreted as a refusal. With both switches on, a
 transport failure after admission returns the existing admission evidence handles
 on its existing error, not a second or outage receipt. With the new switch off,
 all these responses and receipts retain their previous bytes and meaning.
 Disabling the setting stops future emission; it never deletes or rewrites archived
 receipts. Keep the matching checker bundle available after rollback.
+
+With both switches on, the same four reasons also sign these stops of a verified
+key's action. Each is signed after whatever was taken is given back, and never
+with a key issued or a call sent:
+
+- `satgate/delegate` stopped on SatGate's side, in any mode: the stored handoff
+  limit could not be read, the child key could not be made or sealed, or the
+  child's row could not be written (`tool_controls_unavailable`); the carve got
+  no usable answer from the budget store, or the child's budget could not be
+  created (`budget_backend_error`). The caller's answer is unchanged apart from
+  the receipt's handles.
+- Observe: a call to an authenticated method (`tools/call`, `satgate/delegate`,
+  `satgate/budget`, `budget/check`, a forwarded method) stopped because no gap
+  slot was left, a credit-bearing delegation stopped because no pending slot was
+  left, and a call whose money is held and whose receipt was only prepared
+  (never published) when the pending journal definitely did not store its gap
+  (`pending_capacity_exhausted`); a credit-bearing delegation whose pending
+  entry the budget store could not prepare (`budget_backend_error`).
+
+These receipts name the method (`route_or_tool` such as `mcp:satgate/delegate`
+or `mcp:satgate/budget`) and the server's request_id, never the JSON-RPC id.
+An Observe call whose allowed receipt could not be made goes through and is
+counted in the gap receipt below; an Observe call whose allowed receipt is made
+gets that receipt. With both switches on the count also covers a call that
+could not be given a server identity, a gap the pending journal definitely did
+not store when no money is held for it (kept and counted in memory, as without a
+journal), and a journaled gap older than 48 hours (counted in its own minute,
+not dropped).
+With either switch off each of these keeps its previous behavior.
 
 ## Receipts when sign-every-action is on
 

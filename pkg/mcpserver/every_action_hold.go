@@ -135,6 +135,7 @@ type everyAction struct {
 	// is not given a request id is given one the server makes (newCallID),
 	// never one derived from the client's JSON-RPC id.
 	on            atomic.Bool
+	refusals      atomic.Bool // mirrors SetSignUnavailableCheckRefusals; see closesGaps
 	settings      atomic.Pointer[EveryActionSettings]
 	pending       *pendingStore
 	durable       PendingStore
@@ -168,6 +169,21 @@ func newEveryAction() *everyAction {
 }
 
 func (ea *everyAction) cfg() EveryActionSettings { return *ea.settings.Load() }
+
+// closesGaps reports whether both signing switches are on. Only then does an
+// Observe call with no server identity, or whose gap the journal definitely
+// did not store, go through and get counted, and a journaled gap older than
+// PendingHorizon still get its count. With either switch off each of these
+// keeps the behaviour it had before.
+func (ea *everyAction) closesGaps() bool { return ea.on.Load() && ea.refusals.Load() }
+
+// localCallID is the identity of an Observe call that could not get one from
+// newCallID: unique to this process (the pending store's nonce and sequence),
+// made from nothing the client sent. It names the call's spend or hold only;
+// no receipt is signed under it, the call is counted as a miss instead.
+func (ea *everyAction) localCallID(prefix string) string {
+	return prefix + ea.pending.nextID(kindGap)
+}
 
 func (ea *everyAction) setRecorder(rec EvidenceRecorder) {
 	ea.recMu.Lock()
@@ -643,7 +659,15 @@ func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slo
 		call.ReportID = ea.pending.nextID(kindGap)
 	}
 	if ea.durable != nil && ea.on.Load() {
-		return ea.durableGap(ctx, slot, call)
+		err := ea.durableGap(ctx, slot, call)
+		prep, _ := ctx.Value(pendingPreparationKey{}).(*pendingPreparation)
+		if !errors.Is(err, ErrPendingNotStored) || prep != nil || !ea.closesGaps() {
+			return err
+		}
+		// The journal definitely did not store the gap and no money is held
+		// for it: keep it here, in the slot set aside for it, and count it as
+		// the in-memory store does. The call goes through.
+		log.Error().Str("method", call.Decision.MCPMethod).Str("tool", receiptTool(call.Decision.ToolName)).Msg("observe miss could not be journaled; kept in memory for retry")
 	}
 	if wr, ok := rec.(WindowRecorder); ok {
 		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), ea.cfg().MissReportTimeout)

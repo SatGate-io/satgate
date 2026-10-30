@@ -985,16 +985,25 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 	// Generate request ID for idempotency
 	requestID := generateRequestID(budgetID, tc.Name, req.ID)
+	// unidentified is set when an Observe call could not be given a server
+	// identity: it goes on with no receipt and is counted (both switches on).
+	var unidentified error
 	if p.signEveryAction {
 		// Sign every action: the call's identity is one the server makes for
 		// this call alone. It names the hold, the amount kept if the commit
 		// fails, the spend, the events and the receipt's request_id. The
 		// JSON-RPC id is the client's and a different session may send the
 		// same one, so it is never part of it (see newCallID).
-		id, err := newCallID(callIDPrefix)
-		if err != nil {
+		id, err := p.every().callID(callIDPrefix)
+		if err != nil && (p.allowReceiptFailureBlocks(mode) || !p.every().closesGaps()) {
 			log.Error().Err(err).Str("tool", receiptTool(tc.Name)).Msg("sign every action: no identity could be made for the call; refusing it before any charge")
 			return proofUnavailableResponse(req.ID, tc.Name), nil
+		}
+		if err != nil {
+			// Observe: no receipt can name this call. It goes on, under an
+			// identity of this process, and is counted as a miss.
+			unidentified = err
+			id = p.every().localCallID(callIDPrefix)
 		}
 		requestID = id
 	}
@@ -1203,14 +1212,18 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					return proofUnavailableResponse(req.ID, tc.Name), nil
 				}
 			}
-			allowedEvidence, evidenceErr = p.recordMCPDecision(recCtx, req, tokenInfo, tc.Name, MCPDecision{
-				Decision:         "allowed",
-				DecisionReason:   "budget_authorized",
-				PolicyMode:       normalizeEnforcementMode(mode),
-				CostCredits:      cost,
-				RemainingCredits: result.Remaining,
-				RequestID:        eventRequestID,
-			})
+			if unidentified != nil {
+				evidenceErr = unidentified
+			} else {
+				allowedEvidence, evidenceErr = p.recordMCPDecision(recCtx, req, tokenInfo, tc.Name, MCPDecision{
+					Decision:         "allowed",
+					DecisionReason:   "budget_authorized",
+					PolicyMode:       normalizeEnforcementMode(mode),
+					CostCredits:      cost,
+					RemainingCredits: result.Remaining,
+					RequestID:        eventRequestID,
+				})
+			}
 			if evidenceErr != nil {
 				log.Error().Err(evidenceErr).Str("tool", tc.Name).Str("budgetId", budgetID).Msg("MCP allowed evidence recording failed")
 				if holder != nil && isControl {
@@ -1230,7 +1243,13 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						if holder != nil && !errors.Is(err, ErrPendingOutcomeUnknown) {
 							p.every().release(ctx, holder, budgetID, requestID, cost)
 						}
-						return pendingFailureResponse(req.ID, tc.Name, err), nil
+						stopped := pendingFailureResponse(req.ID, tc.Name, err)
+						if prep != nil && errors.Is(err, ErrPendingNotStored) {
+							// The receipt was only prepared, never published,
+							// and the hold is let go of: the stop is signed.
+							stopped = p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePendingCapacity, stopped)
+						}
+						return stopped, nil
 					}
 				}
 				if isControl {
@@ -1277,11 +1296,17 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 	// spend path signed already has its receipt (budget_authorized, with the
 	// cost and the balance) and gets no second one.
 	if p.signEveryAction && allowedEvidence == nil && !spendReceiptTried {
-		ev, stopped := p.signAllowed(ctx, req, tokenInfo, MethodToolsCall, tc.Name, eventRequestID, mode)
-		if stopped != nil {
-			return stopped, nil
+		if unidentified != nil {
+			if stopped := p.receiptFailed(ctx, req, tokenInfo, MethodToolsCall, tc.Name, mode, unidentified, "identity"); stopped != nil {
+				return stopped, nil
+			}
+		} else {
+			ev, stopped := p.signAllowed(ctx, req, tokenInfo, MethodToolsCall, tc.Name, eventRequestID, mode)
+			if stopped != nil {
+				return stopped, nil
+			}
+			allowedEvidence = ev
 		}
-		allowedEvidence = ev
 	}
 
 	// Publish tool call event
