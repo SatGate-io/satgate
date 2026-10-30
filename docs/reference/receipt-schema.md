@@ -84,8 +84,8 @@ Each reason requires `decision: denied`, a verified key, and no evaluated budget
 | --- | --- |
 | `tool_price_unavailable` | A required checked price lookup failed; the call was not sent. No fallback price is claimed. |
 | `tool_controls_unavailable` | Required spending/approval controls could not be checked, were absent, or returned an invalid admission; not a limit or approval denial. For `satgate/delegate`: the stored handoff limit could not be read, or the child key or the child's row could not be made or written. |
-| `budget_backend_error` | A required fail-closed budget/hold backend operation failed; not budget exhaustion or a known failed-store return value. For `satgate/delegate`: the carve got no usable answer, the child's budget could not be created, or the carve's pending entry could not be prepared. |
-| `pending_capacity_exhausted` | A local pending reservation could not be made (Control, before a hold; Observe, for the call's gap or a carve), or the pending journal definitely did not store a gap whose money is held; not evidence the customer's funds were exhausted. |
+| `budget_backend_error` | A required fail-closed budget/hold backend operation failed; not budget exhaustion or a known failed-store return value. For `satgate/delegate`: the carve got no usable answer, the child's budget could not be created, or the carve's pending entry could not be prepared. Also any stop signed after the call's budget hold was given back when the budget store did not confirm that the hold is gone; the held amount then comes back when the hold lapses. |
+| `pending_capacity_exhausted` | A local pending reservation could not be made (before a hold; in Observe, also for the call's gap), or the pending journal definitely did not store the entry of a call whose money is held (its gap, or its allowed receipt that was only prepared); not evidence the customer's funds were exhausted. |
 
 `budget` and the Pack's `budget_state` are exactly
 `{"spend_mode":"not_evaluated","cost_credits":0}` (integer zero, no extra keys).
@@ -103,16 +103,22 @@ failure cannot be proven by signing a new receipt and remains unsigned.
 
 Price refusals precede controls, reservation and spend. Invalid control admissions
 are settled before signing; real spending-limit and approval denials keep their
-policy meaning. For tools/call, budget backend receipts are produced only for the
-fail-closed blocking branch, never Observe or configured fail-open Control.
+policy meaning. For tools/call, a failed spend gets a budget backend receipt only
+in the fail-closed blocking branch, never in Observe or configured fail-open
+Control; a held call whose pending entry the budget store could not prepare is
+refused with that reason in either mode, after its hold is given back, whether
+or not the store confirms that the hold is gone.
 Pending-capacity receipts for a pending reservation that could not be made are
-signed after proof preflight and before any hold. The one exception is in
-Observe: when money is held for a `tools/call` or a credit-bearing
-`satgate/delegate`, its receipt was only prepared (never published) and the
-pending journal definitely did not store its gap, the hold is released first
-and the `pending_capacity_exhausted` refusal is signed after that.
-No refusal reserves an additional pending slot. Missing hold support and
-preparation failure after a hold of a tools/call remain unsigned. A possibly persisted allowed receipt or
+signed after proof preflight and before any hold. The exception: when money is
+held for a `tools/call` or a credit-bearing `satgate/delegate`, its allowed
+receipt was only prepared (never published), and the pending journal definitely
+did not store that receipt (Control or Observe) or, in Observe, its gap, the
+hold is given back first and the refusal is signed after that:
+`pending_capacity_exhausted` when the budget store confirms that the hold is
+gone (released, or no longer there), and `budget_backend_error` when it does
+not after the release's retries.
+No refusal reserves an additional pending slot. Missing hold support, and a
+journal whose recorder or budget store cannot prepare at all, remain unsigned. A possibly persisted allowed receipt or
 `outcome_unknown` is never reinterpreted as a refusal. With both switches on, a
 transport failure after admission returns the existing admission evidence handles
 on its existing error, not a second or outage receipt. With the new switch off,
@@ -122,7 +128,17 @@ receipts. Keep the matching checker bundle available after rollback.
 
 With both switches on, the same four reasons also sign these stops of a verified
 key's action. Each is signed after whatever was taken is given back, and never
-with a key issued or a call sent:
+with a key issued or a call sent. When money was held for the action, the hold
+is given back first: if the budget store confirms that the hold is gone
+(released, or no longer there), the stop is signed with its reason below; if it
+does not after the release's retries, the stop is signed `budget_backend_error`
+instead, and the held amount comes back when the hold lapses
+(`EveryActionSettings.HoldTTL`, 60 seconds by default); the request does not
+wait for that. The same holds for a
+credit-bearing `satgate/delegate` refused because the budget store would not
+create the child's budget after the hold: it keeps its usual signed refusal when
+the hold is confirmed gone, and is signed `budget_backend_error` when it is not.
+The caller's answer is the same either way, apart from the receipt's handles:
 
 - `satgate/delegate` stopped on SatGate's side, in any mode: the stored handoff
   limit could not be read, the child key could not be made or sealed, or the
@@ -132,11 +148,15 @@ with a key issued or a call sent:
   the receipt's handles.
 - Observe: a call to an authenticated method (`tools/call`, `satgate/delegate`,
   `satgate/budget`, `budget/check`, a forwarded method) stopped because no gap
-  slot was left, a credit-bearing delegation stopped because no pending slot was
-  left, and a call whose money is held and whose receipt was only prepared
-  (never published) when the pending journal definitely did not store its gap
-  (`pending_capacity_exhausted`); a credit-bearing delegation whose pending
-  entry the budget store could not prepare (`budget_backend_error`).
+  slot was left, and a call whose money is held and whose receipt was only
+  prepared (never published) when the pending journal definitely did not store
+  its gap (`pending_capacity_exhausted`).
+- Control and Observe, a priced `tools/call` or a credit-bearing
+  `satgate/delegate` that takes a hold: no pending slot was left for it, before
+  the hold (`pending_capacity_exhausted`); the budget store could not prepare
+  its pending entry (`budget_backend_error`); its allowed receipt was only
+  prepared (never published) and the pending journal definitely did not store
+  it (`pending_capacity_exhausted`).
 
 These receipts name the method (`route_or_tool` such as `mcp:satgate/delegate`
 or `mcp:satgate/budget`) and the server's request_id, never the JSON-RPC id.
@@ -151,7 +171,7 @@ With either switch off each of these keeps its previous behavior.
 
 ## Receipts when sign-every-action is on
 
-A gateway can be run with a switch (`Proxy.SetSignEveryAction` in the open-source MCP proxy; the hosted gateways wire their own setting; off by default) that makes it sign a receipt for each call made with a key SatGate issued, whether the call is let through or refused. While the switch is off, only the calls that had a receipt before get one, and nothing below is promised. While it is on, a call whose receipt cannot be made is not passed on, and nothing is charged for it: the caller gets `proof_unavailable`. A recorder that answers with nothing counts as a receipt that could not be made. A refusal that cannot be recorded is answered `proof_unavailable` as well, in place of the usual refusal. Observe is the one exception: the call goes through and the miss is counted (see the gap receipt below). The switch needs a recorder that keeps refusal windows (`WindowRecorder`); turning it on without one is a setup error. With the switch on, the `request_id` of a receipt is made by the server for that one call (random, never built from the caller's JSON-RPC id, session or request id), so two callers that number their requests alike get receipts that can be told apart.
+A gateway can be run with a switch (`Proxy.SetSignEveryAction` in the open-source MCP proxy; the hosted gateways wire their own setting; off by default) that makes it sign a receipt for each call made with a key SatGate issued, whether the call is let through or refused. While the switch is off, only the calls that had a receipt before get one, and nothing below is promised. While it is on, a call whose receipt cannot be made is not passed on, and nothing is charged for it: the caller gets `proof_unavailable`. A recorder that answers with nothing counts as a receipt that could not be made. A refusal that cannot be recorded is answered `proof_unavailable` as well, in place of the usual refusal. Observe is the one exception: the call goes through and the miss is counted (see the gap receipt below). Observe still stops a call when there is no room to keep that miss or the money held for the call, when the budget store cannot prepare the held money's pending entry, or when the save's outcome is unknown (`outcome_unknown`); with the unavailable-check setting above also on, each of these stops except `outcome_unknown` is signed (`pending_capacity_exhausted` or `budget_backend_error`). The switch needs a recorder that keeps refusal windows (`WindowRecorder`); turning it on without one is a setup error. With the switch on, the `request_id` of a receipt is made by the server for that one call (random, never built from the caller's JSON-RPC id, session or request id), so two callers that number their requests alike get receipts that can be told apart.
 
 What counts as a call: a request that arrives with a key that verifies. What does not: the connection handshake (`initialize`, `ping`, notifications), listing tools, a request with no key or a key SatGate did not issue. A request stopped because a required check was unavailable stays unsigned unless the separate unavailable-check setting above is also on. Signer, identity and archive failures remain unsigned in either case.
 
@@ -183,7 +203,7 @@ The verifier refuses a window receipt with another phase, a start that is not a 
 
 ### A gap: calls that went through in Observe with no receipt
 
-Observe never stops a call. If SatGate cannot make the receipt for an Observe call, the call still goes through and SatGate counts it. When signing works again it signs one gap receipt per key, tool and UTC minute: `decision` `allowed`, `decision_reason` `observe_unrecorded`, with these signed top-level fields:
+If SatGate cannot make the receipt for an Observe call, the call still goes through and SatGate counts it. The only Observe calls stopped instead, apart from a setup error, are those listed under the receipts when sign-every-action is on: no room to keep the count or the money held for the call, held money whose pending entry the budget store cannot prepare (both stops signed when the unavailable-check setting is also on), and a save whose outcome is unknown. When signing works again it signs one gap receipt per key, tool and UTC minute: `decision` `allowed`, `decision_reason` `observe_unrecorded`, with these signed top-level fields:
 
 | field | meaning |
 | --- | --- |

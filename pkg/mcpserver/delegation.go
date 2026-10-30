@@ -456,23 +456,22 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		}
 		if slot = d.state().pending.reserve(kindUncharged); slot == nil {
 			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the pending store is full")
-			if !d.blocksOnReceiptFailure(ctx, parent.TenantID) {
-				// Observe (journal installed): the stop is signed.
-				return nil, d.unavailable(unavailablePendingCapacity, errDelegationProofUnavailable)
-			}
-			return nil, errDelegationProofUnavailable
+			// Control, and Observe with a journal installed: the stop is signed.
+			return nil, d.unavailable(unavailablePendingCapacity, errDelegationProofUnavailable)
 		}
 		defer slot.release()
 	}
 	// undoCarve lets go of what the carve took when the delegation stops
 	// before its key is issued: the hold is released (and lapses by itself if
-	// the release fails), or, with no hold, the carve is refunded.
-	undoCarve := func(delegationID string) {
+	// the release fails), or, with no hold, the carve is refunded. It reports
+	// whether a hold is confirmed gone (always true with no hold): a stop
+	// signed after it is signed budget_backend_error when it is not.
+	undoCarve := func(delegationID string) bool {
 		if holder != nil {
-			d.state().release(ctx, holder, parent.BudgetID, delegationID, params.Budget)
-			return
+			return d.state().release(ctx, holder, parent.BudgetID, delegationID, params.Budget)
 		}
 		d.giveBack(ctx, parent, delegationID, params.Budget)
+		return true
 	}
 	if params.Budget < 0 {
 		return nil, &clientError{msg: "budget must be non-negative"}
@@ -703,11 +702,16 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			initCtx, initCredits = ctx, 0
 		}
 		if err := d.budget.Initialize(initCtx, childBudgetID, initCredits); err != nil {
-			undoCarve(delegationID)
+			released := undoCarve(delegationID)
 			if errors.Is(err, ErrInsufficientBudget) {
 				// The budget said no when the money was to move: a real refusal.
 				// The client gets the fixed sentence, never the error's text.
 				log.Warn().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Str("childBudgetId", childBudgetID).Msg("delegation refused: the parent budget could not afford the carve")
+				if !released {
+					// The hold is not confirmed gone: the refusal is
+					// signed budget_backend_error, the answer unchanged.
+					return nil, d.unavailable(unavailableBudgetBackend, errInsufficientParentBudget)
+				}
 				return nil, errInsufficientParentBudget
 			}
 			log.Error().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Str("childBudgetId", childBudgetID).Msg("delegation refused: child budget could not be created")
@@ -788,8 +792,8 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			cancel()
 			if perr != nil {
 				log.Error().Msg("delegation refused: the helper could not be recorded where a revoke finds it")
-				undoCarve(delegationID)
-				return nil, d.unavailable(unavailableControls, ErrChildTokenFailed)
+				released := undoCarve(delegationID)
+				return nil, d.unavailable(heldStop(released, unavailableControls), ErrChildTokenFailed)
 			}
 		}
 	}
@@ -814,9 +818,11 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			if perr != nil {
 				undoCarve(delegationID)
 				var budgetErr *pendingBudgetError
-				if errors.As(perr, &budgetErr) && !d.blocksOnReceiptFailure(ctx, parent.TenantID) {
-					// Observe: the budget store could not prepare the
-					// carve's entry. Nothing was signed; the stop is.
+				if errors.As(perr, &budgetErr) {
+					// The budget store could not prepare the carve's
+					// entry. Nothing was signed; the stop is, after the
+					// release: budget_backend_error whether or not the
+					// release confirmed the hold gone.
 					return nil, d.unavailable(unavailableBudgetBackend, errDelegationProofUnavailable)
 				}
 				return nil, errDelegationProofUnavailable
@@ -838,11 +844,13 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 					if errors.Is(err, ErrPendingOutcomeUnknown) {
 						return nil, err
 					}
-					undoCarve(delegationID)
+					released := undoCarve(delegationID)
 					if prep != nil && errors.Is(err, ErrPendingNotStored) {
 						// The receipt was only prepared, never published,
-						// and the hold is let go of: the stop is signed.
-						return nil, d.unavailable(unavailablePendingCapacity, errDelegationProofUnavailable)
+						// and the hold is let go of: the stop is signed,
+						// budget_backend_error if the hold is not
+						// confirmed gone (it lapses).
+						return nil, d.unavailable(heldStop(released, unavailablePendingCapacity), errDelegationProofUnavailable)
 					}
 					return nil, errDelegationProofUnavailable
 				}
@@ -853,8 +861,12 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 				if errors.Is(perr, ErrPendingOutcomeUnknown) {
 					return nil, perr
 				}
-				undoCarve(delegationID)
-				return nil, errDelegationProofUnavailable
+				released := undoCarve(delegationID)
+				// The receipt was only prepared, never published, and the
+				// journal definitely did not keep it: the hold is let go of
+				// and the stop is signed, budget_backend_error if the hold
+				// is not confirmed gone (it lapses).
+				return nil, d.unavailable(heldStop(released, unavailablePendingCapacity), errDelegationProofUnavailable)
 			}
 			if perr != nil {
 				log.Warn().Msg("signed delegation is durably pending settlement")

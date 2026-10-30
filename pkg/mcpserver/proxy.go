@@ -1065,10 +1065,8 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			}
 			if slot = p.every().pending.reserve(kindUncharged); slot == nil {
 				log.Error().Str("tool", receiptTool(tc.Name)).Msg("sign every action: the pending store is full; refusing the call before any charge")
-				if isControl {
-					return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePendingCapacity, proofUnavailableResponse(req.ID, tc.Name)), nil
-				}
-				return proofUnavailableResponse(req.ID, tc.Name), nil
+				// Control, and Observe with a journal installed: the stop is signed.
+				return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePendingCapacity, proofUnavailableResponse(req.ID, tc.Name)), nil
 			}
 			defer slot.release()
 		}
@@ -1209,7 +1207,16 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				recCtx, prep, perr = p.every().preparePending(recCtx, PendingRecord{TokenID: tokenInfo.TokenID, TenantID: tenantID, BudgetID: budgetID, Method: MethodToolsCall, Tool: receiptTool(tc.Name), RequestID: requestID, Amount: cost})
 				if perr != nil {
 					p.every().release(ctx, holder, budgetID, requestID, cost)
-					return proofUnavailableResponse(req.ID, tc.Name), nil
+					stopped := proofUnavailableResponse(req.ID, tc.Name)
+					var budgetErr *pendingBudgetError
+					if errors.As(perr, &budgetErr) {
+						// The budget store could not prepare the held
+						// amount's entry. Nothing was signed; the stop is,
+						// after the release: budget_backend_error whether
+						// or not the release confirmed the hold gone.
+						stopped = p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailableBudgetBackend, stopped)
+					}
+					return stopped, nil
 				}
 			}
 			if unidentified != nil {
@@ -1240,14 +1247,17 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				// behaviour); with the switch on the miss is reported, once.
 				if !isControl {
 					if err := p.reportObserveMiss(recCtx, tokenInfo, MethodToolsCall, tc.Name, mode); err != nil {
+						released := false
 						if holder != nil && !errors.Is(err, ErrPendingOutcomeUnknown) {
-							p.every().release(ctx, holder, budgetID, requestID, cost)
+							released = p.every().release(ctx, holder, budgetID, requestID, cost)
 						}
 						stopped := pendingFailureResponse(req.ID, tc.Name, err)
 						if prep != nil && errors.Is(err, ErrPendingNotStored) {
 							// The receipt was only prepared, never published,
-							// and the hold is let go of: the stop is signed.
-							stopped = p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePendingCapacity, stopped)
+							// and the hold is let go of: the stop is signed,
+							// budget_backend_error if the hold is not
+							// confirmed gone (it lapses).
+							stopped = p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, heldStop(released, unavailablePendingCapacity), stopped)
 						}
 						return stopped, nil
 					}
@@ -1265,8 +1275,12 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					if errors.Is(perr, ErrPendingOutcomeUnknown) {
 						return pendingFailureResponse(req.ID, tc.Name, perr), nil
 					}
-					p.every().release(ctx, holder, budgetID, requestID, cost)
-					return proofUnavailableResponse(req.ID, tc.Name), nil
+					released := p.every().release(ctx, holder, budgetID, requestID, cost)
+					// The receipt was only prepared, never published, and
+					// the journal definitely did not keep it: the hold is
+					// let go of and the stop is signed, budget_backend_error
+					// if the hold is not confirmed gone (it lapses).
+					return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, heldStop(released, unavailablePendingCapacity), proofUnavailableResponse(req.ID, tc.Name)), nil
 				}
 				if perr != nil {
 					log.Warn().Msg("signed call is durably pending settlement")

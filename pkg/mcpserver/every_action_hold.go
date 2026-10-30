@@ -350,7 +350,12 @@ func (ea *everyAction) commit(ctx context.Context, h BudgetHolder, budgetID, hol
 // release gives the hold holdID back on a context of its own, bounded by
 // CommitTimeout. If it still fails the hold lapses by itself; the failure is
 // logged and counted (ReversalFailures), and nothing more has to succeed.
-func (ea *everyAction) release(ctx context.Context, h BudgetHolder, budgetID, holdID string, amount int64) {
+//
+// It reports whether the hold is confirmed gone: the store released it, or
+// answered that it no longer exists (ErrHoldGone). Any other answer, after the
+// retries, is not a confirmation: the hold may still be open until it lapses
+// (HoldTTL). The request does not wait for that.
+func (ea *everyAction) release(ctx context.Context, h BudgetHolder, budgetID, holdID string, amount int64) bool {
 	err := retryUndo(ctx, ea.cfg().CommitTimeout, func(c context.Context) error {
 		return h.ReleaseHold(c, budgetID, holdID)
 	})
@@ -359,6 +364,18 @@ func (ea *everyAction) release(ctx context.Context, h BudgetHolder, budgetID, ho
 		log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", holdID).Int64("amount", amount).
 			Dur("lapsesWithin", ea.cfg().HoldTTL).Msg("could not release a budget hold; it lapses by itself and the balance comes back")
 	}
+	return err == nil || errors.Is(err, ErrHoldGone)
+}
+
+// heldStop is the reason a stop is signed with when it is signed after the
+// call's budget hold was given back: the stop's own reason when release
+// confirmed the hold gone, and budget_backend_error when it did not (the held
+// amount then comes back when the hold lapses).
+func heldStop(released bool, reason unavailableCheckReason) unavailableCheckReason {
+	if released {
+		return reason
+	}
+	return unavailableBudgetBackend
 }
 
 // ---- the pending store ----
