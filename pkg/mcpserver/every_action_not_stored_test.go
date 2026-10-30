@@ -229,6 +229,12 @@ func TestNotStored_SwitchOffBytes(t *testing.T) {
 	for _, c := range notStoredUnknownCases() {
 		add(c, append(off, run{"both-on", true, true}))
 	}
+	// Round 2: the stops signed after a hold is given back, with the release
+	// working and failing. Rows added after main's; main's rows unchanged.
+	for _, c := range heldReleaseCases() {
+		add(c.gapsCase, off)
+		add(c.failing().gapsCase, off)
+	}
 	if p := os.Getenv("NOT_STORED_OFF_SNAPSHOT"); p != "" {
 		b, _ := json.MarshalIndent(got, "", "  ")
 		if err := os.WriteFile(p, append(b, '\n'), 0o600); err != nil {

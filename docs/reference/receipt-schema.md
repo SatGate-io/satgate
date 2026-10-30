@@ -84,7 +84,7 @@ Each reason requires `decision: denied`, a verified key, and no evaluated budget
 | --- | --- |
 | `tool_price_unavailable` | A required checked price lookup failed; the call was not sent. No fallback price is claimed. |
 | `tool_controls_unavailable` | Required spending/approval controls could not be checked, were absent, or returned an invalid admission; not a limit or approval denial. For `satgate/delegate`: the stored handoff limit could not be read, or the child key or the child's row could not be made or written. |
-| `budget_backend_error` | A required fail-closed budget/hold backend operation failed; not budget exhaustion or a known failed-store return value. For `satgate/delegate`: the carve got no usable answer, the child's budget could not be created, or the carve's pending entry could not be prepared. |
+| `budget_backend_error` | A required fail-closed budget/hold backend operation failed; not budget exhaustion or a known failed-store return value. For `satgate/delegate`: the carve got no usable answer, the child's budget could not be created, or the carve's pending entry could not be prepared. Also any stop signed after the call's budget hold was given back when the budget store did not confirm that the hold is gone; the held amount then comes back when the hold lapses. |
 | `pending_capacity_exhausted` | A local pending reservation could not be made (before a hold; in Observe, also for the call's gap), or the pending journal definitely did not store the entry of a call whose money is held (its gap, or its allowed receipt that was only prepared); not evidence the customer's funds were exhausted. |
 
 `budget` and the Pack's `budget_state` are exactly
@@ -106,14 +106,17 @@ are settled before signing; real spending-limit and approval denials keep their
 policy meaning. For tools/call, a failed spend gets a budget backend receipt only
 in the fail-closed blocking branch, never in Observe or configured fail-open
 Control; a held call whose pending entry the budget store could not prepare is
-refused with that reason in either mode, after its hold is released.
+refused with that reason in either mode, after its hold is given back, whether
+or not the store confirms that the hold is gone.
 Pending-capacity receipts for a pending reservation that could not be made are
 signed after proof preflight and before any hold. The exception: when money is
 held for a `tools/call` or a credit-bearing `satgate/delegate`, its allowed
 receipt was only prepared (never published), and the pending journal definitely
 did not store that receipt (Control or Observe) or, in Observe, its gap, the
-hold is released first and the `pending_capacity_exhausted` refusal is signed
-after that.
+hold is given back first and the refusal is signed after that:
+`pending_capacity_exhausted` when the budget store confirms that the hold is
+gone (released, or no longer there), and `budget_backend_error` when it does
+not after the release's retries.
 No refusal reserves an additional pending slot. Missing hold support, and a
 journal whose recorder or budget store cannot prepare at all, remain unsigned. A possibly persisted allowed receipt or
 `outcome_unknown` is never reinterpreted as a refusal. With both switches on, a
@@ -125,7 +128,17 @@ receipts. Keep the matching checker bundle available after rollback.
 
 With both switches on, the same four reasons also sign these stops of a verified
 key's action. Each is signed after whatever was taken is given back, and never
-with a key issued or a call sent:
+with a key issued or a call sent. When money was held for the action, the hold
+is given back first: if the budget store confirms that the hold is gone
+(released, or no longer there), the stop is signed with its reason below; if it
+does not after the release's retries, the stop is signed `budget_backend_error`
+instead, and the held amount comes back when the hold lapses
+(`EveryActionSettings.HoldTTL`, 60 seconds by default); the request does not
+wait for that. The same holds for a
+credit-bearing `satgate/delegate` refused because the budget store would not
+create the child's budget after the hold: it keeps its usual signed refusal when
+the hold is confirmed gone, and is signed `budget_backend_error` when it is not.
+The caller's answer is the same either way, apart from the receipt's handles:
 
 - `satgate/delegate` stopped on SatGate's side, in any mode: the stored handoff
   limit could not be read, the child key could not be made or sealed, or the
