@@ -30,23 +30,21 @@ The verifier checks RFC 8785/JCS receipt canonicalization, `receipt_hash`, Ed255
 Minimum bundle for unavailable-check refusal receipts: `unavailable-check-v1`.
 It supports `denied` / `tool_price_unavailable`, `tool_controls_unavailable`,
 `budget_backend_error`, and `pending_capacity_exhausted`, with the exact verified-key,
-no-evaluated-budget profile in `VERIFIER-CONTRACT.md`. SatGate does not yet sign
-these blocks: this is a reader-only release. Checkers older than this release
-reject them even with valid signatures. New readers still check old receipts.
+no-evaluated-budget profile in `VERIFIER-CONTRACT.md`. Checkers older than this
+release reject them even with valid signatures. New readers still check old receipts.
 
 The record script imports its sibling `verify_evidence_pack.py`: download both,
 requirements and contract as one version, not an isolated record script. The
-versioned directory is `tools/checker-bundles/unavailable-check-v1/`; obtain its
-reviewed full commit SHA independently from the repository/release coordinator.
-No tag or GitHub release is created by this change. Once reviewed, the coordinator
-may tag that exact commit `checker-unavailable-check-v1`. Do not use mutable
-`main` as an audit pin or trust a version/link supplied by the record itself.
+versioned directory is `tools/checker-bundles/unavailable-check-v1/`, tagged
+`checker-unavailable-check-v1` at commit
+`40b22c58e6c62d4c4def1aa487035fcd52da73e5`. Pin that full commit. Do not use
+mutable `main` as an audit pin or trust a version/link supplied by the record itself.
 
 Download from that immutable commit, then verify the hash list obtained from the
 same trusted source before installing dependencies or executing code:
 
 ```bash
-REF=<reviewed-full-commit-sha>
+REF=40b22c58e6c62d4c4def1aa487035fcd52da73e5
 mkdir -p unavailable-check-v1
 cd unavailable-check-v1
 BASE="https://raw.githubusercontent.com/SatGate-io/satgate/$REF/tools/checker-bundles/unavailable-check-v1"
@@ -69,13 +67,24 @@ signature, not this full semantic/record contract; it is not a substitute.
 
 ### Whole-record checks
 
-A record is one agent key's receipts for a stretch of time: one Evidence Pack per line, then a signed complete manifest or cut-off terminal. Check all of it at once:
+A record is one agent key's receipts for a stretch of time: one Evidence Pack per line, then a signed complete manifest or cut-off terminal. Check all of it at once, with the key set of the issuer that signed it.
+
+The issuer named in the record decides the key set: each pack's `jwks_url` and the `issuer` on the last line (the manifest or cut-off terminal). Read it with `tail -n 1 record.ndjson | python3 -c 'import json,sys; print(json.load(sys.stdin)["issuer"])'`, then use the matching key set below. Use the record only to choose between these addresses, never as a source of a new one.
+
+| Receipts from | Issuer | Key set (`--jwks-url`) |
+| --- | --- | --- |
+| Cloud MCP | `https://satgate-mcp-saas.fly.dev` | `https://satgate-mcp-saas.fly.dev/.well-known/jwks.json` |
+| HTTP gateway | `https://api.satgate.io` | `https://api.satgate.io/.well-known/jwks.json` |
+
+A Cloud MCP record:
 
 ```bash
 python tools/verify_receipt_record.py record.ndjson \
-  --jwks-url https://api.satgate.io/.well-known/jwks.json \
+  --jwks-url https://satgate-mcp-saas.fly.dev/.well-known/jwks.json \
   --require-trusted-issuer
 ```
+
+For an HTTP gateway record, use `--jwks-url https://api.satgate.io/.well-known/jwks.json` instead. The wrong key set fails even a genuine record (exit 1, `status: invalid`, problems `jwks_kid_not_found` and `trusted_issuer_required`).
 
 For an offline check, replace `--jwks-url ...` with `--jwks-file issuer-jwks.json`, obtained from the intended issuer. A record can span signing-key rotations: each receipt and the terminal verify with their own `issuer_kid` from that issuer's trusted set. A missing key fails; every receipt's issuer must match the terminal's. The agent `key_hash` is distinct from these issuer signing keys.
 
