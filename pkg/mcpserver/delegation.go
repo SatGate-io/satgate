@@ -456,11 +456,8 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		}
 		if slot = d.state().pending.reserve(kindUncharged); slot == nil {
 			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the pending store is full")
-			if !d.blocksOnReceiptFailure(ctx, parent.TenantID) {
-				// Observe (journal installed): the stop is signed.
-				return nil, d.unavailable(unavailablePendingCapacity, errDelegationProofUnavailable)
-			}
-			return nil, errDelegationProofUnavailable
+			// Control, and Observe with a journal installed: the stop is signed.
+			return nil, d.unavailable(unavailablePendingCapacity, errDelegationProofUnavailable)
 		}
 		defer slot.release()
 	}
@@ -814,9 +811,9 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			if perr != nil {
 				undoCarve(delegationID)
 				var budgetErr *pendingBudgetError
-				if errors.As(perr, &budgetErr) && !d.blocksOnReceiptFailure(ctx, parent.TenantID) {
-					// Observe: the budget store could not prepare the
-					// carve's entry. Nothing was signed; the stop is.
+				if errors.As(perr, &budgetErr) {
+					// The budget store could not prepare the carve's
+					// entry. Nothing was signed; the stop is.
 					return nil, d.unavailable(unavailableBudgetBackend, errDelegationProofUnavailable)
 				}
 				return nil, errDelegationProofUnavailable
@@ -854,7 +851,10 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 					return nil, perr
 				}
 				undoCarve(delegationID)
-				return nil, errDelegationProofUnavailable
+				// The receipt was only prepared, never published, and the
+				// journal definitely did not keep it: the hold is let go of
+				// and the stop is signed.
+				return nil, d.unavailable(unavailablePendingCapacity, errDelegationProofUnavailable)
 			}
 			if perr != nil {
 				log.Warn().Msg("signed delegation is durably pending settlement")

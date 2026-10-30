@@ -1065,10 +1065,8 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 			}
 			if slot = p.every().pending.reserve(kindUncharged); slot == nil {
 				log.Error().Str("tool", receiptTool(tc.Name)).Msg("sign every action: the pending store is full; refusing the call before any charge")
-				if isControl {
-					return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePendingCapacity, proofUnavailableResponse(req.ID, tc.Name)), nil
-				}
-				return proofUnavailableResponse(req.ID, tc.Name), nil
+				// Control, and Observe with a journal installed: the stop is signed.
+				return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePendingCapacity, proofUnavailableResponse(req.ID, tc.Name)), nil
 			}
 			defer slot.release()
 		}
@@ -1209,7 +1207,14 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 				recCtx, prep, perr = p.every().preparePending(recCtx, PendingRecord{TokenID: tokenInfo.TokenID, TenantID: tenantID, BudgetID: budgetID, Method: MethodToolsCall, Tool: receiptTool(tc.Name), RequestID: requestID, Amount: cost})
 				if perr != nil {
 					p.every().release(ctx, holder, budgetID, requestID, cost)
-					return proofUnavailableResponse(req.ID, tc.Name), nil
+					stopped := proofUnavailableResponse(req.ID, tc.Name)
+					var budgetErr *pendingBudgetError
+					if errors.As(perr, &budgetErr) {
+						// The budget store could not prepare the held
+						// amount's entry. Nothing was signed; the stop is.
+						stopped = p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailableBudgetBackend, stopped)
+					}
+					return stopped, nil
 				}
 			}
 			if unidentified != nil {
@@ -1266,7 +1271,10 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 						return pendingFailureResponse(req.ID, tc.Name, perr), nil
 					}
 					p.every().release(ctx, holder, budgetID, requestID, cost)
-					return proofUnavailableResponse(req.ID, tc.Name), nil
+					// The receipt was only prepared, never published, and
+					// the journal definitely did not keep it: the hold is
+					// let go of and the stop is signed.
+					return p.refuseUnavailableCheck(ctx, tokenInfo, tc.Name, unavailablePendingCapacity, proofUnavailableResponse(req.ID, tc.Name)), nil
 				}
 				if perr != nil {
 					log.Warn().Msg("signed call is durably pending settlement")

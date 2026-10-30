@@ -110,9 +110,11 @@ func (p *Proxy) SignEveryAction() bool { return p.signEveryAction }
 //
 // With both switches on, the remaining stops of a verified key's action are
 // also signed with these reasons (satgate/delegate stopped on SatGate's side,
-// an Observe call stopped for want of pending room), and an Observe call that
-// goes through with no receipt is counted even when it cannot be journaled or
-// is older than PendingHorizon (see closesGaps).
+// an Observe call stopped for want of pending room, and a held call or carve
+// stopped for want of pending room, a pending entry the budget store could not
+// prepare, or a prepared receipt the journal definitely did not store), and an
+// Observe call that goes through with no receipt is counted even when it cannot
+// be journaled or is older than PendingHorizon (see closesGaps).
 func (p *Proxy) SetSignUnavailableCheckRefusals(on bool) {
 	p.signUnavailableCheckRefusals = on
 	p.every().refusals.Store(on)
