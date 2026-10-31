@@ -1418,5 +1418,1505 @@
     "debit": 5,
     "misses": 0,
     "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U1/delegate/observe/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U1/delegate/control/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U2/tools-call/observe/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U2/tools-call/control/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 1,
+    "journaled": 1
+  },
+  {
+    "case": "U3a/delegate-held/observe/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 1,
+    "journaled": 1
+  },
+  {
+    "case": "U3b/tools-call-held/observe/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"free_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"free_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 1,
+    "journaled": 1
+  },
+  {
+    "case": "U3c/tools-call-free/observe/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 1,
+    "journaled": 1
+  },
+  {
+    "case": "U3c/helper/observe/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 1,
+    "journaled": 1
+  },
+  {
+    "case": "U3c/budget/observe/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 1,
+    "journaled": 1
+  },
+  {
+    "case": "U3c/forwarded-method/observe/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U1/delegate/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U1/delegate/control/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U2/tools-call/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U2/tools-call/control/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U3a/delegate-held/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U3b/tools-call-held/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"free_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U3c/tools-call-free/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U3c/helper/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U3c/budget/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/aged-49h/kept=0/receipts=0/disposition=aged_out",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "U3c/forwarded-method/observe/aged-49h/kept=0/receipts=0/disposition=open",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/observe/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U1/delegate/control/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/observe/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U2/tools-call/control/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3a/delegate-held/observe/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3b/tools-call-held/observe/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"free_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"free_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/tools-call-free/observe/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/helper/observe/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/budget/observe/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/not-written/resolve-up=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/not-written/resolve-up=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/not-written/resolve-up=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/not-written/resolve-up=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/not-written/resolve-up=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "U3c/forwarded-method/observe/not-written/resolve-up=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
   }
 ]

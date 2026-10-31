@@ -110,7 +110,10 @@ type Delegator struct {
 	signEveryAction      bool
 	receiptFailureBlocks func(ctx context.Context, tenantID string) bool
 	reportMiss           func(ctx context.Context, parent *TokenInfo) error
-	reversalFailed       func()
+	// keepUnknown keeps a delegation whose prepared receipt has an unknown
+	// save until the journal can tell (Proxy.keepUnknownPrepared).
+	keepUnknown    func(ctx context.Context, parent *TokenInfo, prep *pendingPreparation, release func(context.Context))
+	reversalFailed func()
 	// refuseUnavailable signs a delegation stopped on SatGate's side with an
 	// unavailable-check reason (Proxy.refuseUnavailableMethod). The proxy sets
 	// it; it signs only with both signing switches on.
@@ -859,6 +862,14 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			stored, perr := d.state().keepPrepared(ctx, prep)
 			if !stored {
 				if errors.Is(perr, ErrPendingOutcomeUnknown) {
+					// The answer stays outcome_unknown; the delegation is
+					// kept until the journal can tell (unknownOutcome).
+					if d.keepUnknown != nil {
+						budgetID, amount := parent.BudgetID, params.Budget
+						d.keepUnknown(ctx, parent, prep, func(c context.Context) {
+							d.state().release(c, holder, budgetID, delegationID, amount)
+						})
+					}
 					return nil, perr
 				}
 				released := undoCarve(delegationID)
