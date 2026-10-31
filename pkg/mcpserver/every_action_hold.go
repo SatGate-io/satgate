@@ -448,7 +448,10 @@ type pendingEntry struct {
 	// the parent and funds the child, exactly once however often it is called
 	// (CarveSettler). The retry worker runs it whether or not an
 	// UnchargedRecorder is installed.
-	settle   func(ctx context.Context) error
+	settle func(ctx context.Context) error
+	// unknown is set on a call whose journal save has an unknown result
+	// (unknownOutcome): the retry worker resolves it instead of counting it.
+	unknown  *unknownOutcome
 	inflight bool
 }
 
@@ -671,13 +674,24 @@ func missSlotFrom(ctx context.Context) *pendingSlot {
 // the miss is kept with its tenant, key, tool and minute and retried in the
 // background until the recorder takes it, exactly once. A non-nil error stops
 // forwarding; a durable unknown must be answered as unknown, never refused.
+// With both switches on, the unknown is kept, in the call's slot, until the
+// journal can tell whether it holds the gap (unknownOutcome).
+//
+// Accepted residual of this in-memory retry: an entry it keeps (a gap here, or
+// an unknown outcome, see unknownOutcome) is lost if the process ends before
+// it is recorded; and a Control call's unknown outcome, which has no gap slot
+// of its own, is not kept when the gap store is at its bound (logged only).
 func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slot *pendingSlot, call MCPWindowedCall) error {
 	if call.ReportID == "" {
 		call.ReportID = ea.pending.nextID(kindGap)
 	}
 	if ea.durable != nil && ea.on.Load() {
-		err := ea.durableGap(ctx, slot, call)
+		w, err := ea.durableGapWork(ctx, slot, call)
 		prep, _ := ctx.Value(pendingPreparationKey{}).(*pendingPreparation)
+		if errors.Is(err, ErrPendingOutcomeUnknown) && ea.closesGaps() {
+			ea.keepUnknownGap(slot, w, prep)
+			return err
+		}
 		if !errors.Is(err, ErrPendingNotStored) || prep != nil || !ea.closesGaps() {
 			return err
 		}
@@ -801,14 +815,21 @@ func (ea *everyAction) flush(ctx context.Context) bool {
 	progressed := false
 	for _, e := range ea.pending.claim(sink != nil) {
 		ok := false
-		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), ea.cfg().MissReportTimeout)
-		switch e.Kind {
-		case PendingGap:
+		bound := ea.cfg().MissReportTimeout
+		if e.unknown != nil {
+			// Asking the journal, then publishing, counting or signing.
+			bound = ea.cfg().CommitTimeout + ea.cfg().SignTimeout
+		}
+		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), bound)
+		switch {
+		case e.unknown != nil:
+			ok = ea.resolveUnknown(rctx, e)
+		case e.Kind == PendingGap:
 			if wr, isWR := rec.(WindowRecorder); isWR {
 				_, err := wr.RecordWindowedCall(rctx, e.call)
 				ok = err == nil
 			}
-		case PendingUncharged:
+		case e.Kind == PendingUncharged:
 			switch {
 			case e.settle != nil:
 				ok = ea.settleCarveEntry(rctx, e)

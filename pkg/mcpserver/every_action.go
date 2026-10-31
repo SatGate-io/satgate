@@ -154,6 +154,9 @@ func (p *Proxy) wireDelegator() {
 	p.delegator.refuseUnavailable = func(ctx context.Context, parent *TokenInfo, reason unavailableCheckReason, resp *Response) *Response {
 		return p.refuseUnavailableMethod(ctx, parent, MethodSatGateDelegate, MethodSatGateDelegate, reason, resp)
 	}
+	p.delegator.keepUnknown = func(ctx context.Context, parent *TokenInfo, prep *pendingPreparation, release func(context.Context)) {
+		p.keepUnknownPrepared(ctx, parent, MethodSatGateDelegate, "", p.enforcementModeFor(ctx, tenantOf(parent)), prep, release)
+	}
 }
 
 // allowReceiptFailureBlocks reports whether failing to make an allow receipt
@@ -443,32 +446,92 @@ func (p *Proxy) refuseUnavailableMethod(ctx context.Context, tokenInfo *TokenInf
 	if !p.unavailableCheckRefusalsEnabled() {
 		return resp
 	}
-	if reason.reason() == "" || tokenInfo == nil || p.setupBlocks() || p.evidence == nil {
-		return proofUnavailableResponse(resp.ID, tool)
-	}
-	requestID, err := p.every().callID(callIDPrefix)
+	ev, err := p.signUnavailableStop(ctx, tokenInfo, method, tool, reason, "")
 	if err != nil {
 		return proofUnavailableResponse(resp.ID, tool)
+	}
+	return withEvidenceData(resp, ev)
+}
+
+var errStopNotSignable = errors.New("this stop cannot be signed")
+
+// signUnavailableStop signs one stop of a verified key's call with reason,
+// under requestID ("" makes a fresh server identity). It is the signing step of
+// refuseUnavailableMethod, also run by the retry worker for a Control call
+// whose unknown outcome turned out absent (unknownOutcome).
+func (p *Proxy) signUnavailableStop(ctx context.Context, tokenInfo *TokenInfo, method, tool string, reason unavailableCheckReason, requestID string) (*MCPEvidence, error) {
+	if !p.unavailableCheckRefusalsEnabled() || reason.reason() == "" || tokenInfo == nil || p.setupBlocks() || p.evidence == nil {
+		return nil, errStopNotSignable
+	}
+	if requestID == "" {
+		id, err := p.every().callID(callIDPrefix)
+		if err != nil {
+			return nil, err
+		}
+		requestID = id
 	}
 	// Price failure precedes the ordinary tools/call preflight. Recheck here
 	// for all four stops so a failed signer is never itself signed as an outage.
 	preCtx, cancel := context.WithTimeout(ctx, p.every().cfg().SignTimeout)
 	defer cancel()
 	if err := p.evidence.Preflight(preCtx); err != nil {
-		return proofUnavailableResponse(resp.ID, tool)
+		return nil, err
 	}
 	// No Request is passed: not even the caller's JSON-RPC id is a signed
 	// field here. The response correlation id remains only in the envelope.
-	ev, err := p.recordMethodDecision(ctx, nil, tokenInfo, method, tool, MCPDecision{
+	return p.recordMethodDecision(ctx, nil, tokenInfo, method, tool, MCPDecision{
 		Decision:           "denied",
 		DecisionReason:     reason.reason(),
 		BudgetNotEvaluated: true,
 		RequestID:          requestID,
 	})
-	if err != nil {
-		return proofUnavailableResponse(resp.ID, tool)
+}
+
+// keepUnknownPrepared keeps a held call whose prepared receipt the journal may
+// or may not hold (keepPrepared answered ErrPendingOutcomeUnknown) until the
+// journal can tell (unknownOutcome). Found, the receipt is published by
+// recovery. Absent, release gives the hold back and the call is recorded: in
+// Observe counted as a miss in its own minute, in Control its stop signed
+// budget_backend_error. With either switch off nothing is kept.
+func (p *Proxy) keepUnknownPrepared(ctx context.Context, tokenInfo *TokenInfo, method, tool, mode string, prep *pendingPreparation, release func(context.Context)) {
+	ea := p.every()
+	if !ea.closesGaps() || prep == nil || tokenInfo == nil || ea.durable == nil {
+		return
 	}
-	return withEvidenceData(resp, ev)
+	// The identity the key proved, without the key itself.
+	who := *tokenInfo
+	who.RawToken = ""
+	r := prep.work.Record
+	u := &unknownOutcome{work: prep.work, store: ea.durable, release: release}
+	if p.allowReceiptFailureBlocks(mode) {
+		stopTool := tool
+		if method != MethodToolsCall {
+			stopTool = method
+		}
+		// One identity for the stop, however often signing is tried.
+		stopID, _ := ea.callID(callIDPrefix)
+		// The request's values, but not the key: none is kept for later.
+		stopCtx := context.WithValue(detachedCtx(ctx), CtxTokenInfo, &who)
+		u.absent = func(c context.Context, _ PendingRecord) error {
+			sc, cancel := context.WithTimeout(stopCtx, ea.cfg().SignTimeout)
+			defer cancel()
+			if dl, ok := c.Deadline(); ok {
+				var cancel2 context.CancelFunc
+				sc, cancel2 = context.WithDeadline(sc, dl)
+				defer cancel2()
+			}
+			_, err := p.signUnavailableStop(sc, &who, method, stopTool, unavailableBudgetBackend, stopID)
+			return err
+		}
+	} else {
+		call := unrecordedCall(&who, method, tool, mode)
+		u.absent = func(c context.Context, rec PendingRecord) error {
+			miss := call
+			miss.ReportID, miss.WindowStart = rec.ID, rec.Minute
+			return ea.countMiss(c, miss)
+		}
+	}
+	ea.keepUnknown(missSlotFrom(ctx), PendingRecord{TenantID: r.TenantID, TokenID: r.TokenID, BudgetID: r.BudgetID, Method: r.Method, Tool: r.Tool, Minute: r.Minute}, u)
 }
 
 // withEvidenceData returns resp with the receipt's handles merged into the

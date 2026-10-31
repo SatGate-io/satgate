@@ -237,15 +237,26 @@ func (ea *everyAction) flushDurable(ctx context.Context) {
 		if ctx.Err() != nil {
 			return
 		}
-		if _, err := ea.durable.Process(ctx, w.Record.ID, func(c context.Context, work PendingWork) (PendingDisposition, error) {
-			work.Recovery = true
-			return ea.resolveDurable(c, work)
-		}); err != nil {
+		if _, err := ea.durable.Process(ctx, w.Record.ID, ea.recoverDurable); err != nil {
 			log.Warn().Str("kind", w.Record.Kind).Msg("durable pending entry remains open")
 		}
 	}
 }
+
+// recoverDurable is what recovery does with an open journal row: the row is
+// resolved as stored, its credential delivery unconfirmed.
+func (ea *everyAction) recoverDurable(c context.Context, work PendingWork) (PendingDisposition, error) {
+	work.Recovery = true
+	return ea.resolveDurable(c, work)
+}
+
 func (ea *everyAction) durableGap(ctx context.Context, slot *pendingSlot, call MCPWindowedCall) error {
+	_, err := ea.durableGapWork(ctx, slot, call)
+	return err
+}
+
+// durableGapWork is durableGap that also returns the work it tried to store.
+func (ea *everyAction) durableGapWork(ctx context.Context, slot *pendingSlot, call MCPWindowedCall) (PendingWork, error) {
 	r := PendingRecord{ID: call.ReportID, Kind: PendingGap, TenantID: call.Decision.TenantID, TokenID: call.Decision.TokenID, BudgetID: call.Decision.BudgetID, Method: call.Decision.MCPMethod, Tool: receiptTool(call.Decision.ToolName), Minute: call.WindowStart, Since: time.Now().UTC()}
 	w := PendingWork{Version: 1}
 	if prep, _ := ctx.Value(pendingPreparationKey{}).(*pendingPreparation); prep != nil {
@@ -262,9 +273,138 @@ func (ea *everyAction) durableGap(ctx context.Context, slot *pendingSlot, call M
 	defer cancel()
 	w.Record, w.Window = r, &call
 	if err := ea.saveDurable(c, w); err != nil {
-		return err
+		return w, err
 	}
 	slot.release()
 	_, _ = ea.durable.Process(c, r.ID, ea.resolveDurable)
-	return nil
+	return w, nil
+}
+
+// ---- an unknown outcome, resolved later ----
+
+// unknownOutcome is a verified key's call whose journal save has an unknown
+// result: the journal may or may not hold its work, and asking it again
+// failed too (ErrPendingOutcomeUnknown). Its answer stays outcome_unknown and
+// nothing is released, refused, sent or issued for it then. With both switches
+// on it is kept, in the bounded in-memory pending store a gap uses
+// (reportMiss), and the retry worker asks the journal again (ResolveSave)
+// until it can tell:
+//
+//   - the journal holds the work: the row is recovered as any journal row is
+//     (recoverDurable: the prepared receipt is published, or the gap counted,
+//     then the budget settled);
+//   - the journal confirmed the work absent (ResolveSave wrote its
+//     cancellation, so no late Save can store it): the call's hold, if any,
+//     is given back and the call is recorded by absent: an Observe call is
+//     counted as a miss in the call's own minute, a Control call's stop is
+//     signed budget_backend_error.
+//
+// Residual, as for a gap kept in memory: a store at its bound, or a process
+// that ends before the journal answers, leaves the call unrecorded (logged).
+type unknownOutcome struct {
+	work  PendingWork
+	store PendingStore
+	// release gives back the call's hold once the work is known absent; nil
+	// when nothing is held.
+	release func(context.Context)
+	// absent records the call once the work is known absent. It is given the
+	// kept entry: its ID names the count, its Minute is the call's.
+	absent func(context.Context, PendingRecord) error
+	// known is set once the journal confirmed the work absent.
+	known bool
+}
+
+// keepUnknown keeps u in slot, or, with none, in the gap store if it has
+// room, and starts the retry worker. rec names the call (tenant, key, budget,
+// method, tool, the call's minute); the entry gets an id of its own.
+func (ea *everyAction) keepUnknown(slot *pendingSlot, rec PendingRecord, u *unknownOutcome) bool {
+	rec.ID, rec.Kind, rec.Since = ea.pending.nextID(kindGap), PendingGap, time.Time{}
+	e := &pendingEntry{PendingRecord: rec, unknown: u}
+	if !slot.put(e) && !ea.pending.add(kindGap, e) {
+		log.Error().Str("method", rec.Method).Str("tool", rec.Tool).Msg("an action whose outcome is unknown could not be kept for retry: the pending store is full; it stays unrecorded")
+		return false
+	}
+	log.Warn().Str("method", rec.Method).Str("tool", rec.Tool).Msg("action outcome unknown; kept until the pending journal can tell whether it holds the action")
+	ea.kick()
+	return true
+}
+
+// resolveUnknown is one retry of a kept unknown outcome. It reports whether
+// the entry is done with.
+func (ea *everyAction) resolveUnknown(ctx context.Context, e *pendingEntry) bool {
+	u := e.unknown
+	if !u.known {
+		// Failures are not logged here: the entry is retried, silently,
+		// as a kept gap is (flush), until the journal answers.
+		stored, err := u.store.ResolveSave(ctx, u.work)
+		if err != nil {
+			return false
+		}
+		if stored {
+			// A row that is busy or already completed is another
+			// recovery's to finish (Process returns false, nil).
+			if _, err := u.store.Process(ctx, u.work.Record.ID, ea.recoverDurable); err != nil {
+				return false
+			}
+			log.Info().Str("method", e.Method).Str("tool", e.Tool).Msg("an action whose outcome was unknown is in the pending journal; recovered")
+			return true
+		}
+		u.known = true
+		if u.release != nil {
+			u.release(ctx)
+		}
+	}
+	if err := u.absent(ctx, e.PendingRecord); err != nil {
+		return false
+	}
+	log.Info().Str("method", e.Method).Str("tool", e.Tool).Msg("an action whose outcome was unknown was never in the pending journal; recorded")
+	return true
+}
+
+// countMiss counts call as an Observe miss with the window recorder.
+func (ea *everyAction) countMiss(ctx context.Context, call MCPWindowedCall) error {
+	wr, ok := ea.recorder().(WindowRecorder)
+	if !ok {
+		return errors.New("window recorder unavailable")
+	}
+	_, err := wr.RecordWindowedCall(ctx, call)
+	return err
+}
+
+// keepUnknownGap keeps an Observe gap whose journal save is unknown (see
+// unknownOutcome). Absent, the gap is counted as recovery would have counted
+// it, in the call's minute; money held for it (prep) is given back first.
+func (ea *everyAction) keepUnknownGap(slot *pendingSlot, w PendingWork, prep *pendingPreparation) {
+	if w.Window == nil {
+		return
+	}
+	call := *w.Window
+	u := &unknownOutcome{work: w, store: ea.durable}
+	if prep != nil {
+		if h, ok := ea.pendingBudget.(BudgetHolder); ok {
+			r := prep.work.Record
+			u.release = func(c context.Context) { ea.release(c, h, r.BudgetID, r.RequestID, r.Amount) }
+		}
+	}
+	u.absent = func(c context.Context, rec PendingRecord) error {
+		miss := call
+		miss.WindowStart = rec.Minute
+		return ea.countMiss(c, miss)
+	}
+	rec := w.Record
+	rec.Minute = call.WindowStart
+	ea.keepUnknown(slot, rec, u)
+}
+
+// detachedCtx keeps ctx's values for a step the retry worker runs after the
+// request has been answered: no cancellation or deadline, and none of the
+// request's own handles (its prepared receipt, its hold's expiry, its
+// operation lease, its pending slot).
+func detachedCtx(ctx context.Context) context.Context {
+	c := context.WithoutCancel(ctx)
+	c = context.WithValue(c, pendingPreparationKey{}, (*pendingPreparation)(nil))
+	c = context.WithValue(c, holdExpiryKey{}, nil)
+	c = context.WithValue(c, operationLeaseKey{}, (*operationLease)(nil))
+	c = context.WithValue(c, missSlotKey{}, (*pendingSlot)(nil))
+	return c
 }
