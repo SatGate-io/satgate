@@ -474,7 +474,7 @@ func keepSyntheticCall(u *unknownRig, mode string, markers []string) (weak.Point
 	prep := &pendingPreparation{work: PendingWork{Version: 1, Receipt: json.RawMessage(`{}`), Record: PendingRecord{
 		ID: "fixture-work", RequestID: "fixture-call", Kind: PendingUncharged, TenantID: "fixture-tenant", TokenID: "fixture-token",
 		BudgetID: "fixture-budget", Method: MethodToolsCall, Tool: "paid_read", Amount: 1, Minute: RateWindowStart(time.Now()), Since: time.Now().UTC()}}}
-	u.proxy.keepUnknownPrepared(ctx, info, MethodToolsCall, "paid_read", mode, prep, func(context.Context) {})
+	u.proxy.keepUnknownPrepared(ctx, info, MethodToolsCall, "paid_read", mode, nil, prep, func(context.Context) {})
 	return weak.Make(info), weak.Make(mac), weak.Make(req)
 }
 

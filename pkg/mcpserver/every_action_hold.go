@@ -621,7 +621,7 @@ func (s *pendingStore) claim(withUncharged bool) []*pendingEntry {
 		if e.inflight {
 			continue
 		}
-		if e.Kind == PendingUncharged && !withUncharged && e.settle == nil {
+		if e.Kind == PendingUncharged && !withUncharged && e.settle == nil && e.unknown == nil {
 			continue
 		}
 		e.inflight = true
@@ -649,7 +649,7 @@ func (s *pendingStore) retryable(withUncharged bool) bool {
 		return true
 	}
 	for _, e := range s.entries {
-		if e.settle != nil {
+		if e.settle != nil || e.unknown != nil {
 			return true
 		}
 	}
@@ -680,8 +680,7 @@ func missSlotFrom(ctx context.Context) *pendingSlot {
 //
 // Accepted residual of this in-memory retry: an entry it keeps (a gap here, or
 // an unknown outcome, see unknownOutcome) is lost if the process ends before
-// it is recorded; and a Control call's unknown outcome, which has no gap slot
-// of its own, is not kept when the gap store is at its bound (logged only).
+// it is recorded.
 func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slot *pendingSlot, call MCPWindowedCall) error {
 	if call.ReportID == "" {
 		call.ReportID = ea.pending.nextID(kindGap)

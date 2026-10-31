@@ -1275,7 +1275,7 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 					if errors.Is(perr, ErrPendingOutcomeUnknown) {
 						// The answer stays outcome_unknown; the call is kept
 						// until the journal can tell (unknownOutcome).
-						p.keepUnknownPrepared(ctx, tokenInfo, MethodToolsCall, tc.Name, mode, prep, func(c context.Context) {
+						p.keepUnknownPrepared(ctx, tokenInfo, MethodToolsCall, tc.Name, mode, slot, prep, func(c context.Context) {
 							p.every().release(c, holder, budgetID, requestID, cost)
 						})
 						return pendingFailureResponse(req.ID, tc.Name, perr), nil

@@ -2918,5 +2918,125 @@
     "debit": 0,
     "misses": 0,
     "journaled": 0
+  },
+  {
+    "case": "full-gap/U1/delegate/control/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U1/delegate/control/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U1/delegate/control/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U1/delegate/control/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U1/delegate/control/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "full-gap/U1/delegate/control/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U2/tools-call/control/landed=false/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U2/tools-call/control/landed=false/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U2/tools-call/control/landed=false/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U2/tools-call/control/landed=true/kept=0",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "full-gap/U2/tools-call/control/landed=true/kept=0",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Action outcome unknown: the action may or may not complete; check before retrying\",\"data\":{\"error\":\"outcome_unknown\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 1
+  },
+  {
+    "case": "full-gap/U2/tools-call/control/landed=true/kept=0",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
   }
 ]

@@ -112,7 +112,7 @@ type Delegator struct {
 	reportMiss           func(ctx context.Context, parent *TokenInfo) error
 	// keepUnknown keeps a delegation whose prepared receipt has an unknown
 	// save until the journal can tell (Proxy.keepUnknownPrepared).
-	keepUnknown    func(ctx context.Context, parent *TokenInfo, prep *pendingPreparation, release func(context.Context))
+	keepUnknown    func(ctx context.Context, parent *TokenInfo, slot *pendingSlot, prep *pendingPreparation, release func(context.Context))
 	reversalFailed func()
 	// refuseUnavailable signs a delegation stopped on SatGate's side with an
 	// unavailable-check reason (Proxy.refuseUnavailableMethod). The proxy sets
@@ -866,7 +866,7 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 					// kept until the journal can tell (unknownOutcome).
 					if d.keepUnknown != nil {
 						budgetID, amount := parent.BudgetID, params.Budget
-						d.keepUnknown(ctx, parent, prep, func(c context.Context) {
+						d.keepUnknown(ctx, parent, slot, prep, func(c context.Context) {
 							d.state().release(c, holder, budgetID, delegationID, amount)
 						})
 					}
