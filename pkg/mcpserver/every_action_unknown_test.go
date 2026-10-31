@@ -5,8 +5,9 @@ package mcpserver
 //
 // The agent's answer stays outcome_unknown, as before: nothing is released,
 // refused, sent or issued at the time. With both signing switches on the call
-// is now also kept in the bounded in-memory pending store a gap uses, and the
-// retry worker asks the journal again until it can tell:
+// is now also kept in the bounded in-memory pending store a gap uses, in the
+// room the call set aside before it went ahead, and the retry worker asks the
+// journal again until it can tell:
 //
 //	row found   the journal holds the work: it is recovered as any journal
 //	            row is (the prepared receipt published, or the gap counted).
@@ -26,10 +27,13 @@ package mcpserver
 //	     and durableGap (U3).
 //	U1   delegation.go:859-862 (now :862-874) credit-bearing satgate/delegate,
 //	     held, prepared receipt: Control and Observe. Was: bare answer,
-//	     nothing kept. Now kept (Proxy.keepUnknownPrepared).
+//	     nothing kept. Now kept (Proxy.keepUnknownPrepared), in the call's
+//	     own slot: Observe's miss slot, Control's uncharged-kind slot,
+//	     reserved before the hold.
 //	U2   proxy.go:1273-1276 (now :1273-1282) priced tools/call, held,
 //	     prepared receipt: Control and Observe. Was: bare answer, nothing
-//	     kept. Now kept (Proxy.keepUnknownPrepared).
+//	     kept. Now kept (Proxy.keepUnknownPrepared), in the call's own slot
+//	     as U1.
 //	U3   every_action_hold.go:678-683 (now :688-694) reportMiss, an Observe
 //	     gap whose save is unknown. Was: returned, nothing kept. Now kept, in
 //	     the call's gap slot (keepUnknownGap). Its callers answer unknown:
@@ -72,10 +76,10 @@ package mcpserver
 //
 // Accepted residual (beside the gap memory retry's, every_action_hold.go
 // reportMiss): an unknown kept in memory is lost if the process ends before
-// the journal answers; a Control unknown finds no room when the gap store is
-// at its bound (Observe always has its call's own slot) and is then only
-// logged. The enterprise journal makes the common case (Postgres down before
-// the transaction) definite instead (satgate-enterprise, mcppending D8).
+// the journal answers. Keeping it never depends on free room: every held call
+// has a slot of its own (every_action_control_room_test.go). The enterprise
+// journal makes the common case (Postgres down before the transaction)
+// definite instead (satgate-enterprise, mcppending D8).
 //
 // This file uses no symbol the change adds, so it compiles and runs on main,
 // where the kept-and-resolved tests fail.
@@ -470,35 +474,17 @@ func TestUnknown_CountedInTheCallsMinute(t *testing.T) {
 	}
 }
 
-// D9 residual: a Control unknown that finds the gap store at its bound is not
-// kept; its answer is unchanged and nothing is recorded (logged only). An
-// Observe call always has its own slot, so it is never in this case.
-func TestUnknown_FullRetryStoreIsTheResidual(t *testing.T) {
-	for _, c := range unknownCases() {
-		if c.observe {
-			continue
-		}
-		t.Run(c.name, func(t *testing.T) {
-			u, done := newUnknownRig(t, c, false, true, true, eaRoad{name: "direct"}, func(t *testing.T, g *gapsRig) { g.fill(t, kindGap) })
-			defer done()
-			r := c.act(u.gapsRig)
-			assertUnknownAnswer(t, u, r)
-			if n := u.kept(); n != 0 {
-				t.Fatalf("kept %d entries past the bound", n)
-			}
-			u.up()
-			u.proxy.FlushPending(context.Background())
-			if len(u.decisions()) != 0 || u.misses() != 0 {
-				t.Fatalf("recorded past the bound: %v", u.base.signed())
-			}
-		})
-	}
-}
-
 // The released checkers (tools/, demo/ and the unavailable-check-v1 bundle,
 // identical to tag checker-unavailable-check-v1) accept every new stop and
 // count, pack by pack and as one whole record (UNKNOWN_PACK_DIR keeps them).
 func TestUnknown_PublicCheckersAcceptThem(t *testing.T) {
+	unknownCheckersAccept(t, false)
+}
+
+// unknownCheckersAccept is that check. With full only the held Control calls
+// run, each with the gap kind of the pending store full (so each is kept in
+// its own slot), and the record is their two stops.
+func unknownCheckersAccept(t *testing.T, full bool) {
 	root, err := filepath.Abs("../..")
 	if err != nil {
 		t.Fatal(err)
@@ -506,6 +492,11 @@ func TestUnknown_PublicCheckersAcceptThem(t *testing.T) {
 	dir := os.Getenv("UNKNOWN_PACK_DIR")
 	if dir == "" {
 		dir = t.TempDir()
+	} else if full {
+		dir = filepath.Join(dir, "full-gap-store")
+		if err := os.MkdirAll(dir, 0o700); err != nil {
+			t.Fatal(err)
+		}
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -538,7 +529,7 @@ func TestUnknown_PublicCheckersAcceptThem(t *testing.T) {
 	var ordered []unknownCase
 	for _, observe := range []bool{false, true} {
 		for _, c := range unknownCases() {
-			if c.observe == observe {
+			if c.observe == observe && !(full && (observe || !c.held)) {
 				ordered = append(ordered, c)
 			}
 		}
@@ -547,6 +538,9 @@ func TestUnknown_PublicCheckersAcceptThem(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			var rec *gapsPackRecorder
 			u, done := newUnknownRig(t, c, false, true, true, eaRoads[1], func(t *testing.T, g *gapsRig) {
+				if full {
+					g.fill(t, kindGap)
+				}
 				rec = &gapsPackRecorder{eaWindowRecorder: newEAWindowRecorder(g.base), pack: pack}
 				g.rec = rec.eaWindowRecorder
 				jr := g.proxy.evidence.(*unknownWindows)
@@ -589,7 +583,11 @@ func TestUnknown_PublicCheckersAcceptThem(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := map[string]int{"budget_backend_error": stops, "observe_unrecorded": misses}
-	if stops != 2 || misses != 8 || !reflect.DeepEqual(result.Counts, want) || result.Unrecorded != misses || result.Packs != stops+misses {
+	wantStops, wantMisses := 2, 8
+	if full {
+		want, wantMisses = map[string]int{"budget_backend_error": stops}, 0
+	}
+	if stops != wantStops || misses != wantMisses || !reflect.DeepEqual(result.Counts, want) || result.Unrecorded != misses || result.Packs != stops+misses {
 		t.Fatalf("record counts %v (want %v), unrecorded %d, packs %d, stops %d, misses %d", result.Counts, want, result.Unrecorded, result.Packs, stops, misses)
 	}
 	t.Logf("%d packs valid and trusted in tools, demo and the unavailable-check-v1 bundle; whole record valid, trusted and complete; counts %v", result.Packs, result.Counts)

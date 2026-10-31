@@ -313,8 +313,9 @@ func (ea *everyAction) durableGapWork(ctx context.Context, slot *pendingSlot, ca
 // failed too (ErrPendingOutcomeUnknown). Its answer stays outcome_unknown and
 // nothing is released, refused, sent or issued for it then. With both switches
 // on it is kept, in the bounded in-memory pending store a gap uses
-// (reportMiss), and the retry worker asks the journal again (ResolveSave)
-// until it can tell:
+// (reportMiss), in the room the call set aside before it went ahead (its
+// pending slot, whichever kind of the store that is), and the retry worker
+// asks the journal again (ResolveSave) until it can tell:
 //
 //   - the journal holds the work: the row is recovered as any journal row is
 //     (recoverDurable: the prepared receipt is published, or the gap counted,
@@ -325,8 +326,8 @@ func (ea *everyAction) durableGapWork(ctx context.Context, slot *pendingSlot, ca
 //     counted as a miss in the call's own minute, a Control call's stop is
 //     signed budget_backend_error.
 //
-// Residual, as for a gap kept in memory: a store at its bound, or a process
-// that ends before the journal answers, leaves the call unrecorded (logged).
+// Residual, as for a gap kept in memory: a process that ends before the
+// journal answers leaves the call unrecorded.
 type unknownOutcome struct {
 	work  PendingWork
 	store PendingStore
@@ -345,11 +346,16 @@ type unknownOutcome struct {
 	stopCtx context.Context
 }
 
-// keepUnknown keeps u in slot, or, with none, in the gap store if it has
-// room, and starts the retry worker. rec names the call (tenant, key, budget,
-// method, tool, the call's minute); the entry gets an id of its own.
+// keepUnknown keeps u in slot, the room the call set aside (of whatever kind),
+// or, with none, in the gap store if it has room, and starts the retry
+// worker. rec names the call (tenant, key, budget, method, tool, the call's
+// minute); the entry gets an id of its own and the kind of the room it sits in.
 func (ea *everyAction) keepUnknown(slot *pendingSlot, rec PendingRecord, u *unknownOutcome) bool {
-	rec.ID, rec.Kind, rec.Since = ea.pending.nextID(kindGap), PendingGap, time.Time{}
+	kind := kindGap
+	if slot != nil {
+		kind = slot.kind
+	}
+	rec.ID, rec.Kind, rec.Since = ea.pending.nextID(kind), kindName(kind), time.Time{}
 	e := &pendingEntry{PendingRecord: rec, unknown: u}
 	if !slot.put(e) && !ea.pending.add(kindGap, e) {
 		log.Error().Str("method", rec.Method).Str("tool", rec.Tool).Msg("an action whose outcome is unknown could not be kept for retry: the pending store is full; it stays unrecorded")
