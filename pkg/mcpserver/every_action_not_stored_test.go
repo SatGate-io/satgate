@@ -238,9 +238,9 @@ func TestNotStored_SwitchOffBytes(t *testing.T) {
 	// Round 3: the unknown outcomes (every_action_unknown_test.go). Rows
 	// added after round 2's; earlier rows unchanged.
 	got = append(got, unknownOffRows(t)...)
-	// Round 4 (round 2 of the unknown-outcome change): a stored prepared row
+	// A stored prepared row
 	// older than PendingHorizon, and the store's new not-written failure, with
-	// either switch off. Rows added after round 3's; earlier rows unchanged.
+	// either switch off. Rows added after the unknown outcomes'; earlier rows unchanged.
 	got = append(got, horizonOffRows(t)...)
 	got = append(got, notWrittenOffRows(t)...)
 	if p := os.Getenv("NOT_STORED_OFF_SNAPSHOT"); p != "" {

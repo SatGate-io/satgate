@@ -44,30 +44,27 @@ package mcpserver
 //	     delegation.go:1142-1143 (now :1153-1154) HandleDelegate: the
 //	     outcome_unknown answer. Unchanged.
 //
-// D10, corrected in round 2 (two reviewers' findings), what a Save or a
-// Process failure means:
+// What a Save or a Process failure means:
 //
 //	Save     a failure the store marks ErrPendingNotWritten (before any write:
 //	         bad work, no connection, a transaction that cannot start, a lock
 //	         or read that fails) is a definite not-stored save only with both
 //	         switches on. With either switch off saveDurable takes main's
 //	         ambiguous path (ResolveSave, then exactly as main), so no answer,
-//	         hold, release, record or count differs from main's (D11). A
+//	         hold, release, record or count differs from main's. A
 //	         written cancellation or a reached bound is the plain
 //	         ErrPendingNotStored, definite as on main. An INSERT or Commit
 //	         failure is unknown.
 //	Process  an error from the store means the callback's effects may or may
-//	         not have landed, and, for a Commit error (enterprise
-//	         mcppending store.go, Process's final Commit), that the completion
-//	         itself may have been committed: the row may be completed, not
-//	         always open. Publication, counting and settlement are idempotent
+//	         not have landed, and, for an error of its final commit, that the
+//	         completion itself may have been committed: the row may be
+//	         completed, not always open. Publication, counting and settlement are idempotent
 //	         by the stored identity, so the retry is safe either way.
 //	aged     a prepared (PendingUncharged) row older than PendingHorizon that
-//	         was stored but never published. Round 1 treated it as aged out
-//	         (a final no-op, no receipt, count or stop). Now, with both
-//	         switches on, nothing ages out (D12): recovery, ordinary
-//	         (flushDurable) and the unknown outcome's (resolveUnknown), publishes
-//	         its stored signed receipt and settles it however late, and the
+//	         was stored but never published. With both switches on nothing
+//	         ages out (never a final no-op without a receipt, count or
+//	         stop): recovery, ordinary (flushDurable) and the unknown
+//	         outcome's (resolveUnknown), publishes its stored signed receipt and settles it however late, and the
 //	         row completes only when both have landed; money keeps the
 //	         settlement contract of PendingBudget (idempotent beyond the
 //	         horizon, never a fresh Spend). With either switch off it ages

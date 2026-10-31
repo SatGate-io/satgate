@@ -1,15 +1,16 @@
 package mcpserver
 
-// Round 2 of the unknown-outcome change (two reviewers' findings):
+// Nothing ages out with both switches on, the store's not-written failure, and
+// what a kept call holds:
 //
-//	D12  with both switches on, a stored, never-published prepared row is not
+//	age  with both switches on, a stored, never-published prepared row is not
 //	     aged out at PendingHorizon: it is published and settled however late,
 //	     in ordinary recovery and in the unknown outcome's recovery alike. With
 //	     either switch off it ages out exactly as on main.
-//	D11  with either switch off, the store's not-written failure
+//	save with either switch off, the store's not-written failure
 //	     (ErrPendingNotWritten) takes main's ambiguous path; with both on it is
 //	     the definite not-stored save D8 settled.
-//	D13  the context a kept call carries holds no key, raw token or request.
+//	kept the context a kept call carries holds no key, raw token or request.
 
 import (
 	"context"
@@ -98,7 +99,7 @@ func assertPublishedAndSettledOnce(t *testing.T, u *unknownRig, c unknownCase, r
 	}
 }
 
-// D12, over the actual handlers (satgate/delegate and a priced tools/call,
+// Nothing ages out, over the actual handlers (satgate/delegate and a priced tools/call,
 // Observe and Control, direct, Streamable HTTP and SSE): the journal holds the
 // work, its save answer was lost, and the journal answers again 49 hours later.
 // The receipt is published and the money settled once, however it is recovered.
@@ -234,7 +235,7 @@ func TestHorizon_Prepared49hOldRowSettlesByTheContractAndChargesOnce(t *testing.
 	}
 }
 
-// ---- D11 ----
+// ---- the not-written failure ----
 
 func TestNotWritten_IsNotStoredAndNotTheOtherWayAround(t *testing.T) {
 	err := fixtureNotWritten(errors.New("fixture: pool closed"))
@@ -281,7 +282,7 @@ func notWrittenRoads(c unknownCase) []eaRoad {
 	return eaRoads[:1]
 }
 
-// D11: with either switch off the store's not-written failure reaches no
+// With either switch off the store's not-written failure reaches no
 // answer, hold, release, record or count that main (where it was an unmarked
 // error) would not reach; with the journal's answer down it is outcome_unknown
 // with the hold left, and with it answering absent it is main's too.
@@ -333,7 +334,7 @@ func TestNotWritten_BothOnIsTheDefiniteNotStoredSave(t *testing.T) {
 	}
 }
 
-// ---- D13 ----
+// ---- what a kept call holds ----
 
 // retention walks everything reachable from v (unexported fields, interfaces,
 // pointers, maps, slices and the context chain included; closures cannot be

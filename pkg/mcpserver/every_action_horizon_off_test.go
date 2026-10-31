@@ -1,7 +1,7 @@
 package mcpserver
 
 // Rows and fixtures shared by the switches-off snapshot (TestNotStored_
-// SwitchOffBytes) and the round 2 tests (every_action_horizon_test.go). This
+// SwitchOffBytes) and the tests of nothing aging out, the not-written failure and the kept call (every_action_horizon_test.go). This
 // file uses no production symbol that the change adds (the sentinel comes from
 // fixtureNotWritten, every_action_not_written_fixture_test.go), so the rows
 // can be generated on main, where they are the baseline.
