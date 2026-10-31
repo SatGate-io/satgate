@@ -172,9 +172,10 @@ func (ea *everyAction) cfg() EveryActionSettings { return *ea.settings.Load() }
 
 // closesGaps reports whether both signing switches are on. Only then does an
 // Observe call with no server identity, or whose gap the journal definitely
-// did not store, go through and get counted, and a journaled gap older than
-// PendingHorizon still get its count. With either switch off each of these
-// keeps the behaviour it had before.
+// did not store (ErrPendingNotWritten included), go through and get counted,
+// and nothing journaled age out at PendingHorizon: a gap is still counted, and
+// a prepared receipt still published and its money settled, however late. With
+// either switch off each of these keeps the behaviour it had before.
 func (ea *everyAction) closesGaps() bool { return ea.on.Load() && ea.refusals.Load() }
 
 // localCallID is the identity of an Observe call that could not get one from

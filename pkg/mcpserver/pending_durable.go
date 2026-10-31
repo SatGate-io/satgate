@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -11,6 +13,10 @@ import (
 
 // PendingHorizon is the final-no-op horizon, measured from the original minute,
 // never from a retry. Hosts count PendingAgedOut only on committed completion.
+// With both signing switches on nothing ages out: a journaled gap is counted,
+// and a prepared receipt published and its money settled, however late (see
+// everyAction.closesGaps). With either switch off an entry older than the
+// horizon is a final no-op, as it always was.
 const PendingHorizon = 48 * time.Hour
 
 // PendingWork is a versioned, self-contained recovery instruction. Receipt is an
@@ -44,6 +50,18 @@ const (
 // ErrPendingNotStored is permitted only when the store proves no work was stored.
 // Every other error, including a lost commit reply, means UNKNOWN.
 var ErrPendingNotStored = errors.New("pending work definitely not stored")
+
+// ErrPendingNotWritten is ErrPendingNotStored for a store that proves, from a
+// failure before it wrote anything (no connection, a transaction that cannot
+// start, a lock or read that fails, work it cannot encode), that this work is
+// not stored and cannot be stored later. It wraps ErrPendingNotStored, so
+// errors.Is(err, ErrPendingNotStored) holds. A store returns it only for those
+// failures; a written cancellation or a reached bound stays the plain
+// ErrPendingNotStored, as before. The proxy answers it as a definite
+// not-stored save only with both signing switches on; with either off it
+// treats the save as ambiguous, as it always did (ResolveSave first).
+var ErrPendingNotWritten = fmt.Errorf("%w: nothing was written", ErrPendingNotStored)
+
 var ErrPendingOutcomeUnknown = errors.New("pending action outcome unknown")
 
 func PendingSaveResult(err error) PendingSaveOutcome {
@@ -171,17 +189,22 @@ func (ea *everyAction) saveDurable(ctx context.Context, w PendingWork) error {
 	case PendingStored:
 		return nil
 	case PendingNotStored:
-		return err
-	default:
-		stored, resolveErr := ea.durable.ResolveSave(ctx, w)
-		if resolveErr != nil {
-			return ErrPendingOutcomeUnknown
+		// A store's not-written failure is definite only with both switches
+		// on. With either off it takes main's ambiguous path below, so no
+		// answer, hold, release, record or count differs from main's. The
+		// switch state is read here, once, and nowhere in the store.
+		if !errors.Is(err, ErrPendingNotWritten) || ea.closesGaps() {
+			return err
 		}
-		if !stored {
-			return ErrPendingNotStored
-		}
-		return nil
 	}
+	stored, resolveErr := ea.durable.ResolveSave(ctx, w)
+	if resolveErr != nil {
+		return ErrPendingOutcomeUnknown
+	}
+	if !stored {
+		return ErrPendingNotStored
+	}
+	return nil
 }
 func pendingFailureResponse(id json.RawMessage, tool string, err error) *Response {
 	if errors.Is(err, ErrPendingOutcomeUnknown) {
@@ -193,13 +216,16 @@ func (ea *everyAction) resolveDurable(ctx context.Context, w PendingWork) (Pendi
 	if w.Version != 1 {
 		return "", errors.New("unsupported pending version")
 	}
-	if time.Since(w.Record.Minute) > PendingHorizon && (w.Record.Kind != PendingGap || !ea.closesGaps()) {
+	if time.Since(w.Record.Minute) > PendingHorizon && !ea.closesGaps() {
 		log.Warn().Str("kind", w.Record.Kind).Msg("durable pending entry passed the 48-hour horizon; final uncounted no-op")
 		return PendingAgedOut, nil
 	}
-	// With both switches on, a gap is a call that went through: it is counted
-	// in its own minute however late, never dropped. Until the count lands the
-	// entry stays open.
+	// With both switches on, nothing ages out. A gap is a call that went
+	// through: it is counted in its own minute however late. A prepared
+	// receipt is published (its exact stored bytes, idempotently) and its
+	// money settled however late, by the settlement contract on
+	// PendingBudget: idempotent beyond PendingHorizon, never a fresh Spend.
+	// Until both have landed the entry stays open.
 	switch w.Record.Kind {
 	case PendingGap:
 		wr, ok := ea.recorder().(WindowRecorder)
@@ -312,6 +338,11 @@ type unknownOutcome struct {
 	absent func(context.Context, PendingRecord) error
 	// known is set once the journal confirmed the work absent.
 	known bool
+	// stopCtx is the context a Control call's stop is signed under later: built
+	// from nothing of the request (detachedCtx), plus the identity the key
+	// proved without the key (keptIdentity). Nil for an Observe call, which
+	// counts under the retry worker's own context.
+	stopCtx context.Context
 }
 
 // keepUnknown keeps u in slot, or, with none, in the gap store if it has
@@ -396,15 +427,51 @@ func (ea *everyAction) keepUnknownGap(slot *pendingSlot, w PendingWork, prep *pe
 	ea.keepUnknown(slot, rec, u)
 }
 
-// detachedCtx keeps ctx's values for a step the retry worker runs after the
-// request has been answered: no cancellation or deadline, and none of the
-// request's own handles (its prepared receipt, its hold's expiry, its
-// operation lease, its pending slot).
+// detachedCtx is the context a kept call carries for a step the retry worker
+// runs after the request has been answered. It is built from
+// context.Background() and the explicit list of values that step needs, below.
+// Nothing of the request's context is kept, directly or as a parent: not its
+// cancellation or deadline, and none of its values, so the key, the raw token,
+// the connection's credential, the request and its body are not reachable from
+// what the kept call holds. The step adds the identity it signs for (see
+// keptIdentity).
+//
+// The list, each value copied (strings.Clone, so no part of a larger string,
+// such as a token, is kept alive by a substring):
+//   - CtxTenantID: the tenant's id, a plain account identifier (not a
+//     credential). Budget and evidence routing of a multi-tenant host read it.
+//   - ctxEnforcementMode: the mode name the call was decided under ("observe",
+//     "control", ...), read when the stop is signed, so the receipt's policy
+//     mode is the call's.
+//
+// Left out on purpose: the prepared receipt, the hold's expiry, the operation
+// lease and the pending slot (the request's own handles), and everything else.
 func detachedCtx(ctx context.Context) context.Context {
-	c := context.WithoutCancel(ctx)
-	c = context.WithValue(c, pendingPreparationKey{}, (*pendingPreparation)(nil))
-	c = context.WithValue(c, holdExpiryKey{}, nil)
-	c = context.WithValue(c, operationLeaseKey{}, (*operationLease)(nil))
-	c = context.WithValue(c, missSlotKey{}, (*pendingSlot)(nil))
+	c := context.Background()
+	if tenant := TenantFromContext(ctx); tenant != "" {
+		c = context.WithValue(c, CtxTenantID, strings.Clone(tenant))
+	}
+	if mode, ok := EnforcementModeFromContext(ctx); ok {
+		c = context.WithValue(c, ctxEnforcementMode, strings.Clone(mode))
+	}
 	return c
+}
+
+// keptIdentity is the identity a verified key proved, for a kept call to sign
+// or count for later, and nothing of the key: it is built field by field from
+// the ids, limits and scope a receipt names (identifyDecision), never copied
+// whole. RawToken (the encoded key), Raw (the decoded macaroon and its
+// signature) and the rule lists, which a receipt does not carry, are left out.
+func keptIdentity(t *TokenInfo) *TokenInfo {
+	return &TokenInfo{
+		TokenID:          strings.Clone(t.TokenID),
+		BudgetID:         strings.Clone(t.BudgetID),
+		BudgetLimit:      t.BudgetLimit,
+		TenantID:         strings.Clone(t.TenantID),
+		Scope:            strings.Clone(t.Scope),
+		DelegationDepth:  t.DelegationDepth,
+		DelegationBudget: t.DelegationBudget,
+		Depth:            t.Depth,
+		ParentTokenID:    strings.Clone(t.ParentTokenID),
+	}
 }

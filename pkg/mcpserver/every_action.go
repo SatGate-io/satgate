@@ -114,7 +114,9 @@ func (p *Proxy) SignEveryAction() bool { return p.signEveryAction }
 // stopped for want of pending room, a pending entry the budget store could not
 // prepare, or a prepared receipt the journal definitely did not store), and an
 // Observe call that goes through with no receipt is counted even when it cannot
-// be journaled or is older than PendingHorizon (see closesGaps).
+// be journaled. With both switches on nothing journaled ages out at
+// PendingHorizon either: a gap is counted, and a prepared receipt published and
+// its money settled, however late (see closesGaps).
 func (p *Proxy) SetSignUnavailableCheckRefusals(on bool) {
 	p.signUnavailableCheckRefusals = on
 	p.every().refusals.Store(on)
@@ -498,9 +500,8 @@ func (p *Proxy) keepUnknownPrepared(ctx context.Context, tokenInfo *TokenInfo, m
 	if !ea.closesGaps() || prep == nil || tokenInfo == nil || ea.durable == nil {
 		return
 	}
-	// The identity the key proved, without the key itself.
-	who := *tokenInfo
-	who.RawToken = ""
+	// The identity the key proved, and nothing of the key (keptIdentity).
+	who := keptIdentity(tokenInfo)
 	r := prep.work.Record
 	u := &unknownOutcome{work: prep.work, store: ea.durable, release: release}
 	if p.allowReceiptFailureBlocks(mode) {
@@ -510,21 +511,22 @@ func (p *Proxy) keepUnknownPrepared(ctx context.Context, tokenInfo *TokenInfo, m
 		}
 		// One identity for the stop, however often signing is tried.
 		stopID, _ := ea.callID(callIDPrefix)
-		// The request's values, but not the key: none is kept for later.
-		stopCtx := context.WithValue(detachedCtx(ctx), CtxTokenInfo, &who)
+		// What the kept call signs under is built from nothing of the
+		// request: no key, no raw token, no request (detachedCtx).
+		u.stopCtx = context.WithValue(detachedCtx(ctx), CtxTokenInfo, who)
 		u.absent = func(c context.Context, _ PendingRecord) error {
-			sc, cancel := context.WithTimeout(stopCtx, ea.cfg().SignTimeout)
+			sc, cancel := context.WithTimeout(u.stopCtx, ea.cfg().SignTimeout)
 			defer cancel()
 			if dl, ok := c.Deadline(); ok {
 				var cancel2 context.CancelFunc
 				sc, cancel2 = context.WithDeadline(sc, dl)
 				defer cancel2()
 			}
-			_, err := p.signUnavailableStop(sc, &who, method, stopTool, unavailableBudgetBackend, stopID)
+			_, err := p.signUnavailableStop(sc, who, method, stopTool, unavailableBudgetBackend, stopID)
 			return err
 		}
 	} else {
-		call := unrecordedCall(&who, method, tool, mode)
+		call := unrecordedCall(who, method, tool, mode)
 		u.absent = func(c context.Context, rec PendingRecord) error {
 			miss := call
 			miss.ReportID, miss.WindowStart = rec.ID, rec.Minute

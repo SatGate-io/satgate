@@ -44,6 +44,35 @@ package mcpserver
 //	     delegation.go:1142-1143 (now :1153-1154) HandleDelegate: the
 //	     outcome_unknown answer. Unchanged.
 //
+// D10, corrected in round 2 (two reviewers' findings), what a Save or a
+// Process failure means:
+//
+//	Save     a failure the store marks ErrPendingNotWritten (before any write:
+//	         bad work, no connection, a transaction that cannot start, a lock
+//	         or read that fails) is a definite not-stored save only with both
+//	         switches on. With either switch off saveDurable takes main's
+//	         ambiguous path (ResolveSave, then exactly as main), so no answer,
+//	         hold, release, record or count differs from main's (D11). A
+//	         written cancellation or a reached bound is the plain
+//	         ErrPendingNotStored, definite as on main. An INSERT or Commit
+//	         failure is unknown.
+//	Process  an error from the store means the callback's effects may or may
+//	         not have landed, and, for a Commit error (enterprise
+//	         mcppending store.go, Process's final Commit), that the completion
+//	         itself may have been committed: the row may be completed, not
+//	         always open. Publication, counting and settlement are idempotent
+//	         by the stored identity, so the retry is safe either way.
+//	aged     a prepared (PendingUncharged) row older than PendingHorizon that
+//	         was stored but never published. Round 1 treated it as aged out
+//	         (a final no-op, no receipt, count or stop). Now, with both
+//	         switches on, nothing ages out (D12): recovery, ordinary
+//	         (flushDurable) and the unknown outcome's (resolveUnknown), publishes
+//	         its stored signed receipt and settles it however late, and the
+//	         row completes only when both have landed; money keeps the
+//	         settlement contract of PendingBudget (idempotent beyond the
+//	         horizon, never a fresh Spend). With either switch off it ages
+//	         out exactly as on main.
+//
 // Accepted residual (beside the gap memory retry's, every_action_hold.go
 // reportMiss): an unknown kept in memory is lost if the process ends before
 // the journal answers; a Control unknown finds no room when the gap store is
@@ -184,6 +213,15 @@ type unknownRig struct {
 
 func newUnknownRig(t *testing.T, c unknownCase, landed, sign, refusals bool, road eaRoad, extra func(*testing.T, *gapsRig)) (*unknownRig, func()) {
 	t.Helper()
+	return newJournalRig(t, c, func(g *gapsRig, down *atomic.Bool) PendingStore {
+		return unknownJournal{p2Store{g.b}, down, landed}
+	}, sign, refusals, road, extra)
+}
+
+// newJournalRig is newUnknownRig with the journal made by mk: down is set
+// until up is called.
+func newJournalRig(t *testing.T, c unknownCase, mk func(*gapsRig, *atomic.Bool) PendingStore, sign, refusals bool, road eaRoad, extra func(*testing.T, *gapsRig)) (*unknownRig, func()) {
+	t.Helper()
 	down := &atomic.Bool{}
 	down.Store(true)
 	var rec *unknownWindows
@@ -191,7 +229,7 @@ func newUnknownRig(t *testing.T, c unknownCase, landed, sign, refusals bool, roa
 		setup: func(t *testing.T, g *gapsRig) {
 			rec = &unknownWindows{p2Recorder: g.p2(), failPrepare: c.failPrepare}
 			g.journal(t, rec)
-			g.proxy.SetPendingStore(unknownJournal{p2Store{g.b}, down, landed})
+			g.proxy.SetPendingStore(mk(g, down))
 			if c.failRecord {
 				g.base.mu.Lock()
 				g.base.failRecord = true

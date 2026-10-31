@@ -166,7 +166,9 @@ gets that receipt. With both switches on the count also covers a call that
 could not be given a server identity, a gap the pending journal definitely did
 not store when no money is held for it (kept and counted in memory, as without a
 journal), and a journaled gap older than 48 hours (counted in its own minute,
-not dropped).
+not dropped). With both switches on a held call's prepared receipt that is still
+unpublished after 48 hours is not dropped either: it is published as it was
+signed and its money settled, however late.
 With either switch off each of these keeps its previous behavior.
 
 ## Receipts when sign-every-action is on
