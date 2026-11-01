@@ -52,8 +52,8 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">Overview</h2>
             <p className="text-gray-400 leading-relaxed">
-              This page says what SatGate collects when you use SatGate Cloud or the satgate.io website,
-              how long it keeps each kind of record, and which other companies receive your data. It also
+              This page describes the data SatGate collects when you use SatGate Cloud or the satgate.io website,
+              how long it keeps the records listed below, and which other companies receive your data. It also
               covers the open-source software you run yourself.
             </p>
           </section>
@@ -61,22 +61,22 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">SatGate Cloud (cloud.satgate.io)</h2>
             <p className="text-gray-400 leading-relaxed mb-4">
-              When you sign up for SatGate Cloud, we collect:
+              When you sign up for and use SatGate Cloud, we collect:
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
               <li>Email address — for authentication (magic link, OAuth, or SSO) and service communications</li>
               <li>OAuth profile data — if you sign in via Google or GitHub, we receive your name and email from the provider</li>
               <li>Name: the name you enter when you sign up</li>
-              <li>Usage records: for requests through SatGate, the route, the request path and method, the result, the size and the time, and for MCP tools the tool name. Budget spending is recorded too.</li>
-              <li>Refused requests: the route, the reason, the request path, and the IP address and the name of the browser or software that sent the request</li>
-              <li>Audit log: what was done in your account and when, with the email address, IP address and browser of the person who did it</li>
+              <li>Usage records can include, for requests through SatGate, the route, the request path and method, the response status, the size and the time, and for MCP tools the tool name. Budget spending is recorded too.</li>
+              <li>Refused requests: the route, the reason, the request path, and the IP address and browser or software information sent with the request</li>
+              <li>Audit log: mints, revocations, delegations, budget changes and config updates, with the person&apos;s email address, IP address and browser when available</li>
               <li>Signed receipts: a signed record of what an agent did or was refused, such as the agent, the route or tool, the decision, the amounts and the time</li>
               <li>Held calls: when a tool needs your approval, the values of the call, so you can review them</li>
             </ul>
             <p className="text-gray-400 leading-relaxed mt-4">
               SatGate reads the token and where each request is going. For MCP tools it also reads the tool name and the
               arguments your rules check, for example an order&apos;s amount. If a tool needs your approval, the call&apos;s
-              details are shown to you, and the approval email carries the same values. On SatGate Cloud, the credentials
+              details are shown to you. When an approval email is sent, it carries the same values. On SatGate Cloud, the credentials
               SatGate uses to reach your services are stored encrypted.
             </p>
           </section>
@@ -84,9 +84,8 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">Data We Don&apos;t Collect</h2>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Request or response bodies, other than the values of a call held for your approval</li>
               <li>Card numbers (Stripe takes card payments for SatGate plans)</li>
-              <li>Passwords (we use passwordless authentication)</li>
+              <li>A password for your SatGate account (SatGate sign-in is passwordless)</li>
             </ul>
           </section>
 
@@ -95,9 +94,10 @@ export default function PrivacyPage() {
             <p className="text-gray-400 leading-relaxed">
               Card payments for SatGate plans go through Stripe. SatGate keeps your Stripe customer and subscription IDs,
               your plan and its status. For payments that your routes accept, Lightning invoices come from your own
-              Lightning address and USDC goes to the wallet address you set on the route. SatGate keeps only what it
-              needs to check a payment and refuse reuse: for Lightning the payment hash, and for USDC the payer&apos;s
-              wallet address, the amount and the transaction.
+              Lightning address and USDC goes to the wallet address you set on the route. For payments to your routes,
+              SatGate keeps payment records to check payment and prevent reuse. These include the Lightning payment hash
+              and pending invoice details, and for USDC the payer and recipient wallet addresses, amount, transaction
+              and the identifier used to prevent reuse.
             </p>
           </section>
 
@@ -105,18 +105,17 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-white mb-4">Self-host</h2>
             <p className="text-gray-400 leading-relaxed">
               Enterprise self-host runs SatGate in your own environment.
-              Custody boundaries are agreed by contract. When the
-              gateway runs in your environment, all proxied traffic stays in your infrastructure. We have no access
-              to your server logs, API traffic, or Lightning node data.
+              Custody boundaries are agreed by contract. The gateway runs in your environment and sends requests to
+              the services you configure. Any access SatGate has to your environment is agreed by contract.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">Website Analytics</h2>
             <p className="text-gray-400 leading-relaxed">
-              The satgate.io website does not load an analytics script, and it sets no cookies. If you fill in the design
-              partner form, your name, company, email address and answers are emailed to the SatGate team through Resend,
-              and your name, company and email address are also written to the website&apos;s server logs on Vercel.
+              The website code does not include an analytics script or set cookies. If you fill in the design partner
+              form, we use Resend to email form entries to the SatGate team and send you a confirmation. The website
+              also logs your name, company and email address.
             </p>
           </section>
 
@@ -134,17 +133,19 @@ export default function PrivacyPage() {
               SatGate Cloud uses these outside services. This is what each one receives.
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Fly.io runs the SatGate Cloud servers and database, in the United States (Virginia). It holds what SatGate Cloud stores.</li>
-              <li>Upstash hosts the Redis store that SatGate Cloud uses for budget and spend tracking.</li>
+              <li>Fly.io hosts SatGate Cloud&apos;s servers, database and logs in its Ashburn, Virginia region.</li>
+              <li>Upstash provides the Redis store, through Fly.io in the same region, that SatGate Cloud uses for budget and spend tracking and for revocation lists.</li>
               <li>Vercel hosts the satgate.io website. It receives the requests for the website&apos;s pages and the design partner form entries.</li>
               <li>Resend sends SatGate&apos;s emails, such as sign-in links and approval emails. It receives the recipient&apos;s email address and the contents of the email, including the call&apos;s values in an approval email.</li>
               <li>Stripe takes card payments for SatGate plans. It receives your name, email address and card details.</li>
-              <li>WorkOS handles enterprise SSO. It receives your sign-in from your company&apos;s identity provider and passes your name and email address to SatGate.</li>
+              <li>For configured enterprise SSO, WorkOS passes your sign-in profile to SatGate, including your name and email address.</li>
               <li>Google and GitHub, if you sign in with them. They know that you are signing in to SatGate, and SatGate receives your name, email address and account ID from them. Their respective privacy policies apply.</li>
+              <li>PayAI, for USDC payments to your routes on the Base network. It receives the signed payment (the payer&apos;s and recipient&apos;s wallet addresses, the amount, the dates it is valid for, a one-time identifier and the signature) and the payment terms for the route.</li>
+              <li>Strike, if you pay for a SatGate plan with Lightning. It creates the invoice and receives the plan price and a description that names the plan and the first eight characters of your account ID.</li>
               <li>Robinhood, if you connect it. You sign in on Robinhood&apos;s own page and SatGate never sees your Robinhood password. SatGate stores the access Robinhood gives it, encrypted, and Robinhood receives the calls your agent makes through SatGate.</li>
             </ul>
             <p className="text-gray-400 leading-relaxed mt-4">
-              For Lightning (L402) features, your Lightning node provider&apos;s privacy policy applies.
+              For Lightning payments, your Lightning address or node provider&apos;s privacy policy also applies.
             </p>
           </section>
 
@@ -155,11 +156,11 @@ export default function PrivacyPage() {
               what SatGate Cloud does today.
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Usage records: Starter 3 days. Trial, Growth, Personal and Pro 365 days. Enterprise 7 years.</li>
-              <li>Refused requests: 7 days.</li>
+              <li>Raw usage records: eligible for daily cleanup after 3 days on Starter, 365 days on Trial, Growth, Personal and Pro, and 2,555 days (7 years) on Enterprise.</li>
+              <li>Refused-request event records: eligible for hourly cleanup after 7 days. Counts and signed receipts are separate records.</li>
               <li>Held calls: the call&apos;s values are cleared 24 hours after the approval is used, denied or expires. The approval record is deleted 90 days after that moment. The approval email stays where it was sent.</li>
               <li>Audit log: not deleted on a schedule today.</li>
-              <li>Signed receipts and budget spending records: not deleted on a schedule today.</li>
+              <li>Signed receipts and budget spending records: not deleted on a schedule today. Older Starter Evidence Packs can also expire when a new Pack is saved.</li>
               <li>Account details: not deleted on a schedule today.</li>
             </ul>
             <p className="text-gray-400 leading-relaxed mt-4">
