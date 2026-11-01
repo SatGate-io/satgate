@@ -153,10 +153,34 @@ func spentMCPConfig() *mcpserver.Config {
 // spentNet is an MCP proxy on SSE and Streamable HTTP whose lineage checks use
 // a spentBoundary's service.
 type spentNet struct {
-	proxy  *mcpserver.Proxy
-	router *countingRouter
-	budget *mcpserver.InMemoryBudgetEnforcer
-	url    string
+	proxy    *mcpserver.Proxy
+	router   *countingRouter
+	budget   *mcpserver.InMemoryBudgetEnforcer
+	url      string
+	sessions *sseConnects
+}
+
+// sseConnects is the proxy's event publisher: it records the SSE sessions
+// whose connect has ended. The server sends the endpoint event before it
+// checks the connect's token, and publishes session_connect after that check.
+type sseConnects struct {
+	mu   sync.Mutex
+	done map[string]bool
+}
+
+func (c *sseConnects) Publish(e mcpserver.Event) {
+	if e.Type != mcpserver.EventSessionConnect {
+		return
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.done[e.SessionID] = true
+}
+
+func (c *sseConnects) ended(session string) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.done[session]
 }
 
 func newSpentNet(t *testing.T, b *spentBoundary, budget *mcpserver.InMemoryBudgetEnforcer) *spentNet {
@@ -169,9 +193,11 @@ func newSpentNet(t *testing.T, b *spentBoundary, budget *mcpserver.InMemoryBudge
 	p.SetUpstreamRouter(router)
 	p.SetBudgetEnforcer(budget)
 	p.SetLineageRevocationChecker(b.g)
+	sessions := &sseConnects{done: map[string]bool{}}
+	p.SetEventPublisher(sessions)
 	srv := httptest.NewServer(mcpserver.NewSSEServer(p, ":0").Handler())
 	t.Cleanup(srv.Close)
-	return &spentNet{proxy: p, router: router, budget: budget, url: srv.URL}
+	return &spentNet{proxy: p, router: router, budget: budget, url: srv.URL, sessions: sessions}
 }
 
 func rpc(id int, method string, params map[string]any) map[string]any {
@@ -249,8 +275,12 @@ type sseConn struct {
 	body                io.Closer
 }
 
-func openSSE(t *testing.T, url, token string) *sseConn {
+// openSSE opens an SSE stream on n and returns once the server has ended the
+// connect, so the connect's own token check never reads the ban store during
+// a later spentBoundary.cross: the read cross holds is the message's.
+func openSSE(t *testing.T, n *spentNet, token string) *sseConn {
 	t.Helper()
+	url := n.url
 	req, _ := http.NewRequest(http.MethodGet, url+"/sse", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := http.DefaultClient.Do(req)
@@ -267,6 +297,11 @@ func openSSE(t *testing.T, url, token string) *sseConn {
 		}
 		if line = strings.TrimSpace(line); strings.HasPrefix(line, "data: /message?sessionId=") {
 			c.session = strings.TrimPrefix(line, "data: /message?sessionId=")
+		}
+	}
+	for deadline := time.Now().Add(10 * time.Second); !n.sessions.ended(c.session); time.Sleep(time.Millisecond) {
+		if time.Now().After(deadline) {
+			t.Fatal("SSE connect did not end")
 		}
 	}
 	go func() {
@@ -351,11 +386,11 @@ func TestSpentMCP_NetworkDecisionInProgressAnswersUnavailable(t *testing.T) {
 			return func() outcome { s, body := sseConnect(t, a.url, k.child); return outcome{status: s, body: body} }
 		}},
 		{"sse_message", true, true, func(t *testing.T, k spentMCPKeys, _ *spentBoundary, a, _ *spentNet) func() outcome {
-			conn := openSSE(t, a.url, k.tenantChild)
+			conn := openSSE(t, a, k.tenantChild)
 			return func() outcome { return outcome{resp: conn.send(t, toolCallMsg(2))} }
 		}},
 		{"sse_message_delegate", true, true, func(t *testing.T, k spentMCPKeys, _ *spentBoundary, a, _ *spentNet) func() outcome {
-			conn := openSSE(t, a.url, k.tenantChild)
+			conn := openSSE(t, a, k.tenantChild)
 			return func() outcome { return outcome{resp: conn.send(t, delegateMsg(2))} }
 		}},
 		{"streamable_initialize", false, false, func(t *testing.T, k spentMCPKeys, _ *spentBoundary, a, _ *spentNet) func() outcome {
@@ -602,7 +637,7 @@ func TestSpentMCP_DecisionCrossingIntoSpentStateProjectsUnavailable(t *testing.T
 					return s == http.StatusServiceUnavailable && rpcUnavailable(rpcIn(body))
 				}
 			case "sse_message":
-				conn := openSSE(t, n.url, k.child)
+				conn := openSSE(t, n, k.child)
 				decide = func() bool { return rpcUnavailable(conn.send(t, toolCallMsg(3))) }
 			case "stdio":
 				s := newSpentStdio(t, b, false)

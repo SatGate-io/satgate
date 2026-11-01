@@ -1,0 +1,722 @@
+[
+  {
+    "case": "G/handoff-unreadable/control",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/handoff-unreadable/control",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/handoff-unreadable/control",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-key/control",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-key/control",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-key/control",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/carve-answer/control",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/carve-answer/control",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/carve-answer/control",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-budget/control",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-budget/control",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-budget/control",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-row/control",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-row/control",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-row/control",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/handoff-unreadable/observe",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/handoff-unreadable/observe",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/handoff-unreadable/observe",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-key/observe",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-key/observe",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-key/observe",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/carve-answer/observe",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/carve-answer/observe",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/carve-answer/observe",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-budget/observe",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-budget/observe",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-budget/observe",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-row/observe",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-row/observe",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "G/child-row/observe",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32000,\"message\":\"This child token couldn't be created because of a problem on our side. Try again in a few minutes.\",\"data\":{\"error\":\"delegation_failed\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/tools-call-priced",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/tools-call-priced",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/tools-call-priced",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/tools-call-free",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/tools-call-free",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"free_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/tools-call-free",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/delegate",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/delegate",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/delegate",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/budget",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/budget",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/budget\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/budget",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/budget-check",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"unreachable\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/budget-check",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"budget/check\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/budget-check",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"unreachable\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/forwarded-method",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/forwarded-method",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"resources/list\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/slot/forwarded-method",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "D/delegate-slot",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "D/delegate-slot",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "D/delegate-slot",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "D/delegate-prepare",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "D/delegate-prepare",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "D/delegate-prepare",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/tools-call-free",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/tools-call-free",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"free_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/tools-call-free",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"isError\":false}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/budget",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/budget",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/budget",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"budgetId\":\"budget-ea\",\"remaining\":50,\"tokenId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/forwarded-method",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/forwarded-method",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/forwarded-method",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"resources\":[]}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/helper",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/helper",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored/helper",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":0,\"parentRemaining\":0}}",
+    "signed": "",
+    "out": 1,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored-held/tools-call",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored-held/tools-call",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"paid_read\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored-held/tools-call",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"_meta\":{\"satgate_evidence\":{\"evidence_pack_id\":\"ep_1\",\"evidence_url\":\"https://issuer.example/v1/evidence/evid_1\",\"receipt_hash\":\"sha256:1\",\"receipt_id\":\"rcpt_1\"}},\"content\":[{\"text\":\"ok\",\"type\":\"text\"}],\"isError\":false}}",
+    "signed": "allowed/budget_authorized",
+    "out": 1,
+    "debit": 1,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored-held/delegate",
+    "switches": "both-off",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored-held/delegate",
+    "switches": "sign-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"Evidence proof unavailable\",\"data\":{\"error\":\"proof_unavailable\",\"tool\":\"satgate/delegate\"}}}",
+    "signed": "",
+    "out": 0,
+    "debit": 0,
+    "misses": 0,
+    "journaled": 0
+  },
+  {
+    "case": "H/not-stored-held/delegate",
+    "switches": "refusals-only",
+    "response": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"token\":\"\u003ctoken\u003e\",\"tokenId\":\"\u003cid\u003e\",\"budget\":5,\"parentRemaining\":45,\"budgetId\":\"\u003cid\u003e\"}}",
+    "signed": "",
+    "out": 1,
+    "debit": 5,
+    "misses": 0,
+    "journaled": 0
+  }
+]

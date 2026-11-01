@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"slices"
 	"strings"
 	"testing"
@@ -389,6 +390,50 @@ func TestUpstreamCredentials_ForeignOnlyMalformedValuesForwardedUnchanged(t *tes
 	}
 }
 
+// timeRemovals returns, for each header, the time of one
+// removeGatewayCredentials call on it: the median of five timed batches,
+// after one warm-up batch. The headers take turns, batch by batch, so a slow
+// stretch on a busy machine falls on all of them rather than on one. A batch
+// runs reps[i] fresh, separately allocated copies back to back; with reps
+// chosen so that every batch reads the same amount of input, each batch lasts
+// about as long, and a short run cannot fit between interruptions that a long
+// run cannot avoid. The median, unlike the shortest batch, is not set by one
+// batch that ran unusually fast or slow.
+func timeRemovals(gw *Gateway, hs []http.Header, reps []int) []time.Duration {
+	samples := make([][]time.Duration, len(hs))
+	for round := 0; round < 6; round++ {
+		for s, h := range hs {
+			copies := make([]http.Header, reps[s])
+			for j := range copies {
+				c := make(http.Header, len(h))
+				for name, values := range h {
+					own := make([]string, len(values))
+					for k, v := range values {
+						own[k] = strings.Clone(v)
+					}
+					c[name] = own
+				}
+				copies[j] = c
+			}
+			runtime.GC()
+			start := time.Now()
+			for _, c := range copies {
+				gw.removeGatewayCredentials(c, false)
+			}
+			elapsed := time.Since(start) / time.Duration(reps[s])
+			if round > 0 {
+				samples[s] = append(samples[s], elapsed)
+			}
+		}
+	}
+	median := make([]time.Duration, len(hs))
+	for s, d := range samples {
+		slices.Sort(d)
+		median[s] = d[len(d)/2]
+	}
+	return median
+}
+
 // Finding gateway tokens in Authorization costs allocations and time linear
 // in the input: 20 KB and 80 KB of each shape cost less than six times what
 // 5 KB and 20 KB cost, whether the field is forwarded or dropped.
@@ -432,10 +477,19 @@ func TestRemoveGatewayCredentials_5KB20KB80KBCostStaysLinear(t *testing.T) {
 	}
 	for name, shape := range shapes {
 		t.Run(name, func(t *testing.T) {
+			sizes := []int{5 << 10, 20 << 10, 80 << 10}
+			hs := make([]http.Header, len(sizes))
+			reps := make([]int, len(sizes))
+			for i, size := range sizes {
+				hs[i] = http.Header{"Authorization": shape(size)}
+				reps[i] = sizes[len(sizes)-1] / size
+			}
+			elapsed := timeRemovals(gw, hs, reps)
 			var prev parserCost
-			for i, size := range []int{5 << 10, 20 << 10, 80 << 10} {
-				h := http.Header{"Authorization": shape(size)}
+			for i, size := range sizes {
+				h := hs[i]
 				c := measureRemoval(gw, h)
+				c.elapsed = elapsed[i]
 				t.Logf("%s, %d KB: allocated %d bytes in %d allocations, %v", name, size>>10, c.bytes, c.allocs, c.elapsed)
 				if i > 0 {
 					if c.bytes > 6*prev.bytes+4096 || c.allocs > 6*prev.allocs+16 {

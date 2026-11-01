@@ -159,7 +159,7 @@ The federation rule is:
 {issuer_id}/.well-known/jwks.json
 ```
 
-Receipts reference both an issuer and an `issuer_kid`. Hosted receipts are signed by `https://api.satgate.io` (kid `satgate-gateway-ed25519-2026-05`). Verifiers must first authorize the issuer origin against configured trust anchors, then fetch that issuer's JWKS, select the key by `issuer_kid`, and verify the receipt signature. `https://satgate.io/.well-known/jwks.json` redirects to `https://api.satgate.io/.well-known/jwks.json` so an old bookmark does not publish an empty key set. It is not a second issuer. Do **not** trust any issuer URL found in a receipt until it matches an acceptor-configured trust anchor; otherwise an attacker can publish their own JWKS and sign their own fake receipt.
+Receipts reference both an issuer and an `issuer_kid`. HTTP gateway receipts are signed by `https://api.satgate.io` (kid `satgate-gateway-ed25519-2026-05`), key set `https://api.satgate.io/.well-known/jwks.json`. Cloud MCP receipts are signed by `https://satgate-mcp-saas.fly.dev`, key set `https://satgate-mcp-saas.fly.dev/.well-known/jwks.json`. Verifiers must first authorize the issuer origin against configured trust anchors, then fetch that issuer's JWKS, select the key by `issuer_kid`, and verify the receipt signature. `https://satgate.io/.well-known/jwks.json` redirects to `https://api.satgate.io/.well-known/jwks.json` so an old bookmark does not publish an empty key set. It is not a second issuer. Do **not** trust any issuer URL found in a receipt until it matches an acceptor-configured trust anchor; otherwise an attacker can publish their own JWKS and sign their own fake receipt.
 
 Verifiers should respect the advertised JWKS TTL during normal operation, but on signature failure for a previously trusted issuer they should force a fresh JWKS fetch before rejecting the receipt. This handles key rotation without training implementations to ignore cache policy entirely. If the issuer remains trusted and the refreshed JWKS still lacks the `issuer_kid`, fail closed.
 
@@ -196,7 +196,7 @@ def load_jwks_for_receipt(receipt: dict) -> dict:
 def verify_receipt(receipt: dict) -> bool:
     key = load_jwks_for_receipt(receipt)
     # Verify receipt["signature"] over the canonical receipt payload with `key`.
-    # Hosted receipts use issuer https://api.satgate.io, not https://satgate.io.
+    # HTTP gateway receipts use issuer https://api.satgate.io, not https://satgate.io.
     return bool(key)
 ```
 
@@ -227,7 +227,7 @@ export async function loadJwksKeyForReceipt(receipt: Receipt) {
 export async function verifyReceipt(receipt: Receipt) {
   const key = await loadJwksKeyForReceipt(receipt);
   // Verify receipt.signature over the canonical receipt payload with `key`.
-  // Hosted receipts use issuer https://api.satgate.io, not https://satgate.io.
+  // HTTP gateway receipts use issuer https://api.satgate.io, not https://satgate.io.
   return Boolean(key);
 }
 ```

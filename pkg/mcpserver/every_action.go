@@ -107,8 +107,19 @@ func (p *Proxy) SignEveryAction() bool { return p.signEveryAction }
 // module upgrade. Both switches must be on to emit these refusals or deliver
 // existing admission handles on a transport error. Call before serving requests.
 // Disabling it stops future emission; it does not rewrite archived receipts.
+//
+// With both switches on, the remaining stops of a verified key's action are
+// also signed with these reasons (satgate/delegate stopped on SatGate's side,
+// an Observe call stopped for want of pending room, and a held call or carve
+// stopped for want of pending room, a pending entry the budget store could not
+// prepare, or a prepared receipt the journal definitely did not store), and an
+// Observe call that goes through with no receipt is counted even when it cannot
+// be journaled. With both switches on nothing journaled ages out at
+// PendingHorizon either: a gap is counted, and a prepared receipt published and
+// its money settled, however late (see closesGaps).
 func (p *Proxy) SetSignUnavailableCheckRefusals(on bool) {
 	p.signUnavailableCheckRefusals = on
+	p.every().refusals.Store(on)
 }
 
 func (p *Proxy) unavailableCheckRefusalsEnabled() bool {
@@ -141,6 +152,12 @@ func (p *Proxy) wireDelegator() {
 	p.delegator.reversalFailed = func() { p.reversalFailures.Add(1) }
 	p.delegator.reportMiss = func(ctx context.Context, parent *TokenInfo) error {
 		return p.reportObserveMiss(ctx, parent, MethodSatGateDelegate, "", p.enforcementModeFor(ctx, tenantOf(parent)))
+	}
+	p.delegator.refuseUnavailable = func(ctx context.Context, parent *TokenInfo, reason unavailableCheckReason, resp *Response) *Response {
+		return p.refuseUnavailableMethod(ctx, parent, MethodSatGateDelegate, MethodSatGateDelegate, reason, resp)
+	}
+	p.delegator.keepUnknown = func(ctx context.Context, parent *TokenInfo, slot *pendingSlot, prep *pendingPreparation, release func(context.Context)) {
+		p.keepUnknownPrepared(ctx, parent, MethodSatGateDelegate, "", p.enforcementModeFor(ctx, tenantOf(parent)), slot, prep, release)
 	}
 }
 
@@ -336,15 +353,7 @@ func recordIdentifiedDecision(ctx context.Context, ea *everyAction, rec Evidence
 // nothing was read from a balance, so it claims none.
 func (p *Proxy) signAllowed(ctx context.Context, req *Request, tokenInfo *TokenInfo, method, tool, requestID, mode string) (*MCPEvidence, *Response) {
 	stop := func(err error, stage string) (*MCPEvidence, *Response) {
-		log.Error().Err(err).Str("method", method).Str("tool", tool).Str("stage", stage).Msg("MCP allow receipt unavailable")
-		if !p.allowReceiptFailureBlocks(mode) {
-			log.Warn().Str("method", method).Str("tool", tool).Str("mode", mode).Msg("observe mode: passing the call on with no receipt")
-			if err := p.reportObserveMiss(ctx, tokenInfo, method, tool, mode); err != nil {
-				return nil, pendingFailureResponse(req.ID, tool, err)
-			}
-			return nil, nil
-		}
-		return nil, proofUnavailableResponse(req.ID, tool)
+		return nil, p.receiptFailed(ctx, req, tokenInfo, method, tool, mode, err, stage)
 	}
 	if p.evidence == nil {
 		return stop(errors.New("sign every action is on but no evidence recorder is installed"), "no_recorder")
@@ -360,6 +369,21 @@ func (p *Proxy) signAllowed(ctx context.Context, req *Request, tokenInfo *TokenI
 		return stop(err, "record")
 	}
 	return ev, nil
+}
+
+// receiptFailed is what a call whose allowed receipt could not be made gets:
+// nil (go on) in Observe once the miss is reported, otherwise the response
+// that stops it.
+func (p *Proxy) receiptFailed(ctx context.Context, req *Request, tokenInfo *TokenInfo, method, tool, mode string, err error, stage string) *Response {
+	log.Error().Err(err).Str("method", method).Str("tool", tool).Str("stage", stage).Msg("MCP allow receipt unavailable")
+	if !p.allowReceiptFailureBlocks(mode) {
+		log.Warn().Str("method", method).Str("tool", tool).Str("mode", mode).Msg("observe mode: passing the call on with no receipt")
+		if err := p.reportObserveMiss(ctx, tokenInfo, method, tool, mode); err != nil {
+			return pendingFailureResponse(req.ID, tool, err)
+		}
+		return nil
+	}
+	return proofUnavailableResponse(req.ID, tool)
 }
 
 // refuseSigned signs the refusal of a verified key's call that no earlier
@@ -414,35 +438,114 @@ func (r unavailableCheckReason) reason() string {
 // signing timeout and recorder archive contract. No failure is retried as a
 // refusal: in particular, a possibly persisted allow is never passed here.
 func (p *Proxy) refuseUnavailableCheck(ctx context.Context, tokenInfo *TokenInfo, tool string, reason unavailableCheckReason, resp *Response) *Response {
+	return p.refuseUnavailableMethod(ctx, tokenInfo, MethodToolsCall, tool, reason, resp)
+}
+
+// refuseUnavailableMethod is refuseUnavailableCheck for any authenticated
+// method: tools/call with its tool, or another method with tool set to the
+// method's name. The receipt names the method, never anything the agent sent.
+func (p *Proxy) refuseUnavailableMethod(ctx context.Context, tokenInfo *TokenInfo, method, tool string, reason unavailableCheckReason, resp *Response) *Response {
 	if !p.unavailableCheckRefusalsEnabled() {
 		return resp
 	}
-	if reason.reason() == "" || tokenInfo == nil || p.setupBlocks() || p.evidence == nil {
-		return proofUnavailableResponse(resp.ID, tool)
-	}
-	requestID, err := p.every().callID(callIDPrefix)
+	ev, err := p.signUnavailableStop(ctx, tokenInfo, method, tool, reason, "")
 	if err != nil {
 		return proofUnavailableResponse(resp.ID, tool)
+	}
+	return withEvidenceData(resp, ev)
+}
+
+var errStopNotSignable = errors.New("this stop cannot be signed")
+
+// signUnavailableStop signs one stop of a verified key's call with reason,
+// under requestID ("" makes a fresh server identity). It is the signing step of
+// refuseUnavailableMethod, also run by the retry worker for a Control call
+// whose unknown outcome turned out absent (unknownOutcome).
+func (p *Proxy) signUnavailableStop(ctx context.Context, tokenInfo *TokenInfo, method, tool string, reason unavailableCheckReason, requestID string) (*MCPEvidence, error) {
+	if !p.unavailableCheckRefusalsEnabled() || reason.reason() == "" || tokenInfo == nil || p.setupBlocks() || p.evidence == nil {
+		return nil, errStopNotSignable
+	}
+	if requestID == "" {
+		id, err := p.every().callID(callIDPrefix)
+		if err != nil {
+			return nil, err
+		}
+		requestID = id
 	}
 	// Price failure precedes the ordinary tools/call preflight. Recheck here
 	// for all four stops so a failed signer is never itself signed as an outage.
 	preCtx, cancel := context.WithTimeout(ctx, p.every().cfg().SignTimeout)
 	defer cancel()
 	if err := p.evidence.Preflight(preCtx); err != nil {
-		return proofUnavailableResponse(resp.ID, tool)
+		return nil, err
 	}
 	// No Request is passed: not even the caller's JSON-RPC id is a signed
 	// field here. The response correlation id remains only in the envelope.
-	ev, err := p.recordMethodDecision(ctx, nil, tokenInfo, MethodToolsCall, tool, MCPDecision{
+	return p.recordMethodDecision(ctx, nil, tokenInfo, method, tool, MCPDecision{
 		Decision:           "denied",
 		DecisionReason:     reason.reason(),
 		BudgetNotEvaluated: true,
 		RequestID:          requestID,
 	})
-	if err != nil {
-		return proofUnavailableResponse(resp.ID, tool)
+}
+
+// keepUnknownPrepared keeps a held call whose prepared receipt the journal may
+// or may not hold (keepPrepared answered ErrPendingOutcomeUnknown) until the
+// journal can tell (unknownOutcome). Found, the receipt is published by
+// recovery. Absent, release gives the hold back and the call is recorded: in
+// Observe counted as a miss in its own minute, in Control its stop signed
+// budget_backend_error. With either switch off nothing is kept.
+//
+// The unknown is kept in a slot the call set aside before it went ahead, so
+// keeping it never depends on free room elsewhere in the store: an Observe
+// call's miss slot, as before, and otherwise slot, the room a held call
+// reserved before its hold (Control, which has no miss slot). The slot's
+// release, deferred by the caller, then does nothing, as put already gives
+// the room to the entry. Only a call with no slot at all (none of the callers
+// in the proxy) finds room in the gap kind of the store, if it has any.
+func (p *Proxy) keepUnknownPrepared(ctx context.Context, tokenInfo *TokenInfo, method, tool, mode string, slot *pendingSlot, prep *pendingPreparation, release func(context.Context)) {
+	ea := p.every()
+	if !ea.closesGaps() || prep == nil || tokenInfo == nil || ea.durable == nil {
+		return
 	}
-	return withEvidenceData(resp, ev)
+	// The identity the key proved, and nothing of the key (keptIdentity).
+	who := keptIdentity(tokenInfo)
+	r := prep.work.Record
+	u := &unknownOutcome{work: prep.work, store: ea.durable, release: release}
+	if p.allowReceiptFailureBlocks(mode) {
+		stopTool := tool
+		if method != MethodToolsCall {
+			stopTool = method
+		}
+		// One identity for the stop, however often signing is tried.
+		stopID, _ := ea.callID(callIDPrefix)
+		// What the kept call signs under is built from nothing of the
+		// request: no key, no raw token, no request (detachedCtx).
+		u.stopCtx = context.WithValue(detachedCtx(ctx), CtxTokenInfo, who)
+		u.absent = func(c context.Context, _ PendingRecord) error {
+			sc, cancel := context.WithTimeout(u.stopCtx, ea.cfg().SignTimeout)
+			defer cancel()
+			if dl, ok := c.Deadline(); ok {
+				var cancel2 context.CancelFunc
+				sc, cancel2 = context.WithDeadline(sc, dl)
+				defer cancel2()
+			}
+			_, err := p.signUnavailableStop(sc, who, method, stopTool, unavailableBudgetBackend, stopID)
+			return err
+		}
+	} else {
+		call := unrecordedCall(who, method, tool, mode)
+		u.absent = func(c context.Context, rec PendingRecord) error {
+			miss := call
+			miss.ReportID, miss.WindowStart = rec.ID, rec.Minute
+			return ea.countMiss(c, miss)
+		}
+	}
+	own := missSlotFrom(ctx)
+	if own == nil {
+		own = slot
+	}
+	ea.keepUnknown(own, PendingRecord{TenantID: r.TenantID, TokenID: r.TokenID, BudgetID: r.BudgetID, Method: r.Method, Tool: r.Tool, Minute: r.Minute}, u)
 }
 
 // withEvidenceData returns resp with the receipt's handles merged into the
@@ -728,7 +831,10 @@ func (p *Proxy) dispatchAuthenticated(ctx context.Context, req *Request) (*Respo
 			slot := p.every().pending.reserve(kindGap)
 			if slot == nil {
 				log.Error().Str("method", req.Method).Msg("the pending store is full; refusing the Observe call until it drains")
-				return proofUnavailableResponse(req.ID, refusalTool(req)), nil
+				// With both switches on, the stop itself is signed. It takes
+				// no slot (refuseUnavailableMethod never reserves one).
+				return p.refuseUnavailableMethod(ctx, tokenInfo, req.Method, refusalTool(req), unavailablePendingCapacity,
+					proofUnavailableResponse(req.ID, refusalTool(req))), nil
 			}
 			defer slot.release()
 			ctx = withMissSlot(ctx, slot)

@@ -110,7 +110,14 @@ type Delegator struct {
 	signEveryAction      bool
 	receiptFailureBlocks func(ctx context.Context, tenantID string) bool
 	reportMiss           func(ctx context.Context, parent *TokenInfo) error
-	reversalFailed       func()
+	// keepUnknown keeps a delegation whose prepared receipt has an unknown
+	// save until the journal can tell (Proxy.keepUnknownPrepared).
+	keepUnknown    func(ctx context.Context, parent *TokenInfo, slot *pendingSlot, prep *pendingPreparation, release func(context.Context))
+	reversalFailed func()
+	// refuseUnavailable signs a delegation stopped on SatGate's side with an
+	// unavailable-check reason (Proxy.refuseUnavailableMethod). The proxy sets
+	// it; it signs only with both signing switches on.
+	refuseUnavailable func(ctx context.Context, parent *TokenInfo, reason unavailableCheckReason, resp *Response) *Response
 	// ea is the switch's shared state (holds, pending store, readiness). The
 	// proxy sets it; a delegator used on its own gets a default one.
 	ea     *everyAction
@@ -168,6 +175,31 @@ func (d *Delegator) SetSignEveryAction(on bool) { d.signEveryAction = on }
 // delegation could not be made. Nothing was carved: the carve was given back
 // and no key leaves. HandleDelegate answers it as proof_unavailable.
 var errDelegationProofUnavailable = errors.New("evidence proof unavailable")
+
+// delegationUnavailable marks a delegation stopped on SatGate's side: a store,
+// a check or the key could not be used. It wraps the error Delegate returned
+// before, so the text and the answer are the same; HandleDelegate also signs
+// the stop with reason. It is made only with both signing switches on.
+type delegationUnavailable struct {
+	reason unavailableCheckReason
+	err    error
+}
+
+func (e *delegationUnavailable) Error() string { return e.err.Error() }
+func (e *delegationUnavailable) Unwrap() error { return e.err }
+
+// unavailable is err marked with reason when the stop will be signed (both
+// switches on, wired by a proxy), and err as it is otherwise.
+func (d *Delegator) unavailable(reason unavailableCheckReason, err error) error {
+	if !d.signsUnavailable() {
+		return err
+	}
+	return &delegationUnavailable{reason: reason, err: err}
+}
+
+func (d *Delegator) signsUnavailable() bool {
+	return d.signEveryAction && d.refuseUnavailable != nil && d.ea != nil && d.ea.closesGaps()
+}
 
 type delegateRequestKey struct{}
 
@@ -356,7 +388,7 @@ func (d *Delegator) checkStoredHandoffLimit(ctx context.Context, parent *TokenIn
 			return nil, errNoStoredHandoff
 		}
 		log.Error().Err(errClass(err)).Msg("delegation refused: the stored handoff limit could not be read")
-		return nil, ErrChildTokenFailed
+		return nil, d.unavailable(unavailableControls, ErrChildTokenFailed)
 	}
 	if rowID == "" {
 		return nil, nil
@@ -427,19 +459,22 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 		}
 		if slot = d.state().pending.reserve(kindUncharged); slot == nil {
 			log.Error().Str("parent", parent.TokenID).Msg("delegation refused before any carve: the pending store is full")
-			return nil, errDelegationProofUnavailable
+			// Control, and Observe with a journal installed: the stop is signed.
+			return nil, d.unavailable(unavailablePendingCapacity, errDelegationProofUnavailable)
 		}
 		defer slot.release()
 	}
 	// undoCarve lets go of what the carve took when the delegation stops
 	// before its key is issued: the hold is released (and lapses by itself if
-	// the release fails), or, with no hold, the carve is refunded.
-	undoCarve := func(delegationID string) {
+	// the release fails), or, with no hold, the carve is refunded. It reports
+	// whether a hold is confirmed gone (always true with no hold): a stop
+	// signed after it is signed budget_backend_error when it is not.
+	undoCarve := func(delegationID string) bool {
 		if holder != nil {
-			d.state().release(ctx, holder, parent.BudgetID, delegationID, params.Budget)
-			return
+			return d.state().release(ctx, holder, parent.BudgetID, delegationID, params.Budget)
 		}
 		d.giveBack(ctx, parent, delegationID, params.Budget)
+		return true
 	}
 	if params.Budget < 0 {
 		return nil, &clientError{msg: "budget must be non-negative"}
@@ -606,6 +641,8 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 	// calls neither Spend nor Initialize on the parent.
 	var parentResult *BudgetResult
 	var delegationID string
+	// carveUnidentified is the carve's identity failure in Observe, if any.
+	var carveUnidentified error
 	if params.Budget > 0 {
 		// Auto-initialize parent budget from macaroon caveat if not yet initialized
 		if parent.BudgetLimit > 0 && parent.BudgetID != "" {
@@ -623,10 +660,16 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			// for this carve alone, from nothing the client sent (not the
 			// label, the amount or the JSON-RPC id). It names the hold, the
 			// settlement and the receipt's request_id (see newCallID).
-			id, err := newCallID(carveIDPrefix)
-			if err != nil {
+			id, err := d.state().callID(carveIDPrefix)
+			if err != nil && (d.blocksOnReceiptFailure(ctx, parent.TenantID) || !d.signsUnavailable()) {
 				log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation refused before any carve: no identity could be made for it")
 				return nil, errDelegationProofUnavailable
+			}
+			if err != nil {
+				// Observe: no receipt can name this carve. It goes on, under
+				// an identity of this process, and is counted as a miss.
+				carveUnidentified = err
+				id = d.state().localCallID(carveIDPrefix)
 			}
 			delegationID = id
 		}
@@ -662,15 +705,20 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			initCtx, initCredits = ctx, 0
 		}
 		if err := d.budget.Initialize(initCtx, childBudgetID, initCredits); err != nil {
-			undoCarve(delegationID)
+			released := undoCarve(delegationID)
 			if errors.Is(err, ErrInsufficientBudget) {
 				// The budget said no when the money was to move: a real refusal.
 				// The client gets the fixed sentence, never the error's text.
 				log.Warn().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Str("childBudgetId", childBudgetID).Msg("delegation refused: the parent budget could not afford the carve")
+				if !released {
+					// The hold is not confirmed gone: the refusal is
+					// signed budget_backend_error, the answer unchanged.
+					return nil, d.unavailable(unavailableBudgetBackend, errInsufficientParentBudget)
+				}
 				return nil, errInsufficientParentBudget
 			}
 			log.Error().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Str("childBudgetId", childBudgetID).Msg("delegation refused: child budget could not be created")
-			return nil, ErrChildTokenFailed
+			return nil, d.unavailable(unavailableBudgetBackend, ErrChildTokenFailed)
 		}
 	}
 
@@ -747,8 +795,8 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			cancel()
 			if perr != nil {
 				log.Error().Msg("delegation refused: the helper could not be recorded where a revoke finds it")
-				undoCarve(delegationID)
-				return nil, ErrChildTokenFailed
+				released := undoCarve(delegationID)
+				return nil, d.unavailable(heldStop(released, unavailableControls), ErrChildTokenFailed)
 			}
 		}
 	}
@@ -772,10 +820,22 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			sctx, prep, perr = d.state().preparePending(sctx, PendingRecord{TokenID: parent.TokenID, TenantID: parent.TenantID, BudgetID: parent.BudgetID, ChildBudgetID: childBudgetID, Method: MethodSatGateDelegate, RequestID: delegationID, Amount: params.Budget})
 			if perr != nil {
 				undoCarve(delegationID)
+				var budgetErr *pendingBudgetError
+				if errors.As(perr, &budgetErr) {
+					// The budget store could not prepare the carve's
+					// entry. Nothing was signed; the stop is, after the
+					// release: budget_backend_error whether or not the
+					// release confirmed the hold gone.
+					return nil, d.unavailable(unavailableBudgetBackend, errDelegationProofUnavailable)
+				}
 				return nil, errDelegationProofUnavailable
 			}
 		}
-		if err := d.signDelegation(sctx, parent, delegationID); err != nil {
+		signErr := carveUnidentified
+		if signErr == nil {
+			signErr = d.signDelegation(sctx, parent, delegationID)
+		}
+		if err := signErr; err != nil {
 			log.Error().Err(err).Str("parent", parent.TokenID).Msg("delegation receipt unavailable")
 			if d.blocksOnReceiptFailure(ctx, parent.TenantID) {
 				undoCarve(delegationID)
@@ -787,7 +847,14 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 					if errors.Is(err, ErrPendingOutcomeUnknown) {
 						return nil, err
 					}
-					undoCarve(delegationID)
+					released := undoCarve(delegationID)
+					if prep != nil && errors.Is(err, ErrPendingNotStored) {
+						// The receipt was only prepared, never published,
+						// and the hold is let go of: the stop is signed,
+						// budget_backend_error if the hold is not
+						// confirmed gone (it lapses).
+						return nil, d.unavailable(heldStop(released, unavailablePendingCapacity), errDelegationProofUnavailable)
+					}
 					return nil, errDelegationProofUnavailable
 				}
 			}
@@ -795,10 +862,22 @@ func (d *Delegator) Delegate(ctx context.Context, parent *TokenInfo, params *Del
 			stored, perr := d.state().keepPrepared(ctx, prep)
 			if !stored {
 				if errors.Is(perr, ErrPendingOutcomeUnknown) {
+					// The answer stays outcome_unknown; the delegation is
+					// kept until the journal can tell (unknownOutcome).
+					if d.keepUnknown != nil {
+						budgetID, amount := parent.BudgetID, params.Budget
+						d.keepUnknown(ctx, parent, slot, prep, func(c context.Context) {
+							d.state().release(c, holder, budgetID, delegationID, amount)
+						})
+					}
 					return nil, perr
 				}
-				undoCarve(delegationID)
-				return nil, errDelegationProofUnavailable
+				released := undoCarve(delegationID)
+				// The receipt was only prepared, never published, and the
+				// journal definitely did not keep it: the hold is let go of
+				// and the stop is signed, budget_backend_error if the hold
+				// is not confirmed gone (it lapses).
+				return nil, d.unavailable(heldStop(released, unavailablePendingCapacity), errDelegationProofUnavailable)
 			}
 			if perr != nil {
 				log.Warn().Msg("signed delegation is durably pending settlement")
@@ -877,7 +956,7 @@ func (d *Delegator) refuseMint(parent *TokenInfo, err error, what string) error 
 		return ErrParentCannotDelegate
 	}
 	log.Error().Err(err).Str("parent", parent.TokenID).Msgf("delegation refused: %s", what)
-	return ErrChildTokenFailed
+	return d.unavailable(unavailableControls, ErrChildTokenFailed)
 }
 
 // refusalCodes are the ErrorCodes of a Spend result that mean "the budget said
@@ -920,7 +999,7 @@ func (d *Delegator) carveOutcome(parent *TokenInfo, res *BudgetResult, err error
 		err = errors.New("the budget store gave no usable answer")
 	}
 	log.Error().Err(err).Str("parent", parent.TokenID).Str("budgetId", parent.BudgetID).Msg("delegation refused: the carve was not approved by the budget store")
-	return ErrChildTokenFailed
+	return d.unavailable(unavailableBudgetBackend, ErrChildTokenFailed)
 }
 
 // refusalError is the budget refusal built from a result's code. numbers adds
@@ -1061,6 +1140,16 @@ func (d *Delegator) HandleDelegate(ctx context.Context, req *Request, tokenInfo 
 	ctx = context.WithValue(ctx, delegateRequestKey{}, req)
 	result, err := d.Delegate(ctx, tokenInfo, &params)
 	if err != nil {
+		var stop *delegationUnavailable
+		if errors.As(err, &stop) && d.refuseUnavailable != nil {
+			// Stopped on SatGate's side, both switches on: the answer it
+			// always got, with the signed refusal's handles.
+			resp := proofUnavailableResponse(req.ID, MethodSatGateDelegate)
+			if !errors.Is(err, errDelegationProofUnavailable) {
+				resp = d.refusalResponse(req, tokenInfo, &params, err)
+			}
+			return d.refuseUnavailable(ctx, tokenInfo, stop.reason, resp), nil
+		}
 		if errors.Is(err, ErrPendingOutcomeUnknown) {
 			return pendingFailureResponse(req.ID, MethodSatGateDelegate, err), nil
 		}

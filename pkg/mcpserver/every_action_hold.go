@@ -135,6 +135,7 @@ type everyAction struct {
 	// is not given a request id is given one the server makes (newCallID),
 	// never one derived from the client's JSON-RPC id.
 	on            atomic.Bool
+	refusals      atomic.Bool // mirrors SetSignUnavailableCheckRefusals; see closesGaps
 	settings      atomic.Pointer[EveryActionSettings]
 	pending       *pendingStore
 	durable       PendingStore
@@ -168,6 +169,22 @@ func newEveryAction() *everyAction {
 }
 
 func (ea *everyAction) cfg() EveryActionSettings { return *ea.settings.Load() }
+
+// closesGaps reports whether both signing switches are on. Only then does an
+// Observe call with no server identity, or whose gap the journal definitely
+// did not store (ErrPendingNotWritten included), go through and get counted,
+// and nothing journaled age out at PendingHorizon: a gap is still counted, and
+// a prepared receipt still published and its money settled, however late. With
+// either switch off each of these keeps the behaviour it had before.
+func (ea *everyAction) closesGaps() bool { return ea.on.Load() && ea.refusals.Load() }
+
+// localCallID is the identity of an Observe call that could not get one from
+// newCallID: unique to this process (the pending store's nonce and sequence),
+// made from nothing the client sent. It names the call's spend or hold only;
+// no receipt is signed under it, the call is counted as a miss instead.
+func (ea *everyAction) localCallID(prefix string) string {
+	return prefix + ea.pending.nextID(kindGap)
+}
 
 func (ea *everyAction) setRecorder(rec EvidenceRecorder) {
 	ea.recMu.Lock()
@@ -334,7 +351,12 @@ func (ea *everyAction) commit(ctx context.Context, h BudgetHolder, budgetID, hol
 // release gives the hold holdID back on a context of its own, bounded by
 // CommitTimeout. If it still fails the hold lapses by itself; the failure is
 // logged and counted (ReversalFailures), and nothing more has to succeed.
-func (ea *everyAction) release(ctx context.Context, h BudgetHolder, budgetID, holdID string, amount int64) {
+//
+// It reports whether the hold is confirmed gone: the store released it, or
+// answered that it no longer exists (ErrHoldGone). Any other answer, after the
+// retries, is not a confirmation: the hold may still be open until it lapses
+// (HoldTTL). The request does not wait for that.
+func (ea *everyAction) release(ctx context.Context, h BudgetHolder, budgetID, holdID string, amount int64) bool {
 	err := retryUndo(ctx, ea.cfg().CommitTimeout, func(c context.Context) error {
 		return h.ReleaseHold(c, budgetID, holdID)
 	})
@@ -343,6 +365,18 @@ func (ea *everyAction) release(ctx context.Context, h BudgetHolder, budgetID, ho
 		log.Error().Err(err).Str("budgetId", budgetID).Str("requestId", holdID).Int64("amount", amount).
 			Dur("lapsesWithin", ea.cfg().HoldTTL).Msg("could not release a budget hold; it lapses by itself and the balance comes back")
 	}
+	return err == nil || errors.Is(err, ErrHoldGone)
+}
+
+// heldStop is the reason a stop is signed with when it is signed after the
+// call's budget hold was given back: the stop's own reason when release
+// confirmed the hold gone, and budget_backend_error when it did not (the held
+// amount then comes back when the hold lapses).
+func heldStop(released bool, reason unavailableCheckReason) unavailableCheckReason {
+	if released {
+		return reason
+	}
+	return unavailableBudgetBackend
 }
 
 // ---- the pending store ----
@@ -415,7 +449,10 @@ type pendingEntry struct {
 	// the parent and funds the child, exactly once however often it is called
 	// (CarveSettler). The retry worker runs it whether or not an
 	// UnchargedRecorder is installed.
-	settle   func(ctx context.Context) error
+	settle func(ctx context.Context) error
+	// unknown is set on a call whose journal save has an unknown result
+	// (unknownOutcome): the retry worker resolves it instead of counting it.
+	unknown  *unknownOutcome
 	inflight bool
 }
 
@@ -584,7 +621,7 @@ func (s *pendingStore) claim(withUncharged bool) []*pendingEntry {
 		if e.inflight {
 			continue
 		}
-		if e.Kind == PendingUncharged && !withUncharged && e.settle == nil {
+		if e.Kind == PendingUncharged && !withUncharged && e.settle == nil && e.unknown == nil {
 			continue
 		}
 		e.inflight = true
@@ -612,7 +649,7 @@ func (s *pendingStore) retryable(withUncharged bool) bool {
 		return true
 	}
 	for _, e := range s.entries {
-		if e.settle != nil {
+		if e.settle != nil || e.unknown != nil {
 			return true
 		}
 	}
@@ -638,12 +675,30 @@ func missSlotFrom(ctx context.Context) *pendingSlot {
 // the miss is kept with its tenant, key, tool and minute and retried in the
 // background until the recorder takes it, exactly once. A non-nil error stops
 // forwarding; a durable unknown must be answered as unknown, never refused.
+// With both switches on, the unknown is kept, in the call's slot, until the
+// journal can tell whether it holds the gap (unknownOutcome).
+//
+// Accepted residual of this in-memory retry: an entry it keeps (a gap here, or
+// an unknown outcome, see unknownOutcome) is lost if the process ends before
+// it is recorded.
 func (ea *everyAction) reportMiss(ctx context.Context, rec EvidenceRecorder, slot *pendingSlot, call MCPWindowedCall) error {
 	if call.ReportID == "" {
 		call.ReportID = ea.pending.nextID(kindGap)
 	}
 	if ea.durable != nil && ea.on.Load() {
-		return ea.durableGap(ctx, slot, call)
+		w, err := ea.durableGapWork(ctx, slot, call)
+		prep, _ := ctx.Value(pendingPreparationKey{}).(*pendingPreparation)
+		if errors.Is(err, ErrPendingOutcomeUnknown) && ea.closesGaps() {
+			ea.keepUnknownGap(slot, w, prep)
+			return err
+		}
+		if !errors.Is(err, ErrPendingNotStored) || prep != nil || !ea.closesGaps() {
+			return err
+		}
+		// The journal definitely did not store the gap and no money is held
+		// for it: keep it here, in the slot set aside for it, and count it as
+		// the in-memory store does. The call goes through.
+		log.Error().Str("method", call.Decision.MCPMethod).Str("tool", receiptTool(call.Decision.ToolName)).Msg("observe miss could not be journaled; kept in memory for retry")
 	}
 	if wr, ok := rec.(WindowRecorder); ok {
 		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), ea.cfg().MissReportTimeout)
@@ -760,14 +815,21 @@ func (ea *everyAction) flush(ctx context.Context) bool {
 	progressed := false
 	for _, e := range ea.pending.claim(sink != nil) {
 		ok := false
-		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), ea.cfg().MissReportTimeout)
-		switch e.Kind {
-		case PendingGap:
+		bound := ea.cfg().MissReportTimeout
+		if e.unknown != nil {
+			// Asking the journal, then publishing, counting or signing.
+			bound = ea.cfg().CommitTimeout + ea.cfg().SignTimeout
+		}
+		rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), bound)
+		switch {
+		case e.unknown != nil:
+			ok = ea.resolveUnknown(rctx, e)
+		case e.Kind == PendingGap:
 			if wr, isWR := rec.(WindowRecorder); isWR {
 				_, err := wr.RecordWindowedCall(rctx, e.call)
 				ok = err == nil
 			}
-		case PendingUncharged:
+		case e.Kind == PendingUncharged:
 			switch {
 			case e.settle != nil:
 				ok = ea.settleCarveEntry(rctx, e)
