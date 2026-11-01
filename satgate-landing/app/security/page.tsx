@@ -37,7 +37,7 @@ export default function SecurityPage() {
     url: 'https://satgate.io/security',
     description: metadata.description,
     datePublished: '2026-04-12',
-    dateModified: '2026-05-03',
+    dateModified: '2026-11-01',
     isPartOf: { '@type': 'WebSite', name: 'SatGate', url: 'https://satgate.io' },
     about: [
       { '@type': 'Thing', name: 'AI agent security' },
@@ -64,7 +64,7 @@ export default function SecurityPage() {
       {
         '@type': 'Question',
         name: 'How does SatGate secure AI agent API access?',
-        acceptedAnswer: { '@type': 'Answer', text: 'SatGate secures AI agent API access with policy enforcement before the request goes through, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway before forwarding.' },
+        acceptedAnswer: { '@type': 'Answer', text: 'SatGate secures AI agent API access with policy enforcement before the request goes through, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway.' },
       },
       {
         '@type': 'Question',
@@ -98,8 +98,8 @@ export default function SecurityPage() {
           <section className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 border border-purple-800/30 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">The Security Model</h2>
             <p className="text-gray-400 leading-relaxed mb-4">
-              SatGate implements <strong className="text-white">Economic Access Control</strong> — a capability-based security model
-              where every protected API request must present a cryptographically verified token with embedded access constraints.
+              SatGate implements <strong className="text-white">Economic Access Control</strong>, a capability-based security model.
+              SatGate uses cryptographically verified capability tokens to constrain agent access. Public routes do not require a token; Admit checks the payment proof required by the route.
             </p>
             <p className="text-gray-400 leading-relaxed mb-4">
               Traditional APIs ask <em>&ldquo;who are you?&rdquo;</em> and often tie enforcement to broad user credentials.
@@ -108,7 +108,7 @@ export default function SecurityPage() {
             </p>
             <p className="text-gray-400 leading-relaxed mb-0">
               The gateway operates as a <strong className="text-white">Policy Enforcement Point (PEP)</strong>.
-              No request reaches your upstream without passing cryptographic verification.
+              Requests to protected routes must pass verification before reaching your upstream.
             </p>
           </section>
 
@@ -120,7 +120,7 @@ export default function SecurityPage() {
             </div>
             <p className="text-gray-400 leading-relaxed mb-4">
               Agents authenticate through your existing identity infrastructure. SatGate Mint exchanges workload identity tokens
-              (OIDC JWTs from Kubernetes, AWS IAM, or any OIDC provider) for capability-bearing macaroons with policy-defined constraints.
+              (Kubernetes service account tokens, AWS IAM identity, or tokens from a configured OIDC provider) for capability-bearing macaroons with policy-defined constraints.
             </p>
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 mb-4">
               <div className="flex items-center justify-center gap-3 text-sm flex-wrap">
@@ -160,23 +160,23 @@ export default function SecurityPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-                <h4 className="text-white text-sm font-bold mb-2">Delegation Without Calling Home</h4>
+                <h4 className="text-white text-sm font-bold mb-2">Delegation that only narrows</h4>
                 <p className="text-gray-500 text-xs">
                   A manager mints a token, carves off a weaker one for their team, who delegates further to an agent.
-                  Each step is cryptographically chained — no API call, no DB write. Permissions only shrink.
+                  Each handoff is signed into the token, so permissions can only shrink.
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h4 className="text-white text-sm font-bold mb-2">Runtime Constraints Built In</h4>
                 <p className="text-gray-500 text-xs">
                   Caveats encode &ldquo;only until 5pm,&rdquo; &ldquo;only for /openai/*,&rdquo; or &ldquo;max 200 credits.&rdquo;
-                  Verified at the gateway on every request. The token carries its own budget.
+                  Verified at the gateway on every request. The token identifies the budget checked by the gateway.
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h4 className="text-white text-sm font-bold mb-2">The Right Building Block for Agents</h4>
                 <p className="text-gray-500 text-xs">
-                  Agents can&apos;t do OAuth flows or sign up for accounts. But they can hold a bearer token
+                  Agents can use scoped bearer tokens without repeating an interactive sign-in for every call. They can hold a bearer token
                   that encodes exactly what they&apos;re allowed to do and spend. That&apos;s a macaroon.
                 </p>
               </div>
@@ -205,14 +205,14 @@ export default function SecurityPage() {
                 <Eye size={20} className="text-green-400 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="text-white text-sm font-bold">Observe</h4>
-                  <p className="text-gray-500 text-xs mb-0">Verify → Allow → Log. Full visibility into agent traffic, cost attribution by team, zero enforcement. Free forever.</p>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Allow → Log. Full visibility into agent traffic, cost attribution by team, zero enforcement. Free on the Starter plan, up to a fair-use cap.</p>
                 </div>
               </div>
               <div className="bg-gray-900/50 border border-purple-800/30 rounded-lg p-4 flex items-start gap-4">
                 <Shield size={20} className="text-purple-400 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="text-white text-sm font-bold">Control</h4>
-                  <p className="text-gray-500 text-xs mb-0">Verify → Enforce Budget → Allow. Per-agent spending caps, real-time budget enforcement. Works with Stripe, ERP — no crypto required. HTTP 402 when budget exhausted.</p>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Enforce Budget → Allow. Per-agent spending caps, real-time budget enforcement. No crypto required. HTTP 402 when budget exhausted.</p>
                 </div>
               </div>
               <div className="bg-gray-900/50 border border-yellow-800/30 rounded-lg p-4 flex items-start gap-4">
@@ -232,10 +232,10 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Non-Custodial Architecture</h2>
             </div>
             <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Never stores upstream credentials.</strong> SatGate verifies tokens at the gateway. Your API keys, secrets, and upstream credentials stay in your infrastructure.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">No request body inspection.</strong> Gateway inspects only token and routing metadata. Request payloads pass through opaque (MCP proxy reads method/tool name for cost attribution only).</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Tenant-isolated data.</strong> All data scoped by tenant_id and enforced at the data layer — no shared query paths across tenants.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Non-custodial payment details.</strong> In the Lightning demo, payment moves from payer to the configured recipient without SatGate taking custody. Other rails follow their own settlement and dispute rules.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Upstream credentials.</strong> On SatGate Cloud, the credentials SatGate uses to reach your services are stored encrypted. On a self-hosted gateway they stay in your infrastructure.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">What SatGate reads.</strong> SatGate reads the token and where each request is going. For MCP tools it also reads the tool name and the arguments your rules check, for example an order&apos;s amount. If a tool needs your approval, the call&apos;s details are shown to you.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Each account&apos;s data is kept separate.</strong> It is stored under the account&apos;s own ID and looked up by that ID.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Non-custodial payments.</strong> On paid routes, Lightning invoices come from your own Lightning address (or your own node, if you self-host) and USDC goes straight to the wallet address you set. SatGate never holds that money.</span></li>
             </ul>
           </section>
 
@@ -254,7 +254,7 @@ export default function SecurityPage() {
                 { label: 'Policy Enforcement Point', desc: 'Deny-by-default. Every protected request verified before proxying.' },
                 { label: 'Continuous Authorization', desc: 'Token validated on each request — no long-lived sessions or network zone trust.' },
                 { label: 'Least Privilege', desc: 'Macaroon caveats restrict scope, method, TTL, and budget per token.' },
-                { label: 'No Trust Dependencies', desc: 'Cryptographic verification — no centralized user database required.' },
+                { label: 'Token-based verification', desc: 'Cryptographic verification; no centralized user database required.' },
               ].map((item, i) => (
                 <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
                   <h4 className="text-white text-xs font-bold mb-1">{item.label}</h4>
@@ -266,7 +266,7 @@ export default function SecurityPage() {
               <h4 className="text-white text-sm font-bold mb-2">What SatGate is (and isn&apos;t)</h4>
               <ul className="text-gray-400 text-xs space-y-1 list-none pl-0 mb-0">
                 <li><span className="text-green-400">✓</span> Zero Trust PEP for API access (request-level verification + least privilege)</li>
-                <li><span className="text-green-400">✓</span> Economic abuse friction — high-volume abuse becomes self-limiting</li>
+                <li><span className="text-green-400">✓</span> Configured spending limits can restrict costly agent traffic.</li>
                 <li><span className="text-green-400">✓</span> Complements existing security stack (WAF/CDN, rate limiting, SIEM)</li>
                 <li><span className="text-yellow-400">⚠</span> Not a full Zero Trust program (identity governance, device posture, microsegmentation)</li>
               </ul>
@@ -280,9 +280,8 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Audit & Compliance</h2>
             </div>
             <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">55 event types</strong> across 12 categories in a tamper-evident audit log. Every mint, revocation, delegation, budget change, and config update recorded.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Real-time alerts</strong> via Slack, Discord, email, or custom webhooks for critical events.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Shadow Report</strong> — real-time dashboard showing all agent traffic, spend, and policy violations.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Audit log.</strong> Mints, revocations, delegations, budget changes and config updates are recorded.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Alerts</strong> can be sent through configured Slack, Discord, email or HTTP channels.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Export</strong> — CSV/JSON export for audit log and billing data via dashboard and API.</span></li>
             </ul>
           </section>
@@ -295,10 +294,10 @@ export default function SecurityPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
-                { title: 'Open Source', items: ['Core gateway is Apache 2.0 licensed', 'Full source audit at any time', 'No black boxes'] },
-                { title: 'Dependencies', items: ['Automated Dependabot updates', 'Go vulnerability scanning', 'Checksum verification'] },
-                { title: 'Infrastructure', items: ['TLS 1.2+ enforced', 'Stateless gateway design', 'Minimal attack surface'] },
-                { title: 'Code Quality', items: ['Required code review', 'Automated tests on every PR', 'Static analysis enforced'] },
+                { title: 'Open Source', items: ['Core gateway is Apache 2.0 licensed', 'Audit the open-source code at any time'] },
+                { title: 'Dependencies', items: ['Go vulnerability scanning', 'Checksum verification'] },
+                { title: 'Infrastructure', items: ['TLS 1.2+ enforced', 'Minimal attack surface'] },
+                { title: 'Code Quality', items: ['Automated tests on every PR', 'Static analysis on every PR'] },
               ].map((group, i) => (
                 <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                   <h4 className="text-white text-sm font-bold mb-2">{group.title}</h4>
@@ -319,7 +318,7 @@ export default function SecurityPage() {
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                 <h3 className="text-white text-sm font-bold mb-2">How does SatGate secure AI agent API access?</h3>
                 <p className="text-gray-500 text-xs mb-0">
-                  SatGate secures AI agent API access with policy enforcement before the request goes through, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway before forwarding.
+                  SatGate secures AI agent API access with policy enforcement before the request goes through, capability tokens, macaroon caveats, scoped budgets, expiry, delegation limits, revocation, and audit evidence at the gateway.
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
@@ -374,7 +373,8 @@ export default function SecurityPage() {
                 { item: 'Responsible disclosure program', status: 'Active', color: 'text-green-400' },
                 { item: 'Automated vulnerability scanning', status: 'Active', color: 'text-green-400' },
                 { item: 'Open source core (Apache 2.0)', status: 'Active', color: 'text-green-400' },
-                { item: 'Third-party penetration test', status: 'Q2 2026', color: 'text-yellow-400' },
+                // The status of the third-party penetration test is the text after "status:" on the next line.
+                { item: 'Third-party penetration test', status: 'Planned', color: 'text-yellow-400' },
                 { item: 'SOC 2 Type I', status: 'Post-revenue', color: 'text-gray-500' },
               ].map((item, i) => (
                 <div key={i} className={`flex items-center justify-between px-4 py-2.5 text-sm ${i > 0 ? 'border-t border-gray-800' : ''}`}>
@@ -395,8 +395,8 @@ export default function SecurityPage() {
               Email: <a href="mailto:security@satgate.io" className="text-purple-400 hover:text-purple-300 underline underline-offset-2">security@satgate.io</a>
             </p>
             <ul className="text-gray-500 text-sm space-y-1 list-none pl-0">
-              <li>• Acknowledge receipt within 48 hours</li>
-              <li>• Initial assessment within 7 days</li>
+              <li>• We aim to acknowledge receipt within 48 hours</li>
+              <li>• We aim to give an initial assessment within 7 days</li>
               <li>• Coordinated disclosure</li>
               <li>• Public credit (unless you prefer anonymity)</li>
             </ul>
@@ -409,7 +409,7 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Open Source Transparency</h2>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              All gateway code is open source under the Apache 2.0 License. Audit every line, fork it, run your own infrastructure.
+              The core gateway, the MCP server packages and the receipt verifier are open source under the Apache 2.0 License. The SDKs are open source under the MIT License. Audit them, fork them, run your own.
             </p>
             <a
               href="https://github.com/SatGate-io/satgate"
