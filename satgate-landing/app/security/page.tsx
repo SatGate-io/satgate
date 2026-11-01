@@ -160,10 +160,10 @@ export default function SecurityPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-                <h4 className="text-white text-sm font-bold mb-2">Delegation Without Calling Home</h4>
+                <h4 className="text-white text-sm font-bold mb-2">Delegation that only narrows</h4>
                 <p className="text-gray-500 text-xs">
                   A manager mints a token, carves off a weaker one for their team, who delegates further to an agent.
-                  Each step is cryptographically chained — no API call, no DB write. Permissions only shrink.
+                  Each handoff is signed into the token, so permissions can only shrink.
                 </p>
               </div>
               <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
@@ -205,14 +205,14 @@ export default function SecurityPage() {
                 <Eye size={20} className="text-green-400 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="text-white text-sm font-bold">Observe</h4>
-                  <p className="text-gray-500 text-xs mb-0">Verify → Allow → Log. Full visibility into agent traffic, cost attribution by team, zero enforcement. Free forever.</p>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Allow → Log. Full visibility into agent traffic, cost attribution by team, zero enforcement. Free on the Starter plan, up to a fair-use cap.</p>
                 </div>
               </div>
               <div className="bg-gray-900/50 border border-purple-800/30 rounded-lg p-4 flex items-start gap-4">
                 <Shield size={20} className="text-purple-400 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="text-white text-sm font-bold">Control</h4>
-                  <p className="text-gray-500 text-xs mb-0">Verify → Enforce Budget → Allow. Per-agent spending caps, real-time budget enforcement. Works with Stripe, ERP — no crypto required. HTTP 402 when budget exhausted.</p>
+                  <p className="text-gray-500 text-xs mb-0">Verify → Enforce Budget → Allow. Per-agent spending caps, real-time budget enforcement. No crypto required. HTTP 402 when budget exhausted.</p>
                 </div>
               </div>
               <div className="bg-gray-900/50 border border-yellow-800/30 rounded-lg p-4 flex items-start gap-4">
@@ -232,10 +232,10 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Non-Custodial Architecture</h2>
             </div>
             <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Never stores upstream credentials.</strong> SatGate verifies tokens at the gateway. Your API keys, secrets, and upstream credentials stay in your infrastructure.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">No request body inspection.</strong> Gateway inspects only token and routing metadata. Request payloads pass through opaque (MCP proxy reads method/tool name for cost attribution only).</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Tenant-isolated data.</strong> All data scoped by tenant_id and enforced at the data layer — no shared query paths across tenants.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Non-custodial payment details.</strong> In the Lightning demo, payment moves from payer to the configured recipient without SatGate taking custody. Other rails follow their own settlement and dispute rules.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Upstream credentials.</strong> On SatGate Cloud, the credentials SatGate uses to reach your services are stored encrypted. On a self-hosted gateway they stay in your infrastructure.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">What SatGate reads.</strong> SatGate reads the token and where each request is going. For MCP tools it also reads the tool name and the arguments your rules check, for example an order&apos;s amount. If a tool needs your approval, the call&apos;s details are shown to you and kept until a day after you decide.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Each account&apos;s data is kept separate.</strong> It is stored under the account&apos;s own ID and looked up by that ID.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Non-custodial payments.</strong> On paid routes, Lightning invoices come from your own Lightning address (or your own node, if you self-host) and USDC goes straight to the wallet address you set. SatGate never holds that money.</span></li>
             </ul>
           </section>
 
@@ -280,9 +280,8 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Audit & Compliance</h2>
             </div>
             <ul className="text-gray-400 text-sm space-y-2 list-none pl-0">
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">55 event types</strong> across 12 categories in a tamper-evident audit log. Every mint, revocation, delegation, budget change, and config update recorded.</span></li>
+              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Audit log.</strong> Mints, revocations, delegations, budget changes and config updates are recorded.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Real-time alerts</strong> via Slack, Discord, email, or custom webhooks for critical events.</span></li>
-              <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Shadow Report</strong> — real-time dashboard showing all agent traffic, spend, and policy violations.</span></li>
               <li className="flex items-start gap-2"><CheckCircle size={14} className="text-green-500 mt-1 flex-shrink-0" /> <span><strong className="text-white">Export</strong> — CSV/JSON export for audit log and billing data via dashboard and API.</span></li>
             </ul>
           </section>
@@ -295,10 +294,10 @@ export default function SecurityPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
-                { title: 'Open Source', items: ['Core gateway is Apache 2.0 licensed', 'Full source audit at any time', 'No black boxes'] },
+                { title: 'Open Source', items: ['Core gateway is Apache 2.0 licensed', 'Audit the open-source code at any time'] },
                 { title: 'Dependencies', items: ['Automated Dependabot updates', 'Go vulnerability scanning', 'Checksum verification'] },
-                { title: 'Infrastructure', items: ['TLS 1.2+ enforced', 'Stateless gateway design', 'Minimal attack surface'] },
-                { title: 'Code Quality', items: ['Required code review', 'Automated tests on every PR', 'Static analysis enforced'] },
+                { title: 'Infrastructure', items: ['TLS 1.2+ enforced', 'Minimal attack surface'] },
+                { title: 'Code Quality', items: ['Automated tests on every PR', 'Static analysis on every PR'] },
               ].map((group, i) => (
                 <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
                   <h4 className="text-white text-sm font-bold mb-2">{group.title}</h4>
@@ -374,7 +373,8 @@ export default function SecurityPage() {
                 { item: 'Responsible disclosure program', status: 'Active', color: 'text-green-400' },
                 { item: 'Automated vulnerability scanning', status: 'Active', color: 'text-green-400' },
                 { item: 'Open source core (Apache 2.0)', status: 'Active', color: 'text-green-400' },
-                { item: 'Third-party penetration test', status: 'Q2 2026', color: 'text-yellow-400' },
+                // The status of the third-party penetration test is the text after "status:" on the next line.
+                { item: 'Third-party penetration test', status: 'Planned', color: 'text-yellow-400' },
                 { item: 'SOC 2 Type I', status: 'Post-revenue', color: 'text-gray-500' },
               ].map((item, i) => (
                 <div key={i} className={`flex items-center justify-between px-4 py-2.5 text-sm ${i > 0 ? 'border-t border-gray-800' : ''}`}>
@@ -409,7 +409,7 @@ export default function SecurityPage() {
               <h2 className="text-xl font-bold text-white mb-0">Open Source Transparency</h2>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              All gateway code is open source under the Apache 2.0 License. Audit every line, fork it, run your own infrastructure.
+              The core gateway, the MCP server packages and the receipt verifier are open source under the Apache 2.0 License. The SDKs are open source under the MIT License. Audit them, fork them, run your own.
             </p>
             <a
               href="https://github.com/SatGate-io/satgate"
