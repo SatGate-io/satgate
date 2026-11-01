@@ -133,8 +133,8 @@ export default function PrivacyPage() {
               SatGate Cloud uses these outside services. This is what each one receives.
             </p>
             <ul className="list-disc list-inside text-gray-400 space-y-2">
-              <li>Fly.io hosts SatGate Cloud&apos;s servers, database and logs in its Ashburn, Virginia region.</li>
-              <li>Upstash provides the Redis store, through Fly.io in the same region, that SatGate Cloud uses for budget and spend tracking and for revocation lists.</li>
+              <li>Fly.io hosts SatGate Cloud&apos;s servers and database, and handles its application logs.</li>
+              <li>Upstash provides the Redis store, through Fly.io, that SatGate Cloud uses for budget and spend tracking and for revocation lists.</li>
               <li>Vercel hosts the satgate.io website. It receives the requests for the website&apos;s pages and the design partner form entries.</li>
               <li>Resend sends SatGate&apos;s emails, such as sign-in links and approval emails. It receives the recipient&apos;s email address and the contents of the email, including the call&apos;s values in an approval email.</li>
               <li>Stripe takes card payments for SatGate plans. It receives your name, email address and card details.</li>
