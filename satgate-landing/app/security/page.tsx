@@ -254,7 +254,7 @@ export default function SecurityPage() {
                 { label: 'Policy Enforcement Point', desc: 'Deny-by-default. Every protected request verified before proxying.' },
                 { label: 'Continuous Authorization', desc: 'Token validated on each request — no long-lived sessions or network zone trust.' },
                 { label: 'Least Privilege', desc: 'Macaroon caveats restrict scope, method, TTL, and budget per token.' },
-                { label: 'Token-based verification', desc: 'Cryptographic verification — no centralized user database required.' },
+                { label: 'Token-based verification', desc: 'Cryptographic verification; no centralized user database required.' },
               ].map((item, i) => (
                 <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
                   <h4 className="text-white text-xs font-bold mb-1">{item.label}</h4>
