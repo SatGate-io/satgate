@@ -243,6 +243,9 @@ func TestNotStored_SwitchOffBytes(t *testing.T) {
 	// either switch off. Rows added after the unknown outcomes'; earlier rows unchanged.
 	got = append(got, horizonOffRows(t)...)
 	got = append(got, notWrittenOffRows(t)...)
+	// A Control unknown outcome with the gap kind full: rows added after the
+	// ones above; earlier rows unchanged.
+	got = append(got, controlRoomOffRows(t)...)
 	if p := os.Getenv("NOT_STORED_OFF_SNAPSHOT"); p != "" {
 		b, _ := json.MarshalIndent(got, "", "  ")
 		if err := os.WriteFile(p, append(b, '\n'), 0o600); err != nil {

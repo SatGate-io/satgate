@@ -156,8 +156,8 @@ func (p *Proxy) wireDelegator() {
 	p.delegator.refuseUnavailable = func(ctx context.Context, parent *TokenInfo, reason unavailableCheckReason, resp *Response) *Response {
 		return p.refuseUnavailableMethod(ctx, parent, MethodSatGateDelegate, MethodSatGateDelegate, reason, resp)
 	}
-	p.delegator.keepUnknown = func(ctx context.Context, parent *TokenInfo, prep *pendingPreparation, release func(context.Context)) {
-		p.keepUnknownPrepared(ctx, parent, MethodSatGateDelegate, "", p.enforcementModeFor(ctx, tenantOf(parent)), prep, release)
+	p.delegator.keepUnknown = func(ctx context.Context, parent *TokenInfo, slot *pendingSlot, prep *pendingPreparation, release func(context.Context)) {
+		p.keepUnknownPrepared(ctx, parent, MethodSatGateDelegate, "", p.enforcementModeFor(ctx, tenantOf(parent)), slot, prep, release)
 	}
 }
 
@@ -495,7 +495,15 @@ func (p *Proxy) signUnavailableStop(ctx context.Context, tokenInfo *TokenInfo, m
 // recovery. Absent, release gives the hold back and the call is recorded: in
 // Observe counted as a miss in its own minute, in Control its stop signed
 // budget_backend_error. With either switch off nothing is kept.
-func (p *Proxy) keepUnknownPrepared(ctx context.Context, tokenInfo *TokenInfo, method, tool, mode string, prep *pendingPreparation, release func(context.Context)) {
+//
+// The unknown is kept in a slot the call set aside before it went ahead, so
+// keeping it never depends on free room elsewhere in the store: an Observe
+// call's miss slot, as before, and otherwise slot, the room a held call
+// reserved before its hold (Control, which has no miss slot). The slot's
+// release, deferred by the caller, then does nothing, as put already gives
+// the room to the entry. Only a call with no slot at all (none of the callers
+// in the proxy) finds room in the gap kind of the store, if it has any.
+func (p *Proxy) keepUnknownPrepared(ctx context.Context, tokenInfo *TokenInfo, method, tool, mode string, slot *pendingSlot, prep *pendingPreparation, release func(context.Context)) {
 	ea := p.every()
 	if !ea.closesGaps() || prep == nil || tokenInfo == nil || ea.durable == nil {
 		return
@@ -533,7 +541,11 @@ func (p *Proxy) keepUnknownPrepared(ctx context.Context, tokenInfo *TokenInfo, m
 			return ea.countMiss(c, miss)
 		}
 	}
-	ea.keepUnknown(missSlotFrom(ctx), PendingRecord{TenantID: r.TenantID, TokenID: r.TokenID, BudgetID: r.BudgetID, Method: r.Method, Tool: r.Tool, Minute: r.Minute}, u)
+	own := missSlotFrom(ctx)
+	if own == nil {
+		own = slot
+	}
+	ea.keepUnknown(own, PendingRecord{TenantID: r.TenantID, TokenID: r.TokenID, BudgetID: r.BudgetID, Method: r.Method, Tool: r.Tool, Minute: r.Minute}, u)
 }
 
 // withEvidenceData returns resp with the receipt's handles merged into the
