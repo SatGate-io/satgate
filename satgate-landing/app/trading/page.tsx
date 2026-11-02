@@ -6,10 +6,11 @@ import { ArrowRight, DollarSign, Lock, Receipt, Users } from 'lucide-react';
 const title = 'Financial guardrail for your AI agents';
 const tagline = 'Control what agents can do and spend. Prove every action.';
 const lead =
-  'Your limits sit outside the AI, so it can\'t loosen them or talk its way past them. SatGate checks them before an order reaches Robinhood.';
-const metaTitle = 'Financial guardrails for agentic trading on Robinhood | SatGate';
+  'Your limits sit outside the AI, so it can\'t loosen them or talk its way past them. SatGate checks them before an order reaches your broker.';
+const worksToday = 'Works with Robinhood today, with more brokerages to follow.';
+const metaTitle = 'Dollar limits and signed receipts for AI trading agents | SatGate';
 const description =
-  'Set dollar limits per order, per day and per week. Lock your AI agent to your Robinhood Agentic account. Approve orders by email, and stop your agent with one button.';
+  'Dollar limits for your AI trading agent. Approve large orders, give each agent its own key, get signed receipts, and stop any agent with one button.';
 
 export const metadata: Metadata = {
   title: { absolute: metaTitle },
@@ -32,9 +33,9 @@ export const metadata: Metadata = {
 const signupUrl = 'https://cloud.satgate.io/cloud/signup?intent=trading';
 
 const whatItDoes = [
-  { icon: Users, text: 'Run agents from different AI apps on one Robinhood account, each with its own limits.' },
-  { icon: Lock, text: 'Lock your agent to your Robinhood Agentic account, so it can\'t read your other accounts.' },
   { icon: DollarSign, text: 'Set dollar limits per order, per day and per week, and have any order over a limit refused.' },
+  { icon: Lock, text: 'Pick a dollar amount. An order over it waits for your yes by email or in SatGate, and smaller orders go through within your limits.' },
+  { icon: Users, text: 'Run agents from different AI apps on one account. Each agent gets its own key and its own limits.' },
   { icon: Receipt, text: 'Every action your agent takes is recorded in a signed receipt, and you can stop your agent with one button.' },
 ];
 
@@ -68,6 +69,18 @@ const auditItems = [
 
 const auditDetail =
   'SatGate\'s receipts show what SatGate decided. Your broker\'s statement shows what was filled. Calls from an agent you\'ve stopped are turned away. An order SatGate refuses stays stopped even if its receipt cannot be made.';
+
+const generalTitle = 'What SatGate does and doesn\'t do';
+
+const generalItems = [
+  'SatGate does not trade for anyone or open accounts. Your own AI agent trades in your own account. SatGate is your tool that sets limits and keeps receipts, like a firewall.',
+  'SatGate signs a receipt when it refuses your agent\'s request for breaking your rules, with the tool name and a refusal code. If SatGate can\'t make the receipt, the request is still stopped.',
+  'You can stop your agent in SatGate at any time.',
+  'SatGate\'s bill is a separate subscription and never comes out of your brokerage account.',
+];
+
+const robinhoodTitle = 'SatGate with Robinhood';
+const robinhoodIntro = 'Robinhood is the brokerage SatGate works with today. Everything in this section is about Robinhood.';
 
 const comparisonTitle = 'What Robinhood gives you, and what SatGate adds';
 const comparisonIntro =
@@ -113,8 +126,8 @@ const canAndCant = [
   'SatGate stores the access Robinhood gives it, encrypted, and uses it to pass along the calls your agent is allowed to make.',
   'On its own, SatGate only asks Robinhood for its list of tools, plus one read of your account list during setup, when you click, to find your Agentic account. It never reads your balances or places orders by itself.',
   'Robinhood lets a connected agent read all your Robinhood accounts. SatGate locks yours to the Agentic account.',
-  'SatGate signs a receipt when it refuses your agent\'s request for breaking your rules, with the tool name and a refusal code. If SatGate can\'t make the receipt, the request is still stopped. We don\'t keep Robinhood\'s replies, so we don\'t keep your balances or positions.',
-  'You can stop your agent in SatGate at any time, or disconnect SatGate in the Robinhood app. SatGate\'s bill is a separate subscription and never comes out of your brokerage account.',
+  'We don\'t keep Robinhood\'s replies, so we don\'t keep your balances or positions.',
+  'You can also disconnect SatGate in the Robinhood app at any time.',
 ];
 
 export default function TradingPage() {
@@ -176,6 +189,10 @@ export default function TradingPage() {
         </div>
       </section>
 
+      <div className="border-b border-gray-900">
+        <p className="mx-auto max-w-4xl px-6 py-4 text-base font-medium text-cyan-300">{worksToday}</p>
+      </div>
+
       <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="audit-title">
         <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
           <h2 id="audit-title" className="mb-3 text-2xl font-bold text-white">{auditTitle}</h2>
@@ -191,9 +208,22 @@ export default function TradingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="comparison-title">
+      <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="general-title">
         <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
-          <h2 id="comparison-title" className="mb-3 text-2xl font-bold text-white">{comparisonTitle}</h2>
+          <h2 id="general-title" className="mb-5 text-2xl font-bold text-white">{generalTitle}</h2>
+          <ul className="list-disc space-y-3 pl-5 text-gray-300 marker:text-cyan-300">
+            {generalItems.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="robinhood-title">
+        <h2 id="robinhood-title" className="mb-3 text-3xl font-bold text-white">{robinhoodTitle}</h2>
+        <p className="mb-8 text-gray-300">{robinhoodIntro}</p>
+        <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
+          <h3 id="comparison-title" className="mb-3 text-2xl font-bold text-white">{comparisonTitle}</h3>
           <p className="mb-6 text-gray-300">{comparisonIntro}</p>
           <div className="hidden gap-8 border-b border-gray-800 pb-3 text-sm font-semibold text-gray-400 md:grid md:grid-cols-2" aria-hidden="true">
             <span>Robinhood on its own</span>
@@ -202,7 +232,7 @@ export default function TradingPage() {
           <ul>
             {comparisonRows.map((row) => (
               <li key={row.topic} className="border-b border-gray-800 py-5 last:border-b-0 last:pb-0">
-                <h3 className="mb-3 text-base font-semibold text-white">{row.topic}</h3>
+                <h4 className="mb-3 text-base font-semibold text-white">{row.topic}</h4>
                 <div className="grid gap-4 md:grid-cols-2 md:gap-8">
                   <div>
                     <p className="mb-1 text-sm font-semibold text-gray-400 md:hidden">Robinhood on its own</p>
@@ -217,11 +247,9 @@ export default function TradingPage() {
             ))}
           </ul>
         </div>
-      </section>
 
-      <section className="mx-auto max-w-4xl px-6 py-16">
-        <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
-          <h2 className="mb-5 text-2xl font-bold text-white">What SatGate can and can&apos;t do with your Robinhood connection</h2>
+        <div className="mt-8 rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
+          <h3 className="mb-5 text-2xl font-bold text-white">What SatGate can and can&apos;t do with your Robinhood connection</h3>
           <ul className="list-disc space-y-3 pl-5 text-gray-300 marker:text-cyan-300">
             {canAndCant.map((line) => (
               <li key={line}>{line}</li>
@@ -229,7 +257,11 @@ export default function TradingPage() {
           </ul>
         </div>
 
-        <div className="mt-10">
+        <p className="mt-6 text-sm text-gray-500">SatGate is not affiliated with or endorsed by Robinhood.</p>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 py-16">
+        <div>
           <a
             href={signupUrl}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500"
@@ -240,7 +272,6 @@ export default function TradingPage() {
           <p className="mt-4 text-sm text-gray-500">
             SatGate sets limits and keeps receipts. It does not pick trades or give investment advice.
           </p>
-          <p className="mt-2 text-sm text-gray-500">SatGate is not affiliated with or endorsed by Robinhood.</p>
         </div>
       </section>
     </main>

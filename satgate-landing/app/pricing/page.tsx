@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: 'What is the Personal plan?',
-    a: 'Personal is $9.99 a month after 30 days free, for people who let an AI app trade for them on Robinhood. It sets your limits and keeps receipts. It does not pick trades or give investment advice. Your SatGate bill is a separate subscription and never comes out of your brokerage account.',
+    a: 'Personal is $9.99 a month after 30 days free, for people who let their own AI agent trade in their own brokerage account. SatGate does not trade for anyone or open accounts. It is your tool that sets limits and keeps receipts, like a firewall. It does not pick trades or give investment advice. It works with Robinhood today, with more brokerages to follow. Your SatGate bill is a separate subscription and never comes out of your brokerage account.',
   },
   {
     q: 'What is included in Pro?',
@@ -110,7 +110,7 @@ const PricingPage = () => {
         name: 'SatGate Personal',
         price: '9.99',
         priceCurrency: 'USD',
-        description: 'For people who let an AI app trade for them. 30 days free. No card to start. $9.99/month. Dollar limits per order, per day and per week. Your agent sees only your Robinhood Agentic account. Orders over an amount you pick wait for your yes. One budget your AI apps can share. Every action your agent takes is recorded in a signed receipt. Stop any agent with one button.',
+        description: 'For people who let an AI app trade for them. 30 days free. No card to start. $9.99/month. Dollar limits per order, per day and per week. On Robinhood, your agent sees only your Agentic account. Orders over an amount you pick wait for your yes. One budget your AI apps can share. Every action your agent takes is recorded in a signed receipt. Stop any agent with one button. Works with Robinhood today, with more brokerages to follow.',
         availability: 'https://schema.org/InStock',
         url: personalSignupUrl,
         itemOffered: { '@type': 'Service', name: 'SatGate Personal', serviceType: 'AI agent governance' },
@@ -263,7 +263,7 @@ const PricingPage = () => {
             </div>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
               <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Dollar limits per order, per day and per week</li>
-              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Your agent sees only your Robinhood Agentic account</li>
+              <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />On Robinhood, your agent sees only your Agentic account</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Orders over an amount you pick wait for your yes</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />One budget your AI apps can share</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-pink-400 mt-0.5 shrink-0" />Every action your agent takes is recorded in a signed receipt</li>
@@ -336,7 +336,7 @@ const PricingPage = () => {
           </div>
         </div>
         <p className="max-w-3xl mx-auto mt-8 text-center text-sm text-gray-500">
-          SatGate sets limits and keeps receipts. It does not pick trades or give investment advice. SatGate is not affiliated with or endorsed by Robinhood.
+          SatGate does not trade for anyone or open accounts. Your own AI agent trades in your own account, and SatGate is your tool that sets limits and keeps receipts, like a firewall. It does not pick trades or give investment advice. Works with Robinhood today, with more brokerages to follow. SatGate is not affiliated with or endorsed by Robinhood.
         </p>
       </section>
 
