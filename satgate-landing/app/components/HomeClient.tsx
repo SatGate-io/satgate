@@ -199,7 +199,7 @@ const LandingPage = () => {
             </p>
             <p className="mt-2 text-sm text-gray-500">14 days free. No credit card.</p>
             <p className="mt-4 text-base text-gray-300">
-              Trading on Robinhood? Set limits for your AI agent.{' '}
+              Letting an AI agent trade in your brokerage account? Set limits for it. Works with Robinhood today.{' '}
               <Link href="/trading" className="font-medium text-cyan-300 hover:text-cyan-200 underline underline-offset-2">See how</Link>
             </p>
 
