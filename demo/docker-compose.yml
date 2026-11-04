@@ -36,7 +36,7 @@ services:
       SATGATE_EVIDENCE_ARCHIVE_REQUIRED: "true"
       SATGATE_RECEIPT_ISSUER: https://localhost
       SATGATE_RECEIPT_SIGNING_KID: local-demo-v1
-      SATGATE_RECEIPT_SIGNING_KEY_B64: Qq9mCjlOdQfAfGs4Pje2Nk-UpjeuUx78H27wjk8m4_U
+      SATGATE_RECEIPT_SIGNING_KEY_B64: ${SATGATE_DEMO_SIGNING_KEY_B64:?Generate a local demo signing key as described in demo/README.md}
       SATGATE_RECEIPT_SIGNING_KEY_REQUIRED: "true"
     volumes:
       - ./configs:/app/configs:ro

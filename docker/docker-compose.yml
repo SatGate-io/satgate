@@ -6,7 +6,7 @@ version: '3.8'
 
 services:
   satgate:
-    image: satgate/satgate:latest
+    image: ghcr.io/satgate-io/satgate:latest
     # Or build locally:
     # build:
     #   context: .
@@ -29,8 +29,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes

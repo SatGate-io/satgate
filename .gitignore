@@ -33,3 +33,20 @@ Thumbs.db
 *.swo
 node_modules/
 bin/
+
+# Local deployment metadata, build binaries and coordinator scratch files
+.vercel/
+/satgate-cli
+/satgate-mcp
+/staging_config.yaml
+/EXTRACTION_STATUS.md
+/TASK.md
+*.key
+*.pem
+.env
+.env.*
+!.env.example
+.cache/
+coverage/
+playwright-report/
+test-results/
