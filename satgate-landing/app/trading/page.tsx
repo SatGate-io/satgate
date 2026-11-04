@@ -189,6 +189,27 @@ export default function TradingPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="how-it-works-title">
+        <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
+          <h2 id="how-it-works-title" className="mb-5 text-2xl font-bold text-white">How it works</h2>
+          <ul className="list-disc space-y-3 pl-5 text-gray-300 marker:text-cyan-300">
+            <li>
+              <strong className="font-semibold text-white">What can my agent do?</strong>{' '}
+              Only the tools and accounts you allow. Everything else is blocked before it reaches your broker.
+            </li>
+            <li>
+              <strong className="font-semibold text-white">How much can it spend?</strong>{' '}
+              A hard dollar limit it can&apos;t go past. Orders above an amount you choose wait for your OK by email.
+            </li>
+            <li>
+              <strong className="font-semibold text-white">Can I prove what happened?</strong>{' '}
+              Every action leaves a signed receipt. You, your accountant or anyone you show it to can check it against SatGate&apos;s published keys, with no need to trust the AI company.
+            </li>
+          </ul>
+          <p className="mt-6 text-gray-300">Example: Say your agent tries to buy $2 of Bitcoin and crypto isn&apos;t on its list. SatGate refuses it, the order never reaches your broker, and you get a signed receipt of the refusal.</p>
+        </div>
+      </section>
+
       <div className="border-b border-gray-900">
         <p className="mx-auto max-w-4xl px-6 py-4 text-base font-medium text-cyan-300">{worksToday}</p>
       </div>
