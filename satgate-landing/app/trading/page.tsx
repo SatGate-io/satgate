@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, DollarSign, Lock, Receipt, Users } from 'lucide-react';
+import { ArrowRight, Receipt, Users } from 'lucide-react';
 
 const title = 'Financial guardrail for your AI agents';
 const tagline = 'Control what agents can do and spend. Prove every action.';
@@ -33,16 +33,13 @@ export const metadata: Metadata = {
 const signupUrl = 'https://cloud.satgate.io/cloud/signup?intent=trading';
 
 const whatItDoes = [
-  { icon: DollarSign, text: 'Set dollar limits per order, per day and per week, and have any order over a limit refused.' },
-  { icon: Lock, text: 'Pick a dollar amount. An order over it waits for your yes by email or in SatGate, and smaller orders go through within your limits.' },
-  { icon: Users, text: 'Run agents from different AI apps on one account. Each agent gets its own key and its own limits.' },
-  { icon: Receipt, text: 'Every action your agent takes is recorded in a signed receipt, and you can stop your agent with one button.' },
+  { icon: Users, text: 'Each agent gets its own key.' },
+  { icon: Receipt, text: 'You can stop your agent with one button.' },
 ];
 
 const checkerUrl = 'https://github.com/SatGate-io/satgate/tree/main/tools';
 
 const auditTitle = 'Built for audit';
-const auditIntro = 'SatGate keeps a record your auditor can check.';
 
 const auditItems = [
   {
@@ -51,7 +48,7 @@ const auditItems = [
   },
   {
     lead: 'Checked before the money moves.',
-    text: 'SatGate checks each order against your limits before it reaches your broker. A refused order never gets there.',
+    text: 'SatGate checks each order against your limits before it reaches your broker.',
   },
   {
     lead: 'No need to trust the AI company.',
@@ -68,13 +65,13 @@ const auditItems = [
 ];
 
 const auditDetail =
-  'SatGate\'s receipts show what SatGate decided. Your broker\'s statement shows what was filled. Calls from an agent you\'ve stopped are turned away. An order SatGate refuses stays stopped even if its receipt cannot be made.';
+  'SatGate\'s receipts show what SatGate decided. Your broker\'s statement shows what was filled. Calls from an agent you\'ve stopped are turned away.';
 
 const generalTitle = 'What SatGate does and doesn\'t do';
 
 const generalItems = [
   'SatGate does not trade for anyone or open accounts. Your own AI agent trades in your own account. SatGate is your tool that sets limits and keeps receipts, like a firewall.',
-  'SatGate signs a receipt when it refuses your agent\'s request for breaking your rules, with the tool name and a refusal code. If SatGate can\'t make the receipt, the request is still stopped.',
+  'SatGate signs a receipt when it refuses your agent\'s request for breaking your rules, with the tool name and a refusal code.',
   'You can stop your agent in SatGate at any time.',
   'SatGate\'s bill is a separate subscription and never comes out of your brokerage account.',
 ];
@@ -110,7 +107,7 @@ const comparisonRows = [
     topic: 'Orders that were stopped',
     robinhood: 'Orders your agent places show up in the Activity section of its account in the Robinhood app.',
     satgate:
-      'Every action your agent takes is recorded in a signed receipt, including orders SatGate refuses for being over a limit, outside the Agentic account or not allowed. If SatGate can\'t make the receipt, the order is still stopped.',
+      'Every action your agent takes is recorded in a signed receipt, including orders SatGate refuses for being over a limit, outside the Agentic account or not allowed.',
   },
   {
     topic: 'More than one agent',
@@ -217,7 +214,6 @@ export default function TradingPage() {
       <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="audit-title">
         <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
           <h2 id="audit-title" className="mb-3 text-2xl font-bold text-white">{auditTitle}</h2>
-          <p className="mb-6 text-gray-300">{auditIntro}</p>
           <ul className="list-disc space-y-3 pl-5 text-gray-300 marker:text-cyan-300">
             {auditItems.map(({ lead, text }) => (
               <li key={lead}>
