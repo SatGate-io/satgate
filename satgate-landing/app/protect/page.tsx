@@ -155,22 +155,14 @@ export default function ProtectDemoPage() {
   const [adminToken, setAdminToken] = useState(''); // Admin token for live mode
   const [showAdminInput, setShowAdminInput] = useState(false);
 
-  // Load admin token from localStorage on mount
+  // Discard credentials persisted by older versions; live-mode credentials
+  // now exist only in component memory and disappear on reload.
   useEffect(() => {
-    const savedToken = localStorage.getItem('satgate_admin_token');
-    if (savedToken) {
-      setAdminToken(savedToken);
-    }
+    localStorage.removeItem('satgate_admin_token');
   }, []);
 
-  // Save admin token to localStorage when it changes
   const handleSetAdminToken = (token: string) => {
     setAdminToken(token);
-    if (token) {
-      localStorage.setItem('satgate_admin_token', token);
-    } else {
-      localStorage.removeItem('satgate_admin_token');
-    }
   };
 
   const addLog = (msg: string, type: LogEntry['type'] = 'info') => {

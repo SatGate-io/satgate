@@ -20,6 +20,7 @@ export default function DesignPartnersPage() {
     agentCount: '',
     apis: [] as string[],
     challenge: '',
+    website: '',
   });
 
   const toggleFaq = (idx: number) => {
@@ -351,6 +352,9 @@ export default function DesignPartnersPage() {
           <p className="text-gray-500 text-center mb-10">Takes about 2 minutes. We review each application and reply with fit questions or a proposed pilot scope.</p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div hidden aria-hidden="true">
+              <input name="website" type="text" tabIndex={-1} autoComplete="off" value={formData.website} onChange={e => setFormData({ ...formData, website: e.target.value })} />
+            </div>
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Name *</label>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { escapeHtml, IntakeError, readApplication, reserveRecipient, success } from '../../../lib/design-partner-intake';
 
 async function sendEmail(apiKey: string, params: { from: string; to: string[]; cc?: string[]; subject: string; html: string }) {
   const res = await fetch('https://api.resend.com/emails', {
@@ -8,39 +9,39 @@ async function sendEmail(apiKey: string, params: { from: string; to: string[]; c
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(params),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Resend API error ${res.status}: ${err}`);
+    throw new Error('Mail delivery failed');
   }
   return res.json();
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    const { name, email, company, role, agentCount, apis, challenge } = data;
-
-    if (!name || !email || !company) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const data = await readApplication(req);
+    if (!data) return NextResponse.json(success);
+    if (!await reserveRecipient(data.email)) {
+      return NextResponse.json({ error: 'Too many applications' }, { status: 429, headers: { 'Retry-After': '3600' } });
     }
+    const { name, company, role, agentCount, challenge } = Object.fromEntries(
+      Object.entries(data).filter(([, value]) => typeof value === 'string').map(([key, value]) => [key, escapeHtml(value as string)])
+    );
+    const email = escapeHtml(data.email);
+    const apis = data.apis.map(escapeHtml);
 
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      console.error('[Design Partner] RESEND_API_KEY not configured');
-      // Still log the submission even if email fails
-      console.log(`[Design Partner] ${company} — ${name} (${email})`);
-      return NextResponse.json({ ok: true, message: "Application received! We'll be in touch within 24 hours." });
+      throw new IntakeError(503, 'Service unavailable');
     }
 
     const fromName = process.env.RESEND_FROM_NAME || 'SatGate';
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@satgate.io';
 
-    // Send notification to Wayne + Matt
+    // Send notification to the active mailbox only.
     await sendEmail(apiKey, {
       from: `${fromName} <${fromEmail}>`,
       to: ['wayne@satgate.io'],
-      cc: ['matt@satgate.io'],
       subject: `🚀 New Design Partner Application: ${company}`,
       html: `
         <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -68,12 +69,12 @@ export async function POST(req: NextRequest) {
     // Send confirmation to applicant
     await sendEmail(apiKey, {
       from: `${fromName} <${fromEmail}>`,
-      to: [email],
+      to: [data.email],
       subject: 'SatGate Design Partner Application Received',
       html: `
         <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Thanks for applying, ${(name || '').split(' ')[0]}!</h2>
-          <p>We received your Design Partner application for <strong>${company}</strong>.</p>
+          <h2>Thanks for applying!</h2>
+          <p>We received your Design Partner application.</p>
           <p>We review applications within 24 hours. You'll hear from Wayne Mattadeen, our founder, directly.</p>
           <p>In the meantime, you can:</p>
           <ul>
@@ -87,10 +88,10 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    console.log(`[Design Partner] ✅ ${company} — ${name} (${email})`);
-    return NextResponse.json({ ok: true, message: "Application received! We'll be in touch within 24 hours." });
+    return NextResponse.json(success);
   } catch (err) {
-    console.error('[Design Partner] Error:', err);
+    if (err instanceof IntakeError) return NextResponse.json({ error: err.message }, { status: err.status });
+    console.error('[Design Partner] Delivery unavailable');
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test:design-partner": "node --test tests/design-partner.test.cjs",
+    "test:csp": "node scripts/check_csp.mjs",
     "lint": "eslint",
     "seo:gsc": "python3 scripts/gsc_telemetry.py",
     "seo:links": "python3 scripts/internal_link_audit.py",
@@ -31,6 +33,7 @@
     "resend": "^6.9.3"
   },
   "devDependencies": {
+    "playwright": "1.64.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

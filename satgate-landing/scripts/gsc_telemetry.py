@@ -7,8 +7,9 @@ Generates a Markdown report and JSON artifact covering:
 - CTR and position opportunities
 - selected URL Inspection index states
 
-Requires a Search Console OAuth token with webmasters scope at:
-  /Users/mattdean/.gbrain/google-search-console-tokens.json
+Requires a Search Console OAuth token with webmasters scope at the path
+specified by GSC_TOKEN_PATH. Output directories can be set with GSC_OUT_DIR
+and GSC_JSON_DIR; defaults are relative to the current directory.
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import pathlib
 import re
 import sys
@@ -31,9 +33,9 @@ from googleapiclient.discovery import build
 SITE = "sc-domain:satgate.io"
 BASE_URL = "https://satgate.io"
 SITEMAP_URL = "https://satgate.io/sitemap.xml"
-TOKEN_PATH = pathlib.Path("/Users/mattdean/.gbrain/google-search-console-tokens.json")
-DEFAULT_OUT_DIR = pathlib.Path("/Users/mattdean/Obsidian/AgentMemory/Agent-OpenClaw/reports")
-DEFAULT_JSON_DIR = pathlib.Path("/Users/mattdean/.openclaw/workspace/reports")
+TOKEN_PATH = pathlib.Path(os.environ["GSC_TOKEN_PATH"]).expanduser() if os.environ.get("GSC_TOKEN_PATH") else None
+DEFAULT_OUT_DIR = pathlib.Path(os.environ.get("GSC_OUT_DIR", "seo/reports"))
+DEFAULT_JSON_DIR = pathlib.Path(os.environ.get("GSC_JSON_DIR", "seo/reports"))
 SCOPES = [
     "https://www.googleapis.com/auth/webmasters",
     "openid",
@@ -73,8 +75,8 @@ def iso_date(days_ago: int) -> str:
 
 
 def get_creds() -> Credentials:
-    if not TOKEN_PATH.exists():
-        raise SystemExit(f"Missing Search Console token: {TOKEN_PATH}")
+    if TOKEN_PATH is None or not TOKEN_PATH.exists():
+        raise SystemExit("Set GSC_TOKEN_PATH to an existing Search Console credential file")
     creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
     if creds.expired and creds.refresh_token:
         creds.refresh(Request())
