@@ -65,7 +65,7 @@ const auditItems = [
 ];
 
 const auditDetail =
-  'SatGate\'s receipts show what SatGate decided. Your broker\'s statement shows what was filled. Calls from an agent you\'ve stopped are turned away. An order SatGate refuses stays stopped even if its receipt cannot be made.';
+  'SatGate\'s receipts show what SatGate decided. Your broker\'s statement shows what was filled. Calls from an agent you\'ve stopped are turned away.';
 
 const generalTitle = 'What SatGate does and doesn\'t do';
 
