@@ -10,16 +10,23 @@ be empty. All submitted HTML values are escaped. Confirmation content is fixed;
 only its envelope recipient comes from the application. Notification has no cc.
 Provider response/error bodies and submitted personal data are not logged.
 
-Before enabling delivery, configure RESEND_API_KEY and a dedicated shared
-Upstash-compatible Redis REST store through UPSTASH_REDIS_REST_URL (HTTPS) and
-UPSTASH_REDIS_REST_TOKEN. Do not expose these variables as NEXT_PUBLIC_*.
-The store needs EVAL, INCR and EXPIRE permissions. The route atomically reserves
-at most three attempts per normalized recipient for 3600 seconds from the first
-attempt, including failed mail attempts. Keys contain only a SHA-256 recipient
-digest, never a raw address. Missing/unavailable rate storage fails closed; there
-is deliberately no per-process fallback. This prevents serverless restarts or
-parallel instances from resetting the limit. These are code/configuration
-requirements, not a deployment instruction. No deployment is part of this PR.
+Mail delivery requires the existing RESEND_API_KEY; missing mail configuration
+fails closed. No new service or setting is required to accept applications and
+notify the fixed internal recipient. Only the submitter confirmation is limited.
+It reuses either complete existing pair: UPSTASH_REDIS_REST_URL (HTTPS) with
+UPSTASH_REDIS_REST_TOKEN, or KV_REST_API_URL (HTTPS) with KV_REST_API_TOKEN.
+The Upstash pair takes precedence when both pairs are complete; credentials are
+never mixed between pairs. Do not expose these variables as NEXT_PUBLIC_*.
+The store needs EVAL, INCR and EXPIRE permissions. After internal delivery, the
+route atomically reserves at most three confirmation attempts per normalized
+recipient for 3600 seconds from the first attempt, including failed confirmation
+attempts. Keys contain only a SHA-256 recipient digest, never a raw address.
+Absent/incomplete/invalid storage configuration, failed reads or writes, malformed
+counter responses and exhausted limits all suppress only confirmation. There is
+no per-process fallback. The internal notification still sends and the browser
+receives exactly the same success status/body/headers as an allowed confirmation.
+Confirmation delivery failures likewise do not reveal confirmation status.
+No deployment or external configuration change is part of this PR.
 
 CSP
 

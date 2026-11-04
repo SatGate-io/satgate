@@ -69,23 +69,28 @@ export async function readApplication(req: Request) {
   return { name, email, company, role, agentCount, challenge, apis: apis as string[] };
 }
 
-// Atomic shared Redis counter: serverless instances cannot enforce a durable
-// recipient limit with a process-local Map. Fail closed if the store is absent.
+// Only the applicant confirmation needs a durable recipient limit. Reuse either
+// existing Redis REST configuration pair; never mix credentials between pairs.
+// Missing/unavailable storage suppresses confirmation, not the application.
 export async function reserveRecipient(email: string): Promise<boolean> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token || !url.startsWith('https://')) throw new IntakeError(503, 'Service unavailable');
+  const upstash = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = upstash ? process.env.UPSTASH_REDIS_REST_URL : process.env.KV_REST_API_URL;
+  const token = upstash ? process.env.UPSTASH_REDIS_REST_TOKEN : process.env.KV_REST_API_TOKEN;
+  if (!url || !token || !url.startsWith('https://')) return false;
   const key = `design-partner:${createHash('sha256').update(email).digest('hex')}`;
   const script = "local n = redis.call('INCR', KEYS[1]); if n == 1 then redis.call('EXPIRE', KEYS[1], 3600) end; return n";
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(['EVAL', script, '1', key]),
-    signal: AbortSignal.timeout(5000),
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new IntakeError(503, 'Service unavailable');
-  const result = await res.json();
-  if (!Number.isInteger(result.result) || result.result < 1) throw new IntakeError(503, 'Service unavailable');
-  return result.result <= RECEIPTS_PER_HOUR;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(['EVAL', script, '1', key]),
+      signal: AbortSignal.timeout(5000),
+      cache: 'no-store',
+    });
+    if (!res.ok) return false;
+    const result = await res.json();
+    return !result?.error && Number.isInteger(result?.result) && result.result >= 1 && result.result <= RECEIPTS_PER_HOUR;
+  } catch {
+    return false;
+  }
 }

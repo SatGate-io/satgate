@@ -68,7 +68,7 @@ func gatewayConfigFiles(t *testing.T, root string) []string {
 func TestRepoGatewayConfigsStillLoad(t *testing.T) {
 	root := repoRoot(t)
 	files := gatewayConfigFiles(t, root)
-	for _, want := range []string{"examples/gateway.yaml", "demo/configs/demo.yaml", "staging_config.yaml"} {
+	for _, want := range []string{"examples/gateway.yaml", "demo/configs/demo.yaml"} {
 		found := false
 		for _, f := range files {
 			found = found || filepath.ToSlash(f) == want

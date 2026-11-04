@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { escapeHtml, IntakeError, readApplication, reserveRecipient, success } from '../../../lib/design-partner-intake';
 
-async function sendEmail(apiKey: string, params: { from: string; to: string[]; cc?: string[]; subject: string; html: string }) {
+async function sendEmail(apiKey: string, params: { from: string; to: string[]; subject: string; html: string }) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -21,9 +21,7 @@ export async function POST(req: NextRequest) {
   try {
     const data = await readApplication(req);
     if (!data) return NextResponse.json(success);
-    if (!await reserveRecipient(data.email)) {
-      return NextResponse.json({ error: 'Too many applications' }, { status: 429, headers: { 'Retry-After': '3600' } });
-    }
+
     const { name, company, role, agentCount, challenge } = Object.fromEntries(
       Object.entries(data).filter(([, value]) => typeof value === 'string').map(([key, value]) => [key, escapeHtml(value as string)])
     );
@@ -66,12 +64,15 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    // Send confirmation to applicant
-    await sendEmail(apiKey, {
-      from: `${fromName} <${fromEmail}>`,
-      to: [data.email],
-      subject: 'SatGate Design Partner Application Received',
-      html: `
+    // The internal notification is independent of optional confirmation storage.
+    // Do not reveal whether a confirmation was allowed or delivered.
+    if (await reserveRecipient(data.email)) {
+      try {
+        await sendEmail(apiKey, {
+          from: `${fromName} <${fromEmail}>`,
+          to: [data.email],
+          subject: 'SatGate Design Partner Application Received',
+          html: `
         <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2>Thanks for applying!</h2>
           <p>We received your Design Partner application.</p>
@@ -86,7 +87,11 @@ export async function POST(req: NextRequest) {
           <p style="color: #666;">— The SatGate Team</p>
         </div>
       `,
-    });
+        });
+      } catch {
+        // The application was delivered internally; confirmation is best effort.
+      }
+    }
 
     return NextResponse.json(success);
   } catch (err) {
