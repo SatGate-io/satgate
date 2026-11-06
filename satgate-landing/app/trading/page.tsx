@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Receipt, Users } from 'lucide-react';
+import { differentiatorCopy } from '../lib/differentiator-copy';
 
 const title = 'Financial guardrail for your AI agents';
 const tagline = 'Control what agents can do and spend. Prove every action.';
@@ -165,6 +166,10 @@ export default function TradingPage() {
         <div className="relative mx-auto max-w-4xl px-6 py-16 md:py-24">
           <h1 className="mb-4 text-4xl font-extrabold tracking-tight md:text-6xl">{title}</h1>
           <p className="mb-4 text-2xl font-semibold text-white md:text-3xl">{tagline}</p>
+          <div className="mb-4 space-y-2 text-lg text-gray-300 md:text-xl">
+            <p>{differentiatorCopy.tradingRules}</p>
+            <p>{differentiatorCopy.tradingEvidence}</p>
+          </div>
           <p className="mb-8 text-lg text-gray-300 md:text-xl">{lead}</p>
           <ul className="space-y-4">
             {whatItDoes.map(({ icon: Icon, text }) => (
