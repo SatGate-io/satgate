@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Check, ChevronDown, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { differentiatorCopy } from '../lib/differentiator-copy';
 
 const personalSignupUrl = 'https://cloud.satgate.io/cloud/signup?intent=trading';
 
@@ -316,6 +317,11 @@ const PricingPage = () => {
             <div className="mb-6">
               <h3 className="text-lg font-bold text-green-400 mb-1">Enterprise</h3>
               <p className="text-gray-500 text-sm">Run it on your own servers. Custom pricing.</p>
+              <div className="mt-3 space-y-2 text-sm text-gray-400">
+                <p>{differentiatorCopy.enterpriseRules}</p>
+                <p>{differentiatorCopy.enterpriseEvidence}</p>
+                <p>{differentiatorCopy.worksToday}</p>
+              </div>
             </div>
             <div className="mb-6">
               <span className="text-4xl font-extrabold text-white">Custom</span>

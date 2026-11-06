@@ -7,7 +7,7 @@ import Image from 'next/image';
 import HeroVideo from './HeroVideo';
 import ProductionRecordings from './ProductionRecordings';
 
-const LandingPage = () => {
+const LandingPage = ({ differentiators }: { differentiators: React.ReactNode }) => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'python' | 'nodejs' | 'curl'>('python');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -234,6 +234,8 @@ const LandingPage = () => {
           </div>
         </div>
       </header>
+
+      {differentiators}
 
       {/* Explainer Video Section */}
       <ProductionRecordings heading="See SatGate in Action" />

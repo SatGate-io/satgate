@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeClient from "./components/HomeClient";
+import { differentiatorCopy } from "./lib/differentiator-copy";
 
 export const metadata: Metadata = {
   title: { absolute: "SatGate: an economic firewall for AI agents" },
@@ -95,7 +96,15 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <HomeClient />
+      <HomeClient differentiators={
+        <section className="px-6 pb-16">
+          <div className="mx-auto max-w-6xl space-y-3 text-lg leading-relaxed text-gray-300">
+            <p>{differentiatorCopy.enterpriseRules}</p>
+            <p>{differentiatorCopy.enterpriseEvidence}</p>
+            <p className="text-sm text-gray-400">{differentiatorCopy.worksToday}</p>
+          </div>
+        </section>
+      } />
     </>
   );
 }
