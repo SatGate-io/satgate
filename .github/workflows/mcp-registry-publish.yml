@@ -2,16 +2,22 @@ name: Publish to MCP Registry
 on:
   workflow_dispatch:
 permissions:
-  id-token: write
   contents: read
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Install mcp-publisher
         run: |
-          curl -sL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            --output mcp-publisher.tar.gz \
+            "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.7/mcp-publisher_linux_amd64.tar.gz"
+          printf '%s  %s\n' '00b21004149a4ce66f0782508ae4a2bce67d1bea395a8da0bd8028159fb59579' 'mcp-publisher.tar.gz' | sha256sum --check --strict
+          tar xzf mcp-publisher.tar.gz mcp-publisher
       - name: Publish
         run: |
           cp .mcp/server.json server.json

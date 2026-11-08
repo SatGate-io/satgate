@@ -15,7 +15,7 @@ TARGETS = [
     "app/mcp/page.tsx",
     "app/pricing/page.tsx",
     "app/pricing/layout.tsx",
-    "app/monetize/page.tsx",
+    "app/pay/page.tsx",
     "app/pay/layout.tsx",
     "app/pay/page.tsx",
     "app/http-402-for-ai-agents/page.tsx",

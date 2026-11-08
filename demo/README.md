@@ -5,7 +5,7 @@ A local, synthetic, pull-only demonstration of SatGate's HTTP Policy-to-Proof pa
 ## Boundaries
 
 - Local demo only; every published port binds to `127.0.0.1`.
-- Uses synthetic traffic and local-only committed demo credentials.
+- Uses synthetic traffic, local-only demo credentials, and a fresh local signing key.
 - Makes no calls to SatGate production, staging, billing, identity, model-provider, or customer systems.
 - Demonstrates one configured HTTP Control route: quote before spend, no-debit price discovery, two allowed calls, budget exhaustion, and buyer-fetchable signed evidence.
 - Stores local Evidence Pack bytes only in a project-scoped Docker volume removed by the documented cleanup command.
@@ -25,6 +25,7 @@ Both SatGate images support `linux/amd64` and `linux/arm64`.
 ```bash
 git clone https://github.com/SatGate-io/satgate.git
 cd satgate/demo
+export SATGATE_DEMO_SIGNING_KEY_B64="$(python3 -c 'import base64,secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode().rstrip("="))')"
 docker compose up -d
 docker compose ps
 curl -fsS http://localhost:8080/healthz
@@ -47,7 +48,7 @@ Then open <http://localhost:13000>. The buyer defaults remain `3000` and `8080`.
 
 ## Verify the Evidence Pack
 
-The kit uses an intentionally public, deterministic local-demo signing seed and identifies its self-signed runtime as `https://localhost` with `kid=local-demo-v1`; it never claims the canonical SatGate issuer. The key provides repeatable demo bytes, not secrecy or external trust. Create an isolated Python environment, then run the verifier against the Evidence Pack URL printed by `golden-path.sh`:
+The kit requires a locally generated signing seed (the quick-start command assigns it without printing it) and identifies its self-signed runtime as `https://localhost` with `kid=local-demo-v1`; it never claims the canonical SatGate issuer. Keep the variable in the same shell for all Compose commands; do not commit it. A local key provides artifact integrity, not external trust. Create an isolated Python environment, then run the verifier against the Evidence Pack URL printed by `golden-path.sh`:
 
 ```bash
 python3 -m venv .venv-verifier
@@ -93,6 +94,7 @@ docker compose config --images
 
 ```bash
 docker compose down -v --remove-orphans
+unset SATGATE_DEMO_SIGNING_KEY_B64
 ```
 
 After cleanup, ports `3000` and `8080` should no longer answer and the project-scoped network and volume should be gone.

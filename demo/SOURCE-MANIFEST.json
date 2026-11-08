@@ -11,7 +11,7 @@
       "source_path": "demo/README.md",
       "source_blob": "997ecb5ba5887f498da9ce12702c35dcf6539cbb",
       "mode": "adapted",
-      "sha256": "02d15dc1abbe7d1c560de0db52a7cba1785f3df97e3645fdaa9de7347401850d"
+      "sha256": "0553289ce4cb00d03e3486c118100f869283cb8941f2cfc1258124749d88757d"
     },
     {
       "public_path": "demo/_vendor/rfc8785/__init__.py",
@@ -46,7 +46,7 @@
       "source_path": "demo/docker-compose.yml",
       "source_blob": "e8dcf88a8f2f7949232d4a4a6a16bd4c05999096",
       "mode": "adapted",
-      "sha256": "bdf347113e904bdbf515df92a57ccda493bf26024e31d328963f0eaceb3b8d97"
+      "sha256": "c44464baa9a9c0a4263474a57e63b1e000b8450b3d0583f03192e7aa25db2a93"
     },
     {
       "public_path": "demo/golden-path.sh",
