@@ -37,11 +37,8 @@ REQUIRED_PHRASES = {
         "Paid-call receipt queued for export",
         "receipt_id",
     ],
-    "app/dashboard/page.tsx": [
-        "Receipt-backed Governance Dashboard",
-        "receipt-backed decisions",
-        "Evidence Pack) is the exportable proof artifact",
-        "Denied-call receipts",
+    "next.config.ts": [
+        "{ source: '/dashboard', destination: '/sandbox', permanent: true }",
     ],
     "app/policy-to-proof/page.tsx": [
         "Signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission, which your CISO",
@@ -97,7 +94,7 @@ FORBIDDEN_PUBLIC_PHRASES = {
         "14 Days Free",
     ],
     "app/pay/page.tsx": ["Zero Invoices. Zero Contracts. Zero Wait."],
-    "app/dashboard/page.tsx": ["Dashboard telemetry explains decisions", "live governance telemetry"],
+    "next.config.ts": ["{ source: '/dashboard', destination: '/sandbox', permanent: false }"],
     "app/policy-to-proof/page.tsx": ["revocation event", "spend event", "matching receipts preserve the event log"],
 }
 
