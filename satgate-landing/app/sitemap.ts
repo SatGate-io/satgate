@@ -15,7 +15,7 @@ const staticRoutes: SitemapEntry[] = [
   { path: '/economic-firewall', lastModified: '2026-05-09', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/partners/rails', lastModified: '2026-05-14', changeFrequency: 'weekly', priority: 0.85 },
   { path: '/policy-to-proof', lastModified: '2026-05-10', changeFrequency: 'weekly', priority: 0.95 },
-  { path: '/ai-agent-cost-control', lastModified: '2026-05-05', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/ai-agent-cost-control', lastModified: '2026-10-12', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/llm-cost-dashboard', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/agent-spending-limits', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/ai-agent-runaway-spend-benchmark', lastModified: '2026-05-03', changeFrequency: 'monthly', priority: 0.85 },
