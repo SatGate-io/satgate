@@ -6,7 +6,7 @@ export const tradingCopy = {
     lines: [
       'An order counts against your limits when your agent places it, at the most it could cost.',
       "Cancelling an order doesn't give its amount back.",
-      "Stock orders go in dollar amounts. An order given as a number of shares is refused, because SatGate can't tell what it would cost.",
+      'Stock orders go in dollar amounts. An order for a number of shares must be a limit buy for the day, and counts as shares times the limit price. Any other order in shares is refused.',
       'Weekly limits run Monday to Sunday.',
     ],
   },

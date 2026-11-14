@@ -211,8 +211,8 @@ export default function TradingPage() {
             </li>
             <li>
               <strong className="font-semibold text-white">How much can it spend?</strong>{' '}
-              <p>{tradingCopy.T4}</p>
               A hard dollar limit it can&apos;t go past. Orders above an amount you choose wait for your OK by email.
+              <p className="mt-2">{tradingCopy.T4}</p>
             </li>
             <li>
               <strong className="font-semibold text-white">Can I prove what happened?</strong>{' '}
