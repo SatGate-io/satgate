@@ -61,6 +61,7 @@ type Proxy struct {
 	tenantCosts       TenantCostResolver // optional, per-tenant cost resolution
 	auth              Authenticator
 	resource          string // MCP resource URL this proxy serves (see resource_binding.go)
+	previousResources []string
 	delegator         *Delegator
 	events            EventPublisher
 	evidence          EvidenceRecorder
