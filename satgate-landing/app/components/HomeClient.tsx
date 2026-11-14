@@ -178,6 +178,8 @@ const LandingPage = () => {
                 for AI agents.
               </span>
             </h1>
+            {/* PL1, owner approved 2026-11-14 ("ok copy PL1"). */}
+            <p className="text-2xl font-semibold text-white mb-4 max-w-lg leading-snug">Any agent. Any API. Signed receipts anyone can check.</p>
             <p className="text-xl text-gray-400 mb-4 max-w-lg leading-relaxed">
               Keep your AI agents within budget on the paid services they use. Make external agents pay before they use yours. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.
             </p>
