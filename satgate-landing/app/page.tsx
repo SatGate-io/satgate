@@ -129,6 +129,19 @@ const canAndCant = [
 ];
 
 export default function TradingPage() {
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        name: 'SatGate',
+        url: 'https://satgate.io',
+        logo: 'https://satgate.io/logo_white_transparent.png',
+        description: 'SatGate is an economic firewall for agent workloads. It checks budgets and permissions on each request. SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.',
+      },
+    ],
+  };
+
   const webPageJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -148,6 +161,7 @@ export default function TradingPage() {
 
   return (
     <main className="min-h-screen bg-black text-gray-100 font-sans">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
