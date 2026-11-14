@@ -4,10 +4,10 @@ import Image from 'next/image';
 import { ArrowRight, Receipt, Users } from 'lucide-react';
 import { tradingCopy } from './trading-copy';
 
-const title = 'Financial guardrail for your AI agents';
-const tagline = 'Control what agents can do and spend. Prove every action.';
-const lead =
-  'Your limits sit outside the AI, so it can\'t loosen them or talk its way past them. SatGate checks them before an order reaches your broker.';
+// Owner approved, 2026-11-14 ("ok copy T1, T10, T11").
+const title = 'Dollar limits and signed receipts for AI trading agents';
+const tagline = "Spending limits your AI agent can't override, with a signed receipt for every order.";
+const lead = 'SatGate checks your limits before an order reaches your broker.';
 const worksToday = 'Works with Robinhood today, with more brokerages to follow.';
 const metaTitle = 'Dollar limits and signed receipts for AI trading agents | SatGate';
 const description =
