@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
+import SiteMenu from './components/SiteMenu';
 import { ArrowRight, Receipt, Users } from 'lucide-react';
 import { tradingCopy } from './trading-copy';
 
@@ -165,14 +165,7 @@ export default function TradingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <nav className="border-b border-gray-800">
-        <div className="mx-auto flex h-16 max-w-4xl items-center px-6">
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <Image src="/logo_white_transparent.png" alt="SatGate" width={32} height={32} className="h-7 w-7 sm:h-8 sm:w-8" />
-            <span className="whitespace-nowrap text-lg font-bold text-white sm:text-xl">SatGate</span>
-          </Link>
-        </div>
-      </nav>
+      <SiteMenu signupUrl={signupUrl} />
 
       <section className="relative overflow-hidden border-b border-gray-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_0%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_32%)]" />
