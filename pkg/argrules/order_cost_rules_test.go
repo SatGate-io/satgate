@@ -73,11 +73,11 @@ func TestMaxCostConditionParseMarshalRoundTrip(t *testing.T) {
 	if got := Describe(rules)[0]; got != "place_equity_order: allowed only when account_number is 5RH12345 and order cost is at most 100" {
 		t.Errorf("Describe = %q", got)
 	}
-	want := "place_equity_order: allowed only when account_number is 5RH12345 and the order's cost is at most 100 (dollar_amount, or quantity times limit_price for a day limit buy of shares)"
+	want := "place_equity_order: allowed only when account_number is 5RH12345 and the order's cost is at most 100 (dollar_amount, or quantity times limit_price for a day limit order of shares)"
 	if got := AgentLines(rules)[0]; got != want {
 		t.Errorf("AgentLines = %q", got)
 	}
-	if got := rules[0].Shapes[0].Fields[1].AgentText(); got != "the order's cost (dollar_amount, or quantity times limit_price for a day limit buy of shares) must be at most 100" {
+	if got := rules[0].Shapes[0].Fields[1].AgentText(); got != "the order's cost (dollar_amount, or quantity times limit_price for a day limit order of shares) must be at most 100" {
 		t.Errorf("AgentText = %q", got)
 	}
 }
@@ -182,7 +182,7 @@ func TestPerOrderCapRefusesUnvaluableShapesAsArgumentDenied(t *testing.T) {
 		{"both sizes", `{"dollar_amount":"` + marker + `","quantity":"1"}`, string(WhyBothSizes)},
 		{"neither size", `{"symbol":"AAPL"}`, string(WhyNoSize)},
 		{"dollars with a price", `{"dollar_amount":"` + marker + `","limit_price":"1"}`, string(WhyDollarsWithPrice)},
-		{"sell by shares", `{"side":"sell","type":"limit","time_in_force":"gfd","quantity":"1","limit_price":"` + marker + `"}`, string(WhyNotABuy)},
+		{"invalid side by shares", `{"side":"short","type":"limit","time_in_force":"gfd","quantity":"1","limit_price":"` + marker + `"}`, string(WhyNotABuy)},
 		{"too large", `{"dollar_amount":"99999999999999"}`, string(WhyCostTooLarge)},
 		{"zero", `{"dollar_amount":"0"}`, string(WhyNotAboveZero)},
 		{"a twin", `{"dollar_amount":"1","Quantity":"` + marker + `"}`, string(WhyUnreadable)},

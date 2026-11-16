@@ -65,7 +65,7 @@ package argrules
 //
 // The reserved field name "order" with max_cost caps what one order can cost,
 // counted by OrderMaxCost (see order_cost.go): dollar_amount, or quantity times
-// limit_price for a day limit buy of shares. It is accepted only on
+// limit_price for a day limit order of shares. It is accepted only on
 // place_equity_order and place_crypto_order, mixes with no other condition on
 // its field, and takes a plain decimal above zero with at most 10 digits
 // before and 8 after the point. A release that predates it refuses the
