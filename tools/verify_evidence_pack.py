@@ -82,6 +82,11 @@ CRYPTO_MISSING_MESSAGE = (
     "Install it with: pip install 'cryptography>=42'"
 )
 DEFAULT_CLOCK_SKEW_SECONDS = 300
+SATGATE_ISSUER_ORIGINS = frozenset({
+    "https://api.satgate.io",
+    "https://satgate-mcp-saas.fly.dev",
+    "https://mcp.satgate.io",
+})
 # BEGIN SHARED SECRET SCAN
 # Keep main's credential patterns unchanged in every distributed verifier.
 SECRET_PATTERNS = [
@@ -218,6 +223,9 @@ def issuer_jwks_url(issuer: str, reasons: list[str], reason_codes: list[str]) ->
         add_reason(reasons, reason_codes, "invalid_issuer", "receipt.issuer must not target private, loopback, link-local, multicast, or reserved IP space")
         return None
     origin = f"https://{parsed.hostname}"
+    if origin not in SATGATE_ISSUER_ORIGINS or parsed.username is not None or parsed.password is not None or "#" in issuer:
+        add_reason(reasons, reason_codes, "issuer_not_satgate", "receipt.issuer is not a SatGate address; to trust another issuer, pass its keys with --jwks-url or --jwks-file")
+        return None
     return origin + "/.well-known/jwks.json"
 
 
@@ -899,12 +907,14 @@ def _verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, requi
         receipts = []
 
     if require_trusted_issuer and discover_jwks and jwks is None and receipts and isinstance(receipts[0], dict):
-        issuer_value = receipts[0].get("issuer")
-        if isinstance(issuer_value, str):
-            discovered = issuer_jwks_url(issuer_value, reasons, reason_codes)
-            if discovered:
-                jwks_source = discovered
-                jwks = load_jwks(discovered)
+        discovered_urls = [
+            issuer_jwks_url(receipt["issuer"], reasons, reason_codes)
+            if isinstance(receipt.get("issuer"), str) else None
+            for receipt in receipts
+        ]
+        if all(discovered_urls):
+            jwks_source = discovered_urls[0]
+            jwks = load_jwks(jwks_source)
 
     if require_trusted_issuer and jwks_source and receipts and isinstance(receipts[0], dict):
         issuer_value = receipts[0].get("issuer")

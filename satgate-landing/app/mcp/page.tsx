@@ -154,7 +154,7 @@ export default function MCPPage() {
       "command": "npx",
       "args": ["-y", "satgate-mcp-bridge"],
       "env": {
-        "SATGATE_URL": "https://satgate-mcp-saas.fly.dev",
+        "SATGATE_URL": "https://mcp.satgate.io",
         "SATGATE_TOKEN": "paste-the-token-from-cloud.satgate.io"
       }
     }
