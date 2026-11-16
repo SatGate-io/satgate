@@ -179,7 +179,7 @@ export default function AgentsLandingPage() {
                 <div className="text-gray-600"># Cursor / Claude Code MCP config (token from Cloud → MCP Setup)</div>
                 <div>{`{ "mcpServers": { "satgate": {`}</div>
                 <div>&nbsp;&nbsp;<span className="text-purple-400">&quot;command&quot;</span>: <span className="text-green-400">&quot;npx&quot;</span>, <span className="text-purple-400">&quot;args&quot;</span>: [<span className="text-green-400">&quot;-y&quot;</span>, <span className="text-green-400">&quot;satgate-mcp-bridge&quot;</span>],</div>
-                <div>&nbsp;&nbsp;<span className="text-purple-400">&quot;env&quot;</span>: {`{ "SATGATE_URL": "https://satgate-mcp-saas.fly.dev", "SATGATE_TOKEN": "<token>" }`}</div>
+                <div>&nbsp;&nbsp;<span className="text-purple-400">&quot;env&quot;</span>: {`{ "SATGATE_URL": "https://mcp.satgate.io", "SATGATE_TOKEN": "<token>" }`}</div>
                 <div>{`} } }`}</div>
               </div>
               <ul className="space-y-2 text-sm text-gray-500">

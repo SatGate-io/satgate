@@ -73,14 +73,14 @@ The issuer named in the record decides the key set: each pack's `jwks_url` and t
 
 | Receipts from | Issuer | Key set (`--jwks-url`) |
 | --- | --- | --- |
-| Cloud MCP | `https://satgate-mcp-saas.fly.dev` | `https://satgate-mcp-saas.fly.dev/.well-known/jwks.json` |
+| Cloud MCP | `https://mcp.satgate.io`, `https://satgate-mcp-saas.fly.dev` | `https://mcp.satgate.io/.well-known/jwks.json`, `https://satgate-mcp-saas.fly.dev/.well-known/jwks.json` |
 | HTTP gateway | `https://api.satgate.io` | `https://api.satgate.io/.well-known/jwks.json` |
 
 A Cloud MCP record:
 
 ```bash
 python tools/verify_receipt_record.py record.ndjson \
-  --jwks-url https://satgate-mcp-saas.fly.dev/.well-known/jwks.json \
+  --jwks-url https://mcp.satgate.io/.well-known/jwks.json \
   --require-trusted-issuer
 ```
 

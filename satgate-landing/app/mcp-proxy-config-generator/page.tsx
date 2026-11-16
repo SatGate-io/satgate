@@ -10,7 +10,7 @@ const cursorSnippet = `{
       "command": "npx",
       "args": ["-y", "satgate-mcp-bridge"],
       "env": {
-        "SATGATE_URL": "https://satgate-mcp-saas.fly.dev",
+        "SATGATE_URL": "https://mcp.satgate.io",
         "SATGATE_TOKEN": "paste-the-token-from-cloud.satgate.io"
       }
     }
@@ -20,10 +20,10 @@ const cursorSnippet = `{
 // Same shapes as MCP Setup in the dashboard (satgate-enterprise
 // dashboard/app/lib/mcp-client-configs.ts): Cursor and Claude Desktop run the
 // stdio bridge; Claude Code and OpenClaw connect to the streamable HTTP /mcp URL.
-const claudeCodeSnippet = `claude mcp add --transport http satgate https://satgate-mcp-saas.fly.dev/mcp \\
+const claudeCodeSnippet = `claude mcp add --transport http satgate https://mcp.satgate.io/mcp \\
   --header 'Authorization: Bearer YOUR_AGENT_TOKEN'`;
 
-const openclawSnippet = `openclaw mcp set satgate '{"url":"https://satgate-mcp-saas.fly.dev/mcp","transport":"streamable-http","headers":{"Authorization":"Bearer YOUR_AGENT_TOKEN"}}'`;
+const openclawSnippet = `openclaw mcp set satgate '{"url":"https://mcp.satgate.io/mcp","transport":"streamable-http","headers":{"Authorization":"Bearer YOUR_AGENT_TOKEN"}}'`;
 
 type ClientKey = 'cursor' | 'claudeCode' | 'claudeDesktop' | 'openclaw';
 

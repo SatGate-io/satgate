@@ -69,7 +69,7 @@ python tools/verify_evidence_pack.py pack.json \
               <li>• The receipt format version, and whether it&apos;s marked as real or a test.</li>
               <li>• It rebuilds the signed content in a standard form (RFC 8785), leaving out <code>receipt_hash</code> and <code>signature</code>.</li>
               <li>• The SHA-256 <code>receipt_hash</code> and the Ed25519 signature.</li>
-              <li>• The signature against SatGate&apos;s public keys at <code>/.well-known/jwks.json</code>. A key stored in the pack is only a fallback and doesn&apos;t prove who signed.</li>
+              <li>• The signature against SatGate&apos;s public keys at <code>https://mcp.satgate.io/.well-known/jwks.json</code>, <code>https://satgate-mcp-saas.fly.dev/.well-known/jwks.json</code>. A key stored in the pack is only a fallback and doesn&apos;t prove who signed.</li>
               <li>• The copies of the result and budget at the top of the pack match the signed receipt.</li>
               <li>• The optional <code>evidence_pack_hash</code>, and that tokens and secrets are blanked out.</li>
             </ul>

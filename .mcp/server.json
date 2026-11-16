@@ -12,7 +12,7 @@
   "remotes": [
     {
       "type": "sse",
-      "url": "https://satgate-mcp-saas.fly.dev/sse",
+      "url": "https://mcp.satgate.io/sse",
       "headers": [
         {
           "name": "Authorization",
@@ -36,7 +36,7 @@
           "name": "SATGATE_URL",
           "description": "SatGate Cloud MCP URL",
           "isRequired": true,
-          "default": "https://satgate-mcp-saas.fly.dev"
+          "default": "https://mcp.satgate.io"
         },
         {
           "name": "SATGATE_TOKEN",
