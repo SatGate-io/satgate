@@ -52,6 +52,16 @@ def test_verify_pack_delegated_discovery(monkeypatch, tmp_path, surface, case):
 
 
 @pytest.mark.parametrize('surface', ['tools', 'demo'])
+@pytest.mark.parametrize('case', [c for c in integration_cases() if c['mode'] == 'file' and not c['valid']], ids=lambda c: c['name'])
+def test_verify_pack_native_crypto_failure(monkeypatch, surface, case):
+    monkeypatch.setenv('SATGATE_VERIFIER', str(ROOT / surface / 'verify_evidence_pack.py'))
+    client = SatGateAgentClient(gateway_url='http://127.0.0.1:1')
+    with pytest.raises(SatGateError) as error:
+        client.verify_pack(case['pack'], case['jwks'])
+    assert 'invalid_signature' in json.loads(str(error.value))['reason_codes']
+
+
+@pytest.mark.parametrize('surface', ['tools', 'demo'])
 def test_verify_pack_existing_cloud_samples_offline(monkeypatch, surface):
     monkeypatch.setenv('SATGATE_VERIFIER', str(ROOT / surface / 'verify_evidence_pack.py'))
     client = SatGateAgentClient(gateway_url='http://127.0.0.1:1')

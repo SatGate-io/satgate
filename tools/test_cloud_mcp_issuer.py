@@ -1,4 +1,3 @@
-import copy
 import json
 import os
 import sys
@@ -19,6 +18,8 @@ REJECTED = (
     'https://satgate-mcp-saas.fly.dev.example.net',
     'https://api-satgate.io',
     'https://xn--satgate-mcp-saas-example',
+    'https://@mcp.satgate.io',
+    'https://mcp.satgate.io/#',
 )
 INVALID = (
     'http://mcp.satgate.io', 'https://mcp.satgate.io:8443',
@@ -60,10 +61,11 @@ def integration_cases():
                 jwks = Fixture().jwks
             else:
                 pack['receipts'][0]['route_or_tool'] = '/tampered'
-            yield dict(name=mutation + '/' + issuer, pack=pack, jwks=jwks,
-                       mode='discovery', valid=False,
-                       calls=[issuer + '/.well-known/jwks.json'],
-                       code='invalid_signature')
+            for mode in ('discovery', 'file'):
+                yield dict(name=mode + '/' + mutation + '/' + issuer, pack=pack, jwks=jwks,
+                           mode=mode, valid=False,
+                           calls=[issuer + '/.well-known/jwks.json'] if mode == 'discovery' else [],
+                           code='invalid_signature')
 
 
 def test_driver():
@@ -81,8 +83,6 @@ def test_driver():
 
     def local_keys(source):
         calls.append(source)
-        if case['mode'] in ('discovery', 'default-discovery') and source not in case['calls']:
-            return case['jwks']  # observable red run; never a network request
         if source.startswith('https://'):
             return case['jwks']
         return json.loads(Path(source).read_text())
@@ -112,7 +112,7 @@ class CloudMCPIssuerTests(unittest.TestCase):
                     self.assertTrue(result['trusted_issuer_valid'])
 
     def test_third_issuer_cannot_use_pinned_cloud_jwks(self):
-        for issuer in REJECTED + ('http://mcp.satgate.io',):
+        for issuer in tuple(i for i in REJECTED if urllib.parse.urlparse(i).hostname != 'mcp.satgate.io') + ('http://mcp.satgate.io',):
             pack, jwks = signed_pack(issuer)
             for surface, verifier in VERIFIERS.items():
                 with self.subTest(issuer=issuer, surface=surface):
@@ -171,6 +171,17 @@ class CloudMCPIssuerTests(unittest.TestCase):
                     self.assertFalse(result['valid'])
                     self.assertIn('invalid_issuer' if issuer in INVALID else 'issuer_not_satgate',
                                   result['reason_codes'])
+
+    def test_supplied_keys_reject_wrong_key_and_tampering(self):
+        for case in integration_cases():
+            if case['mode'] != 'file' or case['valid']:
+                continue
+            for surface, verifier in VERIFIERS.items():
+                with self.subTest(case=case['name'], surface=surface):
+                    result = verifier.verify_pack(case['pack'], jwks=case['jwks'],
+                        require_trusted_issuer=True, now=NOW)
+                    self.assertFalse(result['valid'])
+                    self.assertIn('invalid_signature', result['reason_codes'])
 
     def test_explicit_url_and_file_entrypoints(self):
         import contextlib
