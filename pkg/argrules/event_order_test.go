@@ -492,7 +492,7 @@ func TestExistingRuleDocumentsDecideTheSame(t *testing.T) {
 			dt := releasedv3.Check(then, tool, params)
 			// SS1 changes only the counted-as phrase, not this decision.
 			if dt != nil {
-				dt.Allowed = strings.ReplaceAll(dt.Allowed, "dollar_amount, or quantity times limit_price for a day limit buy of shares", OrderCostCountedAs)
+				dt.Allowed = strings.ReplaceAll(dt.Allowed, "dollar_amount, or quantity times limit_price for a day limit buy of shares", "dollar_amount, or quantity times limit_price for a day limit order of shares")
 			}
 			if (dn == nil) != (dt == nil) || (dn != nil && (dn.Reason != dt.Reason || dn.Field != dt.Field || dn.Allowed != dt.Allowed)) {
 				t.Errorf("%s %s: now %+v, then %+v", tool, args, dn, dt)
