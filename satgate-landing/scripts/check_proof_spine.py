@@ -48,7 +48,7 @@ REQUIRED_PHRASES = {
         "decision_reason",
     ],
     "app/verify-evidence-pack/page.tsx": [
-        "Don&apos;t trust us. Check it yourself.",
+        "Check a SatGate receipt",
         "valid=true",
         "trusted_issuer_valid=true",
         "--jwks-file jwks.json",
