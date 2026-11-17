@@ -76,3 +76,18 @@ sibling pack reader. Python commands run in virtual environments.
 
 No new signed fields, protocol versions, producer switches, product sentences,
 or released checker bytes are changed by this work.
+
+## V2 reader extensions
+
+The inventory above is the immutable v1 baseline, not a claim that archived
+readers acquire new formats. The maintained tools/demo readers now also read raw
+v2 decisions and separate execution observations under the binding-only
+development profile in `RECEIPT-V2-CONTRACT.md`. Both APIs/CLIs and the offline
+SDK/Go wrappers consume the same decision and observation vector corpora.
+The matrix compares complete maintained-reader v2 verdicts, checks sibling-module
+discovery and byte parity, and retains whole-v1-verdict comparisons. Every frozen
+pack/record/linked artifact is tested for explicit raw-v2 rejection; the immutable
+v1 download is not rewritten. Versioned v2 distribution, typed bundles and real
+producer/adapter contracts are separate work. Public signatures alone cannot
+establish the private attempt join of a row-03 decision: without its call opening
+the observation verdict remains partial (`v2_attempt_not_checked`).

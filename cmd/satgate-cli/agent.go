@@ -108,8 +108,7 @@ func mustRead(args []string) []byte {
 }
 
 func agentVerify(args []string) {
-	withOpening := len(args) == 3 && args[1] == "--opening-file"
-	if len(args) != 1 && !withOpening {
+	if len(args) < 1 || len(args)%2 != 1 {
 		fmt.Fprintln(os.Stderr, "Usage: satgate-cli agent verify pack.json")
 		os.Exit(1)
 	}
@@ -118,8 +117,15 @@ func agentVerify(args []string) {
 		script = "tools/verify_evidence_pack.py"
 	}
 	cmdArgs := []string{script, args[0]}
-	if withOpening {
-		cmdArgs = append(cmdArgs, "--opening-file", args[2])
+	seen := make(map[string]bool)
+	for i := 1; i < len(args); i += 2 {
+		option := args[i]
+		if (option != "--opening-file" && option != "--parent-file" && option != "--result-opening-file") || seen[option] {
+			fmt.Fprintln(os.Stderr, "v2_input_invalid")
+			os.Exit(1)
+		}
+		seen[option] = true
+		cmdArgs = append(cmdArgs, option, args[i+1])
 	}
 	if jwks := os.Getenv("SATGATE_JWKS"); jwks != "" {
 		cmdArgs = append(cmdArgs, "--jwks-file", jwks, "--require-trusted-issuer")

@@ -763,7 +763,8 @@ class SatGateAgentClient:
         return resp.json()
 
     def verify_pack(self, pack: dict, jwks: dict, require_trusted_issuer: bool = True,
-                    opening: Optional[dict] = None) -> dict:
+                    opening: Optional[dict] = None, parent: Optional[dict] = None,
+                    result_opening: Optional[dict] = None) -> dict:
         """Verify a pack with the public verifier. SATGATE_VERIFIER must point at that script."""
         import subprocess
         import tempfile
@@ -778,11 +779,14 @@ class SatGateAgentClient:
             with open(jwks_path, "w") as handle:
                 json.dump(jwks, handle)
             cmd = [sys.executable, script, pack_path, "--jwks-file", jwks_path]
-            if opening is not None:
-                opening_path = os.path.join(tmp, "opening.json")
-                with open(opening_path, "w") as handle:
-                    json.dump(opening, handle)
-                cmd.extend(["--opening-file", opening_path])
+            for name, value, option in (("opening", opening, "--opening-file"),
+                                        ("parent", parent, "--parent-file"),
+                                        ("result_opening", result_opening, "--result-opening-file")):
+                if value is not None:
+                    private_path = os.path.join(tmp, name + ".json")
+                    with open(private_path, "w") as handle:
+                        json.dump(value, handle)
+                    cmd.extend([option, private_path])
             if require_trusted_issuer:
                 cmd.append("--require-trusted-issuer")
             verified = subprocess.run(cmd, capture_output=True, text=True)
