@@ -1,0 +1,10 @@
+{
+  "repository": "SatGate-io/satgate",
+  "commit": "f852c2918fb9a0640bf40f8f46919f7379d28c35",
+  "module_version": "v0.5.3-0.20261101131700-f852c2918fb9",
+  "files": {
+    "tools/verify_evidence_pack.py": "251369698bd2461a65f4624bdc0f0759091c2271b56f8096d5e47e2837b13575",
+    "tools/verify_receipt_record.py": "883687f530de0b7216577b037d507410271ea32170c7a5a6b215724e06bbadfa",
+    "demo/verify_evidence_pack.py": "55470ac71ca16ce93caea60c40ffc000bcba5240db4513c6079b03ab8ee0d617"
+  }
+}
