@@ -169,23 +169,32 @@ func inFoldedList(list []string, v string) bool {
 // strictly as argument rules read it (see CheckCallShape): a call that reads
 // two ways is refused as unreadable, not valued.
 func OrderMaxCostOfCall(params json.RawMessage, sentTool, orderTool string) (OrderCost, OrderCostWhy) {
-	if CheckCallShape(params, sentTool) != NumericFieldOK {
+	args, ok := orderArgumentsOfCall(params, sentTool)
+	if !ok {
 		return OrderCost{}, WhyUnreadable
+	}
+	return OrderMaxCost(orderTool, args)
+}
+
+// orderArgumentsOfCall is shared by valuation and dollar-budget classification.
+func orderArgumentsOfCall(params json.RawMessage, sentTool string) (map[string]json.RawMessage, bool) {
+	if CheckCallShape(params, sentTool) != NumericFieldOK {
+		return nil, false
 	}
 	top, err := objectOf(params)
 	if err != nil {
-		return OrderCost{}, WhyUnreadable
+		return nil, false
 	}
 	var args map[string]json.RawMessage
 	if raw, ok := top["arguments"]; ok {
 		trimmed := bytes.TrimSpace(raw)
 		if !bytes.Equal(trimmed, []byte("null")) {
 			if args, err = objectOf(trimmed); err != nil {
-				return OrderCost{}, WhyUnreadable
+				return nil, false
 			}
 		}
 	}
-	return OrderMaxCost(orderTool, args)
+	return args, true
 }
 
 // OrderMaxCost values the arguments of a call to tool. args is
@@ -279,12 +288,22 @@ func OrderMaxCost(tool string, args map[string]json.RawMessage) (OrderCost, Orde
 // case-insensitively, to a list entry. A missing key, null or any other JSON
 // type is not.
 func argIn(args map[string]json.RawMessage, name string, list []string) bool {
+	s, ok := orderString(args, name)
+	return ok && inFoldedList(list, s)
+}
+
+// orderString is the strict string reader shared by valuation and classification.
+func orderString(args map[string]json.RawMessage, name string) (string, bool) {
+	for k := range args {
+		if k != name && strings.EqualFold(k, name) {
+			return "", false
+		}
+	}
 	raw, present := args[name]
 	if !present {
-		return false
+		return "", false
 	}
-	s, ok := jsonString(bytes.TrimSpace(raw))
-	return ok && inFoldedList(list, s)
+	return jsonString(bytes.TrimSpace(raw))
 }
 
 // costOf rounds an exact value up to units and applies the bounds.

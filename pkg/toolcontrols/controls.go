@@ -840,11 +840,17 @@ func HasControls(caveats []string) bool {
 // ("dollar_amount", "usd") gets a $ sign; any other field is left as a plain
 // number, since the unit is not known.
 func FormatAmount(field, amount string) string {
-	f := strings.ToLower(field)
-	if strings.Contains(f, "dollar") || strings.Contains(f, "usd") {
+	if IsDollarField(field) {
 		return "$" + amount
 	}
 	return amount
+}
+
+// IsDollarField is the shared dollar-field vocabulary used by formatting and
+// dollar-budget accounting, including legacy raw-field aliases.
+func IsDollarField(field string) bool {
+	f := strings.ToLower(field)
+	return strings.Contains(f, "dollar") || strings.Contains(f, "usd")
 }
 
 func (w Window) phrase() string {
