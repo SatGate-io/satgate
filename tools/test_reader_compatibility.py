@@ -301,6 +301,50 @@ class ReaderCompatibility(unittest.TestCase):
         if os.environ.get('SATGATE_MATRIX_RED') == '1':
             self.assert_pack_cell('main-tools', case, pack_verdict(stale, case, self.data), reference)
 
+    def test_v1_verdicts_byte_for_byte(self):
+        # Pin snapshots are byte-identical to the row-01 base's reader scripts.
+        # Compare entire verdicts, not just acceptance booleans.
+        for case in self.data['packs']:
+            for kind in ('tools', 'demo'):
+                for options in ({}, {'require_trusted_issuer': False, 'jwks': None},
+                                {'jwks': {'keys': []}}):
+                    with self.subTest(reader=kind, vector=case['name'], mode=str(options)):
+                        before = pack_verdict(self.modules['pin-' + kind], case, self.data, **options)
+                        after = pack_verdict(self.modules['main-' + kind], case, self.data, **options)
+                        self.assertEqual(json.dumps(after, sort_keys=True), json.dumps(before, sort_keys=True))
+                legacy_values = [case['pack']['receipts'][0], dict(case['pack'], record_type='dummy-v1-extension')]
+                for value in legacy_values:
+                    if value.get('schema_version') not in ('satgate.receipt.v1', 'satgate.evidence_pack.v1'):
+                        continue  # New unknown-version dispatch is not a v1 contract.
+                    options = dict(jwks=self.data['jwks'], now=self.data['now'], require_trusted_issuer=True)
+                    before = self.modules['pin-' + kind].verify_pack(copy.deepcopy(value), **options)
+                    after = self.modules['main-' + kind].verify_pack(copy.deepcopy(value), **options)
+                    self.assertEqual(json.dumps(after, sort_keys=True), json.dumps(before, sort_keys=True))
+
+    def test_v2_decision_matrix(self):
+        from tests.generate_decision_v2 import corpus
+        data = corpus()
+        found = {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('receipt_decision_v2.py')}
+        self.assertEqual(found, {'tools/receipt_decision_v2.py', 'demo/receipt_decision_v2.py'})
+        self.assertEqual((ROOT / 'tools/receipt_decision_v2.py').read_bytes(),
+                         (ROOT / 'demo/receipt_decision_v2.py').read_bytes())
+        for case in data['vectors']:
+            options = dict(jwks=case.get('jwks', data['jwks']), now=data['now'],
+                           require_trusted_issuer=True)
+            with patch('socket.socket.connect', side_effect=AssertionError('network forbidden')):
+                reference = self.modules['main-tools'].verify_pack(
+                    case['receipt'], opening=case['opening'], **options)
+                self.assertIs(reference['valid'], case['valid'], case['name'])
+                for name, module in self.modules.items():
+                    with self.subTest(reader=name, vector=case['name']):
+                        if name in ('main-tools', 'main-demo'):
+                            actual = module.verify_pack(case['receipt'], opening=case['opening'], **options)
+                            self.assertEqual(actual, reference)
+                        else:
+                            # Frozen v1 formats do not gain a v2 API. Their exact
+                            # raw-v2 boundary is rejection, not v1 reinterpretation.
+                            self.assertFalse(module.verify_pack(case['receipt'], **options)['valid'])
+
 
 if __name__ == '__main__':
     unittest.main()
