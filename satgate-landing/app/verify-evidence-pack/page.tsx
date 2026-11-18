@@ -30,7 +30,7 @@ export default function VerifyEvidencePackPage() {
         <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
           <article className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-2xl font-black">Run the verifier</h2>
-            <pre className="mt-5 overflow-x-auto rounded-xl bg-black p-4 text-sm text-gray-300"><code>{`git clone https://github.com/SatGate-io/satgate && cd satgate
+            <pre className="mt-5 rounded-xl bg-black p-4 text-sm text-gray-300"><code className="block whitespace-pre-wrap [overflow-wrap:anywhere]">{`git clone https://github.com/SatGate-io/satgate && cd satgate
 python3 -m venv .venv-verify
 . .venv-verify/bin/activate
 pip install cryptography rfc8785

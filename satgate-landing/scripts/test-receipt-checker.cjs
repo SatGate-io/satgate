@@ -51,6 +51,35 @@ function allowedProductRequest(r) {
      u.pathname==='/evidence/mcp-budget-refusal-20261005.json' || siteIcons.includes(u.pathname)));
 }
 const results=[];
+const layoutOnly=process.argv.includes('--layout-only');
+const command=copy.after[copy.after.indexOf('Run the verifier')+1];
+const layout=[];
+async function measureLayout(page,width,state) {
+  await page.evaluate(()=>document.fonts.ready);
+  const bounds=await page.evaluate(()=>({
+    innerWidth:window.innerWidth,
+    scrollWidth:document.documentElement.scrollWidth,
+    outside:[...document.querySelectorAll('*')].flatMap(el=>{
+      const {left,right}=el.getBoundingClientRect();
+      return left<0 || right>window.innerWidth ? [{tag:el.localName,left,right}] : [];
+    }),
+  }));
+  const block=page.locator('main pre code');
+  const {text,selected,clientWidth,scrollWidth,right}=await block.evaluate(code=>{
+    const range=document.createRange();
+    range.selectNodeContents(code);
+    const selection=window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    const selected=selection.toString();
+    selection.removeAllRanges();
+    const pre=code.parentElement;
+    return {text:code.textContent,selected,clientWidth:pre.clientWidth,scrollWidth:pre.scrollWidth,right:code.getBoundingClientRect().right};
+  });
+  assert.equal(text,command,`${width} ${state}: exact command bytes`);
+  assert.equal(selected,command,`${width} ${state}: exact selection text`);
+  layout.push({width,state,...bounds,command:{right,clientWidth,scrollWidth,sha256:crypto.createHash('sha256').update(text).digest('hex')}});
+}
 let browser;
 (async()=>{
   browser=await chromium.launch();
@@ -60,7 +89,7 @@ let browser;
   assert.throws(()=>allowedProductRequest({url:origin+'/icon-32.png',method:'POST',bytes:0}));
   assert.throws(()=>allowedProductRequest({url:origin+'/icon-32.png',method:'GET',bytes:1}));
   results.push({name:'static-icon-allowlist-controls',exit:0});
-  async function scenario(item,{sample=false,shot=null,width=1440,cspMutation=null}={}) {
+  async function scenario(item,{sample=false,shot=null,width=1440,cspMutation=null,layoutState=null}={}) {
     const ctx=await browser.newContext({viewport:{width,height:1000},serviceWorkers:'block'});
     const requests=[],responses=[],errors=[],requestRows=new Map();
     ctx.on('request',r=>{
@@ -121,7 +150,8 @@ let browser;
     await words('');
     assert.equal(normal(await page.locator('body').innerText()),normal(await page.locator('main').innerText()));
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),width);
-    if(shot==='empty') await page.screenshot({path:path.join(lane,'shots',`${width}-empty.png`),fullPage:true});
+    if(layoutState==='pass') await measureLayout(page,width,'empty');
+    if(shot==='empty' || (layoutState==='pass' && shot==='pass')) await page.screenshot({path:path.join(lane,'shots',`${width}-empty.png`),fullPage:true});
     // Seed only after page assets load: checker requests must omit even cookies
     // which exist on this origin, not merely happen to run in a clean context.
     await ctx.addCookies([{name:'dummy',value:'dummy',url:origin}]);
@@ -141,6 +171,7 @@ let browser;
     assert.equal(text,item.wanted||expected(item),item.name);
     await words(text);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),width);
+    if(layoutState) await measureLayout(page,width,layoutState);
     if(shot && shot!=='empty') await page.screenshot({path:path.join(lane,'shots',`${width}-${shot}.png`),fullPage:true});
     for(const r of requests) assert.ok(allowedProductRequest(r),item.name+': '+r.url);
     for(const r of requests.slice(initial)) {
@@ -178,6 +209,15 @@ let browser;
     return result;
   }
   const real={name:'sample',keyBytes:read('fixtures/jwks-mcp.json'),expected:'Valid'};
+  for(const width of [320,390,480,1280]) {
+    await scenario({...real,name:'layout-pass'},{sample:true,width,layoutState:'pass',shot:width<=390?'pass':null});
+    await scenario({name:'layout-fail',text:'not json',expected:'malformed'},{width,layoutState:'fail'});
+  }
+  fs.writeFileSync(path.join(lane,'layout-results.json'),JSON.stringify(layout,null,2));
+  const overflows=layout.filter(row=>row.outside.length || row.scrollWidth!==row.innerWidth || row.command.scrollWidth!==row.command.clientWidth);
+  assert.deepEqual(overflows,[],'horizontal overflow: '+JSON.stringify(overflows));
+  console.log(`PASS ${layout.length} viewport/state bounds and command byte checks`);
+  if(layoutOnly) {await browser.close();return;}
   await scenario(real,{sample:true,shot:'empty'});
   await scenario({...real,name:'real-chosen-file',text:fs.readFileSync(path.join(root,'public/evidence/mcp-budget-refusal-20261005.json'),'utf8')});
   for(const width of [1440,390]) {
