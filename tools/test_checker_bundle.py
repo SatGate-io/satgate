@@ -27,10 +27,13 @@ class CheckerBundle(unittest.TestCase):
         for name, digest in entries.items():
             data = (BUNDLE / name).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), digest)
-            # The released contract is immutable. Producer documentation may
-            # advance after the reader-only release; executable/requirements
-            # bytes must still match the released checker pair exactly.
-            if name != "VERIFIER-CONTRACT.md":
+            # This is an immutable v1 release, not the v2 source distribution.
+            # Row-01's digest-pinned public snapshot preserves its exact scripts;
+            # the matrix separately pins the manifest and all v1 verdict bytes.
+            if name in ("verify_evidence_pack.py", "verify_receipt_record.py"):
+                pinned = ROOT / "tools/fixtures/pinned-checkers-f852c2918fb9/tools" / name
+                self.assertEqual(data, pinned.read_bytes())
+            elif name != "VERIFIER-CONTRACT.md":
                 self.assertEqual(data, (ROOT / "tools" / name).read_bytes())
 
     def test_isolated_bundle_pack_and_record_cli_old_and_new_receipts(self):
