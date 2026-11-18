@@ -91,6 +91,16 @@ type SpendGate struct {
 	// the two order tools the gate knows (toolcontrols.SymbolCapTool).
 	BudgetGoverns func(tool string) bool
 
+	// DollarBudgetExempt is an opt-in trusted classifier. It must authenticate
+	// Robinhood route provenance (not a service label or tool prefix) and prove
+	// the parsed size closes a position without opening/increasing a short,
+	// accounting for concurrent and reserved sells. The public package never
+	// reads holdings. Wire the same classifier for real calls and checks.
+	// Only a resolved, listed origin matching RobinhoodSellDollarBudgetRule
+	// reaches it. Nil, false or an error preserves ordinary budget accounting.
+	// It skips only dollar windows/symbol caps, never other gates or credits.
+	DollarBudgetExempt func(ctx context.Context, call GateCall, order toolcontrols.DollarBudgetOrder) (bool, error)
+
 	// now is the clock; nil means time.Now. Tests set it.
 	now func() time.Time
 }
@@ -295,6 +305,19 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		}
 	}
 
+	// Classification cannot bypass control shape, saved-budget, coverage or
+	// seal validation above. A router label alone grants no exemption.
+	exemptDollars := false
+	if g.DollarBudgetExempt != nil && call.Origin.Listed && call.Origin.Err == nil &&
+		call.Origin.Service != "" && call.Origin.Original != "" &&
+		(call.Origin.Renamed || call.Origin.Original == call.Tool) {
+		if order, ok := toolcontrols.RobinhoodSellDollarBudgetRule.ReadOrderOfCall(
+			call.Params, call.Tool, call.Origin.Service, call.Origin.Original); ok {
+			exempt, err := g.DollarBudgetExempt(ctx, call, order)
+			exemptDollars = exempt && err == nil
+		}
+	}
+
 	callID := g.callID(ctx, call)
 	var taken []held
 	giveBack := func() {
@@ -343,6 +366,9 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			// A limit with no identity has no counter. Never skip it.
 			giveBack()
 			return nil, fmt.Errorf("a spending limit has no counter id")
+		}
+		if exemptDollars && toolcontrols.IsDollarField(l.Field) {
+			continue // no dollar reads, reserves, charges or settlement releases
 		}
 		key := counterKey(call.Token.TenantID, counterName(l), windowIDOf(l, now))
 		if len(l.Symbols) > 0 {
