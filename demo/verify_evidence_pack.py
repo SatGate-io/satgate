@@ -1105,8 +1105,48 @@ def validate_input_shapes(pack: Any, jwks: Any) -> None:
             raise VerificationError("metadata.environment must be a string")
 
 
-def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None) -> dict[str, Any]:
+def decision_v2_module():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("satgate_decision_v2", Path(__file__).with_name("receipt_decision_v2.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def is_decision_input(value):
+    return isinstance(value, dict) and (
+        (str(value.get("schema_version", "")).startswith("satgate.receipt.")
+         and value.get("schema_version") != EXPECTED_RECEIPT_SCHEMA)
+        or ("record_type" in value and value.get("schema_version") not in
+            (EXPECTED_PACK_SCHEMA, EXPECTED_RECEIPT_SCHEMA)))
+
+
+def decision_cli(pack, args):
+    v2 = decision_v2_module()
+    try:
+        if args.jwks_url or args.discover_jwks:
+            return v2.failure("v2_key_required")
+        opening = None
+        if args.opening_file:
+            try:
+                opening = v2.strict_loads(Path(args.opening_file).read_text(encoding="utf-8"))
+                if opening is None:
+                    opening = {"v2_invalid_opening": True}
+            except (ValueError, OverflowError, RecursionError):
+                opening = {"v2_invalid_opening": True}
+        jwks = v2.strict_loads(Path(args.jwks_file).read_text(encoding="utf-8")) if args.jwks_file else None
+        return verify_pack(pack, jwks=jwks, now=args.now, opening=opening)
+    except (ValueError, OSError, OverflowError, RecursionError):
+        return v2.failure("v2_input_invalid")
+
+
+def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None, opening: dict[str, Any] | None = None) -> dict[str, Any]:
     """Public API: untrusted input failures are verdicts, never tracebacks."""
+    if is_decision_input(pack):
+        return decision_v2_module().verify(pack, jwks=jwks, now=now, opening=opening)
+    if opening is not None or (isinstance(pack, dict) and isinstance(pack.get("receipts"), list)
+                               and any(isinstance(r, dict) and r.get("schema_version") == "satgate.receipt.v2" for r in pack["receipts"])):
+        return decision_v2_module().failure("v2_unsupported_container")
     try:
         validate_input_shapes(pack, jwks)
         return _verify_pack(pack, jwks, require_trusted_issuer, allow_mock, now, discover_jwks, jwks_source)
@@ -1533,6 +1573,11 @@ def load_source(source: str) -> tuple[dict[str, Any], dict[str, Any]]:
 
     try:
         pack = json.loads(text)
+        if is_decision_input(pack):
+            try:
+                pack = decision_v2_module().strict_loads(text)
+            except (ValueError, OverflowError, RecursionError):
+                pack = {"schema_version": "satgate.receipt.v2"}
     except json.JSONDecodeError as exc:
         raise VerificationError(f"source is not JSON: {exc}") from exc
     if not isinstance(pack, dict):
@@ -1551,7 +1596,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--discover-jwks", action="store_true", help="discover issuer JWKS from receipt.issuer at /.well-known/jwks.json (on by default in trusted mode when no --jwks-url/--jwks-file is given)")
     parser.add_argument("--allow-mock", action="store_true", help="allow packs or receipts marked mock/demo/test")
     parser.add_argument("--now", help="RFC3339 timestamp to use for temporal verification (tests/reproducibility)")
+    parser.add_argument("--opening-file", help="v2_opening_file")
     args = parser.parse_args(argv)
+    if args.opening_file and (args.source.startswith(("http://", "https://")) or args.jwks_url or args.discover_jwks):
+        print(json.dumps(decision_v2_module().failure("v2_input_invalid"), sort_keys=True))
+        return 1
     if Ed25519PublicKey is None:
         print(
             "Signatures could not be checked because the Python package 'cryptography' is not installed. "
@@ -1569,8 +1618,12 @@ def main(argv: list[str] | None = None) -> int:
         # In trusted mode, auto-discover the issuer JWKS when no explicit source
         # was supplied so a bare `verify_evidence_pack.py <url>` is issuer-anchored.
         discover = require_trusted and (args.discover_jwks or not has_explicit_jwks)
-        jwks = load_jwks(args.jwks_url or args.jwks_file) if has_explicit_jwks else None
         pack, source_meta = load_source(args.source)
+        if is_decision_input(pack) or args.opening_file:
+            result = decision_cli(pack, args)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["valid"] else 1
+        jwks = load_jwks(args.jwks_url or args.jwks_file) if has_explicit_jwks else None
         result = verify_pack(pack, jwks=jwks, require_trusted_issuer=require_trusted, allow_mock=args.allow_mock, now=args.now, discover_jwks=discover, jwks_source=args.jwks_url)
         result.update(source_meta)
         print(json.dumps(result, indent=2, sort_keys=True))
@@ -1586,6 +1639,9 @@ def main(argv: list[str] | None = None) -> int:
             )
         return 0
     except (VerificationError, ValueError, OSError, OverflowError, RecursionError) as exc:
+        if args.opening_file:
+            print(json.dumps(decision_v2_module().failure("v2_input_invalid"), sort_keys=True))
+            return 1
         print(json.dumps({"valid": False, "reason_codes": ["invalid_input"],
                           "error": f"Input could not be loaded or verified ({type(exc).__name__})"},
                          indent=2, sort_keys=True))
