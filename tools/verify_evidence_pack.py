@@ -871,6 +871,40 @@ def observation_v2_module():
     return module
 
 
+def bundle_v2_module():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("satgate_bundle_v2", Path(__file__).with_name("receipt_bundle_v2.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def is_bundle_input(value):
+    return isinstance(value, dict) and (
+        str(value.get("schema_version", "")).startswith("satgate.receipt_bundle.")
+        or (value.get("record_type") == "private_bundle" and
+            (value.get("schema_version") not in (EXPECTED_PACK_SCHEMA, EXPECTED_RECEIPT_SCHEMA)
+             or {"manifest", "artifacts", "capsules"} <= value.keys()))
+        or (value.get("schema_version") not in (EXPECTED_PACK_SCHEMA, EXPECTED_RECEIPT_SCHEMA)
+            and len({"manifest", "artifacts", "capsules"} & value.keys()) >= 2))
+
+
+def bundle_cli(pack, args, invalid_input=False):
+    bundle = bundle_v2_module()
+    if (invalid_input or args.source.startswith(("http://", "https://")) or args.jwks_url
+            or getattr(args, "discover_jwks", False) or any(getattr(args, name, None) for name in
+                                                         ("opening_file", "parent_file", "result_opening_file"))):
+        return bundle.failure("v2_input_invalid")
+    try:
+        if getattr(args, "private_bundle", False):
+            text = sys.stdin.read() if args.source == "-" else Path(args.source).read_text(encoding="utf-8")
+            pack = bundle.d.strict_loads(text)
+        pins = bundle.d.strict_loads(Path(args.jwks_file).read_text(encoding="utf-8")) if args.jwks_file else None
+    except (ValueError, OSError, OverflowError, RecursionError):
+        return bundle.failure("v2_input_invalid")
+    return bundle.verify(pack, jwks=pins, now=args.now)
+
+
 def is_decision_input(value):
     return isinstance(value, dict) and (
         (str(value.get("schema_version", "")).startswith("satgate.receipt.")
@@ -908,6 +942,11 @@ def decision_cli(pack, args):
 
 def verify_pack(pack: dict[str, Any], jwks: dict[str, Any] | None = None, require_trusted_issuer: bool = False, allow_mock: bool = False, now: str | None = None, discover_jwks: bool = False, jwks_source: str | None = None, opening: dict[str, Any] | None = None, parent: dict[str, Any] | None = None, result_opening: dict[str, Any] | None = None) -> dict[str, Any]:
     """Public API: untrusted input failures are verdicts, never tracebacks."""
+    if is_bundle_input(pack):
+        bundle = bundle_v2_module()
+        if any(value is not None for value in (opening, parent, result_opening)) or discover_jwks or jwks_source:
+            return bundle.failure("v2_input_invalid")
+        return bundle.verify(pack, jwks=jwks, now=now)
     if is_decision_input(pack):
         if pack.get("record_type") == "execution_observation" or "decision_receipt_hash" in pack or "record_hash" in pack:
             return observation_v2_module().verify(pack, jwks=jwks, now=now, opening=opening,
@@ -1175,7 +1214,12 @@ def load_source(source: str) -> tuple[dict[str, Any], dict[str, Any]]:
 
     try:
         pack = json.loads(text)
-        if is_decision_input(pack):
+        if is_bundle_input(pack):
+            try:
+                pack = decision_v2_module().strict_loads(text)
+            except (ValueError, OverflowError, RecursionError):
+                metadata["bundle_input_invalid"] = True
+        elif is_decision_input(pack):
             try:
                 pack = decision_v2_module().strict_loads(text)
             except (ValueError, OverflowError, RecursionError):
@@ -1200,7 +1244,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--opening-file", help="v2_opening_file")
     parser.add_argument("--parent-file", help="v2_parent_file")
     parser.add_argument("--result-opening-file", help="v2_result_opening_file")
+    parser.add_argument("--private-bundle", action="store_true", help="v2_private_bundle")
     args = parser.parse_args(argv)
+    if args.private_bundle and Ed25519PublicKey is not None:
+        result = bundle_cli(None, args)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0 if result["valid"] else 1
     local_v2 = args.opening_file or args.parent_file or args.result_opening_file
     if local_v2 and (args.source.startswith(("http://", "https://")) or args.jwks_url or args.discover_jwks):
         print(json.dumps(decision_v2_module().failure("v2_input_invalid"), sort_keys=True))
@@ -1213,6 +1262,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.jwks_url and args.jwks_file:
             raise VerificationError("use either --jwks-url or --jwks-file, not both")
         pack, source_meta = load_source(args.source)
+        if is_bundle_input(pack):
+            result = bundle_cli(pack, args, source_meta.get("bundle_input_invalid", False))
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["valid"] else 1
         if is_decision_input(pack) or local_v2:
             result = decision_cli(pack, args)
             print(json.dumps(result, indent=2, sort_keys=True))
