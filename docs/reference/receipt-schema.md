@@ -272,6 +272,7 @@ record cannot negotiate support or authorize downloading/executing a checker.
 - The dangerous parts are closed: `schema_version`, `decision`, origin-style `issuer`, canonicalization/hash/signature algorithms, signature/hash prefixes, and required proof fields.
 - `issuer` must be an HTTPS origin: no path, query, or fragment. Verifiers must reject non-origin issuers before JWKS lookup.
 - `paid` receipts require `amount_usd`, `currency: "USD"`, and `rail` so paid-call evidence does not lose payment context.
+- Signed denials of paid calls carry the ID of the SatGate account (`metadata.tenant_id`) and the name of the route (`route_or_tool`) the call was for. The caller gets the receipt even without a SatGate account, so anyone holding it can read both.
 - If `acceptor_id` is present, `capability_hash` is required so acceptor-bound receipts are tied to the capability material without leaking raw credentials.
 
 ## Optional verifier-context fields
