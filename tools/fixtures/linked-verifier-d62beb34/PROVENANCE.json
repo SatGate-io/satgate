@@ -1,0 +1,11 @@
+{
+  "repository": "SatGate-io/evidence-pack-verifier",
+  "commit": "d62beb34ffa413f71f62ff56125ed8a3972b075d",
+  "package_version": "0.1.0",
+  "files": {
+    "src/evidence_pack_verifier/__init__.py": "96dcb2170317073668c6bd3c1ae44784c4d8bf112b3cd7c65e01cf7c9ba34881",
+    "src/evidence_pack_verifier/cli.py": "1314c0b06515bc95504bdf3dec101476fa8517f9564e354c9f5e615b19200f76",
+    "src/evidence_pack_verifier/verifier.py": "831b76ef46951456047641457bff8d677aeea516653fb692aba5c4735bebf63b",
+    "LICENSE": "06cd3906766c6eb50384e7549d5e408b571d3f3914f4abd9d5d90d96fa9ba87f"
+  }
+}
