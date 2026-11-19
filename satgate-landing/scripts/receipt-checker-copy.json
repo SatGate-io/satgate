@@ -1,0 +1,36 @@
+{
+  "before": [
+    "← Back to Home",
+    "Check a SatGate receipt",
+    "Choose a receipt file you downloaded from SatGate. This page checks SatGate's signature against our published keys, right in your browser. Your file is not uploaded.",
+    "Choose a receipt file",
+    "No receipt yet? Try a sample."
+  ],
+  "after": [
+    "A pass shows that SatGate signed this receipt and that nothing in it has changed since. It does not show what your broker filled. Your broker's statement shows that.",
+    "Prefer not to rely on this page? Run the same check on your own computer with our open-source checker.",
+    "Run the verifier",
+    "git clone https://github.com/SatGate-io/satgate && cd satgate\npython3 -m venv .venv-verify\n. .venv-verify/bin/activate\npip install cryptography rfc8785\ncurl -fsS https://satgate.io/evidence/mcp-budget-refusal-20261005.json -o pack.json\ncurl -fsS https://satgate-mcp-saas.fly.dev/.well-known/jwks.json -o jwks.json\npython tools/verify_evidence_pack.py pack.json   --jwks-file jwks.json   --require-trusted-issuer",
+    "What the verifier checks",
+    "• The receipt format version, and whether it's marked as real or a test.",
+    "• It rebuilds the signed content in a standard form (RFC 8785), leaving out receipt_hash and signature.",
+    "• The SHA-256 receipt_hash and the Ed25519 signature.",
+    "• The signature against SatGate's public keys at /.well-known/jwks.json. A key stored in the pack is only a fallback and doesn't prove who signed.",
+    "• The copies of the result and budget at the top of the pack match the signed receipt.",
+    "• The optional evidence_pack_hash, and that tokens and secrets are blanked out.",
+    "What the result means.",
+    "valid=true",
+    "Checked with the key stored inside the pack, this only shows the pack is consistent with itself. It doesn't show who signed it.",
+    "trusted_issuer_valid=true",
+    "This is the one that matters: the signature checks out against SatGate's public keys, downloaded separately from the pack.",
+    "What a pass proves, and what it doesn't.",
+    "Proves",
+    "The key named in issuer_kid signed the receipt. Any change to a signed field makes the check fail. The rest of the pack agrees with the signed receipt, and tokens and secrets are blanked out.",
+    "Does not prove by itself",
+    "That a payment settled, that your API's own logs agree, that a revoke took effect everywhere instantly, or anything else beyond this one receipt.",
+    "Current limits",
+    "• Signing keys are stored as platform secrets.",
+    "• Receipts are kept on SatGate's servers.",
+    "• Anyone with a receipt link can open it. Share links with care."
+  ]
+}

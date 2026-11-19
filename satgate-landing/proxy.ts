@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname === '/receipt-checker-worker.mjs') {
+    const response = NextResponse.next();
+    response.headers.set('Content-Security-Policy', [
+      "default-src 'none'",
+      "script-src 'self' 'wasm-unsafe-eval'",
+      "connect-src 'self' https://api.satgate.io/.well-known/jwks.json https://satgate-mcp-saas.fly.dev/.well-known/jwks.json https://mcp.satgate.io/.well-known/jwks.json",
+    ].join('; '));
+    return response;
+  }
   const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(24))).toString('base64');
   const csp = [
     "default-src 'self'",
