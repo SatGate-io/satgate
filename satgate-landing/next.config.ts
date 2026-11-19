@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   trailingSlash: false,
   async redirects() {
     return [
+      { source: '/verify', destination: '/verify-evidence-pack', permanent: false },
+      { source: '/trading', destination: '/', permanent: true },
       { source: '/blog/the-enterprise-adoption-playbook-observe-control-charge', destination: '/blog/the-enterprise-adoption-playbook-observe-control-prove', permanent: true },
       { source: '/blog/agent-to-agent-collaboration-security', destination: '/blog', permanent: true },
       { source: '/about', destination: '/', permanent: true },

@@ -23,7 +23,9 @@ func SSRFSafeTransport(tlsSkipVerify, allowPrivate bool) *http.Transport {
 				return err
 			}
 			ip := net.ParseIP(host)
-			if ip != nil && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
+			v4 := ip.To4()
+			shared := v4 != nil && v4[0] == 100 && v4[1] >= 64 && v4[1] <= 127
+			if ip != nil && (shared || ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
 				return &ssrfBlockedError{host: host}
 			}
 			return nil

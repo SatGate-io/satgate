@@ -6,7 +6,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 TARGETS = [
-    "app/page.tsx",
+    "app/platform/page.tsx",
     "app/components/HomeClient.tsx",
     "app/policy-to-proof/page.tsx",
     "app/govern/page.tsx",
@@ -35,7 +35,7 @@ TARGETS = [
 ]
 
 REQUIRED = {
-    "app/page.tsx": [
+    "app/platform/page.tsx": [
         "Economic Firewall for AI Agents",
         "within budget",
         "signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission",

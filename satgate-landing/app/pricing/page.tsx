@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: 'What is included in Pro?',
-    a: 'Pro is $99 a month. You get unlimited Observe, 1 million Control and Admit requests a month, 25 routes, unlimited team members and all three controls: Observe, Control and Admit (the dashboard calls Admit “Charge”). It also includes budgets, token management and priority support. Upgrade yourself by card in the dashboard (Stripe).',
+    a: 'Pro is for people who run AI agents for clients or with a team. Pro is $99 a month. You get unlimited Observe, 1 million Control and Admit requests a month, 25 routes, unlimited team members and all three controls: Observe, Control and Admit (the dashboard calls Admit “Charge”). It also includes budgets, token management and priority support. Upgrade yourself by card in the dashboard (Stripe).',
   },
   {
     q: 'Can I start without talking to sales?',
@@ -286,6 +286,7 @@ const PricingPage = () => {
             </div>
             <div className="mb-6">
               <h3 className="text-lg font-bold text-purple-400 mb-1">Pro</h3>
+              <p className="text-gray-500 text-sm">For people who run AI agents for clients or with a team.</p>
               <p className="text-gray-500 text-sm">14 days free. No credit card.</p>
             </div>
             <div className="mb-6">
@@ -293,6 +294,7 @@ const PricingPage = () => {
               <span className="text-gray-500 text-sm"> / month</span>
             </div>
             <ul className="space-y-3 text-sm text-gray-400 mb-8 flex-1">
+              <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Each agent gets its own limits and its own signed receipts</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />Unlimited Observe</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />1M Control and Admit requests per month</li>
               <li className="flex items-start gap-2"><Check size={16} className="text-purple-400 mt-0.5 shrink-0" />25 routes</li>

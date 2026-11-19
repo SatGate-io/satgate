@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
 
 REQUIRED_PHRASES = {
-    "app/page.tsx": [
+    "app/platform/page.tsx": [
         "SatGate signs a receipt when it refuses an agent over a budget, a missing payment or a tool permission, and when an agent spends from a budget in Control.",
         "signed receipts for budget spends and for refusals over a budget, a missing payment or a tool permission",
     ],
@@ -48,7 +48,7 @@ REQUIRED_PHRASES = {
         "decision_reason",
     ],
     "app/verify-evidence-pack/page.tsx": [
-        "Don&apos;t trust us. Check it yourself.",
+        "Check a SatGate receipt",
         "valid=true",
         "trusted_issuer_valid=true",
         "--jwks-file jwks.json",

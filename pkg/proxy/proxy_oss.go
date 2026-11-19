@@ -1008,7 +1008,9 @@ func (g *Gateway) createProxy(upstreamURL string, headers map[string]string) (*h
 				return err
 			}
 			ip := net.ParseIP(host)
-			if ip != nil && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
+			v4 := ip.To4()
+			shared := v4 != nil && v4[0] == 100 && v4[1] >= 64 && v4[1] <= 127
+			if ip != nil && (shared || ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
 				return fmt.Errorf("SSRF blocked: resolved to private/internal IP %s", host)
 			}
 			return nil
