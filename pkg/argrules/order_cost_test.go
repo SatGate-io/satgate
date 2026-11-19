@@ -85,6 +85,39 @@ func TestOrderMaxCostDollarsAlone(t *testing.T) {
 	}
 }
 
+func TestCryptoLimitBuyByDollarsAddsWorstCaseFeeRounding(t *testing.T) {
+	for _, tc := range []struct {
+		name, fields string
+		units        int64
+		why          OrderCostWhy
+	}{
+		{"limit", `"side":"buy","type":"limit","dollar_amount":"45","limit_price":"30000"`, 4501000000, OrderCostValued},
+		{"stop limit", `"side":"BUY","type":"STOP_LIMIT","dollar_amount":45,"limit_price":30000,"stop_price":29000`, 4501000000, OrderCostValued},
+		{"near upper bound", `"side":"buy","type":"limit","dollar_amount":"9999999999.99","limit_price":"30000"`, 0, WhyCostTooLarge},
+		{"market", `"side":"buy","type":"market","dollar_amount":"45"`, 4500000000, OrderCostValued},
+		{"stop loss without price", `"side":"buy","type":"stop_loss","dollar_amount":"45"`, 4500000000, OrderCostValued},
+		{"stop loss with price", `"side":"buy","type":"stop_loss","dollar_amount":"45","stop_price":"29000"`, 0, WhyDollarsWithPrice},
+		{"sell", `"side":"sell","type":"market","dollar_amount":"45"`, 4500000000, OrderCostValued},
+		{"limit sell", `"side":"sell","type":"limit","dollar_amount":"45","limit_price":"30000"`, 0, WhyDollarsWithPrice},
+		{"quantity limit", `"side":"buy","type":"limit","quantity":"1","limit_price":"30000"`, 0, WhySharesToolNotYet},
+		{"both sizes", `"side":"buy","type":"limit","dollar_amount":"45","quantity":null,"limit_price":"30000"`, 0, WhyBothSizes},
+		{"invalid dollars", `"side":"buy","type":"limit","dollar_amount":"45e0","limit_price":"30000"`, 0, WhyBadNumber},
+		{"zero dollars", `"side":"buy","type":"limit","dollar_amount":"0","limit_price":"30000"`, 0, WhyNotAboveZero},
+		{"invalid limit price", `"side":"buy","type":"limit","dollar_amount":"45","limit_price":null`, 0, WhyBadNumber},
+		{"invalid stop price", `"side":"buy","type":"stop_limit","dollar_amount":"45","limit_price":"30000","stop_price":"0"`, 0, WhyNotAboveZero},
+		{"missing stop price", `"side":"buy","type":"stop_limit","dollar_amount":"45","limit_price":"30000"`, 0, WhyDollarsWithPrice},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			const tool = "place_crypto_order"
+			params := json.RawMessage(`{"name":"` + tool + `","arguments":{` + tc.fields + `}}`)
+			got, why := OrderMaxCostOfCall(params, tool, tool)
+			if got.Units != tc.units || why != tc.why {
+				t.Errorf("got (%d, %q); want (%d, %q)", got.Units, why, tc.units, tc.why)
+			}
+		})
+	}
+}
+
 func TestOrderMaxCostLimitBuyIsQuantityTimesLimitPrice(t *testing.T) {
 	for _, tc := range []struct {
 		name       string
