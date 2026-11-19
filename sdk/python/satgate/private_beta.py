@@ -83,6 +83,17 @@ class SatGate:
     def verify(self, receipt: Any) -> AttrDict:
         """Verify a SatGate receipt and return proof metadata."""
         payload = receipt.to_dict() if hasattr(receipt, "to_dict") else receipt
+        if isinstance(payload, dict):
+            schema = payload.get("schema_version")
+            if (
+                payload.get("record_type") == "private_bundle"
+                or any(key in payload for key in ("openings", "capsules", "opening"))
+                or isinstance(schema, str) and (
+                    schema.startswith("satgate.receipt_bundle.")
+                    or schema in ("satgate.exact_call.opening.v1", "satgate.execution_result.opening.v1")
+                )
+            ):
+                raise SatGateError("private_evidence_not_posted")
         return self._post("/v1/verify", {"receipt": self._serialize(payload)})
 
     def _post(self, path: str, payload: Dict[str, Any]) -> AttrDict:
