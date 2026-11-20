@@ -1,4 +1,4 @@
-"""One offline v1 matrix across main, pin, releases, APIs, CLIs and wrappers."""
+"""Offline v1/v2 compatibility across main, pins, releases, APIs, CLIs and wrappers."""
 import copy
 from contextlib import redirect_stdout
 import hashlib
@@ -105,14 +105,14 @@ class ReaderCompatibility(unittest.TestCase):
                        PATH=str(Path(sys.executable).parent) + os.pathsep + os.environ['PATH'])
         cls.env.pop('PYTHONPATH', None)
 
-    def cli(self, script, text, *args):
+    def cli(self, script, text, *args, now=None, exits=(0, 1, 4)):
         proc = subprocess.run([sys.executable, '-B', str(script), '-',
                                '--jwks-file', str(self.jwks), '--require-trusted-issuer',
-                               '--now', self.data['now'], *args], input=text,
+                               '--now', now or self.data['now'], *args], input=text,
                               text=True, capture_output=True, cwd=self.directory,
                               env=self.env, timeout=30)
         self.assertNotIn('Traceback', proc.stderr)
-        self.assertIn(proc.returncode, (0, 1, 4), proc.stderr)
+        self.assertIn(proc.returncode, exits, proc.stderr)
         return proc.returncode, json.loads(proc.stdout)
 
     def test_fixed_goldens_and_coverage(self):
@@ -344,6 +344,116 @@ class ReaderCompatibility(unittest.TestCase):
                             # Frozen v1 formats do not gain a v2 API. Their exact
                             # raw-v2 boundary is rejection, not v1 reinterpretation.
                             self.assertFalse(module.verify_pack(case['receipt'], **options)['valid'])
+
+
+    def test_v2_observation_matrix(self):
+        from tests.generate_observation_v2 import corpus
+        data = corpus()
+        found = {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('receipt_observation_v2.py')}
+        self.assertEqual(found, {'tools/receipt_observation_v2.py', 'demo/receipt_observation_v2.py'})
+        self.assertEqual((ROOT / 'tools/receipt_observation_v2.py').read_bytes(),
+                         (ROOT / 'demo/receipt_observation_v2.py').read_bytes())
+        for case in data['vectors']:
+            options = dict(jwks=case.get('jwks', data['jwks']), now=data['now'], require_trusted_issuer=True)
+            private = dict(parent=case['parent'], opening=case['opening'], result_opening=case['result_opening'])
+            with patch('socket.socket.connect', side_effect=AssertionError('network_forbidden')):
+                reference = self.modules['main-tools'].verify_pack(case['receipt'], **private, **options)
+                self.assertIs(reference['valid'], case['valid'], case['name'])
+                for name, module in self.modules.items():
+                    with self.subTest(reader=name, vector=case['name']):
+                        if name in ('main-tools', 'main-demo'):
+                            self.assertEqual(module.verify_pack(case['receipt'], **private, **options), reference)
+                        else:
+                            self.assertFalse(module.verify_pack(case['receipt'], **options)['valid'])
+
+
+    def test_v2_private_bundle_matrix(self):
+        from tests.generate_bundle_v2 import corpus
+        data = corpus()
+        found = {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('receipt_bundle_v2.py')}
+        self.assertEqual(found, {'tools/receipt_bundle_v2.py', 'demo/receipt_bundle_v2.py'})
+        self.assertEqual((ROOT / 'tools/receipt_bundle_v2.py').read_bytes(),
+                         (ROOT / 'demo/receipt_bundle_v2.py').read_bytes())
+        record_spec = importlib.util.spec_from_file_location('bundle_record_api', RECORD_READERS['main-tools'])
+        record_api = importlib.util.module_from_spec(record_spec)
+        # NamedTuple annotations require the executing module in sys.modules.
+        with patch.dict(sys.modules, {record_spec.name: record_api}):
+            record_spec.loader.exec_module(record_api)
+
+        sys.path.insert(0, str(ROOT / 'sdk/python'))
+        sys.path.insert(0, str(LINKED / 'src'))
+        import requests
+        from evidence_pack_verifier import cli as linked_cli, verifier
+        from satgate.agent_client import SatGateAgentClient
+        from satgate.exceptions import SatGateError
+
+        binary = self.directory / 'satgate-cli-bundle'
+        build = subprocess.run(['go', 'build', '-o', str(binary), './cmd/satgate-cli'],
+                               cwd=ROOT, text=True, capture_output=True, timeout=180)
+        self.assertEqual(build.returncode, 0, build.stderr)
+        client = SatGateAgentClient(gateway_url='https://gateway.example', admin_token=None)
+        env = dict(self.env, SATGATE_JWKS=str(self.jwks))
+        env.pop('SATGATE_VERIFIER', None)
+        artifact_path = self.directory / 'private-bundle.json'
+        with patch.dict(os.environ, SATGATE_VERIFIER=str(PACK_READERS['main-tools'])), \
+             patch('socket.socket.connect', side_effect=AssertionError('network_forbidden')):
+            for case in data['vectors']:
+                inputs = case['bundle']
+                text = json.dumps(inputs, sort_keys=True, indent=2)
+                pins = case['jwks']
+                options = dict(jwks=pins, now=data['now'], require_trusted_issuer=True)
+                reference = self.modules['main-tools'].verify_pack(inputs, **options)
+                self.assertEqual(reference['status'], case['status'], case['name'])
+                status = 0 if reference['valid'] else 1
+                self.jwks.write_text(json.dumps(pins))
+                artifact_path.write_text(text)
+                for name, module in self.modules.items():
+                    with self.subTest(reader=name, vector=case['name']):
+                        actual = module.verify_pack(inputs, **options)
+                        if name in ('main-tools', 'main-demo'):
+                            self.assertEqual(actual, reference)
+                            self.assertEqual(self.cli(PACK_READERS[name], text, now=data['now']), (status, reference))
+                        else:
+                            self.assertFalse(actual['valid'])
+                with self.subTest(reader='main-record', vector=case['name']):
+                    self.assertEqual(record_api.verify_record(text, **options), reference)
+                    self.assertEqual(self.cli(RECORD_READERS['main-tools'], text, now=data['now']), (status, reference))
+                for name, script in RECORD_READERS.items():
+                    if name != 'main-tools':
+                        with self.subTest(reader='frozen-record-' + name, vector=case['name']):
+                            # Frozen NDJSON CLIs never had a v2 JSON bundle parser.
+                            expected_exit = 2 if pins is None else 1
+                            code, actual = self.cli(script, json.dumps(inputs), exits=(expected_exit,))
+                            self.assertFalse(actual['valid'])
+                            if code == 1:
+                                self.assertEqual(actual['status'], 'invalid')
+                with self.subTest(reader='linked-signature-only', vector=case['name']):
+                    response = requests.Response()
+                    response.status_code = 200
+                    response._content = text.encode()
+                    url = 'https://artifact.example/bundle'
+                    with patch.object(verifier.requests, 'get', return_value=response) as get:
+                        actual = verifier.verify_evidence_pack(url, discover_jwks=True).to_dict()
+                        self.assertFalse(actual['valid'])
+                        self.assertIn('missing_receipt', actual['reason_codes'])
+                        output = io.StringIO()
+                        with redirect_stdout(output):
+                            self.assertEqual(linked_cli.main([url]), 1)
+                        self.assertIn('missing_receipt', json.loads(output.getvalue())['reason_codes'])
+                        self.assertEqual([call.args[0] for call in get.call_args_list], [url, url])
+                with self.subTest(reader='offline-sdk', vector=case['name']):
+                    try:
+                        actual = client.verify_pack(inputs, pins)
+                    except SatGateError as exc:
+                        self.assertEqual(status, 1)
+                        actual = json.loads(str(exc))
+                    self.assertEqual(actual, reference)
+                with self.subTest(reader='go-cli', vector=case['name']):
+                    proc = subprocess.run([str(binary), 'agent', 'verify', str(artifact_path)],
+                                          cwd=ROOT, env=env, text=True, capture_output=True, timeout=30)
+                    self.assertEqual(proc.returncode, status, proc.stderr)
+                    self.assertEqual(json.loads(proc.stdout), reference)
+        self.jwks.write_text(json.dumps(self.data['jwks']))
 
 
 if __name__ == '__main__':
