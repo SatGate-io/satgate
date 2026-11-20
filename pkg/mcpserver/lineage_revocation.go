@@ -188,7 +188,7 @@ func (p *Proxy) lineageGate() *lineageGate {
 
 // bindAuth binds a to the proxy's resource and its lineage gate.
 func (p *Proxy) bindAuth(a Authenticator) Authenticator {
-	bound := BindResource(a, p.resource)
+	bound := BindResource(a, p.resource, p.previousResources...)
 	if rb, ok := bound.(*ResourceBoundAuthenticator); ok && p.lineage != nil {
 		rb.lineage = p.lineage
 	}
