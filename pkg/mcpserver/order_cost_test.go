@@ -217,7 +217,7 @@ var ocCases = []ocCase{
 	ocRefused("stop_market by shares", ocEquity, `"side":"buy","type":"stop_market","time_in_force":"gfd","quantity":"1","stop_price":"5"`, argrules.WhyNotALimitBuy),
 	ocRefused("trailing stop by shares", ocEquity, `"side":"buy","type":"trailing_stop","time_in_force":"gfd","quantity":"1"`, argrules.WhyNotALimitBuy),
 	ocRefused("market with a stray limit_price", ocEquity, `"side":"buy","type":"market","time_in_force":"gfd","quantity":"1","limit_price":"5"`, argrules.WhyNotALimitBuy),
-	ocRefused("sell by shares", ocEquity, `"side":"sell","type":"limit","time_in_force":"gfd","quantity":"1","limit_price":"5"`, argrules.WhyNotABuy),
+	ocValued("sell by shares", ocEquity, `"side":"sell","type":"limit","time_in_force":"gfd","quantity":"1","limit_price":"5"`, 500000000),
 	ocRefused("no side", ocEquity, `"type":"limit","time_in_force":"gfd","quantity":"1","limit_price":"5"`, argrules.WhyNotABuy),
 	ocRefused("good till canceled", ocEquity, `"side":"buy","type":"limit","time_in_force":"gtc","quantity":"1","limit_price":"5"`, argrules.WhyNotADayOrder),
 	ocRefused("no time_in_force", ocEquity, `"side":"buy","type":"limit","quantity":"1","limit_price":"5"`, argrules.WhyNoTimeInForce),
@@ -729,10 +729,13 @@ func TestOrderCostRenamedToolUnderASharedBudget(t *testing.T) {
 	if tot := ocTotals(store); len(tot) != 1 || tot[0] != 9900000000 {
 		t.Fatalf("totals = %v", tot)
 	}
-	// Not a buy: refused for the fixed reason.
+	// A sell is counted under the same renamed tool and shared budget.
 	adm := admit(`{"symbol":"AAPL","side":"sell","type":"limit","time_in_force":"gfd","quantity":"1","limit_price":"1"}`)
-	if ocRefusalCode(adm) != toolcontrols.DenialCodeSpendLimit || !strings.Contains(adm.Refusal.Message, string(argrules.WhyNotABuy)) {
+	if adm == nil || adm.Refusal != nil {
 		t.Fatalf("%+v", adm)
+	}
+	if tot := ocTotals(store); len(tot) != 1 || tot[0] != 10000000000 {
+		t.Fatalf("buy plus sell totals = %v", tot)
 	}
 }
 

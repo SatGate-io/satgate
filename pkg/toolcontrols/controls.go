@@ -63,7 +63,7 @@
 //
 // The limit or rule then counts each order at the most it can cost, by
 // argrules.OrderMaxCost: dollar_amount, or quantity times limit_price for a day
-// limit buy of shares. It is the same function the per-order cap (the "order"
+// limit order of shares. It is the same function the per-order cap (the "order"
 // condition with max_cost, in pkg/argrules) uses, so a call has one value on
 // every path. An order that does not fill still counts until the day or week
 // resets. The key is accepted only with field dollar_amount and only on
