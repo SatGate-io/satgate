@@ -179,6 +179,20 @@ type held struct {
 
 // Admit implements CallGate.
 func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, error) {
+	return g.admit(ctx, call, nil)
+}
+
+// ReadOverages reads the applicable counters without reserving or releasing
+// anything. It reports only limits known to be exceeded, in gate order. An
+// unreadable limit is not an overage; authority and coverage checks still apply.
+// This is diagnostic only, not an admission decision.
+func (g *SpendGate) ReadOverages(ctx context.Context, call GateCall) []*GateRefusal {
+	var over []*GateRefusal
+	_, _ = g.admit(ctx, call, func(r *GateRefusal) { over = append(over, r) })
+	return over
+}
+
+func (g *SpendGate) admit(ctx context.Context, call GateCall, report func(*GateRefusal)) (*GateAdmission, error) {
 	all, err := call.Token.AllSpendLimits()
 	if err != nil {
 		return nil, fmt.Errorf("token controls: %w", err)
@@ -295,7 +309,10 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		}
 	}
 
-	callID := g.callID(ctx, call)
+	var callID string
+	if report == nil {
+		callID = g.callID(ctx, call)
+	}
 	var taken []held
 	giveBack := func() {
 		for i := len(taken) - 1; i >= 0; i-- {
@@ -340,6 +357,9 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			return &GateAdmission{Refusal: spendRefusalFor(l, sym, msg, remaining)}
 		}
 		if l.ID == "" {
+			if report != nil {
+				continue
+			}
 			// A limit with no identity has no counter. Never skip it.
 			giveBack()
 			return nil, fmt.Errorf("a spending limit has no counter id")
@@ -352,9 +372,15 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 			case toolcontrols.SymbolOther:
 				continue // another symbol: this limit does not touch the call
 			case toolcontrols.SymbolUnreadable:
+				if report != nil {
+					continue
+				}
 				return deny(fmt.Sprintf("%s: this token caps spending by symbol, and the call has no %s the cap can read, so the limit cannot be checked; send the symbol as plain text such as BTC or BTC-USD",
 					call.Tool, toolcontrols.SymbolField), nil), nil
 			case toolcontrols.SymbolAmbiguous:
+				if report != nil {
+					continue
+				}
 				// canon is the stem from the cap's own list, not the agent's
 				// text. The form maps to exactly this one capped symbol, so
 				// the refusal names it and says what is left under that cap,
@@ -372,6 +398,9 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		if l.Value != "" {
 			v := valueOf(l)
 			if !v.why.Valued() {
+				if report != nil {
+					continue
+				}
 				return deny(valueRefusal(call.Tool, v.why), g.remainingAt(ctx, l, key)), nil
 			}
 			if v.closing {
@@ -384,15 +413,42 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		} else {
 			amount, why := argrules.ReadNumericField(call.Params, call.Tool, l.Field)
 			if why != argrules.NumericFieldOK {
+				if report != nil {
+					continue
+				}
 				return deny(fmt.Sprintf("%s: this token has a limit of %s on %s, and %s, so the limit cannot be checked%s",
 					call.Tool, limitPhrase(l), l.Field, fieldReason(why), sendFieldHint(l, why)), g.remainingAt(ctx, l, key)), nil
 			}
 			var ok bool
 			units, ok = amountUnits(amount)
 			if !ok {
+				if report != nil {
+					continue
+				}
 				rem := g.remainingAt(ctx, l, key)
 				return deny(overMessage(call.Tool, l, sym, rem), rem), nil
 			}
+		}
+		over := func(total int64) *GateRefusal {
+			left := leftUnits(l.MaxUnits(), total)
+			var sharedLeft *int64
+			if l.Budget != "" || len(l.Symbols) > 0 {
+				sharedLeft = &left
+			}
+			r := spendRefusalFor(l, sym, overMessage(call.Tool, l, sym, sharedLeft), sharedLeft)
+			r.SpendLimitID = l.ID
+			if l.Value == argrules.OrderCostBasis && strings.EqualFold(ownName(l), "place_crypto_order") {
+				r.Data["cost"] = formatUnits(units)
+				r.Data["remaining"] = formatUnits(left)
+			}
+			return r
+		}
+		if report != nil {
+			total, err := g.store.Total(ctx, key)
+			if err == nil && units > l.MaxUnits()-total {
+				report(over(total))
+			}
+			continue
 		}
 		_, _, end := l.WindowBounds(now)
 		res := toolcontrols.Reservation{
@@ -417,11 +473,8 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		}
 		switch out.Status {
 		case toolcontrols.OverLimit:
-			if l.Budget == "" && len(l.Symbols) == 0 {
-				return deny(overMessage(call.Tool, l, sym, nil), nil), nil
-			}
-			left := leftUnits(l.MaxUnits(), out.Total)
-			return deny(overMessage(call.Tool, l, sym, &left), &left), nil
+			giveBack()
+			return &GateAdmission{Refusal: over(out.Total)}, nil
 		case toolcontrols.Duplicate:
 			// The earlier call with this id holds a reservation. Do not
 			// release it from here, and do not forward a second copy.

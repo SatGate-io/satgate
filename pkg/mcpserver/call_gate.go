@@ -73,6 +73,9 @@ type GateRefusal struct {
 	Data map[string]interface{}
 	// Detail is signed into the refusal receipt. DenialCode defaults to Code.
 	Detail GateReceiptDetail
+	// SpendLimitID identifies a confirmed spend overage for local presentation.
+	// It is never added to response data or receipt details.
+	SpendLimitID string `json:"-"`
 }
 
 // GateReceiptDetail is what a gate adds to a signed receipt. Every field is
@@ -184,6 +187,9 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 	}
 	if adm.Refusal != nil {
 		resp := p.gateRefusalResponse(ctx, req, tokenInfo, toolName, adm.Refusal)
+		if resp.Error != nil {
+			resp.Error.SpendLimitID = adm.Refusal.SpendLimitID
+		}
 		if adm.Settle != nil {
 			adm.Settle(ctx, GateOutcome{})
 		}

@@ -27,9 +27,11 @@ type Response struct {
 
 // RPCError is a JSON-RPC 2.0 error object.
 type RPCError struct {
-	Code    int             `json:"code"`
-	Message string          `json:"message"`
-	Data    json.RawMessage `json:"data,omitempty"`
+	// SpendLimitID is local metadata set by the spending gate, never wire data.
+	SpendLimitID string          `json:"-"`
+	Code         int             `json:"code"`
+	Message      string          `json:"message"`
+	Data         json.RawMessage `json:"data,omitempty"`
 }
 
 // Standard JSON-RPC error codes.
