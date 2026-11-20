@@ -20,6 +20,9 @@
 # production
 /build
 
+# Hash-checked build-time receipt checker assets
+/public/receipt-checker/
+
 # misc
 .DS_Store
 *.pem

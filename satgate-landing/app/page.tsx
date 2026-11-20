@@ -38,7 +38,7 @@ const whatItDoes = [
   { icon: Receipt, text: 'You can stop your agent with one button.' },
 ];
 
-const checkerUrl = 'https://github.com/SatGate-io/satgate/tree/main/tools';
+const checkerUrl = '/verify-evidence-pack';
 
 const auditTitle = 'Built for audit';
 

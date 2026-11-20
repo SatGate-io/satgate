@@ -1,6 +1,7 @@
 package mcpserver
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -31,6 +32,8 @@ type UpstreamManager struct {
 	// redact keeps upstream-supplied text out of errors and logs. See
 	// SetRedactUpstreamText.
 	redactOn atomic.Bool
+
+	dispatchRecorder atomic.Pointer[DispatchRecorder]
 
 	// closed is set by Close. A closed manager starts and adds nothing.
 	closed atomic.Bool
@@ -103,6 +106,21 @@ func (m *UpstreamManager) untrack(c *UpstreamClient) {
 // default; when unset nothing changes. Safe to call at any time; connections
 // already made keep the setting they were made with.
 func (m *UpstreamManager) SetRedactUpstreamText(on bool) { m.redactOn.Store(on) }
+
+// DispatchRecorder receives a copy of the final tools/call message before it
+// is sent upstream. An error stops the send. Calls may run concurrently.
+type DispatchRecorder interface {
+	BeforeRelease(ctx context.Context, msg []byte) error
+}
+
+// SetDispatchRecorder sets the recorder for tools/call requests. Nil removes it.
+func (m *UpstreamManager) SetDispatchRecorder(r DispatchRecorder) {
+	if r == nil {
+		m.dispatchRecorder.Store(nil)
+		return
+	}
+	m.dispatchRecorder.Store(&r)
+}
 
 // redacting reports whether upstream-supplied text is kept out of errors and
 // logs.
@@ -659,6 +677,14 @@ func (m *UpstreamManager) sendRequest(ctx context.Context, client *UpstreamClien
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
+	}
+	if method == MethodToolsCall {
+		if r := m.dispatchRecorder.Load(); r != nil {
+			if err := (*r).BeforeRelease(ctx, bytes.Clone(data)); err != nil {
+				return nil, err
+			}
+			data = bytes.Clone(data)
+		}
 	}
 
 	// Register response channel
