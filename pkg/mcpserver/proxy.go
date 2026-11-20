@@ -110,6 +110,9 @@ type ResponseGuard func(ctx context.Context, req *Request, handle func(ctx conte
 // SetResponseGuard installs g. Call it before the proxy serves requests.
 func (p *Proxy) SetResponseGuard(g ResponseGuard) { p.guard = g }
 
+// SetDispatchRecorder sets the recorder on the proxy's upstream manager.
+func (p *Proxy) SetDispatchRecorder(r DispatchRecorder) { p.upstream.SetDispatchRecorder(r) }
+
 // defaultRouter wraps the shared UpstreamManager for non-multi-tenant use.
 type defaultRouter struct {
 	mgr *UpstreamManager
