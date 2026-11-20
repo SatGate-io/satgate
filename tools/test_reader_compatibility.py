@@ -36,12 +36,15 @@ PACK_READERS = {
     'october-tools': OLD / 'tools/verify_evidence_pack.py',
     'october-demo': OLD / 'demo/verify_evidence_pack.py',
     'bundle-tools': BUNDLES / 'unavailable-check-v1/verify_evidence_pack.py',
+    'receipt-bundle-v2': BUNDLES / 'receipt-bundle-v2/verify_evidence_pack.py',
 }
+V2_PACK_READERS = {'main-tools', 'main-demo', 'receipt-bundle-v2'}
 RECORD_READERS = {name: path.with_name('verify_receipt_record.py')
                   for name, path in PACK_READERS.items() if not name.endswith('demo')}
 # These digest pins are independent of each release's editable manifest.
 IMMUTABLE_BUNDLE_MANIFESTS = {
     'unavailable-check-v1': '96f4c6353961c3f1f9c2e01aa548497d22171592b801b04920281443528d48b0',
+    'receipt-bundle-v2': 'e66c2b85c6aa2d351953f5f6262078788865ca171fada4dd273587181ed3b3b7',
 }
 PIN_HASHES = {
     'tools/verify_evidence_pack.py': '251369698bd2461a65f4624bdc0f0759091c2271b56f8096d5e47e2837b13575',
@@ -321,13 +324,17 @@ class ReaderCompatibility(unittest.TestCase):
                     after = self.modules['main-' + kind].verify_pack(copy.deepcopy(value), **options)
                     self.assertEqual(json.dumps(after, sort_keys=True), json.dumps(before, sort_keys=True))
 
+    def assert_v2_module_copies(self, filename):
+        expected = {PACK_READERS[name].with_name(filename) for name in V2_PACK_READERS}
+        self.assertEqual(set(ROOT.rglob(filename)), expected)
+        reference = (ROOT / 'tools' / filename).read_bytes()
+        for path in expected:
+            self.assertEqual(path.read_bytes(), reference, path.relative_to(ROOT))
+
     def test_v2_decision_matrix(self):
         from tests.generate_decision_v2 import corpus
         data = corpus()
-        found = {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('receipt_decision_v2.py')}
-        self.assertEqual(found, {'tools/receipt_decision_v2.py', 'demo/receipt_decision_v2.py'})
-        self.assertEqual((ROOT / 'tools/receipt_decision_v2.py').read_bytes(),
-                         (ROOT / 'demo/receipt_decision_v2.py').read_bytes())
+        self.assert_v2_module_copies('receipt_decision_v2.py')
         for case in data['vectors']:
             options = dict(jwks=case.get('jwks', data['jwks']), now=data['now'],
                            require_trusted_issuer=True)
@@ -337,7 +344,7 @@ class ReaderCompatibility(unittest.TestCase):
                 self.assertIs(reference['valid'], case['valid'], case['name'])
                 for name, module in self.modules.items():
                     with self.subTest(reader=name, vector=case['name']):
-                        if name in ('main-tools', 'main-demo'):
+                        if name in V2_PACK_READERS:
                             actual = module.verify_pack(case['receipt'], opening=case['opening'], **options)
                             self.assertEqual(actual, reference)
                         else:
@@ -349,10 +356,7 @@ class ReaderCompatibility(unittest.TestCase):
     def test_v2_observation_matrix(self):
         from tests.generate_observation_v2 import corpus
         data = corpus()
-        found = {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('receipt_observation_v2.py')}
-        self.assertEqual(found, {'tools/receipt_observation_v2.py', 'demo/receipt_observation_v2.py'})
-        self.assertEqual((ROOT / 'tools/receipt_observation_v2.py').read_bytes(),
-                         (ROOT / 'demo/receipt_observation_v2.py').read_bytes())
+        self.assert_v2_module_copies('receipt_observation_v2.py')
         for case in data['vectors']:
             options = dict(jwks=case.get('jwks', data['jwks']), now=data['now'], require_trusted_issuer=True)
             private = dict(parent=case['parent'], opening=case['opening'], result_opening=case['result_opening'])
@@ -361,7 +365,7 @@ class ReaderCompatibility(unittest.TestCase):
                 self.assertIs(reference['valid'], case['valid'], case['name'])
                 for name, module in self.modules.items():
                     with self.subTest(reader=name, vector=case['name']):
-                        if name in ('main-tools', 'main-demo'):
+                        if name in V2_PACK_READERS:
                             self.assertEqual(module.verify_pack(case['receipt'], **private, **options), reference)
                         else:
                             self.assertFalse(module.verify_pack(case['receipt'], **options)['valid'])
@@ -370,10 +374,7 @@ class ReaderCompatibility(unittest.TestCase):
     def test_v2_private_bundle_matrix(self):
         from tests.generate_bundle_v2 import corpus
         data = corpus()
-        found = {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('receipt_bundle_v2.py')}
-        self.assertEqual(found, {'tools/receipt_bundle_v2.py', 'demo/receipt_bundle_v2.py'})
-        self.assertEqual((ROOT / 'tools/receipt_bundle_v2.py').read_bytes(),
-                         (ROOT / 'demo/receipt_bundle_v2.py').read_bytes())
+        self.assert_v2_module_copies('receipt_bundle_v2.py')
         record_spec = importlib.util.spec_from_file_location('bundle_record_api', RECORD_READERS['main-tools'])
         record_api = importlib.util.module_from_spec(record_spec)
         # NamedTuple annotations require the executing module in sys.modules.
@@ -410,17 +411,18 @@ class ReaderCompatibility(unittest.TestCase):
                 for name, module in self.modules.items():
                     with self.subTest(reader=name, vector=case['name']):
                         actual = module.verify_pack(inputs, **options)
-                        if name in ('main-tools', 'main-demo'):
+                        if name in V2_PACK_READERS:
                             self.assertEqual(actual, reference)
                             self.assertEqual(self.cli(PACK_READERS[name], text, now=data['now']), (status, reference))
                         else:
                             self.assertFalse(actual['valid'])
                 with self.subTest(reader='main-record', vector=case['name']):
                     self.assertEqual(record_api.verify_record(text, **options), reference)
-                    self.assertEqual(self.cli(RECORD_READERS['main-tools'], text, now=data['now']), (status, reference))
                 for name, script in RECORD_READERS.items():
-                    if name != 'main-tools':
-                        with self.subTest(reader='frozen-record-' + name, vector=case['name']):
+                    with self.subTest(reader='record-' + name, vector=case['name']):
+                        if name in V2_PACK_READERS:
+                            self.assertEqual(self.cli(script, text, now=data['now']), (status, reference))
+                        else:
                             # Frozen NDJSON CLIs never had a v2 JSON bundle parser.
                             expected_exit = 2 if pins is None else 1
                             code, actual = self.cli(script, json.dumps(inputs), exits=(expected_exit,))

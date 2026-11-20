@@ -17,10 +17,13 @@ A supplied local JWKS must be independently obtained for the intended issuer.
 
 The offline SDK `SatGateAgentClient.verify_pack` accepts the optional opening and
 passes it only to the local verifier subprocess. `satgate-cli agent verify` can
-forward `--opening-file`. The separate remote beta SDK verifier is unchanged and
-is not an opening-verification API. Historical pinned/released scripts and the
-immutable unavailable-check-v1 bundle remain v1 artifacts. A v2 downloadable
-bundle is separate future work; these artifacts are not silently upgraded.
+forward `--opening-file`. `SATGATE_VERIFIER` selects the pack script from
+`tools/checker-bundles/receipt-bundle-v2/` for either wrapper; the bundle's
+`SHA256SUMS` digest is pinned in `IMMUTABLE_BUNDLE_MANIFESTS` in
+`tools/test_reader_compatibility.py`. The Python and Node beta `SatGate.verify`
+methods refuse private bundle/opening markers locally with
+`private_evidence_not_posted`, before `POST /v1/verify`. Historical pinned/released
+scripts and the immutable `unavailable-check-v1` bundle remain v1 artifacts.
 
 ## Closed decision object
 
@@ -150,7 +153,7 @@ The CLI adds local `--parent-file` and `--result-opening-file`. All three input
 options prohibit source URLs, JWKS URLs and discovery. The offline SDK and Go
 wrapper forward these inputs only to the local subprocess, not the beta API.
 No v1 pack or NDJSON format is repurposed. Historical immutable artifacts stay
-v1-only until a separately versioned distribution lane; the matrix pins rejection.
+v1-only; the matrix pins rejection alongside the separate v2 distribution.
 
 Every observation field below is required; extra fields are rejected:
 
