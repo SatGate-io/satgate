@@ -23,8 +23,10 @@ import (
 //   - By dollars (dollar_amount present, quantity absent): dollar_amount.
 //     limit_price or stop_price beside it is refused. side and type are not
 //     read otherwise, so a sell by dollars is valued as it always was.
-//   - A crypto limit or stop-limit buy by dollars with its required prices:
-//     dollar_amount plus one cent, the most Robinhood's fee rounding can add.
+//   - A crypto limit or stop-limit buy by dollars: dollar_amount plus one
+//     cent, the most Robinhood's fee rounding can add, if dollar_amount and
+//     each required price are plain decimals above zero and the cost fits.
+//     Otherwise it keeps the usual refusal for dollars with prices.
 //   - By shares (quantity present): quantity x limit_price, and only for a
 //     day limit buy of shares: tool place_equity_order, side buy, type limit
 //     or stop_limit, time_in_force gfd, market_hours absent, regular_hours or
@@ -200,7 +202,9 @@ func OrderMaxCostOfCall(params json.RawMessage, sentTool, orderTool string) (Ord
 //  3. dollar_amount and quantity are not both present, and one is. A key that
 //     is present with null counts as present.
 //  4. By dollars: dollar_amount a plain decimal above zero; limit_price and
-//     stop_price absent except on crypto limit and stop-limit buys.
+//     stop_price absent except on crypto limit and stop-limit buys that can
+//     be valued. If valuation fails, including at the upper bound, a dollar
+//     order with a price still gives WhyDollarsWithPrice.
 //  5. By shares: the tool, side, type, time_in_force and market_hours pass
 //     their allow-lists; limit_price present, a plain decimal above zero;
 //     quantity a plain decimal above zero. stop_price is not read (it cannot
@@ -233,9 +237,13 @@ func OrderMaxCost(tool string, args map[string]json.RawMessage) (OrderCost, Orde
 		if asciiLower(tool) == "place_crypto_order" && argIn(args, "side", orderCostSharesSides[:]) {
 			switch {
 			case argIn(args, "type", []string{"limit"}) && hasLimit && !hasStop:
-				return cryptoLimitBuyCost(dollarsRaw, args["limit_price"])
+				if cost, why := cryptoLimitBuyCost(dollarsRaw, args["limit_price"]); why.Valued() {
+					return cost, why
+				}
 			case argIn(args, "type", []string{"stop_limit"}) && hasLimit && hasStop:
-				return cryptoLimitBuyCost(dollarsRaw, args["limit_price"], args["stop_price"])
+				if cost, why := cryptoLimitBuyCost(dollarsRaw, args["limit_price"], args["stop_price"]); why.Valued() {
+					return cost, why
+				}
 			}
 		}
 		if hasLimit || hasStop {
