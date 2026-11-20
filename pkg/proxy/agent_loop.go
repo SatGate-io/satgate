@@ -864,7 +864,9 @@ func (g *Gateway) identityHTTPClient() *http.Client {
 				return err
 			}
 			ip := net.ParseIP(host)
-			if ip != nil && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
+			v4 := ip.To4()
+			shared := v4 != nil && v4[0] == 100 && v4[1] >= 64 && v4[1] <= 127
+			if ip != nil && (shared || ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
 				return errors.New("identity_jwks_invalid")
 			}
 			return nil
@@ -891,7 +893,10 @@ func (g *Gateway) identityURLAllowed(raw string) error {
 	if parsed.Scheme != "https" && !(allowPrivate && parsed.Scheme == "http") {
 		return errors.New("identity_jwks_invalid")
 	}
-	if ip := net.ParseIP(parsed.Hostname()); ip != nil && !allowPrivate && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsUnspecified()) {
+	ip := net.ParseIP(parsed.Hostname())
+	v4 := ip.To4()
+	shared := v4 != nil && v4[0] == 100 && v4[1] >= 64 && v4[1] <= 127
+	if ip != nil && !allowPrivate && (shared || ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsUnspecified()) {
 		return errors.New("identity_jwks_invalid")
 	}
 	return nil

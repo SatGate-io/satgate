@@ -889,7 +889,9 @@ func isPrivateIP(hostname string) bool {
 		return false // Not an IP address, assume OK (DNS will be checked at runtime)
 	}
 
-	if ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsPrivate() {
+	v4 := ip.To4()
+	shared := v4 != nil && v4[0] == 100 && v4[1] >= 64 && v4[1] <= 127
+	if shared || ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsPrivate() {
 		return true
 	}
 

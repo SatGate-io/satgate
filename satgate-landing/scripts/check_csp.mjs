@@ -21,9 +21,17 @@ await discover('app');
 // These legacy URLs are now config redirects, not executable demo pages.
 paths.push('/crawl', '/dashboard', '/monetize');
 const browser = await chromium.launch({ headless: true });
+const originalPolicy = "default-src 'self'; script-src 'self' 'nonce-NONCE' 'strict-dynamic'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://api.satgate.io https://cloud.satgate.io https://satgate-production-9354.up.railway.app; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
+const workerPolicy = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' https://api.satgate.io/.well-known/jwks.json https://satgate-mcp-saas.fly.dev/.well-known/jwks.json https://mcp.satgate.io/.well-known/jwks.json";
 let count = 0;
 try {
   const context = await browser.newContext();
+  const workerResponse = await context.request.get(origin + '/receipt-checker-worker.mjs');
+  assert.equal(workerResponse.status(), 200);
+  assert.equal(workerResponse.headers()['content-security-policy'], workerPolicy);
+  // The narrowly scoped WebAssembly permission must not become JavaScript eval.
+  assert.ok(!/(?:^|[\s;])'unsafe-eval'/.test(workerPolicy));
+  assert.ok(!/script-src[^;]*unsafe-inline/.test(workerPolicy));
   await context.route('**/*', route => {
     const url = new URL(route.request().url());
     return url.origin === origin && route.request().method() === 'GET'
@@ -44,6 +52,9 @@ try {
     const response = await page.goto(origin + path, { waitUntil: 'networkidle' });
     assert.equal(response.status(), 200, `${path}: page did not load`);
     const csp = response.headers()['content-security-policy'];
+    assert.equal(csp.replace(/'nonce-[^']+'/g, "'nonce-NONCE'"),
+      originalPolicy,
+      `${path}: exact policy; all other routes unchanged`);
     assert.ok(csp && !csp.includes('unsafe-eval'), `${path}: missing or unsafe policy`);
     assert.match(csp, /script-src [^;]*'nonce-[A-Za-z0-9+/=]+'/);
     assert.ok(!/script-src[^;]*unsafe-inline/.test(csp));
