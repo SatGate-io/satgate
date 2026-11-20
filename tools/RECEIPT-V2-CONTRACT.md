@@ -1,7 +1,7 @@
-# V2 decision and observation reader contract (development profile)
+# V2 receipt reader contract (development profile)
 
 Reader-only, binding-only development support. No producer, financial enrollment,
-real broker adapter, authority validation, capsule decryption, bundle,
+real broker adapter, authority validation, capsule decryption,
 replay permission or completeness claim is added here. Existing v1 verification
 and its deliberate tools/demo differences are unchanged.
 
@@ -258,3 +258,71 @@ The dummy-only generator is `tools/tests/generate_observation_v2.py`, and its
 checked-in corpus is `tools/fixtures/reader-v2-observations.json`. Both maintained
 APIs/CLIs, real offline SDK/Go wrappers and the compatibility matrix consume every
 vector; immutable pack/record/linked artifacts retain explicit rejection tests.
+
+## Closed private bundle (reader-only development choice)
+
+The maintained tools pack, demo pack and receipt-record readers accept a single
+private JSON object from a local file or stdin. The Python CLIs accept
+`--private-bundle` to force local-only parsing even for malformed or mislabelled
+input; pin the keys with `--jwks-file`. The existing SDK and Go verification
+wrappers also delegate local bundle files to the maintained pack reader. This
+does not repurpose v1 NDJSON or change the remote beta API or v1 downloads.
+
+The top level is exactly `schema_version: satgate.receipt_bundle.v2`,
+`record_type: private_bundle`, `manifest`, `artifacts`, `capsules`, and `openings`.
+The last three are maps from exact byte SHA-256 digests to canonical unpadded
+base64url of those bytes. Signed records and already-decrypted openings are
+UTF-8 JSON; capsule ciphertext is opaque. Base64url is not encryption. Do not
+publish the bundle, the openings, or their plaintext digests. No AEAD format,
+decryption, export authorization, owner/recipient binding or recovery protocol
+is defined by this development reader.
+
+The manifest has exactly these fields:
+
+| Field | Definition |
+| --- | --- |
+| `schema_version`, `record_type` | `satgate.receipt_bundle_manifest.v2`, `bundle_manifest` |
+| `binding_profile`, `canonicalization`, `hash_algorithm`, `signature_algorithm` | `satgate.binding_only.v1`, `jcs-rfc8785`, `sha256`, `ed25519` |
+| `issuer`, `issuer_kid`, `generated_at` | same origin, key and UTC timestamp syntax/skew as v2 records |
+| `range` | exactly `{from,to}`, UTC timestamps, inclusive start and exclusive end; ordered and no later than `generated_at` |
+| `artifacts` | list of distinct exact-byte artifact digests; order is signed, not an execution or coverage claim |
+| `disclosure` | exactly one entry for each artifact digest; each entry is exactly `{state,capsule_digest,opening_digest}` |
+| `outcomes` | exactly one state for each decision **payload** digest |
+| `retention_state` | `retained`, `expired`, or `deleted` for the export selection |
+| `historical_keys` | reference-only list of public Ed25519 JWKs with exactly `kty`, `crv`, `alg`, `use`, `kid`, `x`; distinct `kid`s |
+| `manifest_hash`, `signature` | SHA-256 and Ed25519 of the manifest JCS bytes excluding only these two top-level fields |
+
+All digest and signature values use the same `sha256:` / `ed25519:` encodings
+as the individual records. Historical keys do not supply trust or override
+pins. The manifest, all decisions and all observations must independently
+verify under the caller's pins for the same issuer; rotation by `issuer_kid`
+is allowed. No receipt-directed network or historical-key fallback is used.
+
+The byte maps must have exactly the three signed digest sets. A disclosure
+state is `disclosed` (non-null `capsule_digest` and `opening_digest`) or
+`withheld`, `missing`, `expired`, `deleted` (null opening digest; the ciphertext
+may still be listed and supplied). Each non-null digest in a map is unique.
+The reader checks each disclosed opening against its signed record commitment.
+For an observation, its own signed `capsule_digest` also matches the exact
+capsule ciphertext bytes when present. The reader checks both commitments but
+does not prove that a supplied opening was decrypted from that ciphertext.
+All artifacts must be in range; an observation
+must join exactly one included decision by payload digest via the row-04 link
+checks. Without a parent call opening, the private attempt/account join remains
+unchecked, even if the result opening independently matches the observation.
+
+An allowed decision has `available` when at least one observation is present
+and none has `sent_outcome_unknown`; any signed unknown observation requires
+`unknown`. Without observations only `pending` or `unknown` is valid. A denied
+decision has `not_expected` and cannot have an observation. A `later_reconciled`
+record does not override a separate signed unknown in this profile because
+row 04 does not bind replacements or reconciliation between observations.
+
+`status: verified` has `valid: true`, `complete: true`, and CLI exit 0 for the
+listed selection only. Explicit missing openings/outcomes or a retention cut
+give authenticated `status: partial`, `valid: false`, `complete: false` and
+exit 1. Structural, signature, byte-hash and link failures are `invalid` and
+exit 1. No verdict includes the underlying orders, amounts, outcomes or other
+private values. No completeness for an account, independent clock or broker
+witness, or fill/settlement claim follows from the manifest. Verdict text is
+limited to machine codes.
