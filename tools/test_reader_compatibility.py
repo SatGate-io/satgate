@@ -346,5 +346,26 @@ class ReaderCompatibility(unittest.TestCase):
                             self.assertFalse(module.verify_pack(case['receipt'], **options)['valid'])
 
 
+    def test_v2_observation_matrix(self):
+        from tests.generate_observation_v2 import corpus
+        data = corpus()
+        found = {p.relative_to(ROOT).as_posix() for p in ROOT.rglob('receipt_observation_v2.py')}
+        self.assertEqual(found, {'tools/receipt_observation_v2.py', 'demo/receipt_observation_v2.py'})
+        self.assertEqual((ROOT / 'tools/receipt_observation_v2.py').read_bytes(),
+                         (ROOT / 'demo/receipt_observation_v2.py').read_bytes())
+        for case in data['vectors']:
+            options = dict(jwks=case.get('jwks', data['jwks']), now=data['now'], require_trusted_issuer=True)
+            private = dict(parent=case['parent'], opening=case['opening'], result_opening=case['result_opening'])
+            with patch('socket.socket.connect', side_effect=AssertionError('network_forbidden')):
+                reference = self.modules['main-tools'].verify_pack(case['receipt'], **private, **options)
+                self.assertIs(reference['valid'], case['valid'], case['name'])
+                for name, module in self.modules.items():
+                    with self.subTest(reader=name, vector=case['name']):
+                        if name in ('main-tools', 'main-demo'):
+                            self.assertEqual(module.verify_pack(case['receipt'], **private, **options), reference)
+                        else:
+                            self.assertFalse(module.verify_pack(case['receipt'], **options)['valid'])
+
+
 if __name__ == '__main__':
     unittest.main()

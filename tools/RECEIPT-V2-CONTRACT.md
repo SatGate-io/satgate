@@ -1,7 +1,7 @@
-# V2 decision reader contract (development profile)
+# V2 decision and observation reader contract (development profile)
 
 Reader-only, binding-only development support. No producer, financial enrollment,
-real broker adapter, authority validation, execution observation, capsule, bundle,
+real broker adapter, authority validation, capsule decryption, bundle,
 replay permission or completeness claim is added here. Existing v1 verification
 and its deliberate tools/demo differences are unchanged.
 
@@ -114,8 +114,8 @@ this generic development profile cannot authorize a real financial dispatch.
 
 `valid` describes the requested signature/schema/hash and, only when supplied,
 opening checks. `call_binding` is `not_checked`, `matched` or `mismatched`.
-Without an opening it is never matched. `authority_state` and `execution_state`
-are always `not_evidenced`. Pending approval reports `admission_state: held` and
+Without an opening it is never matched. For decision records, `authority_state`
+and `execution_state` are always `not_evidenced`. Pending approval reports `admission_state: held` and
 `v2_hold_not_executed`, never executed or a broker rejection. A valid allow is
 not execution evidence. An opening mismatch can retain signature trust while
 `valid` is false. No private opening values or input-derived errors are echoed.
@@ -140,3 +140,121 @@ The reference test generator is `tools/tests/generate_decision_v2.py`.
 compatibility matrix preserves whole v1 verdict bytes and checks v2 parity in
 the maintained copies. New tests exercise both CLIs, the actual offline SDK/Go
 wrappers, and explicit historical/linked/record unsupported-format boundaries.
+
+## Closed execution observation (reader-only development choice)
+
+Both maintained readers also accept a separate raw `satgate.receipt.v2` object
+with `record_type: execution_observation`. The API adds `parent` (exactly one raw
+decision) and `result_opening`; `opening` remains the parent's exact-call opening.
+The CLI adds local `--parent-file` and `--result-opening-file`. All three input
+options prohibit source URLs, JWKS URLs and discovery. The offline SDK and Go
+wrapper forward these inputs only to the local subprocess, not the beta API.
+No v1 pack or NDJSON format is repurposed. Historical immutable artifacts stay
+v1-only until a separately versioned distribution lane; the matrix pins rejection.
+
+Every observation field below is required; extra fields are rejected:
+
+- `schema_version`, `record_type` as above; `binding_profile: satgate.binding_only.v1`
+- `canonicalization: jcs-rfc8785`, `hash_algorithm: sha256`,
+  `signature_algorithm: ed25519`
+- `record_id`, `issuer`, `issuer_kid`, `observed_at`: same bounded string,
+  HTTPS-origin and UTC/future-skew rules as the decision identity
+- `decision_receipt_hash`: the parent's payload SHA-256 digest, not a pack hash
+- `call_commitment`: the same closed profile/algorithm/digest object as the parent
+- `operation_id`, `attempt_id`: opaque references; these must equal the refs in
+  the authenticated parent opening, not client request ids
+- `status`: exactly `accepted`, `rejected`, `transport_failed_before_send`,
+  `sent_outcome_unknown`, `partially_filled`, `filled`, `cancelled`, `later_reconciled`
+- `result_commitment`: exactly `{profile, algorithm, digest}`, with
+  `satgate.execution_result.v1`, `sha256`, and the usual digest encoding
+- `capsule_digest`, `record_hash`: the usual SHA-256 digest encoding
+- `signature`: the usual Ed25519 signature encoding
+
+Hash/sign RFC 8785 bytes excluding ONLY this object's top-level `record_hash`
+and `signature`. In particular, `decision_receipt_hash`, both nested commitment
+digests and `capsule_digest` remain signed. The same independently obtained local
+JWKS selection rules apply; embedded keys never rescue verification. Capsule
+syntax and signed digest are checked here; ciphertext/disclosure selection and
+manifest completeness belong to the separate bundle lane, not this verifier.
+
+The parent is independently schema/hash/signature verified. Require the same
+issuer (key rotation is allowed), exact payload digest and call commitment,
+allowed admission with no pending approval, and observation time no earlier than
+decision issuance. A denied/held decision cannot become broker execution evidence.
+No candidate-parent search or accepting a list of parents is allowed.
+
+Important row-03 boundary: decisions do not publish operation/attempt refs outside
+their private commitment. This lane does not change those signed decision bytes.
+Without the call opening, authentic public observation and parent signatures and
+the parent digest can be checked, but the attempt join is not established:
+`valid: false`, `v2_attempt_not_checked`, `attempt_binding: not_checked`. This is
+explicit partial verification, not an unsupported observation or a false join.
+With the parent's valid opening, wrong attempt/operation/commitment fails. A result
+opening is optional: without it `result_binding: not_checked` and no private
+broker-id, response or amount match is claimed, even if the joined record is valid.
+
+## Private result opening and bounded observation verdict
+
+The result opening is closed, with all of these required members:
+
+- `schema_version: satgate.execution_result.opening.v1`
+- `decision_receipt_hash`, `operation_id`, `attempt_id`, `status`: match the record
+- `opening`: canonical unpadded base64url of 32 bytes, distinct from the call opening
+- `account_binding`: matches the authenticated call opening
+- `broker_order_id`, `client_order_id`, `venue_status`: private nonempty strings
+  or explicit null; no public mirror of these fields
+- `target_order_id`, `replacement_link`: match the call intent's `cancel_target`
+  and `replacement_link`, including explicit nulls
+- `venue_times`: exactly `{received_at, updated_at}`, UTC timestamps or null
+- `parser_version`: nonempty private string
+- `financial_values`: exactly `{quantity, quantity_unit, price, price_unit}`;
+  each amount/unit pair is null/null or nonnegative unambiguous decimal string
+  plus nonempty unit; unknown economic fields fail
+- `response`: null or exactly `{profile, headers_b64, body_b64}`, with
+  `profile: satgate.binding_only.response.v1`. Header and body encodings preserve
+  exact credential-free UTF-8 bytes. This development profile accepts JSON body
+  bytes only; reject duplicate/case-colliding names, invalid Unicode, unsafe JCS
+  numbers and credentials. Credential exclusion rules match the call development
+  transport. Reordering equivalent response JSON still changes its commitment.
+
+Rebuild the envelope by excluding only opening `schema_version` and adding
+`domain: satgate.execution_result.v1`. SHA-256 its JCS bytes; compare the signed
+result commitment. Nothing else is omitted. This commits the response bytes AND
+the private parser projection, rather than interpreting a broker protocol here.
+`accepted`, `partially_filled`, `filled` and `cancelled` openings require response,
+broker id and venue status. `transport_failed_before_send` requires no response,
+broker id or venue status. Missing reliable broker id/status cannot be upgraded
+to one of those reliable statuses in an opened record. `sent_outcome_unknown`
+remains unknown, never rejection; no resend permission is produced.
+
+These are development-profile field/format choices for offline readers, not a
+settled real adapter/producer contract. The reader does not derive a broker
+status, client id, financial projection or broker id from proprietary response
+semantics, corroborate order history, or prove that capture/parser behavior was
+honest. Reconciliation/fill statuses attest only the signed observation. Each
+record links to its immutable decision; no aggregate transition/previous-result
+chain, finality or stream completeness is inferred by this raw-record API.
+
+`execution_state` is exactly `observed_` plus the authenticated status, never an
+upgrade from acceptance to fill/settlement. `observation_status` preserves that
+status. `broker_witness` and `settlement_state` stay `not_evidenced`. No private
+values appear in verdicts/errors. All new runtime reasons are machine codes:
+
+- `v2_parent_required`
+- `v2_parent_invalid`
+- `v2_parent_mismatch`
+- `v2_attempt_not_checked`
+- `v2_observation_verified`
+- `v2_result_not_checked`
+- `v2_result_matched`
+- `v2_result_mismatch`
+- `v2_result_opening_invalid`
+- `v2_result_link_mismatch`
+- `v2_outcome_unknown`
+
+Shared v2 schema/hash/key/signature/input/authority/container codes retain their
+existing meaning. `reasons` equals `reason_codes`; no new runtime sentence ships.
+The dummy-only generator is `tools/tests/generate_observation_v2.py`, and its
+checked-in corpus is `tools/fixtures/reader-v2-observations.json`. Both maintained
+APIs/CLIs, real offline SDK/Go wrappers and the compatibility matrix consume every
+vector; immutable pack/record/linked artifacts retain explicit rejection tests.
