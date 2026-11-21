@@ -190,6 +190,21 @@ func bindingRequestOptIn(ctx context.Context, req *Request) bool {
 	return bindingOptInAt(req.Params, "_meta", bindingCapability, "version")
 }
 
+// BindingOptedIn reports whether the request or its session opted in to the typed
+// receipt handle. It gives the same answer the proxy uses before adding the
+// handle. It reads only the request params and the context's opt-in flag, reads
+// no token, and logs nothing. A nil request returns false; a nil context is
+// treated as context.Background().
+func BindingOptedIn(ctx context.Context, req *Request) bool {
+	if req == nil {
+		return false
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	return bindingRequestOptIn(ctx, req)
+}
+
 func bindingOptInAt(raw json.RawMessage, path ...string) bool {
 	for _, key := range path {
 		var next json.RawMessage
