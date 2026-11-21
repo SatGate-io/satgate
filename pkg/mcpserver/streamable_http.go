@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -202,12 +203,13 @@ func WithMaxStreamableSessions(n int) SSEOption {
 
 // streamSession is one Streamable HTTP client session.
 type streamSession struct {
-	id        string
-	tokenSum  [32]byte
-	protocol  string
-	expiresAt time.Time
-	identity  sseSessionIdentity
-	verified  *TokenInfo
+	id           string
+	tokenSum     [32]byte
+	protocol     string
+	expiresAt    time.Time
+	identity     sseSessionIdentity
+	verified     *TokenInfo
+	bindingOptIn atomic.Bool
 }
 
 // ServeHTTP dispatches legacy SSE routes and the Streamable HTTP endpoint.
@@ -407,6 +409,9 @@ func (s *SSEServer) handleStreamablePost(w http.ResponseWriter, r *http.Request)
 	if req == nil {
 		http.Error(w, "invalid JSON-RPC", http.StatusBadRequest)
 		return
+	}
+	if bindingInitOptIn(req) {
+		sess.bindingOptIn.Store(true)
 	}
 
 	authToken := s.authToken(r)
@@ -709,6 +714,9 @@ func (sess *streamSession) contextOnto(parent context.Context) context.Context {
 	}
 	if sess.verified != nil {
 		parent = context.WithValue(parent, CtxTokenInfo, sess.verified)
+	}
+	if sess.bindingOptIn.Load() {
+		parent = withBindingOptIn(parent)
 	}
 	return parent
 }

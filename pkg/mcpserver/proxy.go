@@ -65,6 +65,7 @@ type Proxy struct {
 	delegator         *Delegator
 	events            EventPublisher
 	evidence          EvidenceRecorder
+	bindingProvider   atomic.Pointer[BindingHandleProvider]
 	revocation        RevocationChecker // optional, checks if token is revoked
 	lineage           *lineageGate      // lineage ban check (SetLineageRevocationChecker)
 	limiter           RequestLimiter    // optional, per-token request rate limit
@@ -413,6 +414,8 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 		Msg("MCP proxy running")
 
 	// Main message loop
+	clientCtx := withClientLoop(ctx)
+	var clientBindingOptIn bool
 	for {
 		msg, err := p.client.ReadMessage(ctx)
 		if err != nil {
@@ -436,7 +439,11 @@ func (p *Proxy) Run(ctx context.Context, clientTransport Transport) error {
 
 		// Handle the request. withClientLoop marks it as read here (stdio),
 		// not over SSE or Streamable HTTP (see authenticate).
-		resp, err := p.handleRequest(withClientLoop(ctx), req)
+		if !clientBindingOptIn && bindingInitOptIn(req) {
+			clientBindingOptIn = true
+			clientCtx = withBindingOptIn(clientCtx)
+		}
+		resp, err := p.handleRequest(clientCtx, req)
 		if err != nil {
 			log.Error().Err(err).Str("method", req.Method).Msg("handler error")
 			resp = NewErrorResponse(req.ID, CodeInternalError, err.Error())
@@ -789,6 +796,27 @@ func (p *Proxy) handleToolsListWithCtx(ctx context.Context, req *Request) (*Resp
 	}
 
 	tools = dropReservedTools(tools)
+
+	if p.bindingProvider.Load() != nil && bindingRequestOptIn(ctx, req) {
+		wrapped := false
+		for i, tool := range tools {
+			if patched, ok := ToolWithBindingSchema(tool); ok {
+				tools[i] = patched
+				wrapped = true
+			}
+		}
+		if wrapped {
+			// Avoid compacting the raw tool values at this layer.
+			result := []byte(`{"tools":[`)
+			for i, tool := range tools {
+				if i > 0 {
+					result = append(result, ',')
+				}
+				result = append(result, tool...)
+			}
+			return &Response{JSONRPC: "2.0", ID: req.ID, Result: append(result, ']', '}')}, nil
+		}
+	}
 
 	result, err := json.Marshal(map[string]interface{}{
 		"tools": tools,
@@ -1431,7 +1459,16 @@ func (p *Proxy) handleToolsCall(ctx context.Context, req *Request, tokenInfo *To
 
 	// Rewrite the response ID to match the client's request ID
 	resp.ID = req.ID
+	// The legacy evidence path can re-encode the result.
+	originalResult := resp.Result
 	attachMCPEvidenceToResponse(resp, allowedEvidence)
+	if provider := p.bindingProvider.Load(); provider != nil && resp.Error == nil && req.Method == MethodToolsCall && bindingRequestOptIn(ctx, req) {
+		if handle, err := (*provider).HandleFor(ctx, req); err == nil {
+			if wrapped, ok := ApplyBindingHandle(originalResult, allowedEvidence, handle); ok {
+				resp.Result = wrapped
+			}
+		}
+	}
 	return resp, nil
 }
 

@@ -62,10 +62,11 @@ type SSEServer struct {
 
 // sseSession represents one connected MCP client over SSE.
 type sseSession struct {
-	id       string
-	messages chan json.RawMessage // outbound messages to client
-	ctx      context.Context
-	cancel   context.CancelFunc
+	id           string
+	messages     chan json.RawMessage // outbound messages to client
+	ctx          context.Context
+	cancel       context.CancelFunc
+	bindingOptIn atomic.Bool
 
 	identityMu        sync.RWMutex
 	tokenID           string     // from auth/session tracking (may be empty)
@@ -129,6 +130,9 @@ func (s *sseSession) contextWithIdentity() context.Context {
 	}
 	if identity.verifiedTokenInfo != nil {
 		ctx = context.WithValue(ctx, CtxTokenInfo, identity.verifiedTokenInfo)
+	}
+	if s.bindingOptIn.Load() {
+		ctx = withBindingOptIn(ctx)
 	}
 	return ctx
 }
@@ -564,6 +568,9 @@ func (s *SSEServer) handleMessage(w http.ResponseWriter, r *http.Request) {
 	if req == nil {
 		w.WriteHeader(http.StatusAccepted)
 		return
+	}
+	if bindingInitOptIn(req) {
+		session.bindingOptIn.Store(true)
 	}
 
 	// Inject auth token into params._meta if from header. The connection's
