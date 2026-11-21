@@ -417,11 +417,20 @@ func (g *SpendGate) Admit(ctx context.Context, call GateCall) (*GateAdmission, e
 		}
 		switch out.Status {
 		case toolcontrols.OverLimit:
-			if l.Budget == "" && len(l.Symbols) == 0 {
-				return deny(overMessage(call.Tool, l, sym, nil), nil), nil
-			}
 			left := leftUnits(l.MaxUnits(), out.Total)
-			return deny(overMessage(call.Tool, l, sym, &left), &left), nil
+			var sharedLeft *int64
+			if l.Budget != "" || len(l.Symbols) > 0 {
+				sharedLeft = &left
+			}
+			admission := deny(overMessage(call.Tool, l, sym, sharedLeft), sharedLeft)
+			if l.Value == argrules.OrderCostBasis && strings.EqualFold(ownName(l), "place_crypto_order") {
+				// Report the exact reservation that failed, not a second reading
+				// of the order or counter. Live and read-only stores both return
+				// the total at the denial decision. Keep receipt details intact.
+				admission.Refusal.Data["cost"] = formatUnits(units)
+				admission.Refusal.Data["remaining"] = formatUnits(left)
+			}
+			return admission, nil
 		case toolcontrols.Duplicate:
 			// The earlier call with this id holds a reservation. Do not
 			// release it from here, and do not forward a second copy.

@@ -22,7 +22,11 @@ import (
 //
 //   - By dollars (dollar_amount present, quantity absent): dollar_amount.
 //     limit_price or stop_price beside it is refused. side and type are not
-//     read, so a sell by dollars is valued as it always was.
+//     read otherwise, so a sell by dollars is valued as it always was.
+//   - A crypto limit or stop-limit buy by dollars: dollar_amount plus one
+//     cent, the most Robinhood's fee rounding can add, if dollar_amount and
+//     each required price are plain decimals above zero and the cost fits.
+//     Otherwise it keeps the usual refusal for dollars with prices.
 //   - By shares (quantity present): quantity x limit_price, and only for a
 //     day limit buy of shares: tool place_equity_order, side buy, type limit
 //     or stop_limit, time_in_force gfd, market_hours absent, regular_hours or
@@ -197,8 +201,10 @@ func OrderMaxCostOfCall(params json.RawMessage, sentTool, orderTool string) (Ord
 //  2. No argument name differs from a field it reads only by letter case.
 //  3. dollar_amount and quantity are not both present, and one is. A key that
 //     is present with null counts as present.
-//  4. By dollars: limit_price and stop_price absent; dollar_amount a plain
-//     decimal above zero.
+//  4. By dollars: dollar_amount a plain decimal above zero; limit_price and
+//     stop_price absent except on crypto limit and stop-limit buys that can
+//     be valued. If valuation fails, including at the upper bound, a dollar
+//     order with a price still gives WhyDollarsWithPrice.
 //  5. By shares: the tool, side, type, time_in_force and market_hours pass
 //     their allow-lists; limit_price present, a plain decimal above zero;
 //     quantity a plain decimal above zero. stop_price is not read (it cannot
@@ -228,6 +234,18 @@ func OrderMaxCost(tool string, args map[string]json.RawMessage) (OrderCost, Orde
 	if hasDollars {
 		_, hasLimit := args["limit_price"]
 		_, hasStop := args["stop_price"]
+		if asciiLower(tool) == "place_crypto_order" && argIn(args, "side", orderCostSharesSides[:]) {
+			switch {
+			case argIn(args, "type", []string{"limit"}) && hasLimit && !hasStop:
+				if cost, why := cryptoLimitBuyCost(dollarsRaw, args["limit_price"]); why.Valued() {
+					return cost, why
+				}
+			case argIn(args, "type", []string{"stop_limit"}) && hasLimit && hasStop:
+				if cost, why := cryptoLimitBuyCost(dollarsRaw, args["limit_price"], args["stop_price"]); why.Valued() {
+					return cost, why
+				}
+			}
+		}
 		if hasLimit || hasStop {
 			return OrderCost{}, WhyDollarsWithPrice
 		}
@@ -273,6 +291,29 @@ func OrderMaxCost(tool string, args map[string]json.RawMessage) (OrderCost, Orde
 		return OrderCost{}, WhyNotAboveZero
 	}
 	return costOf(qty.Times(price))
+}
+
+// Robinhood sizes the quantity using limit_price. Fills are at that price or
+// better and total debit is capped at dollar_amount, plus at most one cent of
+// fee rounding. Validate the prices even though they do not enter the sum.
+func cryptoLimitBuyCost(dollarsRaw json.RawMessage, prices ...json.RawMessage) (OrderCost, OrderCostWhy) {
+	dollars, ok := argumentDecimal(bytes.TrimSpace(dollarsRaw))
+	if !ok {
+		return OrderCost{}, WhyBadNumber
+	}
+	if dollars.rat.Sign() <= 0 {
+		return OrderCost{}, WhyNotAboveZero
+	}
+	for _, raw := range prices {
+		price, ok := argumentDecimal(bytes.TrimSpace(raw))
+		if !ok {
+			return OrderCost{}, WhyBadNumber
+		}
+		if price.rat.Sign() <= 0 {
+			return OrderCost{}, WhyNotAboveZero
+		}
+	}
+	return costOf(new(big.Rat).Add(dollars.rat, big.NewRat(1, 100)))
 }
 
 // argIn reports whether args[name] is a JSON string equal, ASCII
