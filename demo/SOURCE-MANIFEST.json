@@ -88,7 +88,7 @@
       "source_path": "demo/verify_evidence_pack.py",
       "source_blob": "76fe89a681d7f15f06a8d941ebef33daabbb7ade",
       "mode": "adapted",
-      "sha256": "ffd05985ecc01d2c41ab419301eb500391cafea1f4718b8817e259f5ab8080bf"
+      "sha256": "11231a087bc88b0eee160ea16a9659beb8bbaa3a713ea00072f162f1e6266a0d"
     },
     {
       "public_path": "demo/receipt_decision_v2.py",
@@ -96,6 +96,20 @@
       "source_blob": null,
       "mode": "new",
       "sha256": "11d73033cece546ca255178c2d71123274709d632b5bef7833aa71fa9205fba0"
+    },
+    {
+      "public_path": "demo/receipt_observation_v2.py",
+      "source_path": null,
+      "source_blob": null,
+      "mode": "new",
+      "sha256": "1a7ef65b9ce66e0b9760211e55833b66b4e265f5ae5d6ae32e9946fd510d3dd9"
+    },
+    {
+      "public_path": "demo/receipt_bundle_v2.py",
+      "source_path": null,
+      "source_blob": null,
+      "mode": "new",
+      "sha256": "76a3286cdf936dd1d4e8c920c6bc16506d65df5e38e2e4bd14e343d53a1699c2"
     }
   ]
 }

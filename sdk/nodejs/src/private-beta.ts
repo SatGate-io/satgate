@@ -70,6 +70,29 @@ export class SatGate {
   }
 
   async verify(receipt: unknown): Promise<SatGateReceipt> {
+    if (receipt && typeof receipt === 'object' && !Array.isArray(receipt)) {
+      const isPrivate = Object.entries(receipt).some(([key, value]) => {
+        switch (this.toSnakeCase(key)) {
+          case 'schema_version':
+            return typeof value === 'string' && (
+              value.startsWith('satgate.receipt_bundle.') ||
+              value === 'satgate.exact_call.opening.v1' ||
+              value === 'satgate.execution_result.opening.v1'
+            );
+          case 'record_type':
+            return value === 'private_bundle';
+          case 'openings':
+          case 'capsules':
+          case 'opening':
+            return true;
+          default:
+            return false;
+        }
+      });
+      if (isPrivate) {
+        throw new SatGateError('private_evidence_not_posted');
+      }
+    }
     return this.post<SatGateReceipt>('/v1/verify', { receipt: this.toApiPayload(receipt) });
   }
 
