@@ -2,9 +2,10 @@
 
 Scope: public main baseline `b7e6790d3eebb43e1b5804d7e595f2db9c035985`,
 public module pin `f852c2918fb9a0640bf40f8f46919f7379d28c35`, downloadable
-`unavailable-check-v1`, and archived October readers. No producer is changed.
-Paths and line numbers below refer to the baseline; frozen copies retain their
-own source line numbers. All tests use dummy signed data and local JWKS files.
+`unavailable-check-v1` and `receipt-bundle-v2`, and archived October readers.
+No producer is changed. Baseline line numbers refer to the v1 inventory; the
+new v2 distribution is listed separately. All tests use dummy signed data and
+local JWKS files.
 
 ## Reader inventory
 
@@ -15,10 +16,12 @@ own source line numbers. All tests use dummy signed data and local JWKS files.
 | `tools/verify_receipt_record.py:16-29,73-78,85-94,355-359` | NDJSON v1 packs, exactly one receipt each; last signed `satgate.receipt_record_manifest.v1` or `satgate.receipt_record_truncated.v1`; closed terminal fields | delegates every pack to sibling tools reader; validates counts, ranges, windows, key binding | every receipt and terminal must share issuer; key rotation permitted; local JWKS checks every kid; no automatic discovery |
 | `tools/checker-bundles/unavailable-check-v1/verify_evidence_pack.py:54-78,858` and `verify_receipt_record.py:73-78` | same as tools, frozen download | same as tools | same as tools |
 | `tools/checker-bundles/unavailable-check-v1/SHA256SUMS:1-4` | manifest for both scripts, requirements, frozen contract | not a verifier itself | trusted release bytes must be obtained independently |
+| `tools/checker-bundles/receipt-bundle-v2/{verify_evidence_pack,verify_receipt_record}.py` | byte-equal tools readers; v1 inputs plus v2 decisions, observations and private JSON bundles as specified by the v2 contract | same as the corresponding tools reader | independently pinned local JWKS for v2; v1 trust rules unchanged |
+| `tools/checker-bundles/receipt-bundle-v2/SHA256SUMS` | manifest for five scripts, requirements and two contracts | not a verifier itself | SHA-256 pinned in the matrix: `e66c2b85c6aa2d351953f5f6262078788865ca171fada4dd273587181ed3b3b7` |
 | public pin: `tools/fixtures/pinned-checkers-f852c2918fb9/{tools,demo}/verify_evidence_pack.py` and `tools/verify_receipt_record.py` | exact public git objects at the named module pin, not enterprise source | baseline executable bytes match main | same as corresponding tools/demo reader |
 | October archive: `tools/fixtures/released-checkers-20261022/{tools,demo}/verify_evidence_pack.py`, `tools/verify_receipt_record.py`; `PROVENANCE.json` | older public module and dashboard pin recorded in provenance | rejects four unavailable-check reasons; historical tools/demo differences remain | same tools/demo trust distinction |
 | `sdk/python/satgate/agent_client.py:765-785` | subprocess wrapper, requires SATGATE_VERIFIER; no independent format parser | delegated to chosen public pack script; invalid verdict raises SatGateError | supplied JWKS; trusted mode defaults true |
-| `sdk/python/satgate/private_beta.py:83-86` | remote POST `/v1/verify`, not an offline receipt reader | server-dependent, not locally knowable | configured API, not offline issuer verification; tested only with mocked transport, never called live |
+| `sdk/python/satgate/private_beta.py` and `sdk/nodejs/src/private-beta.ts` | remote POST `/v1/verify` for receipts, not an offline reader | private bundle/opening markers fail locally with `private_evidence_not_posted` | configured API, not offline issuer verification; mocked transport only |
 | `cmd/satgate-cli/agent.go:110-127` | `agent verify` invokes python3; default tools script, SATGATE_VERIFIER override | delegated verdict; nonzero collapsed to exit 1 | trusted only when SATGATE_JWKS is set |
 | `satgate-landing/app/verify-evidence-pack/page.tsx:1-108` | static instructions/download links, no browser or server verification implementation | delegates instructions to tools script at lines 55-63 | instructions require independently downloaded local JWKS |
 
@@ -76,3 +79,26 @@ sibling pack reader. Python commands run in virtual environments.
 
 No new signed fields, protocol versions, producer switches, product sentences,
 or released checker bytes are changed by this work.
+
+## V2 reader extensions
+
+The baseline readers do not acquire new formats. The maintained tools/demo
+pack readers and the `receipt-bundle-v2` pack reader read raw v2 decisions and
+separate execution observations under the binding-only development profile in
+`RECEIPT-V2-CONTRACT.md`. The APIs/CLIs and offline SDK/Go wrappers consume
+the decision and observation vectors. The matrix compares complete v2 API
+verdicts across those pack readers, checks sibling-module discovery and byte
+parity, and retains whole-v1-verdict comparisons. The historical v1
+pack/record/linked artifacts retain rejection coverage; the immutable
+`unavailable-check-v1` download is not rewritten. Public signatures alone cannot
+establish the private attempt join of a row-03 decision: without its call opening
+the observation verdict remains partial (`v2_attempt_not_checked`).
+
+The tools and demo pack readers, tools receipt-record reader, and both
+`receipt-bundle-v2` readers accept the private v2 JSON bundle under the same
+offline issuer pins and return the same verdict. The SDK and Go CLI continue to
+delegate to the pack reader; `SATGATE_VERIFIER` can select the distributed copy.
+The matrix exercises the generated private bundle corpus across all of them.
+The frozen v1 download, archived pin/release copies and signature-only linked
+verifier retain their previous formats and reject the v2 bundle. The beta SDK
+guards do not verify private bundles.

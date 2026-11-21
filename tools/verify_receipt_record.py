@@ -215,6 +215,19 @@ def unreadable(message: str) -> dict[str, Any]:
     }
 
 
+def bundle_input(text):
+    try:
+        candidate = json.loads(text)
+    except (ValueError, OverflowError, RecursionError):
+        return None, False
+    if not vep.is_bundle_input(candidate):
+        return None, False
+    try:
+        return vep.decision_v2_module().strict_loads(text), False
+    except (ValueError, OverflowError, RecursionError):
+        return candidate, True
+
+
 def verify_record(
     text: str,
     jwks: dict[str, Any] | None = None,
@@ -222,6 +235,12 @@ def verify_record(
     allow_mock: bool = False,
     now: str | None = None,
 ) -> dict[str, Any]:
+    bundle, invalid_input = bundle_input(text)
+    if bundle is not None:
+        reader = vep.bundle_v2_module()
+        if invalid_input:
+            return reader.failure("v2_input_invalid")
+        return reader.verify(bundle, jwks=jwks, now=now)
     p = Problems()
     lines: list[tuple[int, Any]] = []
     for number, raw in enumerate(text.splitlines(), start=1):
@@ -474,15 +493,25 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--require-trusted-issuer", action="store_true", help="fail unless every receipt and the complete/truncated terminal verify against the trusted JWKS")
     parser.add_argument("--allow-mock", action="store_true", help="allow receipts marked mock/demo/test")
     parser.add_argument("--now", help="RFC3339 time to use for temporal checks (tests/reproducibility)")
+    parser.add_argument("--private-bundle", action="store_true", help="v2_private_bundle")
     args = parser.parse_args(argv)
     if vep.Ed25519PublicKey is None:
         print(vep.CRYPTO_MISSING_MESSAGE)
         return vep.CRYPTO_MISSING_EXIT
+    if args.private_bundle:
+        result = vep.bundle_cli(None, args)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0 if result["valid"] else 1
     try:
+        text = sys.stdin.read() if args.source == "-" else Path(args.source).read_text(encoding="utf-8")
+        bundle, invalid_input = bundle_input(text)
+        if bundle is not None:
+            result = vep.bundle_cli(bundle, args, invalid_input)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["valid"] else 1
         if args.jwks_url and args.jwks_file:
             raise vep.VerificationError("use either --jwks-url or --jwks-file, not both")
         jwks = vep.load_jwks(args.jwks_url or args.jwks_file) if (args.jwks_url or args.jwks_file) else None
-        text = sys.stdin.read() if args.source == "-" else Path(args.source).read_text(encoding="utf-8")
         result = verify_record(text, jwks=jwks, require_trusted_issuer=args.require_trusted_issuer, allow_mock=args.allow_mock, now=args.now)
     except (vep.VerificationError, ValueError, OSError, OverflowError, RecursionError) as exc:
         print(json.dumps({"valid": False, "error": f"Input could not be loaded or verified ({type(exc).__name__})"}, indent=2, sort_keys=True))

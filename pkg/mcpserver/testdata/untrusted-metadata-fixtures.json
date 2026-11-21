@@ -1,0 +1,26 @@
+[
+  {
+    "content": [],
+    "structuredContent": { "n": 1.00e2 },
+    "_meta": {
+      "satgate_evidence": {
+        "schema": "satgate.binding_handle.v1",
+        "decision": {"id": "dummy-metadata", "hash": "test-hash", "url": "https://example.invalid/test"},
+        "observation_state": "pending"
+      }
+    }
+  },
+  {
+    "content": [],
+    "structuredContent": {
+      "satgate_receipt": {
+        "schema": "satgate.binding_handle.v1",
+        "decision": {"id": "dummy-structured", "hash": "test-hash", "url": "https://example.invalid/test"},
+        "observation_state": "available",
+        "observation": {"id": "dummy-observation", "hash": "test-hash", "url": "https://example.invalid/test"},
+        "order_id": "dummy-extra"
+      },
+      "n": 9007199254740993
+    }
+  }
+]
