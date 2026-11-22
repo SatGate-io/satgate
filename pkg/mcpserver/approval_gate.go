@@ -69,6 +69,9 @@ type ApprovalGate struct {
 	// service does not slow the agent's reply. Tests set it.
 	Synchronous bool
 
+	// OrderCostComparison optionally adjusts the order_max_cost comparison.
+	OrderCostComparison OrderCostComparison
+
 	now func() time.Time
 }
 
