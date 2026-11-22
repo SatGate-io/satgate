@@ -145,7 +145,7 @@ func gateDetailFrom(ctx context.Context) (GateReceiptDetail, bool) {
 
 // admitCall asks the gate about one call. It returns a refusal response when
 // the call must not go on, or an admission to settle when it may.
-func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string) (*GateAdmission, *Response) {
+func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInfo, toolName string, origin func() ToolOrigin) (*GateAdmission, *Response) {
 	if p.gate == nil {
 		// The token carries a control and nothing here can enforce it.
 		log.Error().Str("tool", toolName).Msg("token carries a control but no call gate is installed; refusing the call")
@@ -165,7 +165,7 @@ func (p *Proxy) admitCall(ctx context.Context, req *Request, tokenInfo *TokenInf
 		Tool:      toolName,
 		Params:    req.Params,
 		RequestID: gateRequestID(tokenInfo, toolName, req),
-		Origin:    p.toolOrigin(ctx, tokenInfo.TenantID, toolName),
+		Origin:    origin(),
 		Now:       time.Now().UTC(),
 	})
 	if err != nil {

@@ -25,6 +25,12 @@ const DenialCode = "TOOL_ARGUMENT_DENIED"
 // so the values checked here are the values the upstream reads. Nothing is
 // rewritten.
 func Check(rules []Rule, toolName string, params json.RawMessage) *Denial {
+	return CheckWithOrderCostComparison(rules, toolName, params, nil)
+}
+
+// CheckWithOrderCostComparison is Check with an optional adjustment to the
+// at-most comparison for order.max_cost. No other condition uses adjust.
+func CheckWithOrderCostComparison(rules []Rule, toolName string, params json.RawMessage, adjust OrderCostAdjustment) *Denial {
 	if len(rules) == 0 {
 		return nil
 	}
@@ -94,7 +100,7 @@ func Check(rules []Rule, toolName string, params json.RawMessage) *Denial {
 		if rule.Tool != toolName {
 			continue
 		}
-		if d := rule.check(args); d != nil {
+		if d := rule.check(args, adjust); d != nil {
 			return d
 		}
 	}
@@ -141,7 +147,7 @@ func skipJSONValue(dec *json.Decoder) error {
 // not hide the ones after it. On a tie the earliest shape in rule order wins.
 // The pass/deny verdict depends only on whether some shape has no failing
 // condition; the count only picks which field is reported.
-func (r Rule) check(args map[string]json.RawMessage) *Denial {
+func (r Rule) check(args map[string]json.RawMessage, adjust OrderCostAdjustment) *Denial {
 	var best *Denial
 	bestHeld := -1
 	for _, shape := range r.Shapes {
@@ -170,7 +176,7 @@ func (r Rule) check(args map[string]json.RawMessage) *Denial {
 				// The order-cost cap values the whole call with the one
 				// function every order-cost control shares. Its reason, when
 				// the call cannot be valued, is one of its fixed phrases.
-				ok, why := cond.orderCostHolds(r.Tool, args)
+				ok, why := cond.orderCostHolds(r.Tool, args, adjust)
 				if ok {
 					held++
 					continue

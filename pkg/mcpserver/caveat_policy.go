@@ -304,6 +304,13 @@ func narrowestBudgetLimit(mac *macaroon.Macaroon) (int64, bool, error) {
 // will be forwarded; nothing is rewritten, so what is checked is what the
 // upstream reads. A token with no rules is not parsed at all.
 func (t *TokenInfo) CheckToolArguments(toolName string, params json.RawMessage) *argrules.Denial {
+	return t.CheckToolArgumentsWithOrderCostComparison(toolName, params, nil)
+}
+
+// CheckToolArgumentsWithOrderCostComparison is CheckToolArguments with an
+// optional adjustment bound to this call (see OrderCostComparison.ForTool).
+// It applies only to order.max_cost comparisons.
+func (t *TokenInfo) CheckToolArgumentsWithOrderCostComparison(toolName string, params json.RawMessage, adjust argrules.OrderCostAdjustment) *argrules.Denial {
 	if t == nil {
 		return nil
 	}
@@ -317,7 +324,7 @@ func (t *TokenInfo) CheckToolArguments(toolName string, params json.RawMessage) 
 			return &argrules.Denial{Reason: argrules.ReasonRulesInvalid}
 		}
 	}
-	return argrules.Check(rules, toolName, params)
+	return argrules.CheckWithOrderCostComparison(rules, toolName, params, adjust)
 }
 
 // CollectArgumentRules reads and validates the argument rules in a caveat

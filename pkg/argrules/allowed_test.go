@@ -89,7 +89,7 @@ func TestOtherDenialsCarryNoAgentText(t *testing.T) {
 		Check(rules, "place_crypto_order", json.RawMessage(`[]`)),
 		Check(rules, "place_crypto_order", call("place_crypto_order", `{"side":"buy","side":"sell"}`)),
 		Check([]Rule{{Tool: "ExecuteWixAPI", Shapes: []Shape{{Fields: []Condition{{Field: "a", Absent: true}}}}}}, "x", call("x", `{}`)),
-		Rule{Tool: "t"}.check(map[string]json.RawMessage{}),
+		Rule{Tool: "t"}.check(map[string]json.RawMessage{}, nil),
 	} {
 		if d == nil || d.Allowed != "" {
 			t.Fatalf("got %+v, want a denial with no allowed text", d)
