@@ -326,7 +326,7 @@ func costOf(r *big.Rat) (OrderCost, OrderCostWhy) {
 // orderCostHolds is the per-order cap for one condition of rule: the call is
 // valued, and passes when its cost is at most the cap. A call that cannot be
 // valued does not pass. The reason is returned for the refusal's wording.
-func (c Condition) orderCostHolds(tool string, args map[string]json.RawMessage) (bool, OrderCostWhy) {
+func (c Condition) orderCostHolds(tool string, args map[string]json.RawMessage, adjust OrderCostAdjustment) (bool, OrderCostWhy) {
 	cost, why := OrderMaxCost(tool, args)
 	if !why.Valued() {
 		return false, why
@@ -335,5 +335,5 @@ func (c Condition) orderCostHolds(tool string, args map[string]json.RawMessage) 
 	// MaxOrderCostScale fractional digits, so this is exact; a cap built by
 	// hand with more is still compared exactly, not rounded in its favour.
 	capUnits := new(big.Rat).Mul(c.MaxCost.rat, new(big.Rat).SetInt64(UnitsPerOne))
-	return new(big.Rat).SetInt64(cost.Units).Cmp(capUnits) <= 0, why
+	return new(big.Rat).SetInt64(adjust.comparisonUnits(args, cost)).Cmp(capUnits) <= 0, why
 }

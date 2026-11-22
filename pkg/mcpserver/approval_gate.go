@@ -49,12 +49,12 @@ type ApprovalNotifier interface {
 // second try) is a different call and is held again.
 //
 // A rule that carries value "order_max_cost" (toolcontrols.ApprovalRule.Value)
-// does not read its field. It compares the most the call can cost
-// (argrules.OrderMaxCost, the number the spending limits and the per-order cap
-// use) with its threshold: above holds, equal does not. A call it cannot value
-// is refused with APPROVAL_CHECK_FAILED, not held, and nobody is emailed: an
-// owner cannot approve a number SatGate cannot work out. A rule without the
-// key keeps its meaning, including holding a call whose field cannot be read.
+// does not read its field. It compares the order's cost (argrules.OrderMaxCost,
+// optionally raised by OrderCostComparison) with its threshold: above holds,
+// equal does not. A call it cannot value is refused with APPROVAL_CHECK_FAILED,
+// not held, and nobody is emailed: an owner cannot approve a number SatGate
+// cannot work out. A rule without the key keeps its meaning, including holding
+// a call whose field cannot be read.
 //
 // Put it after the SpendGate in ChainGates: a call a limit refuses is refused,
 // never held, and an approved call still reserves against the spending limit
@@ -68,6 +68,10 @@ type ApprovalGate struct {
 	// agent. The default tells the owner in the background, so a slow mail
 	// service does not slow the agent's reply. Tests set it.
 	Synchronous bool
+
+	// OrderCostComparison optionally adjusts the order_max_cost comparison.
+	// Set it before the gate serves requests. Nil uses the base cost.
+	OrderCostComparison OrderCostComparison
 
 	now func() time.Time
 }
@@ -130,10 +134,11 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 	// the call. If one of them cannot value the call the call is refused, even
 	// when an earlier rule would have held it.
 	var held *toolcontrols.ApprovalRule
-	var heldUnits int64 // the cost the holding rule compared, when it has a value basis
+	var heldUnits int64 // the unadjusted cost, when the holding rule has a value basis
 	type costResult struct {
-		cost argrules.OrderCost
-		why  argrules.OrderCostWhy
+		cost          argrules.OrderCost
+		comparedUnits int64
+		why           argrules.OrderCostWhy
 	}
 	costs := map[string]costResult{}
 	valueOf := func(r toolcontrols.ApprovalRule) costResult {
@@ -145,9 +150,13 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 		if r.Value == argrules.EventCostBasis {
 			// An order that can only close a position counts 0: never held.
 			ev, why := argrules.EventOrderMaxCostOfCall(call.Params, call.Tool, r.Schema)
-			c = costResult{cost: argrules.OrderCost{Units: ev.Units}, why: why}
+			c = costResult{cost: argrules.OrderCost{Units: ev.Units}, comparedUnits: ev.Units, why: why}
 		} else {
-			c.cost, c.why = argrules.OrderMaxCostOfCall(call.Params, call.Tool, call.Tool)
+			var adjust argrules.OrderCostAdjustment
+			if r.Value == argrules.OrderCostBasis {
+				adjust = g.OrderCostComparison.ForTool(ctx, call.Origin, call.Tool)
+			}
+			c.cost, c.comparedUnits, c.why = argrules.CompareOrderCostOfCall(call.Params, call.Tool, adjust)
 		}
 		costs[key] = c
 		return c
@@ -166,7 +175,7 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 				return &GateAdmission{Refusal: approvalRefusal(toolcontrols.DenialCodeApprovalUnreadable, rules[i].Field, "",
 					fmt.Sprintf("%s: this token's approval rule could not be checked, so the call was not sent", call.Tool))}, nil
 			}
-			if held == nil && cost.Units > limit {
+			if held == nil && v.comparedUnits > limit {
 				held, heldUnits = &rules[i], cost.Units
 			}
 			continue
@@ -261,7 +270,7 @@ func (g *ApprovalGate) Admit(ctx context.Context, call GateCall) (*GateAdmission
 
 // ownerSummaryFor is what the owner is shown for a held call: every argument,
 // and for a rule with a value basis a first line saying what the order counts
-// as (units is the cost the rule compared). It holds the call's values, so it
+// as (units is the unadjusted cost). It holds the call's values, so it
 // goes to the owner only.
 func ownerSummaryFor(params json.RawMessage, r *toolcontrols.ApprovalRule, units int64) []toolcontrols.SummaryItem {
 	items := toolcontrols.OwnerSummary(params, r.Field)

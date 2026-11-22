@@ -262,7 +262,7 @@ func TestDenialTieKeepsEarliestShape(t *testing.T) {
 }
 
 func TestRuleWithNoShapesKeepsNoShapeDenialWithoutField(t *testing.T) {
-	d := Rule{Tool: "t"}.check(map[string]json.RawMessage{})
+	d := Rule{Tool: "t"}.check(map[string]json.RawMessage{}, nil)
 	if d == nil || d.Reason != ReasonNoShape || d.Field != "" {
 		t.Fatalf("got %+v", d)
 	}

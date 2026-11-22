@@ -446,10 +446,9 @@ func OwnerSummary(params json.RawMessage, field string) []SummaryItem {
 }
 
 // CountsAsItem is the first line of the owner's summary for a call held by a
-// rule with value order_max_cost: the most the order can cost, which is the
-// number the rule compared with its threshold. units is argrules.OrderCost
-// Units. Like the rest of the summary it holds the call's values and goes to
-// the owner only.
+// rule with value order_max_cost: the unadjusted order cost in argrules.OrderCost
+// units. Like the rest of the summary it holds the call's values and goes to the
+// owner only.
 func CountsAsItem(field string, units int64) SummaryItem {
 	whole, frac := units/argrules.UnitsPerOne, units%argrules.UnitsPerOne
 	amount := fmt.Sprintf("%d", whole)
