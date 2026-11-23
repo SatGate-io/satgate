@@ -2,13 +2,13 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
-  title: "HTTP 402 Payment Required: Meaning and API Examples",
-  description: "Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402 and x402.",
+  title: "HTTP 402 Payment Required: What the Code Means",
+  description: "HTTP 402 Payment Required means payment comes before access. It is not 401 or 403. This page explains the status code and when an API returns it.",
   alternates: { canonical: 'https://satgate.io/blog/http-402-payment-required-use-cases' },
   keywords: ['HTTP 402 Payment Required', 'HTTP 402 use cases', 'API payments', 'machine-to-machine payments', 'L402 protocol', 'AI agent payments', 'API monetization', 'pay-per-call API'],
   openGraph: {
-    title: 'HTTP 402 Payment Required: Meaning and API Examples',
-    description: 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402 and x402.',
+    title: 'HTTP 402 Payment Required: What the Code Means',
+    description: 'HTTP 402 Payment Required means payment comes before access. It is not 401 or 403. This page explains the status code and when an API returns it.',
     url: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     type: 'article',
     publishedTime: '2026-04-02T00:00:00Z',
@@ -16,8 +16,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HTTP 402 Payment Required: Meaning and API Examples',
-    description: 'Learn what HTTP 402 Payment Required means, why it is reserved in the HTTP standard, and how paid APIs and AI agents use it with L402 and x402.',
+    title: 'HTTP 402 Payment Required: What the Code Means',
+    description: 'HTTP 402 Payment Required means payment comes before access. It is not 401 or 403. This page explains the status code and when an API returns it.',
   },
 };
 
@@ -25,12 +25,12 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
-    headline: 'HTTP 402 Payment Required: Meaning, Use Cases, and AI Agents',
+    headline: 'HTTP 402 Payment Required: What the Code Means',
     description: metadata.description,
     author: { '@type': 'Organization', name: 'SatGate' },
     publisher: { '@type': 'Organization', name: 'SatGate', url: 'https://satgate.io' },
     datePublished: '2026-04-02',
-    dateModified: '2026-06-01',
+    dateModified: '2026-11-23',
     mainEntityOfPage: 'https://satgate.io/blog/http-402-payment-required-use-cases',
     about: [
       { '@type': 'Thing', name: 'HTTP 402 Payment Required' },
@@ -110,7 +110,7 @@ export default function Http402PaymentRequiredUseCasesBlogPage() {
             <span className="px-2 py-1 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-xs font-mono">AI Agents</span>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: Meaning, Reserved Use, and AI Agent Payments</h1>
+          <h1 className="text-4xl font-bold mb-4">HTTP 402 Payment Required: What the Code Means</h1>
           <div className="mb-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Quick answer</p>
             <p className="text-gray-300">HTTP 402 means access is available after payment. For AI agents, 402 and L402 are the payment step, not the control: check authority, budget, and policy before value moves, and keep a signed receipt after the request.</p>
