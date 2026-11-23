@@ -219,7 +219,7 @@ func TestDescribeValueLimit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	const counted = "counting each order at the most it can cost (dollar_amount, or quantity times limit_price for a day limit buy of shares)"
+	const counted = "counting each order at the most it can cost (dollar_amount, or quantity times limit_price for a day limit order of shares)"
 	got := Describe(d.SpendLimits)
 	want := []string{
 		"place_crypto_order and place_equity_order: at most $300 a day in total, " + counted,
@@ -250,7 +250,7 @@ func TestDescribeApprovalValue(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := "place_crypto_order and place_equity_order: orders that can cost more than $50 wait for your approval, counting each order at the most it can cost (dollar_amount, or quantity times limit_price for a day limit buy of shares)"
+	want := "place_crypto_order and place_equity_order: orders that can cost more than $50 wait for your approval, counting each order at the most it can cost (dollar_amount, or quantity times limit_price for a day limit order of shares)"
 	if got := DescribeApprovals(d.Approvals); len(got) != 1 || got[0] != want {
 		t.Fatalf("DescribeApprovals = %q", got)
 	}

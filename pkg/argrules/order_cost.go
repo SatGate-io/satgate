@@ -28,7 +28,7 @@ import (
 //     each required price are plain decimals above zero and the cost fits.
 //     Otherwise it keeps the usual refusal for dollars with prices.
 //   - By shares (quantity present): quantity x limit_price, and only for a
-//     day limit buy of shares: tool place_equity_order, side buy, type limit
+//     day limit order of shares: tool place_equity_order, side buy or sell, type limit
 //     or stop_limit, time_in_force gfd, market_hours absent, regular_hours or
 //     extended_hours. Every other call that gives quantity is refused. An
 //     order that can stay open past the day or week that counted it could fill
@@ -36,7 +36,7 @@ import (
 //     good-till-canceled order is valued, and neither is an order in the
 //     overnight session (it can fill after midnight).
 //
-// A limit buy is counted at the most it can cost when it is placed. An order
+// A limit buy or sell is counted at quantity x limit_price when it is placed. An order
 // that does not fill still counts until the day or week resets.
 //
 // Arithmetic is exact (big.Rat) and the result is rounded UP to a whole number
@@ -52,7 +52,7 @@ const OrderCostBasis = "order_max_cost"
 // OrderCostCountedAs says in a few words what an order is counted at. Every
 // agent-facing description of an order-cost control uses it, so the words are
 // written once.
-const OrderCostCountedAs = "dollar_amount, or quantity times limit_price for a day limit buy of shares"
+const OrderCostCountedAs = "dollar_amount, or quantity times limit_price for a day limit order of shares"
 
 // The size bounds of a cap, limit or threshold written for order cost. They
 // are the bounds toolcontrols.MaxWholeDigits and toolcontrols.MaxScale give
@@ -97,7 +97,7 @@ var orderCostSharesTimeInForce = [...]string{"gfd"}
 var orderCostSharesMarketHours = [...]string{"regular_hours", "extended_hours"}
 
 // orderCostSharesSides: the sides the shares path values.
-var orderCostSharesSides = [...]string{"buy"}
+var orderCostSharesSides = [...]string{"buy", "sell"}
 
 // OrderCost is a call's most-it-can-cost value.
 type OrderCost struct {
@@ -121,12 +121,12 @@ const (
 	WhyNoSize           OrderCostWhy = "it gives neither dollar_amount nor quantity"
 	WhyDollarsWithPrice OrderCostWhy = "an order by dollar_amount cannot also give limit_price or stop_price"
 	WhySharesToolNotYet OrderCostWhy = "crypto orders by quantity can't be counted yet"
-	WhyNotABuy          OrderCostWhy = "an order by quantity is only counted when side is buy"
-	WhyNotALimitBuy     OrderCostWhy = "an order by quantity is only counted for a limit or stop-limit buy; market and stop orders by quantity cannot be counted"
+	WhyNotABuy          OrderCostWhy = "an order by quantity is only counted when side is buy or sell"
+	WhyNotALimitBuy     OrderCostWhy = "an order by quantity is only counted for a limit or stop-limit order; market and stop orders by quantity cannot be counted"
 	WhyNoTimeInForce    OrderCostWhy = "an order by quantity must give time_in_force gfd (a day order)"
 	WhyNotADayOrder     OrderCostWhy = "an order by quantity is only counted as a day order (time_in_force gfd), because an order that stays open can fill after the day or week that counted it"
 	WhyOvernightSession OrderCostWhy = "an order by quantity is only counted in regular or extended hours, because an overnight order can fill after midnight"
-	WhyNoLimitPrice     OrderCostWhy = "a limit buy by quantity must give limit_price"
+	WhyNoLimitPrice     OrderCostWhy = "a limit order by quantity must give limit_price"
 	WhyBadNumber        OrderCostWhy = "a number in it is not a plain number"
 	WhyNotAboveZero     OrderCostWhy = "a number in it is not above zero"
 	WhyCostTooLarge     OrderCostWhy = "its cost is too large to count"

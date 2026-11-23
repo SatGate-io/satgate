@@ -193,7 +193,7 @@ func TestOrderMaxCostRefusesEveryOtherShape(t *testing.T) {
 		{"type null", "place_equity_order", dayBuy(t, "type", `null`), WhyNotALimitBuy},
 		{"no type", "place_equity_order", dayBuy(t, "type", "-"), WhyNotALimitBuy},
 		{"market with a stray limit_price", "place_equity_order", dayBuy(t, "type", `"market"`, "limit_price", `"5"`), WhyNotALimitBuy},
-		{"sell by shares", "place_equity_order", dayBuy(t, "side", `"sell"`), WhyNotABuy},
+
 		{"no side", "place_equity_order", dayBuy(t, "side", "-"), WhyNotABuy},
 		{"side is not text", "place_equity_order", dayBuy(t, "side", `["buy"]`), WhyNotABuy},
 		{"good till canceled", "place_equity_order", dayBuy(t, "time_in_force", `"gtc"`), WhyNotADayOrder},
@@ -241,7 +241,7 @@ func TestOrderMaxCostAllowListsAreTheDecidedOnes(t *testing.T) {
 		{"shares types", orderCostSharesTypes[:], "limit stop_limit"},
 		{"shares time_in_force", orderCostSharesTimeInForce[:], "gfd"},
 		{"shares market_hours", orderCostSharesMarketHours[:], "regular_hours extended_hours"},
-		{"shares sides", orderCostSharesSides[:], "buy"},
+		{"shares sides", orderCostSharesSides[:], "buy sell"},
 	} {
 		if g := strings.Join(tc.got, " "); g != tc.want {
 			t.Errorf("%s = %q, want %q", tc.name, g, tc.want)

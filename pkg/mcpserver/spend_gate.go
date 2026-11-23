@@ -65,7 +65,7 @@ const counterGrace = time.Hour
 // A limit that carries value "order_max_cost" (toolcontrols.SpendLimit.Value)
 // does not read its field. It counts each call at the most it can cost,
 // argrules.OrderMaxCost: dollar_amount, or quantity times limit_price for a
-// day limit buy of shares. The call is valued once and that one number is
+// day limit order of shares. The call is valued once and that one number is
 // reserved against every value limit the call meets (the token's day and
 // week limits, a shared budget's total and its symbol caps, a token's symbol
 // cap). A call that cannot be valued is refused for one fixed reason. An
