@@ -30,6 +30,7 @@ try {
     assert.ok(await page.getByText(copy, { exact: true }).isVisible(), copy);
   }
   assert.doesNotMatch(await page.locator('body').innerText(), /works with today|set up my agent's limits/i);
+  assert.doesNotMatch(await page.locator('body').innerText(), /connect agents from the AI apps you already use and give each its own limits\./i);
 
   // K4 plus both relabeled links; use accessible names and inspect hrefs without following them.
   const links = page.getByRole('link', { name: 'Join the early-access list', exact: true });
@@ -57,6 +58,10 @@ try {
   const trialLinks = page.getByRole('link', { name: 'Start free trial', exact: true });
   assert.ok(await trialLinks.count());
   for (const link of await trialLinks.all()) assert.equal(await link.getAttribute('href'), signup);
+  assert.doesNotMatch(await page.locator('body').innerText(), /set up my agent's limits/i, '/platform: old trading CTA');
+
+  assert.equal((await page.goto(`${origin}/sandbox`)).status(), 200);
+  assert.doesNotMatch(await page.locator('body').innerText(), /set up my agent's limits/i, '/sandbox: old trading CTA');
 
   const redirect = await context.request.get(`${origin}/trading`, { maxRedirects: 0 });
   assert.equal(redirect.status(), 308);

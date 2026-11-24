@@ -114,7 +114,7 @@ const comparisonRows = [
     topic: 'More than one agent',
     robinhood: 'Every agent you connect gets the same access. Its one safety setting is trade approvals.',
     satgate:
-      'Connect agents from the AI apps you already use and give each its own limits. One can look only while another makes small trades, all in your Agentic account.',
+      'One can look only while another makes small trades, all in your Agentic account.',
   },
 ];
 
