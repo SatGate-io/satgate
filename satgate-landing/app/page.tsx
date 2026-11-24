@@ -4,11 +4,11 @@ import SiteMenu from './components/SiteMenu';
 import { ArrowRight, Receipt, Users } from 'lucide-react';
 import { tradingCopy } from './trading-copy';
 
-// Owner approved, 2026-11-14 ("ok copy T1, T10, T11").
-const title = 'Dollar limits and signed receipts for AI trading agents';
-const tagline = "Spending limits your AI agent can't override, with a signed receipt for every order.";
+// Owner approved, 2026-11-24 (K1–K4).
+const title = 'One budget for your AI agent, across Robinhood and Kalshi.';
+const tagline = 'Set a dollar limit once. SatGate stops the agent at that limit wherever it trades, and signs a receipt for every order.';
 const lead = 'SatGate checks your limits before an order reaches your broker.';
-const worksToday = 'Works with Robinhood today, with more brokerages to follow.';
+const worksToday = "Early access. SatGate runs today on our own Robinhood and Kalshi accounts. We're waiting on approval from Robinhood and Kalshi before we open connections to customers. Sign up and we'll email you when they open.";
 const metaTitle = 'Dollar limits and signed receipts for AI trading agents | SatGate';
 const description =
   'Dollar limits for your AI trading agent. Approve large orders, give each agent its own key, get signed receipts, and stop any agent with one button.';
@@ -78,7 +78,7 @@ const generalItems = [
 ];
 
 const robinhoodTitle = 'SatGate with Robinhood';
-const robinhoodIntro = 'Robinhood is the brokerage SatGate works with today. Everything in this section is about Robinhood.';
+const robinhoodIntro = 'SatGate is built for Robinhood first. Everything in this section is about Robinhood.';
 
 const comparisonTitle = 'What Robinhood gives you, and what SatGate adds';
 const comparisonIntro =
@@ -114,7 +114,7 @@ const comparisonRows = [
     topic: 'More than one agent',
     robinhood: 'Every agent you connect gets the same access. Its one safety setting is trade approvals.',
     satgate:
-      'Connect agents from the AI apps you already use and give each its own limits. One can look only while another makes small trades, all in your Agentic account.',
+      'One can look only while another makes small trades, all in your Agentic account.',
   },
 ];
 
@@ -172,6 +172,13 @@ export default function TradingPage() {
         <div className="relative mx-auto max-w-4xl px-6 py-16 md:py-24">
           <h1 className="mb-4 text-4xl font-extrabold tracking-tight md:text-6xl">{title}</h1>
           <p className="mb-4 text-2xl font-semibold text-white md:text-3xl">{tagline}</p>
+          <p className="mb-4 text-base font-medium text-cyan-300">{worksToday}</p>
+          <a
+            href="https://cloud.satgate.io/cloud/signup"
+            className="mb-8 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500"
+          >
+            Join the early-access list <ArrowRight size={16} aria-hidden="true" />
+          </a>
           <p className="mb-8 text-lg text-gray-300 md:text-xl">{lead}</p>
           <ul className="space-y-4">
             {whatItDoes.map(({ icon: Icon, text }) => (
@@ -186,7 +193,7 @@ export default function TradingPage() {
               href={signupUrl}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500"
             >
-              Set up my agent&apos;s limits <ArrowRight size={16} />
+              Join the early-access list <ArrowRight size={16} />
             </a>
             <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Continue with Personal for <span className="whitespace-nowrap">$9.99 a month.</span></p>
             <p className="mt-3 text-sm text-gray-400">{tradingCopy.T6.intro}<Link href={tradingCopy.T6.href} className="underline underline-offset-2 hover:text-white">{tradingCopy.T6.link}</Link>{tradingCopy.T6.punctuation}</p>
@@ -215,10 +222,6 @@ export default function TradingPage() {
           <p className="mt-6 text-gray-300">{tradingCopy.T3}</p>
         </div>
       </section>
-
-      <div className="border-b border-gray-900">
-        <p className="mx-auto max-w-4xl px-6 py-4 text-base font-medium text-cyan-300">{worksToday}</p>
-      </div>
 
       <section className="mx-auto max-w-4xl px-6 pt-16" aria-labelledby="limits-title">
         <div className="rounded-lg border border-gray-800 bg-black/60 p-6 md:p-8">
@@ -303,7 +306,7 @@ export default function TradingPage() {
             href={signupUrl}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500"
           >
-            Set up my agent&apos;s limits <ArrowRight size={16} />
+            Join the early-access list <ArrowRight size={16} />
           </a>
           <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Continue with Personal for <span className="whitespace-nowrap">$9.99 a month.</span></p>
           <p className="mt-3 text-sm text-gray-400">{tradingCopy.T6.intro}<Link href={tradingCopy.T6.href} className="underline underline-offset-2 hover:text-white">{tradingCopy.T6.link}</Link>{tradingCopy.T6.punctuation}</p>

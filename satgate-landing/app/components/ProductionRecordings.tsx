@@ -60,7 +60,7 @@ export default function ProductionRecordings({ heading }: { heading: string }) {
         </div>
         <div className="mt-6">
           <Link href="/trading" className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500">
-            Set up my agent&apos;s limits <ArrowRight size={16} />
+            Join the early-access list <ArrowRight size={16} />
           </Link>
         </div>
         <p className="text-xs text-gray-500 mt-3">The agents in the recording are scripted MCP clients. The orders are real: three Bitcoin buys, $7 in total. Account numbers are masked.</p>
