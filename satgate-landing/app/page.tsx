@@ -78,7 +78,7 @@ const generalItems = [
 ];
 
 const robinhoodTitle = 'SatGate with Robinhood';
-const robinhoodIntro = 'Robinhood is the brokerage SatGate works with today. Everything in this section is about Robinhood.';
+const robinhoodIntro = 'SatGate is built for Robinhood first. Everything in this section is about Robinhood.';
 
 const comparisonTitle = 'What Robinhood gives you, and what SatGate adds';
 const comparisonIntro =
@@ -193,7 +193,7 @@ export default function TradingPage() {
               href={signupUrl}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500"
             >
-              Set up my agent&apos;s limits <ArrowRight size={16} />
+              Join the early-access list <ArrowRight size={16} />
             </a>
             <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Continue with Personal for <span className="whitespace-nowrap">$9.99 a month.</span></p>
             <p className="mt-3 text-sm text-gray-400">{tradingCopy.T6.intro}<Link href={tradingCopy.T6.href} className="underline underline-offset-2 hover:text-white">{tradingCopy.T6.link}</Link>{tradingCopy.T6.punctuation}</p>
@@ -306,7 +306,7 @@ export default function TradingPage() {
             href={signupUrl}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-500 hover:to-cyan-500"
           >
-            Set up my agent&apos;s limits <ArrowRight size={16} />
+            Join the early-access list <ArrowRight size={16} />
           </a>
           <p className="mt-3 text-sm text-gray-400">Free for 30 days, no card needed. Continue with Personal for <span className="whitespace-nowrap">$9.99 a month.</span></p>
           <p className="mt-3 text-sm text-gray-400">{tradingCopy.T6.intro}<Link href={tradingCopy.T6.href} className="underline underline-offset-2 hover:text-white">{tradingCopy.T6.link}</Link>{tradingCopy.T6.punctuation}</p>
